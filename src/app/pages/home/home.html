@@ -177,18 +177,22 @@
     </div>
   </section>
 
-  <section class="layout">
-    <section class="recipes-list">
-      <div class="section-title">
-        <h2>Recettes</h2>
-        <p>{{ filteredRecipes.length }} résultat(s)</p>
+  <section class="recipes-section">
+    <div class="section-title">
+      <div>
+        <p class="eyebrow">Recettes</p>
+        <h2>Ton répertoire</h2>
       </div>
 
-      <article
+      <p>{{ filteredRecipes.length }} résultat(s)</p>
+    </div>
+
+    <div class="recipes-grid" *ngIf="filteredRecipes.length > 0; else emptyState">
+      <a
         *ngFor="let recipe of filteredRecipes"
         class="recipe-card"
-        [class.active]="selectedRecipe.id === recipe.id"
-        (click)="selectRecipe(recipe)"
+        [routerLink]="['/cocktails', recipe.slug]"
+        [attr.aria-label]="'Ouvrir la fiche de ' + recipe.name"
       >
         <img
           [src]="recipe.imageUrl || '/placeholder-cocktail.svg'"
@@ -196,40 +200,26 @@
         />
 
         <div class="recipe-card-content">
-          <div>
-            <p class="recipe-type">{{ recipe.type }}</p>
-            <h3>{{ recipe.name }}</h3>
-            <p class="recipe-meta">
-              {{ recipe.mainAlcohol }} · {{ recipe.method }}
-            </p>
-          </div>
+          <p class="recipe-type">{{ recipe.type }}</p>
+          <h3>{{ recipe.name }}</h3>
 
           <div class="tags">
-            <span *ngFor="let tag of recipe.tags.slice(0, 4)">
+            <span *ngFor="let tag of recipe.tags.slice(0, 5)">
               {{ tag }}
             </span>
           </div>
 
-          <a
-            class="open-recipe-link"
-            [routerLink]="['/cocktails', recipe.slug]"
-            (click)="$event.stopPropagation()"
-          >
-            Ouvrir la fiche
-          </a>
+          <span class="open-recipe-link">
+            Voir la fiche →
+          </span>
         </div>
-      </article>
+      </a>
+    </div>
 
-      <div *ngIf="filteredRecipes.length === 0" class="empty-state">
+    <ng-template #emptyState>
+      <div class="empty-state">
         Aucune recette ne correspond à ta recherche.
       </div>
-    </section>
-
-    <section class="home-detail-panel" *ngIf="selectedRecipe">
-      <app-recipe-detail-card
-        [recipe]="selectedRecipe"
-        [sticky]="true"
-      ></app-recipe-detail-card>
-    </section>
+    </ng-template>
   </section>
 </main>

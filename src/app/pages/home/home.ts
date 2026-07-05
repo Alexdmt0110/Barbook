@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { RecipeDetailCard } from '../../components/recipe-detail-card/recipe-detail-card';
 import { Recipe } from '../../models/recipe.model';
 import { RecipeService } from '../../services/recipe.service';
 
@@ -11,7 +10,7 @@ type FilterKey = 'type' | 'alcohol' | 'method' | 'tag';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RecipeDetailCard],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -27,8 +26,6 @@ export class Home {
   selectedTag = 'all';
 
   openFilter: FilterKey | null = null;
-
-  selectedRecipe: Recipe = this.recipes[0];
 
   get filteredRecipes(): Recipe[] {
     const search = this.normalize(this.searchTerm);
@@ -91,17 +88,6 @@ export class Home {
   selectTag(tag: string): void {
     this.selectedTag = tag;
     this.closeFilter();
-  }
-
-  selectRecipe(recipe: Recipe): void {
-    this.selectedRecipe = recipe;
-
-    setTimeout(() => {
-      document.getElementById('recipe-detail')?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    });
   }
 
   resetFilters(): void {
