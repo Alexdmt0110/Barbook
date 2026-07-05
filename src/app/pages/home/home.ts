@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Recipe } from '../../models/recipe.model';
 import { RecipeService } from '../../services/recipe.service';
 
+type FilterKey = 'type' | 'alcohol' | 'method' | 'tag';
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -21,6 +23,8 @@ export class Home {
   selectedAlcohol = 'all';
   selectedMethod = 'all';
   selectedTag = 'all';
+
+  openFilter: FilterKey | null = null;
 
   selectedRecipe: Recipe = this.recipes[0];
 
@@ -59,6 +63,34 @@ export class Home {
     return [...new Set(this.recipes.flatMap((recipe) => recipe.tags))].sort();
   }
 
+  toggleFilter(filter: FilterKey): void {
+    this.openFilter = this.openFilter === filter ? null : filter;
+  }
+
+  closeFilter(): void {
+    this.openFilter = null;
+  }
+
+  selectType(type: string): void {
+    this.selectedType = type;
+    this.closeFilter();
+  }
+
+  selectAlcohol(alcohol: string): void {
+    this.selectedAlcohol = alcohol;
+    this.closeFilter();
+  }
+
+  selectMethod(method: string): void {
+    this.selectedMethod = method;
+    this.closeFilter();
+  }
+
+  selectTag(tag: string): void {
+    this.selectedTag = tag;
+    this.closeFilter();
+  }
+
   selectRecipe(recipe: Recipe): void {
     this.selectedRecipe = recipe;
 
@@ -76,6 +108,7 @@ export class Home {
     this.selectedAlcohol = 'all';
     this.selectedMethod = 'all';
     this.selectedTag = 'all';
+    this.closeFilter();
   }
 
   getAbvLabel(recipe: Recipe): string {

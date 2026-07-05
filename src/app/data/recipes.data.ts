@@ -1,11 +1,13 @@
 import { Recipe } from '../models/recipe.model';
 
+const PLACEHOLDER_IMAGE = '/placeholder-cocktail.svg';
+
 export const RECIPES: Recipe[] = [
   {
     id: 1,
     slug: 'derniere-part',
     name: 'Dernière part',
-    imageUrl: 'assets/images/placeholder-cocktail.svg',
+    imageUrl: PLACEHOLDER_IMAGE,
 
     type: 'Création perso',
     family: 'Sour dessert',
@@ -86,7 +88,7 @@ export const RECIPES: Recipe[] = [
     id: 2,
     slug: 'daiquiri',
     name: 'Daiquiri',
-    imageUrl: 'assets/images/placeholder-cocktail.svg',
+    imageUrl: PLACEHOLDER_IMAGE,
 
     type: 'Classique',
     family: 'Sour',

@@ -15,6 +15,12 @@
   </section>
 
   <section class="filters-card">
+    <div
+      *ngIf="openFilter"
+      class="dropdown-backdrop"
+      (click)="closeFilter()"
+    ></div>
+
     <label class="search-field">
       <span>Recherche</span>
       <input
@@ -25,50 +31,150 @@
     </label>
 
     <div class="filters-grid">
-      <label>
-        <span>Type</span>
-        <select [(ngModel)]="selectedType">
-          <option value="all">Tous</option>
-          <option *ngFor="let type of types" [value]="type">
+      <div class="custom-select">
+        <button
+          type="button"
+          class="custom-select-trigger"
+          [class.active]="selectedType !== 'all'"
+          (click)="toggleFilter('type')"
+        >
+          <span>
+            <small>Type</small>
+            {{ selectedType === 'all' ? 'Tous' : selectedType }}
+          </span>
+          <strong>⌄</strong>
+        </button>
+
+        <div class="custom-select-menu" *ngIf="openFilter === 'type'">
+          <button
+            type="button"
+            [class.selected]="selectedType === 'all'"
+            (click)="selectType('all')"
+          >
+            Tous
+          </button>
+
+          <button
+            *ngFor="let type of types"
+            type="button"
+            [class.selected]="selectedType === type"
+            (click)="selectType(type)"
+          >
             {{ type }}
-          </option>
-        </select>
-      </label>
+          </button>
+        </div>
+      </div>
 
-      <label>
-        <span>Alcool</span>
-        <select [(ngModel)]="selectedAlcohol">
-          <option value="all">Tous</option>
-          <option *ngFor="let alcohol of alcohols" [value]="alcohol">
+      <div class="custom-select">
+        <button
+          type="button"
+          class="custom-select-trigger"
+          [class.active]="selectedAlcohol !== 'all'"
+          (click)="toggleFilter('alcohol')"
+        >
+          <span>
+            <small>Alcool</small>
+            {{ selectedAlcohol === 'all' ? 'Tous' : selectedAlcohol }}
+          </span>
+          <strong>⌄</strong>
+        </button>
+
+        <div class="custom-select-menu" *ngIf="openFilter === 'alcohol'">
+          <button
+            type="button"
+            [class.selected]="selectedAlcohol === 'all'"
+            (click)="selectAlcohol('all')"
+          >
+            Tous
+          </button>
+
+          <button
+            *ngFor="let alcohol of alcohols"
+            type="button"
+            [class.selected]="selectedAlcohol === alcohol"
+            (click)="selectAlcohol(alcohol)"
+          >
             {{ alcohol }}
-          </option>
-        </select>
-      </label>
+          </button>
+        </div>
+      </div>
 
-      <label>
-        <span>Méthode</span>
-        <select [(ngModel)]="selectedMethod">
-          <option value="all">Toutes</option>
-          <option *ngFor="let method of methods" [value]="method">
+      <div class="custom-select">
+        <button
+          type="button"
+          class="custom-select-trigger"
+          [class.active]="selectedMethod !== 'all'"
+          (click)="toggleFilter('method')"
+        >
+          <span>
+            <small>Méthode</small>
+            {{ selectedMethod === 'all' ? 'Toutes' : selectedMethod }}
+          </span>
+          <strong>⌄</strong>
+        </button>
+
+        <div class="custom-select-menu" *ngIf="openFilter === 'method'">
+          <button
+            type="button"
+            [class.selected]="selectedMethod === 'all'"
+            (click)="selectMethod('all')"
+          >
+            Toutes
+          </button>
+
+          <button
+            *ngFor="let method of methods"
+            type="button"
+            [class.selected]="selectedMethod === method"
+            (click)="selectMethod(method)"
+          >
             {{ method }}
-          </option>
-        </select>
-      </label>
+          </button>
+        </div>
+      </div>
 
-      <label>
-        <span>Tag</span>
-        <select [(ngModel)]="selectedTag">
-          <option value="all">Tous</option>
-          <option *ngFor="let tag of tags" [value]="tag">
+      <div class="custom-select">
+        <button
+          type="button"
+          class="custom-select-trigger"
+          [class.active]="selectedTag !== 'all'"
+          (click)="toggleFilter('tag')"
+        >
+          <span>
+            <small>Tag</small>
+            {{ selectedTag === 'all' ? 'Tous' : selectedTag }}
+          </span>
+          <strong>⌄</strong>
+        </button>
+
+        <div class="custom-select-menu scrollable" *ngIf="openFilter === 'tag'">
+          <button
+            type="button"
+            [class.selected]="selectedTag === 'all'"
+            (click)="selectTag('all')"
+          >
+            Tous
+          </button>
+
+          <button
+            *ngFor="let tag of tags"
+            type="button"
+            [class.selected]="selectedTag === tag"
+            (click)="selectTag(tag)"
+          >
             {{ tag }}
-          </option>
-        </select>
-      </label>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <button type="button" class="reset-button" (click)="resetFilters()">
-      Réinitialiser
-    </button>
+    <div class="filters-footer">
+      <p>{{ filteredRecipes.length }} résultat(s)</p>
+
+      <button type="button" class="reset-button" (click)="resetFilters()">
+        Réinitialiser
+      </button>
+    </div>
   </section>
 
   <section class="layout">
@@ -85,7 +191,7 @@
         (click)="selectRecipe(recipe)"
       >
         <img
-          [src]="recipe.imageUrl || 'assets/images/placeholder-cocktail.svg'"
+          [src]="recipe.imageUrl || '/placeholder-cocktail.svg'"
           [alt]="recipe.name"
         />
 
@@ -112,7 +218,7 @@
     <section id="recipe-detail" class="recipe-detail" *ngIf="selectedRecipe">
       <img
         class="detail-image"
-        [src]="selectedRecipe.imageUrl || 'assets/images/placeholder-cocktail.svg'"
+        [src]="selectedRecipe.imageUrl || '/placeholder-cocktail.svg'"
         [alt]="selectedRecipe.name"
       />
 

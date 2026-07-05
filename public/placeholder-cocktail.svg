@@ -1,0 +1,16 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" fill="#1B1010"></rect>
+  <circle cx="244" cy="164" r="240" fill="#7A2E24" opacity="0.55"></circle>
+  <circle cx="996" cy="692" r="300" fill="#E0A35B" opacity="0.18"></circle>
+
+  <path d="M380 210H820L652 420V610H548V420L380 210Z" fill="#F1B57C" opacity="0.94"></path>
+  <path d="M512 610H688" stroke="#F8EEE9" stroke-width="32" stroke-linecap="round"></path>
+  <path d="M456 266H744" stroke="#1B1010" stroke-width="20" stroke-linecap="round" opacity="0.6"></path>
+
+  <circle cx="732" cy="250" r="54" fill="#C6533D"></circle>
+  <path d="M732 192C754 156 788 142 828 148" stroke="#6F8C54" stroke-width="16" stroke-linecap="round"></path>
+
+  <text x="600" y="720" text-anchor="middle" fill="#F8EEE9" font-family="Arial, sans-serif" font-size="56" font-weight="700">
+    Barbook
+  </text>
+</svg>

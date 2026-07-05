@@ -70,24 +70,33 @@ h1 {
   color: #d9c5bd;
 }
 
+/* ========================= */
+/* FILTRES */
+/* ========================= */
+
 .filters-card {
+  position: relative;
+  z-index: 20;
   margin-bottom: 24px;
   padding: 18px;
   border-radius: 28px;
 }
 
+.dropdown-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: transparent;
+}
+
 .search-field {
+  position: relative;
+  z-index: 25;
   display: block;
   margin-bottom: 14px;
 }
 
-.filters-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-
-label span {
+.search-field span {
   display: block;
   margin-bottom: 7px;
   color: #d9c5bd;
@@ -95,37 +104,173 @@ label span {
   font-weight: 700;
 }
 
-input,
-select {
+input {
   width: 100%;
-  min-height: 46px;
+  min-height: 48px;
   border: 1px solid rgba(255, 255, 255, 0.11);
   border-radius: 16px;
-  padding: 0 14px;
+  padding: 0 15px;
   color: #f8eee9;
   background: rgba(255, 255, 255, 0.07);
   outline: none;
 }
 
-input:focus,
-select:focus {
+input::placeholder {
+  color: rgba(248, 238, 233, 0.45);
+}
+
+input:focus {
   border-color: rgba(241, 181, 124, 0.8);
   box-shadow: 0 0 0 4px rgba(241, 181, 124, 0.14);
 }
 
-select option {
+.filters-grid {
+  position: relative;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.custom-select {
+  position: relative;
+}
+
+.custom-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 54px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 17px;
+  padding: 9px 12px;
+  color: #f8eee9;
+  background: rgba(255, 255, 255, 0.065);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.custom-select-trigger:hover,
+.custom-select-trigger.active {
+  border-color: rgba(241, 181, 124, 0.55);
+  background: rgba(241, 181, 124, 0.1);
+}
+
+.custom-select-trigger span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-select-trigger small {
+  display: block;
+  margin-bottom: 2px;
+  color: #d9c5bd;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.custom-select-trigger strong {
+  color: #f1b57c;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.custom-select-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 80;
+  width: 100%;
+  min-width: 190px;
+  overflow: hidden;
+  border: 1px solid rgba(241, 181, 124, 0.28);
+  border-radius: 18px;
+  background: #1f1313;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+}
+
+.custom-select-menu.scrollable {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.custom-select-menu button {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 11px 13px;
+  color: #f8eee9;
+  background: #1f1313;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 140ms ease,
+    color 140ms ease;
+}
+
+.custom-select-menu button:last-child {
+  border-bottom: 0;
+}
+
+.custom-select-menu button:hover {
+  background: #2b1b1b;
+}
+
+.custom-select-menu button.selected {
   color: #120b0b;
+  background: #f1b57c;
+  font-weight: 800;
+}
+
+.filters-footer {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.filters-footer p {
+  margin-bottom: 0;
+  color: #d9c5bd;
+  font-size: 0.9rem;
 }
 
 .reset-button {
-  margin-top: 14px;
   border: 1px solid rgba(241, 181, 124, 0.36);
   border-radius: 999px;
-  padding: 10px 16px;
+  padding: 9px 15px;
   color: #f8eee9;
   background: rgba(241, 181, 124, 0.08);
   cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
 }
+
+.reset-button:hover {
+  border-color: rgba(241, 181, 124, 0.68);
+  background: rgba(241, 181, 124, 0.14);
+  transform: translateY(-1px);
+}
+
+/* ========================= */
+/* LISTE + DÉTAIL */
+/* ========================= */
 
 .layout {
   display: grid;
@@ -326,6 +471,10 @@ select option {
   color: #d9c5bd;
 }
 
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
+
 @media (max-width: 980px) {
   .hero,
   .layout {
@@ -336,12 +485,14 @@ select option {
     width: 100%;
   }
 
-  .filters-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .recipe-detail {
     position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .filters-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -351,7 +502,33 @@ select option {
     padding-top: 18px;
   }
 
-  .filters-grid,
+  .hero {
+    gap: 16px;
+  }
+
+  .filters-card {
+    padding: 14px;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .custom-select-trigger {
+    min-height: 50px;
+  }
+
+  .custom-select-menu {
+    position: relative;
+    top: 8px;
+    margin-bottom: 8px;
+  }
+
+  .filters-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .detail-grid {
     grid-template-columns: 1fr;
   }
