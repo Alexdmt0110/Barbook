@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { RecipeDetailCard } from '../../components/recipe-detail-card/recipe-detail-card';
 import { Recipe } from '../../models/recipe.model';
 import { RecipeService } from '../../services/recipe.service';
 
@@ -9,7 +11,7 @@ type FilterKey = 'type' | 'alcohol' | 'method' | 'tag';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink, RecipeDetailCard],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -109,29 +111,6 @@ export class Home {
     this.selectedMethod = 'all';
     this.selectedTag = 'all';
     this.closeFilter();
-  }
-
-  getAbvLabel(recipe: Recipe): string {
-    const totalVolume = recipe.ingredients
-      .filter((ingredient) => ingredient.volumeCl !== undefined)
-      .reduce((total, ingredient) => total + Number(ingredient.volumeCl), 0);
-
-    const pureAlcoholVolume = recipe.ingredients
-      .filter((ingredient) => ingredient.volumeCl !== undefined && ingredient.abv !== undefined)
-      .reduce(
-        (total, ingredient) => total + Number(ingredient.volumeCl) * (Number(ingredient.abv) / 100),
-        0,
-      );
-
-    if (totalVolume <= 0 || pureAlcoholVolume <= 0) {
-      return 'Non calculé';
-    }
-
-    const abv = (pureAlcoholVolume / totalVolume) * 100;
-
-    return `${abv.toLocaleString('fr-FR', {
-      maximumFractionDigits: 1,
-    })} % vol. hors dilution`;
   }
 
   private recipeMatchesSearch(recipe: Recipe, search: string): boolean {

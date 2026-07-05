@@ -195,18 +195,28 @@
           [alt]="recipe.name"
         />
 
-        <div>
-          <p class="recipe-type">{{ recipe.type }}</p>
-          <h3>{{ recipe.name }}</h3>
-          <p class="recipe-meta">
-            {{ recipe.mainAlcohol }} · {{ recipe.method }}
-          </p>
+        <div class="recipe-card-content">
+          <div>
+            <p class="recipe-type">{{ recipe.type }}</p>
+            <h3>{{ recipe.name }}</h3>
+            <p class="recipe-meta">
+              {{ recipe.mainAlcohol }} · {{ recipe.method }}
+            </p>
+          </div>
 
           <div class="tags">
             <span *ngFor="let tag of recipe.tags.slice(0, 4)">
               {{ tag }}
             </span>
           </div>
+
+          <a
+            class="open-recipe-link"
+            [routerLink]="['/cocktails', recipe.slug]"
+            (click)="$event.stopPropagation()"
+          >
+            Ouvrir la fiche
+          </a>
         </div>
       </article>
 
@@ -215,85 +225,11 @@
       </div>
     </section>
 
-    <section id="recipe-detail" class="recipe-detail" *ngIf="selectedRecipe">
-      <img
-        class="detail-image"
-        [src]="selectedRecipe.imageUrl || '/placeholder-cocktail.svg'"
-        [alt]="selectedRecipe.name"
-      />
-
-      <div class="detail-content">
-        <p class="recipe-type">{{ selectedRecipe.type }}</p>
-        <h2>{{ selectedRecipe.name }}</h2>
-
-        <div class="pills">
-          <span>{{ selectedRecipe.family || 'Famille non définie' }}</span>
-          <span>{{ selectedRecipe.mainAlcohol }}</span>
-          <span>{{ selectedRecipe.method }}</span>
-          <span>{{ getAbvLabel(selectedRecipe) }}</span>
-        </div>
-
-        <div class="detail-grid">
-          <section class="detail-block">
-            <h3>Service</h3>
-
-            <div class="info-line">
-              <strong>Verre</strong>
-              <span>{{ selectedRecipe.glass }}</span>
-            </div>
-
-            <div class="info-line">
-              <strong>Glace</strong>
-              <span>{{ selectedRecipe.ice || 'Non précisé' }}</span>
-            </div>
-          </section>
-
-          <section class="detail-block">
-            <h3>Ingrédients du cocktail</h3>
-
-            <ul class="ingredients-list">
-              <li *ngFor="let ingredient of selectedRecipe.ingredients">
-                <strong>{{ ingredient.quantity }}</strong>
-
-                <div>
-                  <span>{{ ingredient.name }}</span>
-                  <small *ngIf="ingredient.notes">{{ ingredient.notes }}</small>
-                </div>
-              </li>
-            </ul>
-          </section>
-
-          <section class="detail-block">
-            <h3>Ingrédients de décoration</h3>
-
-            <ul class="ingredients-list">
-              <li *ngFor="let garnish of selectedRecipe.garnishIngredients">
-                <strong>{{ garnish.quantity || 'QS' }}</strong>
-
-                <div>
-                  <span>{{ garnish.name }}</span>
-                  <small>{{ garnish.usage }}</small>
-                </div>
-              </li>
-            </ul>
-          </section>
-
-          <section class="detail-block wide">
-            <h3>Préparation</h3>
-
-            <ol class="steps-list">
-              <li *ngFor="let step of selectedRecipe.preparation">
-                {{ step }}
-              </li>
-            </ol>
-          </section>
-
-          <section class="detail-block wide" *ngIf="selectedRecipe.notes">
-            <h3>Notes</h3>
-            <p>{{ selectedRecipe.notes }}</p>
-          </section>
-        </div>
-      </div>
+    <section class="home-detail-panel" *ngIf="selectedRecipe">
+      <app-recipe-detail-card
+        [recipe]="selectedRecipe"
+        [sticky]="true"
+      ></app-recipe-detail-card>
     </section>
   </section>
 </main>

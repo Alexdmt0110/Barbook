@@ -1,0 +1,24 @@
+<main class="detail-page">
+  <a routerLink="/" class="back-link">
+    ← Retour aux recettes
+  </a>
+
+  <app-recipe-detail-card
+    *ngIf="recipe; else notFound"
+    [recipe]="recipe"
+  ></app-recipe-detail-card>
+
+  <ng-template #notFound>
+    <section class="not-found-card">
+      <p class="eyebrow">Recette introuvable</p>
+      <h1>Cocktail non trouvé</h1>
+      <p>
+        Cette recette n’existe pas encore ou son adresse a changé.
+      </p>
+
+      <a routerLink="/" class="primary-link">
+        Revenir à l’annuaire
+      </a>
+    </section>
+  </ng-template>
+</main>

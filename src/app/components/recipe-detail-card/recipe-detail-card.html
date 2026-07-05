@@ -1,0 +1,80 @@
+<section id="recipe-detail" class="recipe-detail" [class.sticky]="sticky">
+  <img
+    class="detail-image"
+    [src]="recipe.imageUrl || '/placeholder-cocktail.svg'"
+    [alt]="recipe.name"
+  />
+
+  <div class="detail-content">
+    <p class="recipe-type">{{ recipe.type }}</p>
+    <h2>{{ recipe.name }}</h2>
+
+    <div class="pills">
+      <span>{{ recipe.family || 'Famille non définie' }}</span>
+      <span>{{ recipe.mainAlcohol }}</span>
+      <span>{{ recipe.method }}</span>
+      <span>{{ abvLabel }}</span>
+    </div>
+
+    <div class="detail-grid">
+      <section class="detail-block">
+        <h3>Service</h3>
+
+        <div class="info-line">
+          <strong>Verre</strong>
+          <span>{{ recipe.glass }}</span>
+        </div>
+
+        <div class="info-line">
+          <strong>Glace</strong>
+          <span>{{ recipe.ice || 'Non précisé' }}</span>
+        </div>
+      </section>
+
+      <section class="detail-block">
+        <h3>Ingrédients du cocktail</h3>
+
+        <ul class="ingredients-list">
+          <li *ngFor="let ingredient of recipe.ingredients">
+            <strong>{{ ingredient.quantity }}</strong>
+
+            <div>
+              <span>{{ ingredient.name }}</span>
+              <small *ngIf="ingredient.notes">{{ ingredient.notes }}</small>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="detail-block">
+        <h3>Ingrédients de décoration</h3>
+
+        <ul class="ingredients-list">
+          <li *ngFor="let garnish of recipe.garnishIngredients">
+            <strong>{{ garnish.quantity || 'QS' }}</strong>
+
+            <div>
+              <span>{{ garnish.name }}</span>
+              <small>{{ garnish.usage }}</small>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="detail-block wide">
+        <h3>Préparation</h3>
+
+        <ol class="steps-list">
+          <li *ngFor="let step of recipe.preparation">
+            {{ step }}
+          </li>
+        </ol>
+      </section>
+
+      <section class="detail-block wide" *ngIf="recipe.notes">
+        <h3>Notes</h3>
+        <p>{{ recipe.notes }}</p>
+      </section>
+    </div>
+  </div>
+</section>
