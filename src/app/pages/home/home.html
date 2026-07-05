@@ -1,0 +1,193 @@
+<main class="page">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Annuaire cocktails</p>
+      <h1>Barbook</h1>
+      <p class="hero-description">
+        Tes recettes classiques, créations perso, ingrédients, décorations et étapes de préparation au même endroit.
+      </p>
+    </div>
+
+    <div class="counter-card">
+      <strong>{{ recipes.length }}</strong>
+      <span>recettes</span>
+    </div>
+  </section>
+
+  <section class="filters-card">
+    <label class="search-field">
+      <span>Recherche</span>
+      <input
+        type="search"
+        placeholder="Nom, ingrédient, tag, méthode..."
+        [(ngModel)]="searchTerm"
+      />
+    </label>
+
+    <div class="filters-grid">
+      <label>
+        <span>Type</span>
+        <select [(ngModel)]="selectedType">
+          <option value="all">Tous</option>
+          <option *ngFor="let type of types" [value]="type">
+            {{ type }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Alcool</span>
+        <select [(ngModel)]="selectedAlcohol">
+          <option value="all">Tous</option>
+          <option *ngFor="let alcohol of alcohols" [value]="alcohol">
+            {{ alcohol }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Méthode</span>
+        <select [(ngModel)]="selectedMethod">
+          <option value="all">Toutes</option>
+          <option *ngFor="let method of methods" [value]="method">
+            {{ method }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Tag</span>
+        <select [(ngModel)]="selectedTag">
+          <option value="all">Tous</option>
+          <option *ngFor="let tag of tags" [value]="tag">
+            {{ tag }}
+          </option>
+        </select>
+      </label>
+    </div>
+
+    <button type="button" class="reset-button" (click)="resetFilters()">
+      Réinitialiser
+    </button>
+  </section>
+
+  <section class="layout">
+    <section class="recipes-list">
+      <div class="section-title">
+        <h2>Recettes</h2>
+        <p>{{ filteredRecipes.length }} résultat(s)</p>
+      </div>
+
+      <article
+        *ngFor="let recipe of filteredRecipes"
+        class="recipe-card"
+        [class.active]="selectedRecipe.id === recipe.id"
+        (click)="selectRecipe(recipe)"
+      >
+        <img
+          [src]="recipe.imageUrl || 'assets/images/placeholder-cocktail.svg'"
+          [alt]="recipe.name"
+        />
+
+        <div>
+          <p class="recipe-type">{{ recipe.type }}</p>
+          <h3>{{ recipe.name }}</h3>
+          <p class="recipe-meta">
+            {{ recipe.mainAlcohol }} · {{ recipe.method }}
+          </p>
+
+          <div class="tags">
+            <span *ngFor="let tag of recipe.tags.slice(0, 4)">
+              {{ tag }}
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <div *ngIf="filteredRecipes.length === 0" class="empty-state">
+        Aucune recette ne correspond à ta recherche.
+      </div>
+    </section>
+
+    <section id="recipe-detail" class="recipe-detail" *ngIf="selectedRecipe">
+      <img
+        class="detail-image"
+        [src]="selectedRecipe.imageUrl || 'assets/images/placeholder-cocktail.svg'"
+        [alt]="selectedRecipe.name"
+      />
+
+      <div class="detail-content">
+        <p class="recipe-type">{{ selectedRecipe.type }}</p>
+        <h2>{{ selectedRecipe.name }}</h2>
+
+        <div class="pills">
+          <span>{{ selectedRecipe.family || 'Famille non définie' }}</span>
+          <span>{{ selectedRecipe.mainAlcohol }}</span>
+          <span>{{ selectedRecipe.method }}</span>
+          <span>{{ getAbvLabel(selectedRecipe) }}</span>
+        </div>
+
+        <div class="detail-grid">
+          <section class="detail-block">
+            <h3>Service</h3>
+
+            <div class="info-line">
+              <strong>Verre</strong>
+              <span>{{ selectedRecipe.glass }}</span>
+            </div>
+
+            <div class="info-line">
+              <strong>Glace</strong>
+              <span>{{ selectedRecipe.ice || 'Non précisé' }}</span>
+            </div>
+          </section>
+
+          <section class="detail-block">
+            <h3>Ingrédients du cocktail</h3>
+
+            <ul class="ingredients-list">
+              <li *ngFor="let ingredient of selectedRecipe.ingredients">
+                <strong>{{ ingredient.quantity }}</strong>
+
+                <div>
+                  <span>{{ ingredient.name }}</span>
+                  <small *ngIf="ingredient.notes">{{ ingredient.notes }}</small>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+          <section class="detail-block">
+            <h3>Ingrédients de décoration</h3>
+
+            <ul class="ingredients-list">
+              <li *ngFor="let garnish of selectedRecipe.garnishIngredients">
+                <strong>{{ garnish.quantity || 'QS' }}</strong>
+
+                <div>
+                  <span>{{ garnish.name }}</span>
+                  <small>{{ garnish.usage }}</small>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+          <section class="detail-block wide">
+            <h3>Préparation</h3>
+
+            <ol class="steps-list">
+              <li *ngFor="let step of selectedRecipe.preparation">
+                {{ step }}
+              </li>
+            </ol>
+          </section>
+
+          <section class="detail-block wide" *ngIf="selectedRecipe.notes">
+            <h3>Notes</h3>
+            <p>{{ selectedRecipe.notes }}</p>
+          </section>
+        </div>
+      </div>
+    </section>
+  </section>
+</main>

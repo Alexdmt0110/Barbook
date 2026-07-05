@@ -1,0 +1,134 @@
+import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Recipe } from '../../models/recipe.model';
+import { RecipeService } from '../../services/recipe.service';
+
+@Component({
+  selector: 'app-home',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './home.html',
+  styleUrl: './home.css',
+})
+export class Home {
+  private readonly recipeService = inject(RecipeService);
+
+  recipes = this.recipeService.getAll();
+
+  searchTerm = '';
+  selectedType = 'all';
+  selectedAlcohol = 'all';
+  selectedMethod = 'all';
+  selectedTag = 'all';
+
+  selectedRecipe: Recipe = this.recipes[0];
+
+  get filteredRecipes(): Recipe[] {
+    const search = this.normalize(this.searchTerm);
+
+    return this.recipes.filter((recipe) => {
+      const matchesSearch = !search || this.recipeMatchesSearch(recipe, search);
+
+      const matchesType = this.selectedType === 'all' || recipe.type === this.selectedType;
+
+      const matchesAlcohol =
+        this.selectedAlcohol === 'all' || recipe.mainAlcohol === this.selectedAlcohol;
+
+      const matchesMethod = this.selectedMethod === 'all' || recipe.method === this.selectedMethod;
+
+      const matchesTag = this.selectedTag === 'all' || recipe.tags.includes(this.selectedTag);
+
+      return matchesSearch && matchesType && matchesAlcohol && matchesMethod && matchesTag;
+    });
+  }
+
+  get types(): string[] {
+    return [...new Set(this.recipes.map((recipe) => recipe.type))].sort();
+  }
+
+  get alcohols(): string[] {
+    return [...new Set(this.recipes.map((recipe) => recipe.mainAlcohol))].sort();
+  }
+
+  get methods(): string[] {
+    return [...new Set(this.recipes.map((recipe) => recipe.method))].sort();
+  }
+
+  get tags(): string[] {
+    return [...new Set(this.recipes.flatMap((recipe) => recipe.tags))].sort();
+  }
+
+  selectRecipe(recipe: Recipe): void {
+    this.selectedRecipe = recipe;
+
+    setTimeout(() => {
+      document.getElementById('recipe-detail')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
+  }
+
+  resetFilters(): void {
+    this.searchTerm = '';
+    this.selectedType = 'all';
+    this.selectedAlcohol = 'all';
+    this.selectedMethod = 'all';
+    this.selectedTag = 'all';
+  }
+
+  getAbvLabel(recipe: Recipe): string {
+    const totalVolume = recipe.ingredients
+      .filter((ingredient) => ingredient.volumeCl !== undefined)
+      .reduce((total, ingredient) => total + Number(ingredient.volumeCl), 0);
+
+    const pureAlcoholVolume = recipe.ingredients
+      .filter((ingredient) => ingredient.volumeCl !== undefined && ingredient.abv !== undefined)
+      .reduce(
+        (total, ingredient) => total + Number(ingredient.volumeCl) * (Number(ingredient.abv) / 100),
+        0,
+      );
+
+    if (totalVolume <= 0 || pureAlcoholVolume <= 0) {
+      return 'Non calculé';
+    }
+
+    const abv = (pureAlcoholVolume / totalVolume) * 100;
+
+    return `${abv.toLocaleString('fr-FR', {
+      maximumFractionDigits: 1,
+    })} % vol. hors dilution`;
+  }
+
+  private recipeMatchesSearch(recipe: Recipe, search: string): boolean {
+    const content = [
+      recipe.name,
+      recipe.type,
+      recipe.family,
+      recipe.mainAlcohol,
+      recipe.method,
+      recipe.glass,
+      recipe.ice,
+      recipe.notes,
+      ...recipe.tags,
+      ...recipe.ingredients.map((ingredient) => ingredient.name),
+      ...recipe.ingredients.map((ingredient) => ingredient.notes ?? ''),
+      ...recipe.garnishIngredients.map((ingredient) => ingredient.name),
+      ...recipe.garnishIngredients.map((ingredient) => ingredient.usage),
+      ...recipe.preparation,
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+    return this.normalize(content).includes(search);
+  }
+
+  private normalize(value: string): string {
+    return value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
+}
