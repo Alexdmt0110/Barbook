@@ -31,141 +31,46 @@
     </label>
 
     <div class="filters-grid">
-      <div class="custom-select">
-        <button
-          type="button"
-          class="custom-select-trigger"
-          [class.active]="selectedType !== 'all'"
-          (click)="toggleFilter('type')"
-        >
-          <span>
-            <small>Type</small>
-            {{ selectedType === 'all' ? 'Tous' : selectedType }}
-          </span>
-          <strong>⌄</strong>
-        </button>
+      <app-filter-dropdown
+        label="Type"
+        allLabel="Tous"
+        [options]="types"
+        [selected]="selectedType"
+        [open]="openFilter === 'type'"
+        (toggle)="toggleFilter('type')"
+        (selectedChange)="setFilter('type', $event)"
+      ></app-filter-dropdown>
 
-        <div class="custom-select-menu" *ngIf="openFilter === 'type'">
-          <button
-            type="button"
-            [class.selected]="selectedType === 'all'"
-            (click)="selectType('all')"
-          >
-            Tous
-          </button>
+      <app-filter-dropdown
+        label="Alcool"
+        allLabel="Tous"
+        [options]="alcohols"
+        [selected]="selectedAlcohol"
+        [open]="openFilter === 'alcohol'"
+        (toggle)="toggleFilter('alcohol')"
+        (selectedChange)="setFilter('alcohol', $event)"
+      ></app-filter-dropdown>
 
-          <button
-            *ngFor="let type of types"
-            type="button"
-            [class.selected]="selectedType === type"
-            (click)="selectType(type)"
-          >
-            {{ type }}
-          </button>
-        </div>
-      </div>
+      <app-filter-dropdown
+        label="Méthode"
+        allLabel="Toutes"
+        [options]="methods"
+        [selected]="selectedMethod"
+        [open]="openFilter === 'method'"
+        (toggle)="toggleFilter('method')"
+        (selectedChange)="setFilter('method', $event)"
+      ></app-filter-dropdown>
 
-      <div class="custom-select">
-        <button
-          type="button"
-          class="custom-select-trigger"
-          [class.active]="selectedAlcohol !== 'all'"
-          (click)="toggleFilter('alcohol')"
-        >
-          <span>
-            <small>Alcool</small>
-            {{ selectedAlcohol === 'all' ? 'Tous' : selectedAlcohol }}
-          </span>
-          <strong>⌄</strong>
-        </button>
-
-        <div class="custom-select-menu" *ngIf="openFilter === 'alcohol'">
-          <button
-            type="button"
-            [class.selected]="selectedAlcohol === 'all'"
-            (click)="selectAlcohol('all')"
-          >
-            Tous
-          </button>
-
-          <button
-            *ngFor="let alcohol of alcohols"
-            type="button"
-            [class.selected]="selectedAlcohol === alcohol"
-            (click)="selectAlcohol(alcohol)"
-          >
-            {{ alcohol }}
-          </button>
-        </div>
-      </div>
-
-      <div class="custom-select">
-        <button
-          type="button"
-          class="custom-select-trigger"
-          [class.active]="selectedMethod !== 'all'"
-          (click)="toggleFilter('method')"
-        >
-          <span>
-            <small>Méthode</small>
-            {{ selectedMethod === 'all' ? 'Toutes' : selectedMethod }}
-          </span>
-          <strong>⌄</strong>
-        </button>
-
-        <div class="custom-select-menu" *ngIf="openFilter === 'method'">
-          <button
-            type="button"
-            [class.selected]="selectedMethod === 'all'"
-            (click)="selectMethod('all')"
-          >
-            Toutes
-          </button>
-
-          <button
-            *ngFor="let method of methods"
-            type="button"
-            [class.selected]="selectedMethod === method"
-            (click)="selectMethod(method)"
-          >
-            {{ method }}
-          </button>
-        </div>
-      </div>
-
-      <div class="custom-select">
-        <button
-          type="button"
-          class="custom-select-trigger"
-          [class.active]="selectedTag !== 'all'"
-          (click)="toggleFilter('tag')"
-        >
-          <span>
-            <small>Tag</small>
-            {{ selectedTag === 'all' ? 'Tous' : selectedTag }}
-          </span>
-          <strong>⌄</strong>
-        </button>
-
-        <div class="custom-select-menu scrollable" *ngIf="openFilter === 'tag'">
-          <button
-            type="button"
-            [class.selected]="selectedTag === 'all'"
-            (click)="selectTag('all')"
-          >
-            Tous
-          </button>
-
-          <button
-            *ngFor="let tag of tags"
-            type="button"
-            [class.selected]="selectedTag === tag"
-            (click)="selectTag(tag)"
-          >
-            {{ tag }}
-          </button>
-        </div>
-      </div>
+      <app-filter-dropdown
+        label="Tag"
+        allLabel="Tous"
+        [options]="tags"
+        [selected]="selectedTag"
+        [open]="openFilter === 'tag'"
+        [scrollable]="true"
+        (toggle)="toggleFilter('tag')"
+        (selectedChange)="setFilter('tag', $event)"
+      ></app-filter-dropdown>
     </div>
 
     <div class="filters-footer">

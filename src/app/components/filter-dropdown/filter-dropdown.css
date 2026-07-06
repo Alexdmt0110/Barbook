@@ -1,0 +1,117 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.custom-select {
+  position: relative;
+}
+
+.custom-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 54px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 17px;
+  padding: 9px 12px;
+  color: #f8eee9;
+  background: rgba(255, 255, 255, 0.065);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.custom-select-trigger:hover,
+.custom-select-trigger.active {
+  border-color: rgba(241, 181, 124, 0.55);
+  background: rgba(241, 181, 124, 0.1);
+}
+
+.custom-select-trigger span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-select-trigger small {
+  display: block;
+  margin-bottom: 2px;
+  color: #d9c5bd;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.custom-select-trigger strong {
+  color: #f1b57c;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.custom-select-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 80;
+  width: 100%;
+  min-width: 190px;
+  overflow: hidden;
+  border: 1px solid rgba(241, 181, 124, 0.28);
+  border-radius: 18px;
+  background: #1f1313;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+}
+
+.custom-select-menu.scrollable {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.custom-select-menu button {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 11px 13px;
+  color: #f8eee9;
+  background: #1f1313;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 140ms ease,
+    color 140ms ease;
+}
+
+.custom-select-menu button:last-child {
+  border-bottom: 0;
+}
+
+.custom-select-menu button:hover {
+  background: #2b1b1b;
+}
+
+.custom-select-menu button.selected {
+  color: #120b0b;
+  background: #f1b57c;
+  font-weight: 800;
+}
+
+@media (max-width: 640px) {
+  .custom-select-trigger {
+    min-height: 50px;
+  }
+
+  .custom-select-menu {
+    position: relative;
+    top: 8px;
+    margin-bottom: 8px;
+  }
+}

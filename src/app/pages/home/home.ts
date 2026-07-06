@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { FilterDropdown } from '../../components/filter-dropdown/filter-dropdown';
 import { Recipe } from '../../models/recipe.model';
 import { RecipeService } from '../../services/recipe.service';
 
@@ -10,7 +11,7 @@ type FilterKey = 'type' | 'alcohol' | 'method' | 'tag';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, FilterDropdown],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -70,23 +71,23 @@ export class Home {
     this.openFilter = null;
   }
 
-  selectType(type: string): void {
-    this.selectedType = type;
-    this.closeFilter();
-  }
+  setFilter(filter: FilterKey, value: string): void {
+    if (filter === 'type') {
+      this.selectedType = value;
+    }
 
-  selectAlcohol(alcohol: string): void {
-    this.selectedAlcohol = alcohol;
-    this.closeFilter();
-  }
+    if (filter === 'alcohol') {
+      this.selectedAlcohol = value;
+    }
 
-  selectMethod(method: string): void {
-    this.selectedMethod = method;
-    this.closeFilter();
-  }
+    if (filter === 'method') {
+      this.selectedMethod = value;
+    }
 
-  selectTag(tag: string): void {
-    this.selectedTag = tag;
+    if (filter === 'tag') {
+      this.selectedTag = value;
+    }
+
     this.closeFilter();
   }
 

@@ -1,0 +1,41 @@
+<div class="custom-select">
+  <button
+    type="button"
+    class="custom-select-trigger"
+    [class.active]="hasActiveFilter"
+    [attr.aria-expanded]="open"
+    aria-haspopup="listbox"
+    (click)="toggle.emit()"
+  >
+    <span>
+      <small>{{ label }}</small>
+      {{ selectedLabel }}
+    </span>
+
+    <strong>⌄</strong>
+  </button>
+
+  <div
+    class="custom-select-menu"
+    [class.scrollable]="scrollable"
+    *ngIf="open"
+    role="listbox"
+  >
+    <button
+      type="button"
+      [class.selected]="selected === 'all'"
+      (click)="selectOption('all')"
+    >
+      {{ allLabel }}
+    </button>
+
+    <button
+      *ngFor="let option of options"
+      type="button"
+      [class.selected]="selected === option"
+      (click)="selectOption(option)"
+    >
+      {{ option }}
+    </button>
+  </div>
+</div>
