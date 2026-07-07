@@ -2,7 +2,15 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  getApiInfo(): {
+    name: string;
+    status: string;
+    version: string;
+  } {
+    return {
+      name: 'Barbook API',
+      status: 'running',
+      version: '0.1.0',
+    };
   }
 }

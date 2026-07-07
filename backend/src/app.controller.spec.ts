@@ -14,9 +14,13 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+  describe('getApiInfo', () => {
+    it('should return API information', () => {
+      expect(appController.getApiInfo()).toEqual({
+        name: 'Barbook API',
+        status: 'running',
+        version: '0.1.0',
+      });
     });
   });
 });
