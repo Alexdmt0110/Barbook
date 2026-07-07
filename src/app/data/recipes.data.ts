@@ -1,6 +1,6 @@
 import { Recipe } from '../models/recipe.model';
 
-const PLACEHOLDER_IMAGE = '/placeholder-cocktail.svg';
+const PLACEHOLDER_IMAGE = '/placeholder-cocktail.png';
 
 const ABV = {
   vodka: 40,
