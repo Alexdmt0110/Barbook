@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum CocktailType {
+  CLASSIC
+  PERSONAL_CREATION
+  VARIATION
+  TEMPLATE
+}
+
+enum RecipeMethod {
+  SHAKER
+  MIXING_GLASS
+  BUILD
+  BLENDER
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  displayName  String
+  role         UserRole @default(USER)
+
+  cocktails   Cocktail[]
+  folders     Folder[]
+  tags        Tag[]
+  ingredients Ingredient[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+}
+
+model Folder {
+  id     String @id @default(uuid())
+  name   String
+  userId String
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cocktails Cocktail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Cocktail {
+  id          String       @id @default(uuid())
+  slug        String
+  name        String
+  type        CocktailType
+  family      String?
+  mainAlcohol String
+  method      RecipeMethod
+  glass       String
+  ice         String?
+  notes       String?
+  imageUrl    String?
+
+  isPublicTemplate Boolean @default(false)
+
+  userId   String
+  folderId String?
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folder Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  ingredients CocktailIngredient[]
+  garnishes   GarnishIngredient[]
+  steps       PreparationStep[]
+  tags        CocktailTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, slug])
+  @@index([userId])
+  @@index([folderId])
+  @@index([type])
+  @@index([mainAlcohol])
+  @@index([method])
+  @@index([isPublicTemplate])
+}
+
+model Ingredient {
+  id         String @id @default(uuid())
+  name       String
+  defaultAbv Float?
+  userId     String
+
+  user              User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cocktailRelations CocktailIngredient[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@index([name])
+}
+
+model CocktailIngredient {
+  id           String @id @default(uuid())
+  cocktailId   String
+  ingredientId String
+
+  quantity  String
+  volumeCl  Float?
+  abv       Float?
+  notes     String?
+  sortOrder Int
+
+  cocktail   Cocktail   @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+
+  @@index([cocktailId])
+  @@index([ingredientId])
+  @@index([sortOrder])
+}
+
+model GarnishIngredient {
+  id         String @id @default(uuid())
+  cocktailId String
+
+  name      String
+  quantity  String?
+  usage     String
+  sortOrder Int
+
+  cocktail Cocktail @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
+
+  @@index([cocktailId])
+  @@index([sortOrder])
+}
+
+model PreparationStep {
+  id         String @id @default(uuid())
+  cocktailId String
+
+  content   String
+  sortOrder Int
+
+  cocktail Cocktail @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
+
+  @@index([cocktailId])
+  @@index([sortOrder])
+}
+
+model Tag {
+  id     String @id @default(uuid())
+  name   String
+  slug   String
+  userId String
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cocktails CocktailTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, slug])
+  @@index([userId])
+  @@index([slug])
+}
+
+model CocktailTag {
+  cocktailId String
+  tagId      String
+
+  cocktail Cocktail @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([cocktailId, tagId])
+  @@index([tagId])
+}
