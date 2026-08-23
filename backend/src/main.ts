@@ -1,8 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
-async function bootstrap() {
+/**
+ * Démarre l'API Barbook.
+ */
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
+
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+
+bootstrap().catch((error: unknown) => {
+  console.error('Failed to start Barbook API:', error);
+  process.exit(1);
+});
