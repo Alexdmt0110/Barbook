@@ -126,6 +126,25 @@ export class AuthService {
     });
   }
 
+  async getCurrentUser(userId: string): Promise<AuthenticatedUser> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid or expired access token.');
+    }
+
+    return user;
+  }
+
   private async createAuthResponse(
     user: AuthenticatedUser,
   ): Promise<AuthResponse> {
