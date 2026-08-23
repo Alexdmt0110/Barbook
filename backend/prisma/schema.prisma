@@ -1,0 +1,239 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum WorkspaceKind {
+  PERSONAL
+  SHARED
+}
+
+enum WorkspaceRole {
+  OWNER
+  MEMBER
+}
+
+enum CocktailType {
+  CLASSIC
+  PERSONAL_CREATION
+  VARIATION
+}
+
+enum RecipeMethod {
+  SHAKER
+  MIXING_GLASS
+  BUILD
+  BLENDER
+}
+
+enum MeasurementUnit {
+  ML
+  G
+  PIECE
+  LEAF
+  SPRIG
+  DASH
+  DROP
+  BAR_SPOON
+  TEASPOON
+  TABLESPOON
+  SCOOP
+  PINCH
+  TOP_UP
+}
+
+model User {
+  id           String @id @default(uuid())
+  email        String @unique
+  passwordHash String
+  displayName  String
+
+  personalWorkspace Workspace?        @relation("PersonalWorkspaceOwner")
+  memberships       WorkspaceMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Workspace {
+  id              String        @id @default(uuid())
+  name            String
+  kind            WorkspaceKind
+  personalOwnerId String?       @unique
+
+  personalOwner User? @relation("PersonalWorkspaceOwner", fields: [personalOwnerId], references: [id], onDelete: Cascade)
+
+  members     WorkspaceMember[]
+  cocktails   Cocktail[]
+  ingredients Ingredient[]
+  tags        Tag[]
+  folders     Folder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WorkspaceMember {
+  workspaceId String
+  userId      String
+  role        WorkspaceRole @default(MEMBER)
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  joinedAt DateTime @default(now())
+
+  @@id([workspaceId, userId])
+  @@index([userId])
+}
+
+model Folder {
+  id          String @id @default(uuid())
+  name        String
+  workspaceId String
+
+  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  cocktails Cocktail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([workspaceId, name])
+}
+
+model Cocktail {
+  id   String @id @default(uuid())
+  slug String
+  name String
+
+  type   CocktailType
+  family String?
+  method RecipeMethod
+
+  glass    String
+  ice      String?
+  notes    String?
+  imageUrl String?
+
+  workspaceId   String
+  folderId      String?
+  mainAlcoholId String?
+
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  folder      Folder?     @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  mainAlcohol Ingredient? @relation("CocktailMainAlcohol", fields: [mainAlcoholId], references: [id], onDelete: SetNull)
+
+  ingredients CocktailIngredient[]
+  garnishes   GarnishIngredient[]
+  steps       PreparationStep[]
+  tags        CocktailTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([workspaceId, slug])
+  @@index([folderId])
+  @@index([mainAlcoholId])
+  @@index([workspaceId, name])
+  @@index([workspaceId, type])
+  @@index([workspaceId, mainAlcoholId])
+  @@index([workspaceId, method])
+}
+
+model Ingredient {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String
+  defaultAbv  Decimal? @db.Decimal(5, 2)
+  workspaceId String
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  cocktailRelations CocktailIngredient[]
+  garnishRelations  GarnishIngredient[]
+  mainAlcoholFor    Cocktail[]           @relation("CocktailMainAlcohol")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([workspaceId, slug])
+}
+
+model CocktailIngredient {
+  id           String @id @default(uuid())
+  cocktailId   String
+  ingredientId String
+
+  amount        Decimal?        @db.Decimal(8, 3)
+  unit          MeasurementUnit
+  specification String?
+  abvOverride   Decimal?        @db.Decimal(5, 2)
+  notes         String?
+  sortOrder     Int
+
+  cocktail   Cocktail   @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+
+  @@unique([cocktailId, sortOrder])
+  @@index([ingredientId])
+}
+
+model GarnishIngredient {
+  id           String @id @default(uuid())
+  cocktailId   String
+  ingredientId String
+
+  amount        Decimal?         @db.Decimal(8, 3)
+  unit          MeasurementUnit?
+  specification String?
+  usage         String
+  sortOrder     Int
+
+  cocktail   Cocktail   @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+
+  @@unique([cocktailId, sortOrder])
+  @@index([ingredientId])
+}
+
+model PreparationStep {
+  id         String @id @default(uuid())
+  cocktailId String
+  content    String
+  sortOrder  Int
+
+  cocktail Cocktail @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
+
+  @@unique([cocktailId, sortOrder])
+}
+
+model Tag {
+  id          String @id @default(uuid())
+  name        String
+  slug        String
+  workspaceId String
+
+  workspace Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  cocktails CocktailTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([workspaceId, slug])
+}
+
+model CocktailTag {
+  cocktailId String
+  tagId      String
+
+  cocktail Cocktail @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([cocktailId, tagId])
+  @@index([tagId])
+}
