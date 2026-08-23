@@ -1,0 +1,66 @@
+:root {
+  --color-background: #120b0b;
+
+  --color-surface: rgba(28, 18, 18, 0.78);
+  --color-surface-solid: #1f1313;
+  --color-surface-hover: #2b1b1b;
+
+  --color-text: #f8eee9;
+  --color-text-muted: #d9c5bd;
+  --color-accent: #f1b57c;
+
+  --color-border: rgba(255, 255, 255, 0.1);
+
+  --color-glow-red: rgba(162, 74, 58, 0.35);
+  --color-glow-orange: rgba(255, 180, 105, 0.16);
+
+  --radius-field: 16px;
+  --radius-card: 28px;
+  --radius-panel: 32px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 24px 70px rgba(0, 0, 0, 0.22);
+
+  --backdrop-blur: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+
+  color: var(--color-text);
+
+  background:
+    radial-gradient(circle at top left, var(--color-glow-red), transparent 32rem),
+    radial-gradient(circle at bottom right, var(--color-glow-orange), transparent 28rem),
+    var(--color-background);
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
