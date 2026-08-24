@@ -41,5 +41,6 @@ const JWT_AUDIENCE = 'barbook-web';
   ],
   controllers: [AuthController],
   providers: [AuthService, PasswordService, JwtAuthGuard],
+  exports: [JwtModule, JwtAuthGuard],
 })
 export class AuthModule {}
