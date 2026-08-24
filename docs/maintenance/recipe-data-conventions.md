@@ -146,4 +146,88 @@ Un ingrédient peut posséder un degré alcoolique par défaut.
 
 Une utilisation dans une recette peut définir une valeur de remplacement lorsque la bouteille ou le produit utilisé possède un degré différent.
 
-Le calcul du degré alcoolique estimé utilisera le volume précis et le degré alcoolique effectif de chaque ingrédient concerné.
+Le degré effectif d'une ligne de recette est donc :
+
+```text
+abvOverride ?? defaultAbv
+```
+
+Les valeurs ont deux significations distinctes :
+
+```text
+0    → ingrédient explicitement sans alcool
+null → degré alcoolique inconnu
+```
+
+## Degré alcoolique estimé d'un cocktail
+
+Le degré alcoolique affiché sur une fiche est une estimation avant dilution.
+
+La formule utilisée est :
+
+```text
+Σ(volume ML × ABV)
+──────────────────
+Σ(volume ML)
+```
+
+Seuls les ingrédients exprimés en `ML` participent actuellement au calcul.
+
+Exemple :
+
+```text
+50 ML rhum à 40 %
+25 ML citron à 0 %
+15 ML sirop à 0 %
+
+alcool pur pondéré = 50 × 40
+volume total       = 90
+
+ABV estimé ≈ 22,22 %
+```
+
+Le calcul retourne `null` lorsqu'un ingrédient exprimé en `ML` possède :
+
+```text
+une quantité absente
+une quantité non positive
+un ABV inconnu
+```
+
+Il retourne également `null` lorsqu'un ingrédient utilise :
+
+```text
+TOP_UP
+```
+
+car le volume final du cocktail est alors inconnu.
+
+## Dilution
+
+L'eau provenant de la glace, du shake, du stir ou d'autres techniques de préparation n'est pas incluse dans le calcul actuel.
+
+L'ABV présenté par Barbook représente donc :
+
+```text
+une estimation avant dilution
+```
+
+et non le degré exact du cocktail au moment de la dégustation.
+
+## Limite des unités non volumétriques
+
+Les ingrédients alcoolisés exprimés dans une unité autre que `ML` ne sont actuellement pas convertis en volume.
+
+Exemples :
+
+```text
+DASH
+DROP
+BAR_SPOON
+TEASPOON
+TABLESPOON
+```
+
+Leur contribution n'est donc pas intégrée au calcul actuel.
+
+Une future évolution pourra définir des conversions explicites si un calcul plus précis devient nécessaire.
