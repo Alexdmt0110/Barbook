@@ -3,11 +3,6 @@ import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
   {
-    path: '',
-    canActivate: [authGuard],
-    loadComponent: () => import('./features/home/home').then((module) => module.Home),
-  },
-  {
     path: 'login',
     loadComponent: () => import('./features/auth/login/login').then((module) => module.Login),
   },
@@ -15,6 +10,23 @@ export const routes: Routes = [
     path: 'register',
     loadComponent: () =>
       import('./features/auth/register/register').then((module) => module.Register),
+  },
+  {
+    path: '',
+    canActivate: [authGuard],
+    loadComponent: () => import('./layout/app-shell/app-shell').then((module) => module.AppShell),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () => import('./features/home/home').then((module) => module.Home),
+      },
+      {
+        path: 'cocktails',
+        loadComponent: () =>
+          import('./features/cocktails/cocktails').then((module) => module.Cocktails),
+      },
+    ],
   },
   {
     path: '**',

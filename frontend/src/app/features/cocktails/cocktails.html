@@ -1,0 +1,120 @@
+<section class="cocktails-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Mon Barbook</p>
+
+      <h1>Mes cocktails</h1>
+
+      <p class="page-introduction">
+        Retrouve les classiques, variations et créations que tu veux garder
+        sous la main.
+      </p>
+    </div>
+
+    @if (!isLoading() && !errorMessage()) {
+      <div class="cocktail-count">
+        {{ cocktailCountLabel() }}
+      </div>
+    }
+  </header>
+
+  @if (isLoading()) {
+    <section
+      class="cocktail-grid"
+      aria-label="Chargement des cocktails"
+      aria-busy="true"
+    >
+      @for (placeholder of loadingPlaceholders; track placeholder) {
+        <article class="cocktail-card skeleton-card">
+          <div class="skeleton-image"></div>
+
+          <div class="cocktail-card-content">
+            <div class="skeleton-line skeleton-line-small"></div>
+            <div class="skeleton-line skeleton-line-title"></div>
+            <div class="skeleton-line"></div>
+          </div>
+        </article>
+      }
+    </section>
+  } @else if (errorMessage()) {
+    <section class="state-card error-state" role="alert">
+      <p class="state-eyebrow">Chargement impossible</p>
+
+      <h2>Quelque chose a empêché l’ouverture de ta bibliothèque.</h2>
+
+      <p>{{ errorMessage() }}</p>
+
+      <button type="button" (click)="loadCocktails()">
+        Réessayer
+      </button>
+    </section>
+  } @else if (cocktails().length === 0) {
+    <section class="state-card empty-state">
+      <p class="state-eyebrow">Bibliothèque vide</p>
+
+      <h2>Ton premier cocktail attend encore sa place.</h2>
+
+      <p>
+        Ton Barbook est prêt, mais aucune recette n’y est encore enregistrée.
+        La création de cocktails arrivera dans une prochaine étape.
+      </p>
+    </section>
+  } @else {
+    <section
+      class="cocktail-grid"
+      aria-label="Mes cocktails"
+    >
+      @for (cocktail of cocktails(); track cocktail.id) {
+        <article class="cocktail-card">
+          <div class="cocktail-image-wrapper">
+            <img
+              class="cocktail-image"
+              [src]="cocktail.imageUrl || '/placeholder-cocktail.png'"
+              [alt]="cocktail.name"
+              loading="lazy"
+            />
+
+            <span class="cocktail-type">
+              {{ typeLabel(cocktail.type) }}
+            </span>
+          </div>
+
+          <div class="cocktail-card-content">
+            <div class="cocktail-heading">
+              <div>
+                <p class="cocktail-family">
+                  {{ cocktail.family || 'Sans famille' }}
+                </p>
+
+                <h2>{{ cocktail.name }}</h2>
+              </div>
+
+              @if (cocktail.mainAlcohol; as mainAlcohol) {
+                <span class="main-alcohol">
+                  {{ mainAlcohol.name }}
+                </span>
+              }
+            </div>
+
+            <div class="cocktail-metadata">
+              <span>{{ methodLabel(cocktail.method) }}</span>
+              <span aria-hidden="true">·</span>
+              <span>{{ cocktail.glass }}</span>
+            </div>
+
+            @if (cocktail.tags.length > 0) {
+              <div
+                class="cocktail-tags"
+                [attr.aria-label]="'Tags de ' + cocktail.name"
+              >
+                @for (tag of cocktail.tags; track tag.id) {
+                  <span>{{ tag.name }}</span>
+                }
+              </div>
+            }
+          </div>
+        </article>
+      }
+    </section>
+  }
+</section>
