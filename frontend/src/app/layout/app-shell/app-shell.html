@@ -6,7 +6,10 @@
         <span>Barbook</span>
       </a>
 
-      <nav class="main-navigation" aria-label="Navigation principale">
+      <nav
+        class="main-navigation"
+        aria-label="Navigation principale"
+      >
         <a
           routerLink="/"
           routerLinkActive="active"
@@ -29,6 +32,8 @@
             {{ user.displayName }}
           </span>
         }
+
+        <app-theme-switcher />
 
         <button
           type="button"

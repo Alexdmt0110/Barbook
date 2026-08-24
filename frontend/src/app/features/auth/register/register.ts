@@ -4,10 +4,11 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ThemeSwitcher } from '../../../shared/ui/theme-switcher/theme-switcher';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, ThemeSwitcher],
   templateUrl: './register.html',
   styleUrl: '../auth-page.css',
 })

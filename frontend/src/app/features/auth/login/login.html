@@ -1,4 +1,6 @@
 <main class="auth-page">
+  <app-theme-switcher class="auth-theme-switcher" />
+
   <section class="auth-layout">
     <aside class="auth-introduction">
       <a class="brand" routerLink="/">
@@ -7,14 +9,18 @@
       </a>
 
       <div class="introduction-content">
-        <p class="eyebrow">Ton carnet, à ta manière.</p>
+        <p class="eyebrow">
+          Ton carnet, à ta manière.
+        </p>
 
-        <h1>Retrouve les recettes qui méritent d’être gardées.</h1>
+        <h1>
+          Retrouve les recettes qui méritent d’être gardées.
+        </h1>
 
         <p class="introduction-copy">
-          Un espace personnel pour conserver, organiser et retrouver tes
-          cocktails sans dépendre d’une note perdue ou d’une photo dans ta
-          galerie.
+          Un espace personnel pour conserver, organiser et
+          retrouver tes cocktails sans dépendre d’une note
+          perdue ou d’une photo dans ta galerie.
         </p>
       </div>
 
@@ -33,9 +39,15 @@
           </p>
         </div>
 
-        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <form
+          [formGroup]="form"
+          (ngSubmit)="submit()"
+          novalidate
+        >
           <div class="field">
-            <label for="email">Adresse email</label>
+            <label for="email">
+              Adresse email
+            </label>
 
             <input
               id="email"
@@ -56,12 +68,18 @@
           </div>
 
           <div class="field">
-            <label for="password">Mot de passe</label>
+            <label for="password">
+              Mot de passe
+            </label>
 
             <div class="password-field">
               <input
                 id="password"
-                [type]="passwordVisible() ? 'text' : 'password'"
+                [type]="
+                  passwordVisible()
+                    ? 'text'
+                    : 'password'
+                "
                 formControlName="password"
                 autocomplete="current-password"
                 placeholder="Ton mot de passe"
@@ -77,7 +95,11 @@
                     : 'Afficher le mot de passe'
                 "
               >
-                {{ passwordVisible() ? 'Masquer' : 'Afficher' }}
+                {{
+                  passwordVisible()
+                    ? 'Masquer'
+                    : 'Afficher'
+                }}
               </button>
             </div>
 
@@ -92,7 +114,10 @@
           </div>
 
           @if (errorMessage()) {
-            <div class="form-error" role="alert">
+            <div
+              class="form-error"
+              role="alert"
+            >
               {{ errorMessage() }}
             </div>
           }
@@ -102,13 +127,19 @@
             type="submit"
             [disabled]="isSubmitting()"
           >
-            {{ isSubmitting() ? 'Connexion…' : 'Se connecter' }}
+            {{
+              isSubmitting()
+                ? 'Connexion…'
+                : 'Se connecter'
+            }}
           </button>
         </form>
 
         <p class="auth-switch">
           Pas encore de compte ?
-          <a routerLink="/register">Créer mon Barbook</a>
+          <a routerLink="/register">
+            Créer mon Barbook
+          </a>
         </p>
       </div>
     </section>
