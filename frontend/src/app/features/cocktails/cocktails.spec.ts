@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
 import { CocktailSummary } from './data-access/cocktail.models';
 import { CocktailsService } from './data-access/cocktails.service';
@@ -7,6 +8,7 @@ import { Cocktails } from './cocktails';
 
 class CocktailsServiceStub {
   response: Observable<CocktailSummary[]> = of([]);
+
   callCount = 0;
 
   getPersonalCocktails(): Observable<CocktailSummary[]> {
@@ -77,6 +79,7 @@ describe('Cocktails', () => {
     await TestBed.configureTestingModule({
       imports: [Cocktails],
       providers: [
+        provideRouter([]),
         {
           provide: CocktailsService,
           useClass: CocktailsServiceStub,
@@ -95,14 +98,26 @@ describe('Cocktails', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
+
     const cards = compiled.querySelectorAll('.cocktail-card:not(.skeleton-card)');
 
+    const links = compiled.querySelectorAll<HTMLAnchorElement>('.cocktail-card-link');
+
     expect(cocktailsService.callCount).toBe(1);
+
     expect(cards.length).toBe(2);
+    expect(links.length).toBe(2);
+
+    expect(links[0]?.getAttribute('href')).toBe('/cocktails/daiquiri');
+
     expect(compiled.textContent).toContain('Daiquiri');
+
     expect(compiled.textContent).toContain('Negroni');
+
     expect(compiled.textContent).toContain('2 cocktails');
+
     expect(compiled.textContent).toContain('Rhum blanc');
+
     expect(compiled.textContent).toContain('Verre à mélange');
   });
 
@@ -173,7 +188,9 @@ describe('Cocktails', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
     expect(compiled.textContent).toContain('Daiquiri');
+
     expect(compiled.textContent).toContain('Negroni');
+
     expect(compiled.textContent).not.toContain('Chargement impossible');
   });
 });

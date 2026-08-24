@@ -1,11 +1,13 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { CocktailSummary, CocktailType, RecipeMethod } from './data-access/cocktail.models';
 import { CocktailsService } from './data-access/cocktails.service';
 
 @Component({
   selector: 'app-cocktails',
+  imports: [RouterLink],
   templateUrl: './cocktails.html',
   styleUrl: './cocktails.css',
 })
@@ -13,7 +15,9 @@ export class Cocktails implements OnInit {
   private readonly cocktailsService = inject(CocktailsService);
 
   readonly cocktails = signal<CocktailSummary[]>([]);
+
   readonly isLoading = signal(true);
+
   readonly errorMessage = signal<string | null>(null);
 
   readonly loadingPlaceholders = [0, 1, 2];

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CocktailSummary } from './cocktail.models';
+import { CocktailDetail, CocktailSummary } from './cocktail.models';
 
 @Injectable({
   providedIn: 'root',
@@ -11,5 +11,9 @@ export class CocktailsService {
 
   getPersonalCocktails(): Observable<CocktailSummary[]> {
     return this.http.get<CocktailSummary[]>('/api/cocktails');
+  }
+
+  getPersonalCocktail(slug: string): Observable<CocktailDetail> {
+    return this.http.get<CocktailDetail>(`/api/cocktails/${encodeURIComponent(slug)}`);
   }
 }
