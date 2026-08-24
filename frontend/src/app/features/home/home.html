@@ -1,47 +1,36 @@
 <div class="home-page">
-  <header class="home-header">
-    <a class="brand" href="/">
-      <span class="brand-mark">B</span>
-      <span>Barbook</span>
+  <section class="hero">
+    <p class="eyebrow">Mon Barbook</p>
+
+    @if (authService.currentUser(); as user) {
+      <h1>Bienvenue, {{ user.displayName }}.</h1>
+    } @else {
+      <h1>Bienvenue dans Barbook.</h1>
+    }
+
+    <p class="hero-copy">
+      Conserve les cocktails qui comptent, organise tes classiques et garde
+      tes créations personnelles dans un carnet construit autour de tes
+      recettes.
+    </p>
+
+    <a class="primary-link" routerLink="/cocktails">
+      Voir mes cocktails
+      <span aria-hidden="true">→</span>
     </a>
+  </section>
 
-    <div class="user-actions">
-      @if (authService.currentUser(); as user) {
-        <span class="user-name">{{ user.displayName }}</span>
-      }
+  <section class="home-panel">
+    <div>
+      <p class="section-label">Ta bibliothèque</p>
 
-      <button type="button" class="logout-button" (click)="logout()">
-        Déconnexion
-      </button>
+      <h2>Un carnet qui peut évoluer avec toi.</h2>
     </div>
-  </header>
 
-  <main class="home-content">
-    <section class="hero">
-      <p class="eyebrow">Mon Barbook</p>
-
-      @if (authService.currentUser(); as user) {
-        <h1>Bienvenue, {{ user.displayName }}.</h1>
-      } @else {
-        <h1>Bienvenue dans Barbook.</h1>
-      }
-
-      <p class="hero-copy">
-        Ton espace personnel est prêt. Tu pourras bientôt y retrouver tes
-        classiques, tes créations et toutes les recettes que tu veux garder
-        sous la main.
-      </p>
-    </section>
-
-    <section class="coming-next">
-      <p class="section-label">Prochaine étape</p>
-      <h2>Construire ta bibliothèque de cocktails.</h2>
-
-      <p>
-        La fondation utilisateur est maintenant opérationnelle. La prochaine
-        fonctionnalité métier viendra connecter ce Barbook aux recettes
-        enregistrées en base.
-      </p>
-    </section>
-  </main>
+    <p>
+      Classiques, créations personnelles et variations auront leur propre
+      place dans Barbook. La bibliothèque constitue maintenant le point
+      d’entrée vers tes recettes.
+    </p>
+  </section>
 </div>

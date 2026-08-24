@@ -1,0 +1,47 @@
+<div class="app-shell">
+  <header class="app-header">
+    <div class="header-content">
+      <a class="brand" routerLink="/">
+        <span class="brand-mark">B</span>
+        <span>Barbook</span>
+      </a>
+
+      <nav class="main-navigation" aria-label="Navigation principale">
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Accueil
+        </a>
+
+        <a
+          routerLink="/cocktails"
+          routerLinkActive="active"
+        >
+          Mes cocktails
+        </a>
+      </nav>
+
+      <div class="user-actions">
+        @if (authService.currentUser(); as user) {
+          <span class="user-name">
+            {{ user.displayName }}
+          </span>
+        }
+
+        <button
+          type="button"
+          class="logout-button"
+          (click)="logout()"
+        >
+          Déconnexion
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <router-outlet />
+  </main>
+</div>
