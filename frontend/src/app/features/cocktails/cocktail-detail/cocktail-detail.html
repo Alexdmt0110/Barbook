@@ -1,0 +1,351 @@
+<section class="detail-page">
+  <a
+    class="back-link"
+    routerLink="/cocktails"
+  >
+    <span aria-hidden="true">←</span>
+    Mes cocktails
+  </a>
+
+  @if (isLoading()) {
+    <section
+      class="detail-skeleton"
+      aria-label="Chargement de la recette"
+      aria-busy="true"
+    >
+      <div class="skeleton-visual"></div>
+
+      <div class="skeleton-content">
+        <div
+          class="skeleton-line skeleton-small"
+        ></div>
+
+        <div
+          class="skeleton-line skeleton-title"
+        ></div>
+
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+      </div>
+    </section>
+  } @else if (isNotFound()) {
+    <section class="state-card">
+      <p class="eyebrow">
+        Cocktail introuvable
+      </p>
+
+      <h1>
+        Cette recette n’existe pas dans ton
+        Barbook.
+      </h1>
+
+      <p>
+        Elle a peut-être été supprimée ou
+        l’adresse utilisée n’est plus valide.
+      </p>
+
+      <a
+        class="state-action"
+        routerLink="/cocktails"
+      >
+        Revenir à mes cocktails
+      </a>
+    </section>
+  } @else if (errorMessage()) {
+    <section
+      class="state-card"
+      role="alert"
+    >
+      <p class="eyebrow">
+        Chargement impossible
+      </p>
+
+      <h1>
+        Impossible d’ouvrir cette recette.
+      </h1>
+
+      <p>
+        {{ errorMessage() }}
+      </p>
+
+      <button
+        type="button"
+        class="state-action"
+        (click)="loadCocktail()"
+      >
+        Réessayer
+      </button>
+    </section>
+  } @else if (cocktail(); as recipe) {
+    <header class="detail-hero">
+      <div class="cocktail-visual">
+        <img
+          [src]="
+            recipe.imageUrl ||
+            '/placeholder-cocktail.png'
+          "
+          [alt]="recipe.name"
+        />
+
+        <span class="type-badge">
+          {{ typeLabel(recipe.type) }}
+        </span>
+      </div>
+
+      <div class="hero-content">
+        <div>
+          <p class="eyebrow">
+            {{
+              recipe.family ||
+              'Sans famille'
+            }}
+          </p>
+
+          <h1>{{ recipe.name }}</h1>
+
+          @if (recipe.tags.length > 0) {
+            <div
+              class="tag-list"
+              [attr.aria-label]="
+                'Tags de ' + recipe.name
+              "
+            >
+              @for (
+                tag of recipe.tags;
+                track tag.id
+                ) {
+                <span>{{ tag.name }}</span>
+              }
+            </div>
+          }
+        </div>
+
+        <dl class="service-grid">
+          <div>
+            <dt>Alcool principal</dt>
+            <dd>
+              {{
+                recipe.mainAlcohol?.name ||
+                'Sans alcool principal'
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>Méthode</dt>
+            <dd>
+              {{
+                methodLabel(recipe.method)
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>Verre</dt>
+            <dd>{{ recipe.glass }}</dd>
+          </div>
+
+          <div>
+            <dt>Glace</dt>
+            <dd>
+              {{
+                recipe.ice ||
+                'Sans glace au service'
+              }}
+            </dd>
+          </div>
+
+          <div class="abv-item">
+            <dt>Degré estimé</dt>
+            <dd>
+              {{
+                estimatedAbvLabel(
+                  recipe.estimatedAbv
+                )
+              }}
+            </dd>
+          </div>
+
+          @if (recipe.folder; as folder) {
+            <div>
+              <dt>Dossier</dt>
+              <dd>{{ folder.name }}</dd>
+            </div>
+          }
+        </dl>
+      </div>
+    </header>
+
+    <div class="recipe-layout">
+      <section class="recipe-card ingredients-card">
+        <div class="section-heading">
+          <p class="eyebrow">Recette</p>
+          <h2>Ingrédients</h2>
+        </div>
+
+        @if (recipe.ingredients.length > 0) {
+          <ul class="ingredient-list">
+            @for (
+              ingredient of recipe.ingredients;
+              track ingredient.id
+              ) {
+              <li>
+                <div class="ingredient-main">
+                  <div>
+                    <strong>
+                      {{
+                        ingredient
+                          .ingredient
+                          .name
+                      }}
+                    </strong>
+
+                    @if (
+                      ingredient.specification
+                      ) {
+                      <span
+                        class="ingredient-specification"
+                      >
+                        {{
+                          ingredient.specification
+                        }}
+                      </span>
+                    }
+                  </div>
+
+                  <span
+                    class="ingredient-amount"
+                  >
+                    {{
+                      formatMeasurement(
+                        ingredient.amount,
+                        ingredient.unit
+                      )
+                    }}
+                  </span>
+                </div>
+
+                @if (ingredient.notes) {
+                  <p class="ingredient-note">
+                    {{ ingredient.notes }}
+                  </p>
+                }
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="section-empty">
+            Aucun ingrédient renseigné.
+          </p>
+        }
+      </section>
+
+      <section class="recipe-card preparation-card">
+        <div class="section-heading">
+          <p class="eyebrow">
+            Au bar
+          </p>
+          <h2>Préparation</h2>
+        </div>
+
+        @if (recipe.steps.length > 0) {
+          <ol class="step-list">
+            @for (
+              step of recipe.steps;
+              track step.id;
+              let index = $index
+              ) {
+              <li>
+                <span
+                  class="step-number"
+                  aria-hidden="true"
+                >
+                  {{
+                    (index + 1)
+                      .toString()
+                      .padStart(2, '0')
+                  }}
+                </span>
+
+                <p>{{ step.content }}</p>
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="section-empty">
+            Aucune étape renseignée.
+          </p>
+        }
+      </section>
+
+      @if (recipe.garnishes.length > 0) {
+        <section class="recipe-card garnish-card">
+          <div class="section-heading">
+            <p class="eyebrow">
+              Finition
+            </p>
+            <h2>Garniture</h2>
+          </div>
+
+          <ul class="garnish-list">
+            @for (
+              garnish of recipe.garnishes;
+              track garnish.id
+              ) {
+              <li>
+                <div class="garnish-heading">
+                  <strong>
+                    {{
+                      garnish.ingredient.name
+                    }}
+                  </strong>
+
+                  @if (
+                    garnish.amount !== null ||
+                    garnish.unit !== null
+                    ) {
+                    <span>
+                      {{
+                        formatMeasurement(
+                          garnish.amount,
+                          garnish.unit
+                        )
+                      }}
+                    </span>
+                  }
+                </div>
+
+                @if (
+                  garnish.specification
+                  ) {
+                  <p>
+                    {{
+                      garnish.specification
+                    }}
+                  </p>
+                }
+
+                <p>{{ garnish.usage }}</p>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      @if (recipe.notes) {
+        <section class="recipe-card notes-card">
+          <div class="section-heading">
+            <p class="eyebrow">
+              À retenir
+            </p>
+            <h2>Notes</h2>
+          </div>
+
+          <p class="recipe-notes">
+            {{ recipe.notes }}
+          </p>
+        </section>
+      }
+    </div>
+  }
+</section>
