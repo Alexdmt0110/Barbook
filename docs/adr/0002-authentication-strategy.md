@@ -19,7 +19,8 @@ L'authentification repose sur :
 - des mots de passe hashés avec Argon2id ;
 - un access token JWT de courte durée ;
 - un JWT identifiant uniquement l'utilisateur ;
-- un contrôle explicite du workspace dans les futures opérations métier.
+- un contrôle explicite du workspace dans les futures opérations métier ;
+- un stockage temporaire de l'access token dans `sessionStorage` côté frontend pour la V1.
 
 Le payload JWT contient actuellement uniquement :
 
@@ -52,6 +53,8 @@ WorkspaceMember OWNER
 
 Cette transaction garantit qu'un utilisateur ne peut pas être créé sans son Barbook personnel.
 
+Une inscription réussie connecte immédiatement l'utilisateur et retourne un access token.
+
 ## Mots de passe
 
 Les mots de passe sont hashés avec Argon2id.
@@ -80,13 +83,84 @@ Les access tokens :
 
 Le secret JWT est uniquement fourni par l'environnement et n'est jamais versionné.
 
+## Stockage frontend
+
+Pour la V1, l'access token est stocké dans :
+
+```text
+sessionStorage
+```
+
+Ce choix permet de conserver la session lors d'un rafraîchissement de page tout en supprimant le token à la fermeture de la session navigateur.
+
+`sessionStorage` reste accessible au JavaScript exécuté dans la page et ne protège donc pas contre une attaque XSS.
+
+Il s'agit d'un compromis temporaire adapté au développement actuel, pas de la stratégie cible pour une exposition publique durable.
+
+La stratégie cible à réévaluer avant mise en production publique est :
+
+```text
+access token  → mémoire frontend
+refresh token → cookie HttpOnly + Secure + SameSite
+```
+
+Cette évolution nécessite une feature dédiée de gestion des sessions et refresh tokens.
+
+## Restauration de session
+
+Au démarrage de l'application Angular, la présence d'un token dans `sessionStorage` ne suffit pas à considérer l'utilisateur comme authentifié.
+
+Une route protégée déclenche :
+
+```text
+GET /api/auth/me
+```
+
+Le backend valide le JWT et vérifie que l'utilisateur existe toujours.
+
+Si la requête réussit, l'état utilisateur Angular est restauré.
+
+Si elle échoue :
+
+```text
+token supprimé
+session locale supprimée
+redirection vers /login
+```
+
 ## Routes
 
-Les routes d'inscription et de connexion sont publiques.
+Les routes backend d'inscription et de connexion sont publiques.
 
-Les routes protégées utilisent `JwtAuthGuard`.
+Les routes backend protégées utilisent `JwtAuthGuard`.
 
 Le décorateur `CurrentUserId` permet de récupérer l'identifiant authentifié depuis le token validé.
+
+Côté Angular, les routes privées utilisent `authGuard`.
+
+Une tentative d'accès à une route privée sans session redirige vers :
+
+```text
+/login?returnUrl=<route-demandée>
+```
+
+Après connexion, l'utilisateur peut être redirigé vers la route initialement demandée.
+
+## Transmission du token
+
+Un interceptor Angular ajoute automatiquement :
+
+```http
+Authorization: Bearer <access-token>
+```
+
+uniquement aux requêtes dont l'URL commence par :
+
+```text
+/api/
+```
+
+Le token Barbook n'est donc pas automatiquement envoyé vers des services externes.
 
 ## Erreurs d'authentification
 
@@ -97,20 +171,24 @@ Une tentative de connexion échouée retourne volontairement le même message lo
 
 Une opération Argon2 est également effectuée lorsqu'aucun utilisateur n'est trouvé afin de réduire la différence temporelle observable entre les deux situations.
 
+Le frontend ne révèle pas davantage d'informations que le backend.
+
 ## Conséquences
 
 Les futures autorisations devront toujours vérifier l'appartenance de l'utilisateur au workspace ciblé.
 
 Un JWT valide ne constitue pas une autorisation d'accès à toutes les données de l'utilisateur ou des workspaces auxquels il appartient.
 
+Le frontend ne doit jamais être considéré comme une barrière de sécurité suffisante : toutes les autorisations métier restent vérifiées côté backend.
+
 ## Limites actuelles
 
 Les refresh tokens ne sont pas encore implémentés.
 
-La stratégie de stockage des tokens côté frontend n'est pas encore décidée.
+Le stockage de l'access token dans `sessionStorage` est temporaire.
 
 La limitation de débit des endpoints d'authentification n'est pas encore implémentée.
 
-La vérification d'adresse email, la réinitialisation de mot de passe et l'authentification multifacteur sont hors du périmètre actuel.
+La vérification d'adresse email, la réinitialisation de mot de passe, la révocation de sessions et l'authentification multifacteur sont hors du périmètre actuel.
 
 Ces éléments devront être réévalués avant une mise en production publique.

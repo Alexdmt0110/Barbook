@@ -1,0 +1,116 @@
+<main class="auth-page">
+  <section class="auth-layout">
+    <aside class="auth-introduction">
+      <a class="brand" routerLink="/">
+        <span class="brand-mark">B</span>
+        <span>Barbook</span>
+      </a>
+
+      <div class="introduction-content">
+        <p class="eyebrow">Ton carnet, à ta manière.</p>
+
+        <h1>Retrouve les recettes qui méritent d’être gardées.</h1>
+
+        <p class="introduction-copy">
+          Un espace personnel pour conserver, organiser et retrouver tes
+          cocktails sans dépendre d’une note perdue ou d’une photo dans ta
+          galerie.
+        </p>
+      </div>
+
+      <p class="introduction-footer">
+        Barbook · Cocktails, recettes et créations
+      </p>
+    </aside>
+
+    <section class="auth-panel">
+      <div class="auth-form-container">
+        <div class="auth-heading">
+          <p class="eyebrow">Bon retour</p>
+          <h2>Connexion</h2>
+          <p>
+            Accède à ton Barbook personnel.
+          </p>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div class="field">
+            <label for="email">Adresse email</label>
+
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              placeholder="alex@example.com"
+            />
+
+            @if (
+              form.controls.email.touched &&
+              form.controls.email.invalid
+              ) {
+              <p class="field-error">
+                Entre une adresse email valide.
+              </p>
+            }
+          </div>
+
+          <div class="field">
+            <label for="password">Mot de passe</label>
+
+            <div class="password-field">
+              <input
+                id="password"
+                [type]="passwordVisible() ? 'text' : 'password'"
+                formControlName="password"
+                autocomplete="current-password"
+                placeholder="Ton mot de passe"
+              />
+
+              <button
+                class="password-toggle"
+                type="button"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="
+                  passwordVisible()
+                    ? 'Masquer le mot de passe'
+                    : 'Afficher le mot de passe'
+                "
+              >
+                {{ passwordVisible() ? 'Masquer' : 'Afficher' }}
+              </button>
+            </div>
+
+            @if (
+              form.controls.password.touched &&
+              form.controls.password.invalid
+              ) {
+              <p class="field-error">
+                Entre ton mot de passe.
+              </p>
+            }
+          </div>
+
+          @if (errorMessage()) {
+            <div class="form-error" role="alert">
+              {{ errorMessage() }}
+            </div>
+          }
+
+          <button
+            class="primary-button"
+            type="submit"
+            [disabled]="isSubmitting()"
+          >
+            {{ isSubmitting() ? 'Connexion…' : 'Se connecter' }}
+          </button>
+        </form>
+
+        <p class="auth-switch">
+          Pas encore de compte ?
+          <a routerLink="/register">Créer mon Barbook</a>
+        </p>
+      </div>
+    </section>
+  </section>
+</main>
