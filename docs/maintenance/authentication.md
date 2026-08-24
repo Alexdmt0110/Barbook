@@ -1,5 +1,23 @@
 # Authentification Barbook
 
+## Architecture
+
+L'authentification Barbook couvre actuellement le flux complet :
+
+```text
+Angular
+↓
+NestJS
+↓
+Prisma
+↓
+PostgreSQL
+```
+
+Le frontend gère l'état de session et la navigation.
+
+Le backend reste responsable de l'authentification réelle et de toutes les futures autorisations métier.
+
 ## Endpoints
 
 L'API expose actuellement :
@@ -37,6 +55,8 @@ User
 Workspace PERSONAL
 WorkspaceMember OWNER
 ```
+
+L'utilisateur est immédiatement authentifié après la création du compte.
 
 ## Connexion
 
@@ -94,23 +114,120 @@ JWT_SECRET
 
 Il doit comporter au moins 32 caractères et ne doit jamais être versionné.
 
-## Route utilisateur courant
+## Session Angular
 
-Une requête vers :
+Le frontend conserve temporairement l'access token dans :
 
 ```text
-GET /api/auth/me
+sessionStorage
 ```
 
-doit contenir :
+Clé utilisée :
+
+```text
+barbook.accessToken
+```
+
+Aucun mot de passe ni hash de mot de passe n'est stocké côté frontend.
+
+La présence d'un token ne suffit pas à restaurer automatiquement l'identité utilisateur.
+
+Lorsqu'une route protégée est demandée après un rechargement de l'application :
+
+```text
+token présent
+↓
+GET /api/auth/me
+↓
+JWT validé côté backend
+↓
+currentUser restauré
+```
+
+Si le token est invalide ou expiré :
+
+```text
+/auth/me → 401
+↓
+session Angular supprimée
+↓
+token supprimé du sessionStorage
+↓
+redirection vers /login
+```
+
+## Interceptor HTTP
+
+`authInterceptor` ajoute automatiquement :
 
 ```http
 Authorization: Bearer <access-token>
 ```
 
-La route vérifie le JWT puis recherche l'utilisateur correspondant en base.
+aux requêtes internes dont l'URL commence par :
 
-Un token appartenant à un utilisateur supprimé est refusé.
+```text
+/api/
+```
+
+Il ne transmet pas automatiquement le token aux URLs externes.
+
+## Guard Angular
+
+Les routes privées utilisent :
+
+```text
+authGuard
+```
+
+Si aucune session n'est disponible, l'utilisateur est redirigé vers :
+
+```text
+/login?returnUrl=<url-initiale>
+```
+
+Après une connexion réussie, l'application retourne vers la route initialement demandée si celle-ci est une URL interne valide.
+
+## Déconnexion
+
+La déconnexion :
+
+```text
+supprime currentUser
+supprime l'access token en mémoire
+supprime barbook.accessToken du sessionStorage
+redirige vers /login
+```
+
+Il n'existe pas encore de session serveur ou de refresh token à révoquer.
+
+## Proxy de développement
+
+Le frontend appelle toujours l'API avec des URLs relatives :
+
+```text
+/api/...
+```
+
+En développement, Angular utilise :
+
+```text
+frontend/proxy.conf.json
+```
+
+pour transférer les appels vers :
+
+```text
+http://localhost:3000
+```
+
+En production, Nginx devra assurer le même rôle pour :
+
+```text
+https://barbook.melioria.fr/api
+```
+
+Cela évite de coder l'URL du backend directement dans Angular.
 
 ## Validation des requêtes
 
@@ -122,7 +239,9 @@ forbidNonWhitelisted = true
 transform = true
 ```
 
-Les propriétés inconnues sont donc rejetées.
+Angular effectue également une validation ergonomique des formulaires avant envoi.
+
+La validation frontend améliore l'expérience utilisateur mais ne remplace jamais la validation backend.
 
 ## Vérifications backend
 
@@ -149,24 +268,74 @@ npm run verify:db
 
 ajoute également la vérification de l'état des migrations PostgreSQL.
 
-Depuis la racine du dépôt, les mêmes vérifications peuvent être lancées avec :
+Depuis la racine :
 
 ```powershell
 npm --prefix backend run verify
 npm --prefix backend run verify:db
 ```
 
-## Sécurité avant production
+## Vérifications frontend
 
-Avant une exposition publique, les sujets suivants devront être traités ou explicitement réévalués :
+Depuis `frontend` :
+
+```powershell
+npm run verify
+```
+
+vérifie actuellement :
+
+```text
+production build
+unit tests
+```
+
+Depuis la racine :
+
+```powershell
+npm --prefix frontend run verify
+```
+
+## Tests automatisés
+
+Le backend couvre notamment :
+
+```text
+Argon2id
+register
+login
+création PERSONAL + OWNER
+JWT Guard
+utilisateur courant
+```
+
+Le frontend couvre notamment :
+
+```text
+AuthService
+persistance de session
+restauration du token
+logout
+authInterceptor
+authGuard
+```
+
+## Sécurité avant production publique
+
+Les sujets suivants doivent être traités ou explicitement réévalués :
 
 ```text
 refresh tokens
-stockage frontend des tokens
+stockage sécurisé long terme des sessions
 rate limiting sur register/login
 vérification email
 mot de passe oublié
 révocation de sessions
+protection XSS
+Content-Security-Policy
 HTTPS production
-politique CORS production
+CORS production
+configuration Nginx
 ```
+
+Le stockage actuel dans `sessionStorage` est un compromis V1 et ne doit pas être considéré comme la stratégie finale.
