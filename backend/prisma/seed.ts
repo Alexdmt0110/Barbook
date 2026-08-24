@@ -53,6 +53,12 @@ const seedCocktails: SeedCocktail[] = [
   },
 ];
 
+function assertDevelopmentSeedAllowed(): void {
+  if (process.env.NODE_ENV?.trim().toLowerCase() === 'production') {
+    throw new Error('Development seed is disabled when NODE_ENV=production.');
+  }
+}
+
 function readEmailArgument(): string {
   const emailArgumentIndex = process.argv.indexOf('--email');
 
@@ -102,6 +108,8 @@ function createPrismaClient(): PrismaClient {
 }
 
 async function main(): Promise<void> {
+  assertDevelopmentSeedAllowed();
+
   const email = readEmailArgument();
   const prisma = createPrismaClient();
 
