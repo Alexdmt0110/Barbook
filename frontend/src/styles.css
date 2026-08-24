@@ -62,13 +62,13 @@
 
   --color-text: #2d1913;
   --color-text-muted: #74594f;
-  --color-text-subtle: #866b61;
-  --color-placeholder: #9b8177;
+  --color-text-subtle: #82665c;
+  --color-placeholder: #82685e;
 
-  --color-accent: #a75d2d;
+  --color-accent: #a45a2b;
   --color-on-accent: #fffaf7;
-  --color-accent-soft: rgba(167, 93, 45, 0.1);
-  --color-accent-soft-strong: rgba(167, 93, 45, 0.17);
+  --color-accent-soft: rgba(164, 90, 43, 0.1);
+  --color-accent-soft-strong: rgba(164, 90, 43, 0.17);
 
   --color-border: rgba(74, 41, 29, 0.14);
   --color-border-strong: rgba(74, 41, 29, 0.27);
