@@ -1,4 +1,8 @@
-import { CocktailType, RecipeMethod } from '../generated/prisma/client';
+import {
+  CocktailType,
+  MeasurementUnit,
+  RecipeMethod,
+} from '../generated/prisma/client';
 
 export interface CocktailSummaryIngredient {
   id: string;
@@ -29,4 +33,43 @@ export interface CocktailSummary {
   folder: CocktailSummaryFolder | null;
   tags: CocktailSummaryTag[];
   updatedAt: Date;
+}
+
+export interface CocktailDetailIngredientReference {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface CocktailDetailIngredient {
+  id: string;
+  ingredient: CocktailDetailIngredientReference;
+  amount: number | null;
+  unit: MeasurementUnit;
+  specification: string | null;
+  abv: number | null;
+  notes: string | null;
+}
+
+export interface CocktailDetailGarnish {
+  id: string;
+  ingredient: CocktailDetailIngredientReference;
+  amount: number | null;
+  unit: MeasurementUnit | null;
+  specification: string | null;
+  usage: string;
+}
+
+export interface CocktailDetailStep {
+  id: string;
+  content: string;
+}
+
+export interface CocktailDetail extends CocktailSummary {
+  ice: string | null;
+  notes: string | null;
+  ingredients: CocktailDetailIngredient[];
+  garnishes: CocktailDetailGarnish[];
+  steps: CocktailDetailStep[];
+  estimatedAbv: number | null;
 }

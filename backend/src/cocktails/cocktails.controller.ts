@@ -1,7 +1,7 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { CurrentUserId } from '../auth/decorators/current-user-id.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CocktailSummary } from './cocktail.types';
+import { CocktailDetail, CocktailSummary } from './cocktail.types';
 import { CocktailsService } from './cocktails.service';
 
 @Controller('cocktails')
@@ -14,5 +14,13 @@ export class CocktailsController {
     @CurrentUserId() userId: string,
   ): Promise<CocktailSummary[]> {
     return this.cocktailsService.findPersonalCocktails(userId);
+  }
+
+  @Get(':slug')
+  async findPersonalCocktail(
+    @CurrentUserId() userId: string,
+    @Param('slug') slug: string,
+  ): Promise<CocktailDetail> {
+    return this.cocktailsService.findPersonalCocktail(userId, slug);
   }
 }
