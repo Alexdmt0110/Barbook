@@ -1,4 +1,6 @@
 <main class="auth-page">
+  <app-theme-switcher class="auth-theme-switcher" />
+
   <section class="auth-layout">
     <aside class="auth-introduction">
       <a class="brand" routerLink="/">
@@ -7,19 +9,25 @@
       </a>
 
       <div class="introduction-content">
-        <p class="eyebrow">Commence ton carnet.</p>
+        <p class="eyebrow">
+          Commence ton carnet.
+        </p>
 
-        <h1>Construis une bibliothèque de cocktails qui t’appartient.</h1>
+        <h1>
+          Construis une bibliothèque de cocktails qui
+          t’appartient.
+        </h1>
 
         <p class="introduction-copy">
-          Classiques, créations personnelles, variations et recettes à
-          retravailler : garde tout au même endroit et organise-le comme tu
-          l’entends.
+          Classiques, créations personnelles, variations et
+          recettes à retravailler : garde tout au même
+          endroit et organise-le comme tu l’entends.
         </p>
       </div>
 
       <p class="introduction-footer">
-        Un Barbook personnel est créé automatiquement avec ton compte.
+        Un Barbook personnel est créé automatiquement avec
+        ton compte.
       </p>
     </aside>
 
@@ -29,13 +37,20 @@
           <p class="eyebrow">Bienvenue</p>
           <h2>Créer mon compte</h2>
           <p>
-            Quelques informations suffisent pour ouvrir ton Barbook.
+            Quelques informations suffisent pour ouvrir
+            ton Barbook.
           </p>
         </div>
 
-        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <form
+          [formGroup]="form"
+          (ngSubmit)="submit()"
+          novalidate
+        >
           <div class="field">
-            <label for="displayName">Nom affiché</label>
+            <label for="displayName">
+              Nom affiché
+            </label>
 
             <input
               id="displayName"
@@ -50,13 +65,16 @@
               form.controls.displayName.invalid
               ) {
               <p class="field-error">
-                Le nom doit contenir entre 2 et 80 caractères.
+                Le nom doit contenir entre 2 et
+                80 caractères.
               </p>
             }
           </div>
 
           <div class="field">
-            <label for="email">Adresse email</label>
+            <label for="email">
+              Adresse email
+            </label>
 
             <input
               id="email"
@@ -77,12 +95,18 @@
           </div>
 
           <div class="field">
-            <label for="password">Mot de passe</label>
+            <label for="password">
+              Mot de passe
+            </label>
 
             <div class="password-field">
               <input
                 id="password"
-                [type]="passwordVisible() ? 'text' : 'password'"
+                [type]="
+                  passwordVisible()
+                    ? 'text'
+                    : 'password'
+                "
                 formControlName="password"
                 autocomplete="new-password"
                 placeholder="15 caractères minimum"
@@ -98,13 +122,18 @@
                     : 'Afficher le mot de passe'
                 "
               >
-                {{ passwordVisible() ? 'Masquer' : 'Afficher' }}
+                {{
+                  passwordVisible()
+                    ? 'Masquer'
+                    : 'Afficher'
+                }}
               </button>
             </div>
 
             <p class="field-hint">
-              Utilise au minimum 15 caractères. Une phrase facile à retenir
-              vaut mieux qu’un mot de passe artificiellement complexe.
+              Utilise au minimum 15 caractères. Une phrase
+              facile à retenir vaut mieux qu’un mot de
+              passe artificiellement complexe.
             </p>
 
             @if (
@@ -112,13 +141,17 @@
               form.controls.password.invalid
               ) {
               <p class="field-error">
-                Le mot de passe doit contenir entre 15 et 128 caractères.
+                Le mot de passe doit contenir entre
+                15 et 128 caractères.
               </p>
             }
           </div>
 
           @if (errorMessage()) {
-            <div class="form-error" role="alert">
+            <div
+              class="form-error"
+              role="alert"
+            >
               {{ errorMessage() }}
             </div>
           }
@@ -128,13 +161,19 @@
             type="submit"
             [disabled]="isSubmitting()"
           >
-            {{ isSubmitting() ? 'Création…' : 'Créer mon Barbook' }}
+            {{
+              isSubmitting()
+                ? 'Création…'
+                : 'Créer mon Barbook'
+            }}
           </button>
         </form>
 
         <p class="auth-switch">
           Déjà un compte ?
-          <a routerLink="/login">Se connecter</a>
+          <a routerLink="/login">
+            Se connecter
+          </a>
         </p>
       </div>
     </section>

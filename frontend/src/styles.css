@@ -24,6 +24,7 @@
 
   --color-header-background: rgba(18, 11, 11, 0.82);
   --color-overlay-background: rgba(18, 11, 11, 0.72);
+  --color-on-overlay: #f8eee9;
 
   --color-field-background: rgba(10, 7, 7, 0.36);
   --color-field-hover: rgba(10, 7, 7, 0.5);
@@ -74,6 +75,7 @@
 
   --color-header-background: rgba(248, 242, 238, 0.88);
   --color-overlay-background: rgba(45, 25, 19, 0.78);
+  --color-on-overlay: #ffffff;
 
   --color-field-background: rgba(255, 255, 255, 0.7);
   --color-field-hover: rgba(255, 255, 255, 0.94);
@@ -124,6 +126,7 @@
 
   --color-header-background: #000000;
   --color-overlay-background: #000000;
+  --color-on-overlay: #ffffff;
 
   --color-field-background: #000000;
   --color-field-hover: #111111;

@@ -53,7 +53,7 @@
   padding: 0 20px;
   gap: 10px;
   border-radius: var(--radius-pill);
-  color: #24120b;
+  color: var(--color-on-accent);
   background: var(--color-accent);
   font-size: 0.9rem;
   font-weight: 750;
@@ -70,7 +70,9 @@
 
 .home-panel {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(0, 1.1fr);
   width: 100%;
   max-width: 900px;
   margin-top: 110px;
