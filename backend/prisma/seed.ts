@@ -2,12 +2,36 @@ import { config as loadEnv } from 'dotenv';
 import { PrismaPg } from '@prisma/adapter-pg';
 import {
   CocktailType,
+  MeasurementUnit,
   PrismaClient,
   RecipeMethod,
 } from '../src/generated/prisma/client';
 import { buildPostgresConnectionString } from '../src/database/postgres-connection-string';
 
 loadEnv({ path: '../.env' });
+
+interface SeedIngredient {
+  slug: string;
+  name: string;
+  defaultAbv: number;
+}
+
+interface SeedRecipeIngredient {
+  ingredientSlug: string;
+  amount: number | null;
+  unit: MeasurementUnit;
+  specification?: string;
+  abvOverride?: number;
+  notes?: string;
+}
+
+interface SeedGarnish {
+  ingredientSlug: string;
+  amount: number | null;
+  unit: MeasurementUnit | null;
+  specification?: string;
+  usage: string;
+}
 
 interface SeedCocktail {
   slug: string;
@@ -16,9 +40,96 @@ interface SeedCocktail {
   family: string;
   method: RecipeMethod;
   glass: string;
+  ice: string | null;
+  notes: string | null;
   mainAlcoholSlug: string;
   tagSlugs: string[];
+  ingredients: SeedRecipeIngredient[];
+  garnishes: SeedGarnish[];
+  steps: string[];
 }
+
+const seedIngredients: SeedIngredient[] = [
+  {
+    slug: 'gin',
+    name: 'Gin',
+    defaultAbv: 40,
+  },
+  {
+    slug: 'rhum-blanc',
+    name: 'Rhum blanc',
+    defaultAbv: 40,
+  },
+  {
+    slug: 'vodka',
+    name: 'Vodka',
+    defaultAbv: 40,
+  },
+  {
+    slug: 'jus-citron-vert',
+    name: 'Jus de citron vert',
+    defaultAbv: 0,
+  },
+  {
+    slug: 'citron-vert',
+    name: 'Citron vert',
+    defaultAbv: 0,
+  },
+  {
+    slug: 'sirop-sucre',
+    name: 'Sirop de sucre',
+    defaultAbv: 0,
+  },
+  {
+    slug: 'campari',
+    name: 'Campari',
+    defaultAbv: 25,
+  },
+  {
+    slug: 'vermouth-rouge',
+    name: 'Vermouth rouge',
+    defaultAbv: 16,
+  },
+  {
+    slug: 'orange',
+    name: 'Orange',
+    defaultAbv: 0,
+  },
+  {
+    slug: 'liqueur-cafe',
+    name: 'Liqueur de café',
+    defaultAbv: 20,
+  },
+  {
+    slug: 'espresso',
+    name: 'Espresso',
+    defaultAbv: 0,
+  },
+  {
+    slug: 'grains-cafe',
+    name: 'Grains de café',
+    defaultAbv: 0,
+  },
+];
+
+const seedTags = [
+  {
+    slug: 'classique',
+    name: 'Classique',
+  },
+  {
+    slug: 'agrumes',
+    name: 'Agrumes',
+  },
+  {
+    slug: 'cafe',
+    name: 'Café',
+  },
+  {
+    slug: 'amer',
+    name: 'Amer',
+  },
+];
 
 const seedCocktails: SeedCocktail[] = [
   {
@@ -28,8 +139,43 @@ const seedCocktails: SeedCocktail[] = [
     family: 'Sour',
     method: RecipeMethod.SHAKER,
     glass: 'Coupe',
+    ice: null,
+    notes:
+      'Servir bien frais. Ajuster légèrement le sucre selon l’acidité du citron vert.',
     mainAlcoholSlug: 'rhum-blanc',
     tagSlugs: ['classique', 'agrumes'],
+    ingredients: [
+      {
+        ingredientSlug: 'rhum-blanc',
+        amount: 50,
+        unit: MeasurementUnit.ML,
+      },
+      {
+        ingredientSlug: 'jus-citron-vert',
+        amount: 25,
+        unit: MeasurementUnit.ML,
+      },
+      {
+        ingredientSlug: 'sirop-sucre',
+        amount: 15,
+        unit: MeasurementUnit.ML,
+        notes: 'Sirop simple 1:1.',
+      },
+    ],
+    garnishes: [
+      {
+        ingredientSlug: 'citron-vert',
+        amount: 1,
+        unit: MeasurementUnit.PIECE,
+        usage: 'Fine rondelle de citron vert.',
+      },
+    ],
+    steps: [
+      'Verser tous les ingrédients dans un shaker.',
+      'Ajouter de la glace et shaker vivement.',
+      'Double filtrer dans une coupe préalablement refroidie.',
+      'Ajouter la garniture.',
+    ],
   },
   {
     slug: 'espresso-martini',
@@ -38,8 +184,49 @@ const seedCocktails: SeedCocktail[] = [
     family: 'After-dinner',
     method: RecipeMethod.SHAKER,
     glass: 'Coupe',
+    ice: null,
+    notes:
+      'Utiliser un espresso fraîchement préparé et shaker vigoureusement pour obtenir une mousse dense.',
     mainAlcoholSlug: 'vodka',
     tagSlugs: ['classique', 'cafe'],
+    ingredients: [
+      {
+        ingredientSlug: 'vodka',
+        amount: 40,
+        unit: MeasurementUnit.ML,
+      },
+      {
+        ingredientSlug: 'liqueur-cafe',
+        amount: 20,
+        unit: MeasurementUnit.ML,
+      },
+      {
+        ingredientSlug: 'espresso',
+        amount: 30,
+        unit: MeasurementUnit.ML,
+      },
+      {
+        ingredientSlug: 'sirop-sucre',
+        amount: 10,
+        unit: MeasurementUnit.ML,
+        notes: 'Sirop simple 1:1.',
+      },
+    ],
+    garnishes: [
+      {
+        ingredientSlug: 'grains-cafe',
+        amount: 3,
+        unit: MeasurementUnit.PIECE,
+        usage: 'Déposer trois grains de café sur la mousse.',
+      },
+    ],
+    steps: [
+      'Préparer un espresso.',
+      'Verser la vodka, la liqueur de café, l’espresso et le sirop dans un shaker.',
+      'Ajouter beaucoup de glace et shaker vigoureusement.',
+      'Double filtrer dans une coupe préalablement refroidie.',
+      'Déposer les trois grains de café sur la mousse.',
+    ],
   },
   {
     slug: 'negroni',
@@ -48,8 +235,42 @@ const seedCocktails: SeedCocktail[] = [
     family: 'Spirit-forward',
     method: RecipeMethod.MIXING_GLASS,
     glass: 'Old fashioned',
+    ice: 'Gros glaçon',
+    notes:
+      'Chercher une dilution suffisante sans perdre la structure amère du cocktail.',
     mainAlcoholSlug: 'gin',
     tagSlugs: ['classique', 'amer'],
+    ingredients: [
+      {
+        ingredientSlug: 'gin',
+        amount: 30,
+        unit: MeasurementUnit.ML,
+      },
+      {
+        ingredientSlug: 'campari',
+        amount: 30,
+        unit: MeasurementUnit.ML,
+      },
+      {
+        ingredientSlug: 'vermouth-rouge',
+        amount: 30,
+        unit: MeasurementUnit.ML,
+      },
+    ],
+    garnishes: [
+      {
+        ingredientSlug: 'orange',
+        amount: null,
+        unit: null,
+        usage: 'Exprimer un zeste d’orange au-dessus du verre puis le déposer.',
+      },
+    ],
+    steps: [
+      'Verser le gin, le Campari et le vermouth rouge dans un verre à mélange.',
+      'Ajouter de la glace et remuer jusqu’à obtenir la dilution souhaitée.',
+      'Filtrer dans un verre old fashioned sur un gros glaçon.',
+      'Exprimer le zeste d’orange puis garnir.',
+    ],
   },
 ];
 
@@ -107,6 +328,20 @@ function createPrismaClient(): PrismaClient {
   });
 }
 
+function requireMapValue(
+  values: ReadonlyMap<string, string>,
+  key: string,
+  entityName: string,
+): string {
+  const value = values.get(key);
+
+  if (!value) {
+    throw new Error(`Missing seed ${entityName} "${key}".`);
+  }
+
+  return value;
+}
+
 async function main(): Promise<void> {
   assertDevelopmentSeedAllowed();
 
@@ -140,154 +375,57 @@ async function main(): Promise<void> {
     const workspaceId = user.personalWorkspace.id;
 
     await prisma.$transaction(async (transaction) => {
-      const ingredients = await Promise.all([
-        transaction.ingredient.upsert({
-          where: {
-            workspaceId_slug: {
-              workspaceId,
-              slug: 'gin',
+      const ingredients = await Promise.all(
+        seedIngredients.map((ingredient) =>
+          transaction.ingredient.upsert({
+            where: {
+              workspaceId_slug: {
+                workspaceId,
+                slug: ingredient.slug,
+              },
             },
-          },
-          update: {
-            name: 'Gin',
-          },
-          create: {
-            workspaceId,
-            slug: 'gin',
-            name: 'Gin',
-            defaultAbv: 40,
-          },
-          select: {
-            id: true,
-            slug: true,
-          },
-        }),
-        transaction.ingredient.upsert({
-          where: {
-            workspaceId_slug: {
-              workspaceId,
-              slug: 'rhum-blanc',
+            update: {
+              name: ingredient.name,
+              defaultAbv: ingredient.defaultAbv,
             },
-          },
-          update: {
-            name: 'Rhum blanc',
-          },
-          create: {
-            workspaceId,
-            slug: 'rhum-blanc',
-            name: 'Rhum blanc',
-            defaultAbv: 40,
-          },
-          select: {
-            id: true,
-            slug: true,
-          },
-        }),
-        transaction.ingredient.upsert({
-          where: {
-            workspaceId_slug: {
+            create: {
               workspaceId,
-              slug: 'vodka',
+              slug: ingredient.slug,
+              name: ingredient.name,
+              defaultAbv: ingredient.defaultAbv,
             },
-          },
-          update: {
-            name: 'Vodka',
-          },
-          create: {
-            workspaceId,
-            slug: 'vodka',
-            name: 'Vodka',
-            defaultAbv: 40,
-          },
-          select: {
-            id: true,
-            slug: true,
-          },
-        }),
-      ]);
+            select: {
+              id: true,
+              slug: true,
+            },
+          }),
+        ),
+      );
 
-      const tags = await Promise.all([
-        transaction.tag.upsert({
-          where: {
-            workspaceId_slug: {
-              workspaceId,
-              slug: 'classique',
+      const tags = await Promise.all(
+        seedTags.map((tag) =>
+          transaction.tag.upsert({
+            where: {
+              workspaceId_slug: {
+                workspaceId,
+                slug: tag.slug,
+              },
             },
-          },
-          update: {
-            name: 'Classique',
-          },
-          create: {
-            workspaceId,
-            slug: 'classique',
-            name: 'Classique',
-          },
-          select: {
-            id: true,
-            slug: true,
-          },
-        }),
-        transaction.tag.upsert({
-          where: {
-            workspaceId_slug: {
-              workspaceId,
-              slug: 'agrumes',
+            update: {
+              name: tag.name,
             },
-          },
-          update: {
-            name: 'Agrumes',
-          },
-          create: {
-            workspaceId,
-            slug: 'agrumes',
-            name: 'Agrumes',
-          },
-          select: {
-            id: true,
-            slug: true,
-          },
-        }),
-        transaction.tag.upsert({
-          where: {
-            workspaceId_slug: {
+            create: {
               workspaceId,
-              slug: 'cafe',
+              slug: tag.slug,
+              name: tag.name,
             },
-          },
-          update: {
-            name: 'Café',
-          },
-          create: {
-            workspaceId,
-            slug: 'cafe',
-            name: 'Café',
-          },
-          select: {
-            id: true,
-            slug: true,
-          },
-        }),
-        transaction.tag.upsert({
-          where: {
-            workspaceId_slug: {
-              workspaceId,
-              slug: 'amer',
+            select: {
+              id: true,
+              slug: true,
             },
-          },
-          update: {
-            name: 'Amer',
-          },
-          create: {
-            workspaceId,
-            slug: 'amer',
-            name: 'Amer',
-          },
-          select: {
-            id: true,
-            slug: true,
-          },
-        }),
-      ]);
+          }),
+        ),
+      );
 
       const ingredientBySlug = new Map(
         ingredients.map((ingredient) => [ingredient.slug, ingredient.id]),
@@ -296,15 +434,11 @@ async function main(): Promise<void> {
       const tagBySlug = new Map(tags.map((tag) => [tag.slug, tag.id]));
 
       for (const cocktailSeed of seedCocktails) {
-        const mainAlcoholId = ingredientBySlug.get(
+        const mainAlcoholId = requireMapValue(
+          ingredientBySlug,
           cocktailSeed.mainAlcoholSlug,
+          'ingredient',
         );
-
-        if (!mainAlcoholId) {
-          throw new Error(
-            `Missing seed ingredient "${cocktailSeed.mainAlcoholSlug}".`,
-          );
-        }
 
         const cocktail = await transaction.cocktail.upsert({
           where: {
@@ -319,6 +453,8 @@ async function main(): Promise<void> {
             family: cocktailSeed.family,
             method: cocktailSeed.method,
             glass: cocktailSeed.glass,
+            ice: cocktailSeed.ice,
+            notes: cocktailSeed.notes,
             mainAlcoholId,
           },
           create: {
@@ -329,6 +465,8 @@ async function main(): Promise<void> {
             family: cocktailSeed.family,
             method: cocktailSeed.method,
             glass: cocktailSeed.glass,
+            ice: cocktailSeed.ice,
+            notes: cocktailSeed.notes,
             mainAlcoholId,
           },
           select: {
@@ -336,33 +474,99 @@ async function main(): Promise<void> {
           },
         });
 
-        await transaction.cocktailTag.deleteMany({
-          where: {
+        await Promise.all([
+          transaction.cocktailIngredient.deleteMany({
+            where: {
+              cocktailId: cocktail.id,
+            },
+          }),
+          transaction.garnishIngredient.deleteMany({
+            where: {
+              cocktailId: cocktail.id,
+            },
+          }),
+          transaction.preparationStep.deleteMany({
+            where: {
+              cocktailId: cocktail.id,
+            },
+          }),
+          transaction.cocktailTag.deleteMany({
+            where: {
+              cocktailId: cocktail.id,
+            },
+          }),
+        ]);
+
+        const recipeIngredients = cocktailSeed.ingredients.map(
+          (ingredient, index) => ({
             cocktailId: cocktail.id,
-          },
-        });
+            ingredientId: requireMapValue(
+              ingredientBySlug,
+              ingredient.ingredientSlug,
+              'ingredient',
+            ),
+            amount: ingredient.amount,
+            unit: ingredient.unit,
+            specification: ingredient.specification ?? null,
+            abvOverride: ingredient.abvOverride ?? null,
+            notes: ingredient.notes ?? null,
+            sortOrder: index + 1,
+          }),
+        );
 
-        const cocktailTags = cocktailSeed.tagSlugs.map((tagSlug) => {
-          const tagId = tagBySlug.get(tagSlug);
+        const garnishes = cocktailSeed.garnishes.map((garnish, index) => ({
+          cocktailId: cocktail.id,
+          ingredientId: requireMapValue(
+            ingredientBySlug,
+            garnish.ingredientSlug,
+            'ingredient',
+          ),
+          amount: garnish.amount,
+          unit: garnish.unit,
+          specification: garnish.specification ?? null,
+          usage: garnish.usage,
+          sortOrder: index + 1,
+        }));
 
-          if (!tagId) {
-            throw new Error(`Missing seed tag "${tagSlug}".`);
-          }
+        const steps = cocktailSeed.steps.map((content, index) => ({
+          cocktailId: cocktail.id,
+          content,
+          sortOrder: index + 1,
+        }));
 
-          return {
-            cocktailId: cocktail.id,
-            tagId,
-          };
-        });
+        const cocktailTags = cocktailSeed.tagSlugs.map((tagSlug) => ({
+          cocktailId: cocktail.id,
+          tagId: requireMapValue(tagBySlug, tagSlug, 'tag'),
+        }));
 
-        await transaction.cocktailTag.createMany({
-          data: cocktailTags,
-        });
+        if (recipeIngredients.length > 0) {
+          await transaction.cocktailIngredient.createMany({
+            data: recipeIngredients,
+          });
+        }
+
+        if (garnishes.length > 0) {
+          await transaction.garnishIngredient.createMany({
+            data: garnishes,
+          });
+        }
+
+        if (steps.length > 0) {
+          await transaction.preparationStep.createMany({
+            data: steps,
+          });
+        }
+
+        if (cocktailTags.length > 0) {
+          await transaction.cocktailTag.createMany({
+            data: cocktailTags,
+          });
+        }
       }
     });
 
     console.log(
-      `Seed completed for ${user.displayName} <${email}>: ${seedCocktails.length} cocktails available.`,
+      `Seed completed for ${user.displayName} <${email}>: ${seedCocktails.length} complete cocktails available.`,
     );
   } finally {
     await prisma.$disconnect();
@@ -371,5 +575,6 @@ async function main(): Promise<void> {
 
 main().catch((error: unknown) => {
   console.error('Development seed failed:', error);
+
   process.exit(1);
 });

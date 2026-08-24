@@ -10,6 +10,8 @@ import {
 import { PrismaService } from '../database/prisma.service';
 import { CocktailsService } from './cocktails.service';
 
+type FindUniqueMock = jest.Mock<Promise<unknown>, [Record<string, unknown>]>;
+
 function decimal(value: number): { toString(): string } {
   return {
     toString: () => value.toString(),
@@ -54,13 +56,17 @@ function buildDetailRecord(
 }
 
 describe('CocktailsService', () => {
-  let workspaceFindUnique: jest.Mock;
-  let cocktailFindUnique: jest.Mock;
+  let workspaceFindUnique: FindUniqueMock;
+  let cocktailFindUnique: FindUniqueMock;
   let service: CocktailsService;
 
   beforeEach(() => {
-    workspaceFindUnique = jest.fn();
-    cocktailFindUnique = jest.fn();
+    workspaceFindUnique = jest.fn<
+      Promise<unknown>,
+      [Record<string, unknown>]
+    >();
+
+    cocktailFindUnique = jest.fn<Promise<unknown>, [Record<string, unknown>]>();
 
     const prismaService = {
       workspace: {
@@ -316,33 +322,33 @@ describe('CocktailsService', () => {
         },
       });
 
-      expect(cocktailFindUnique).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: {
-            workspaceId_slug: {
-              workspaceId: 'workspace-123',
-              slug: 'daiquiri',
+      expect(cocktailFindUnique).toHaveBeenCalledTimes(1);
+
+      expect(cocktailFindUnique.mock.calls[0]?.[0]).toMatchObject({
+        where: {
+          workspaceId_slug: {
+            workspaceId: 'workspace-123',
+            slug: 'daiquiri',
+          },
+        },
+        select: {
+          ingredients: {
+            orderBy: {
+              sortOrder: 'asc',
             },
           },
-          select: expect.objectContaining({
-            ingredients: expect.objectContaining({
-              orderBy: {
-                sortOrder: 'asc',
-              },
-            }),
-            garnishes: expect.objectContaining({
-              orderBy: {
-                sortOrder: 'asc',
-              },
-            }),
-            steps: expect.objectContaining({
-              orderBy: {
-                sortOrder: 'asc',
-              },
-            }),
-          }),
-        }),
-      );
+          garnishes: {
+            orderBy: {
+              sortOrder: 'asc',
+            },
+          },
+          steps: {
+            orderBy: {
+              sortOrder: 'asc',
+            },
+          },
+        },
+      });
 
       expect(result.ingredients).toEqual([
         {
@@ -520,16 +526,16 @@ describe('CocktailsService', () => {
         service.findPersonalCocktail('user-123', 'private-cocktail'),
       ).rejects.toBeInstanceOf(NotFoundException);
 
-      expect(cocktailFindUnique).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: {
-            workspaceId_slug: {
-              workspaceId: 'workspace-user-123',
-              slug: 'private-cocktail',
-            },
+      expect(cocktailFindUnique).toHaveBeenCalledTimes(1);
+
+      expect(cocktailFindUnique.mock.calls[0]?.[0]).toMatchObject({
+        where: {
+          workspaceId_slug: {
+            workspaceId: 'workspace-user-123',
+            slug: 'private-cocktail',
           },
-        }),
-      );
+        },
+      });
     });
 
     it('fails when the authenticated user has no personal workspace', async () => {
