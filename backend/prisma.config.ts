@@ -1,17 +1,28 @@
 import { config as loadEnv } from 'dotenv';
-import { defineConfig, env } from 'prisma/config';
+import { defineConfig } from 'prisma/config';
+import { buildPostgresConnectionString } from './src/database/postgres-connection-string';
 
 loadEnv({ path: '../.env' });
 
-const databaseUser = encodeURIComponent(env('POSTGRES_USER'));
-const databasePassword = encodeURIComponent(env('POSTGRES_PASSWORD'));
-const databaseHost = env('DATABASE_HOST');
-const databasePort = env('DATABASE_PORT');
-const databaseName = encodeURIComponent(env('POSTGRES_DB'));
+function resolveDatabaseUrl(): string | undefined {
+  const user = process.env.POSTGRES_USER;
+  const password = process.env.POSTGRES_PASSWORD;
+  const host = process.env.DATABASE_HOST;
+  const port = process.env.DATABASE_PORT;
+  const database = process.env.POSTGRES_DB;
 
-const databaseUrl =
-  `postgresql://${databaseUser}:${databasePassword}` +
-  `@${databaseHost}:${databasePort}/${databaseName}?schema=public`;
+  if (!user || !password || !host || !port || !database) {
+    return undefined;
+  }
+
+  return buildPostgresConnectionString({
+    user,
+    password,
+    host,
+    port,
+    database,
+  });
+}
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
@@ -21,6 +32,6 @@ export default defineConfig({
   },
 
   datasource: {
-    url: databaseUrl,
+    url: resolveDatabaseUrl(),
   },
 });
