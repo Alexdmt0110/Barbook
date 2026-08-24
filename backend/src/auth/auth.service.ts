@@ -107,6 +107,8 @@ export class AuthService {
     });
 
     if (!user) {
+      await this.passwordService.hash(dto.password);
+
       throw new UnauthorizedException('Invalid email or password.');
     }
 

@@ -183,8 +183,9 @@ describe('AuthService', () => {
     });
   });
 
-  it('rejects login when the user does not exist', async () => {
+  it('performs password hashing before rejecting an unknown user', async () => {
     userFindUnique.mockResolvedValue(null);
+    hashPassword.mockResolvedValue('discarded-password-hash');
 
     await expect(
       service.login({
@@ -193,6 +194,7 @@ describe('AuthService', () => {
       }),
     ).rejects.toBeInstanceOf(UnauthorizedException);
 
+    expect(hashPassword).toHaveBeenCalledWith(registerDto.password);
     expect(verifyPassword).not.toHaveBeenCalled();
     expect(signToken).not.toHaveBeenCalled();
   });
@@ -213,5 +215,32 @@ describe('AuthService', () => {
     ).rejects.toBeInstanceOf(UnauthorizedException);
 
     expect(signToken).not.toHaveBeenCalled();
+  });
+
+  it('returns the authenticated user', async () => {
+    userFindUnique.mockResolvedValue(createdUser);
+
+    await expect(service.getCurrentUser(createdUser.id)).resolves.toEqual(
+      createdUser,
+    );
+
+    expect(userFindUnique).toHaveBeenCalledWith({
+      where: {
+        id: createdUser.id,
+      },
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+      },
+    });
+  });
+
+  it('rejects a token belonging to a deleted user', async () => {
+    userFindUnique.mockResolvedValue(null);
+
+    await expect(service.getCurrentUser('deleted-user')).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
   });
 });
