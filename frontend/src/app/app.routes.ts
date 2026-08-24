@@ -21,6 +21,11 @@ export const routes: Routes = [
         pathMatch: 'full',
         loadComponent: () => import('./features/home/home').then((module) => module.Home),
       },
+      {
+        path: 'cocktails',
+        loadComponent: () =>
+          import('./features/cocktails/cocktails').then((module) => module.Cocktails),
+      },
     ],
   },
   {

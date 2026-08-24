@@ -1,14 +1,17 @@
 :host {
   display: block;
+  min-width: 0;
 }
 
 .home-page {
-  width: min(1180px, calc(100% - 48px));
+  width: 100%;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 110px 0 80px;
+  padding: 110px 24px 80px;
 }
 
 .hero {
+  min-width: 0;
   max-width: 880px;
 }
 
@@ -29,6 +32,7 @@
   font-weight: 650;
   line-height: 0.92;
   letter-spacing: -0.065em;
+  overflow-wrap: anywhere;
 }
 
 .hero-copy {
@@ -37,15 +41,17 @@
   color: var(--color-text-muted);
   font-size: 1.08rem;
   line-height: 1.8;
+  overflow-wrap: anywhere;
 }
 
 .primary-link {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  max-width: 100%;
   min-height: 48px;
   margin-top: 34px;
   padding: 0 20px;
+  gap: 10px;
   border-radius: var(--radius-pill);
   color: #24120b;
   background: var(--color-accent);
@@ -65,6 +71,7 @@
 .home-panel {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  width: 100%;
   max-width: 900px;
   margin-top: 110px;
   padding: 34px;
@@ -76,11 +83,17 @@
   backdrop-filter: blur(var(--backdrop-blur));
 }
 
+.home-panel > div,
+.home-panel > p {
+  min-width: 0;
+}
+
 .home-panel h2 {
   margin: 0;
   color: var(--color-text);
   font-size: clamp(1.7rem, 4vw, 2.4rem);
   letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
 }
 
 .home-panel > p {
@@ -88,12 +101,12 @@
   margin: 0;
   color: var(--color-text-muted);
   line-height: 1.75;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 700px) {
   .home-page {
-    width: min(100% - 32px, 1180px);
-    padding-top: 72px;
+    padding: 72px 16px 64px;
   }
 
   .hero h1 {
@@ -101,7 +114,7 @@
   }
 
   .home-panel {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     margin-top: 72px;
     padding: 26px;
     gap: 24px;
