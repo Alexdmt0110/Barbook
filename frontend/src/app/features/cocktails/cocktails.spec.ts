@@ -103,12 +103,18 @@ describe('Cocktails', () => {
 
     const links = compiled.querySelectorAll<HTMLAnchorElement>('.cocktail-card-link');
 
+    const createLink = compiled.querySelector<HTMLAnchorElement>('.create-link');
+
     expect(cocktailsService.callCount).toBe(1);
 
     expect(cards.length).toBe(2);
     expect(links.length).toBe(2);
 
     expect(links[0]?.getAttribute('href')).toBe('/cocktails/daiquiri');
+
+    expect(createLink).not.toBeNull();
+
+    expect(createLink?.getAttribute('href')).toBe('/cocktails/new');
 
     expect(compiled.textContent).toContain('Daiquiri');
 
@@ -119,9 +125,11 @@ describe('Cocktails', () => {
     expect(compiled.textContent).toContain('Rhum blanc');
 
     expect(compiled.textContent).toContain('Verre à mélange');
+
+    expect(compiled.textContent).toContain('Nouveau cocktail');
   });
 
-  it('renders the empty state when no cocktail exists', () => {
+  it('renders the empty state with a creation action when no cocktail exists', () => {
     cocktailsService.response = of([]);
 
     const fixture = TestBed.createComponent(Cocktails);
@@ -130,11 +138,23 @@ describe('Cocktails', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
 
+    const createLink = compiled.querySelector<HTMLAnchorElement>('.empty-create-link');
+
     expect(compiled.textContent).toContain('Bibliothèque vide');
 
-    expect(compiled.textContent).toContain('Ton premier cocktail attend encore sa place.');
+    expect(compiled.textContent).toContain('Ton premier cocktail attend sa place.');
+
+    expect(compiled.textContent).toContain(
+      'Commence ton Barbook en enregistrant ta première recette.',
+    );
 
     expect(compiled.textContent).toContain('0 cocktail');
+
+    expect(createLink).not.toBeNull();
+
+    expect(createLink?.getAttribute('href')).toBe('/cocktails/new');
+
+    expect(createLink?.textContent).toContain('Créer mon premier cocktail');
   });
 
   it('renders a connection error when the API is unreachable', () => {

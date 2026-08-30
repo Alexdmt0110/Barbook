@@ -23,6 +23,39 @@
   min-width: 0;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+  gap: 10px;
+}
+
+.create-link,
+.empty-create-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+  font-size: 0.8rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.create-link:hover,
+.empty-create-link:hover {
+  filter: brightness(1.05);
+}
+
+.empty-create-link {
+  margin-top: 24px;
+}
+
 .eyebrow,
 .state-eyebrow,
 .cocktail-family {
@@ -312,5 +345,18 @@
 
   .state-card {
     padding: 26px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .create-link {
+    flex: 1 1 auto;
+  }
+
+  .empty-create-link {
+    width: 100%;
   }
 }

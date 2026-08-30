@@ -27,6 +27,13 @@ export const routes: Routes = [
           import('./features/cocktails/cocktails').then((module) => module.Cocktails),
       },
       {
+        path: 'cocktails/new',
+        loadComponent: () =>
+          import('./features/cocktails/cocktail-create/cocktail-create').then(
+            (module) => module.CocktailCreate,
+          ),
+      },
+      {
         path: 'cocktails/:slug',
         loadComponent: () =>
           import('./features/cocktails/cocktail-detail/cocktail-detail').then(
