@@ -169,6 +169,83 @@ describe('CocktailCreate', () => {
     });
   });
 
+  it('keeps the catalogue identity and ABV override when only the canonical ingredient spelling changes', () => {
+    const component = createComponent();
+
+    fillRequiredFields(component);
+
+    const gin: IngredientSuggestion = {
+      id: 'gin',
+      name: 'Gin',
+      slug: 'gin',
+      defaultAbv: 40,
+    };
+
+    component.onIngredientSelected(0, gin);
+
+    const ingredient = component.ingredients.at(0);
+
+    ingredient.controls.amount.setValue(5);
+
+    component.form.controls.mainAlcoholName.setValue('Gin');
+
+    ingredient.controls.ingredientName.setValue('GIN');
+
+    component.onIngredientNameChanged(0, 'GIN');
+
+    ingredient.controls.ingredientDefaultAbv.setValue(47);
+
+    component.submit();
+
+    expect(cocktailsService.requests).toHaveLength(1);
+
+    expect(cocktailsService.requests[0]?.ingredients[0]).toMatchObject({
+      ingredientName: 'GIN',
+      ingredientDefaultAbv: 40,
+      abvOverride: 47,
+      amount: 50,
+      unit: 'ML',
+    });
+
+    expect(cocktailsService.requests[0]?.mainAlcoholName).toBe('Gin');
+  });
+
+  it('drops the catalogue identity when the ingredient actually changes', () => {
+    const component = createComponent();
+
+    fillRequiredFields(component);
+
+    const gin: IngredientSuggestion = {
+      id: 'gin',
+      name: 'Gin',
+      slug: 'gin',
+      defaultAbv: 40,
+    };
+
+    component.onIngredientSelected(0, gin);
+
+    const ingredient = component.ingredients.at(0);
+
+    ingredient.controls.ingredientName.setValue('Vodka');
+
+    component.onIngredientNameChanged(0, 'Vodka');
+
+    ingredient.controls.ingredientDefaultAbv.setValue(37.5);
+
+    ingredient.controls.amount.setValue(5);
+
+    component.submit();
+
+    expect(cocktailsService.requests[0]?.ingredients[0]).toMatchObject({
+      ingredientName: 'Vodka',
+      ingredientDefaultAbv: 37.5,
+      amount: 50,
+      unit: 'ML',
+    });
+
+    expect(cocktailsService.requests[0]?.ingredients[0]?.abvOverride).toBeUndefined();
+  });
+
   it('uses the entered ABV as the catalogue value for a new ingredient', () => {
     const component = createComponent();
 

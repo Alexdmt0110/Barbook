@@ -11,6 +11,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
+import { toSlug } from '../../../shared/utils/slug';
 import { IngredientSuggestion } from '../../ingredients/data-access/ingredient.models';
 import { IngredientAutocomplete } from '../../ingredients/ui/ingredient-autocomplete';
 import {
@@ -265,6 +266,7 @@ export class CocktailCreate {
     }
 
     this.ingredients.removeAt(index);
+
     this.syncMainAlcoholSelection();
   }
 
@@ -273,7 +275,7 @@ export class CocktailCreate {
 
     const selectedIngredient = this.selectedIngredients.get(group);
 
-    if (selectedIngredient && selectedIngredient.name !== name.trim()) {
+    if (selectedIngredient && toSlug(name) !== selectedIngredient.slug) {
       this.selectedIngredients.delete(group);
     }
 
@@ -309,7 +311,7 @@ export class CocktailCreate {
       return;
     }
 
-    if (!this.alcoholicIngredientOptions().includes(currentSelection)) {
+    if (!this.hasAlcoholicIngredient(currentSelection)) {
       this.form.controls.mainAlcoholName.setValue('');
     }
   }
@@ -452,13 +454,31 @@ export class CocktailCreate {
     ]);
   }
 
+  private hasAlcoholicIngredient(ingredientName: string): boolean {
+    const expectedSlug = toSlug(ingredientName);
+
+    if (!expectedSlug) {
+      return false;
+    }
+
+    return this.ingredients.controls.some((ingredient) => {
+      const abv = ingredient.controls.ingredientDefaultAbv.value;
+
+      if (typeof abv !== 'number' || abv <= 0) {
+        return false;
+      }
+
+      return toSlug(ingredient.controls.ingredientName.value) === expectedSlug;
+    });
+  }
+
   private buildRequest(): CreateCocktailRequest {
     const value = this.form.getRawValue();
 
     const requestedMainAlcohol = this.optionalText(value.mainAlcoholName);
 
     const validMainAlcohol =
-      requestedMainAlcohol && this.alcoholicIngredientOptions().includes(requestedMainAlcohol)
+      requestedMainAlcohol && this.hasAlcoholicIngredient(requestedMainAlcohol)
         ? requestedMainAlcohol
         : undefined;
 
@@ -490,7 +510,8 @@ export class CocktailCreate {
 
         const currentAbv = ingredient.ingredientDefaultAbv;
 
-        const stillUsesSelectedIngredient = selectedIngredient?.name === currentName;
+        const stillUsesSelectedIngredient =
+          selectedIngredient !== undefined && toSlug(currentName) === selectedIngredient.slug;
 
         const abvOverride =
           stillUsesSelectedIngredient &&
