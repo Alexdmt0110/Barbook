@@ -19,6 +19,8 @@ import {
   RecipeMethod,
 } from '../../generated/prisma/client';
 
+const MAX_STORED_AMOUNT = 99_999.999;
+
 interface TransformValue {
   value: unknown;
 }
@@ -75,6 +77,7 @@ export class CreateCocktailIngredientDto {
     maxDecimalPlaces: 3,
   })
   @Min(0.001)
+  @Max(MAX_STORED_AMOUNT)
   amount?: number | null;
 
   @IsEnum(MeasurementUnit)
@@ -112,6 +115,7 @@ export class CreateCocktailGarnishDto {
     maxDecimalPlaces: 3,
   })
   @Min(0.001)
+  @Max(MAX_STORED_AMOUNT)
   amount?: number | null;
 
   @IsOptional()

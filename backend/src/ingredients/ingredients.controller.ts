@@ -1,6 +1,7 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { CurrentUserId } from '../auth/decorators/current-user-id.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { SearchIngredientsQueryDto } from './dto/search-ingredients-query.dto';
 import { IngredientSuggestion } from './ingredient.types';
 import { IngredientsService } from './ingredients.service';
 
@@ -14,12 +15,12 @@ export class IngredientsController {
     @CurrentUserId()
     userId: string,
 
-    @Query('query')
-    query: string | undefined,
+    @Query()
+    query: SearchIngredientsQueryDto,
   ): Promise<IngredientSuggestion[]> {
     return this.ingredientsService.searchPersonalIngredients(
       userId,
-      query ?? '',
+      query.query ?? '',
     );
   }
 }

@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CurrentUserId } from '../auth/decorators/current-user-id.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CocktailCreationService } from './cocktail-creation.service';
 import {
   CocktailDetail,
   CocktailSummary,
@@ -12,14 +13,17 @@ import { CreateCocktailDto } from './dto/create-cocktail.dto';
 @Controller('cocktails')
 @UseGuards(JwtAuthGuard)
 export class CocktailsController {
-  constructor(private readonly cocktailsService: CocktailsService) {}
+  constructor(
+    private readonly cocktailsService: CocktailsService,
+    private readonly cocktailCreationService: CocktailCreationService,
+  ) {}
 
   @Post()
   async createPersonalCocktail(
     @CurrentUserId() userId: string,
     @Body() dto: CreateCocktailDto,
   ): Promise<CreateCocktailResult> {
-    return this.cocktailsService.createPersonalCocktail(userId, dto);
+    return this.cocktailCreationService.createPersonalCocktail(userId, dto);
   }
 
   @Get()
