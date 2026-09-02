@@ -3,17 +3,9 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { toSlug } from '../../../shared/utils/slug';
 import { IngredientSuggestion } from '../../ingredients/data-access/ingredient.models';
 import { IngredientAutocomplete } from '../../ingredients/ui/ingredient-autocomplete';
-import {
-  CocktailType,
-  CreateCocktailGarnishRequest,
-  CreateCocktailIngredientRequest,
-  CreateCocktailRequest,
-  MeasurementUnit,
-  RecipeMethod,
-} from '../data-access/cocktail.models';
+import { CocktailType, RecipeMethod } from '../data-access/cocktail.models';
 import { CocktailsService } from '../data-access/cocktails.service';
 import {
   GarnishFormGroup,
@@ -28,8 +20,19 @@ import {
   MAX_STORED_AMOUNT,
   StepFormControl,
   trimmedRequiredValidator,
-  UnitOption,
 } from './cocktail-create.form';
+import {
+  buildCreateCocktailRequest,
+  getAlcoholicIngredientOptions,
+  hasAlcoholicIngredient,
+} from './cocktail-create.mapper';
+import {
+  COCKTAIL_TYPE_OPTIONS,
+  GARNISH_UNIT_OPTIONS,
+  INGREDIENT_UNIT_OPTIONS,
+  RECIPE_METHOD_OPTIONS,
+} from './cocktail-create.options';
+import { toSlug } from '../../../shared/utils/slug';
 
 @Component({
   selector: 'app-cocktail-create',
@@ -56,109 +59,13 @@ export class CocktailCreate {
 
   readonly maxPreparationSteps = MAX_PREPARATION_STEPS;
 
-  readonly cocktailTypes: UnitOption<CocktailType>[] = [
-    {
-      value: 'CLASSIC',
-      label: 'Classique',
-    },
-    {
-      value: 'PERSONAL_CREATION',
-      label: 'Création personnelle',
-    },
-    {
-      value: 'VARIATION',
-      label: 'Variation',
-    },
-  ];
+  readonly cocktailTypes = COCKTAIL_TYPE_OPTIONS;
 
-  readonly recipeMethods: UnitOption<RecipeMethod>[] = [
-    {
-      value: 'SHAKER',
-      label: 'Shaker',
-    },
-    {
-      value: 'MIXING_GLASS',
-      label: 'Verre à mélange',
-    },
-    {
-      value: 'BUILD',
-      label: 'Direct au verre',
-    },
-    {
-      value: 'BLENDER',
-      label: 'Blender',
-    },
-  ];
+  readonly recipeMethods = RECIPE_METHOD_OPTIONS;
 
-  readonly ingredientUnits: UnitOption<IngredientInputUnit>[] = [
-    {
-      value: 'CL',
-      label: 'cL',
-    },
-    {
-      value: 'ML',
-      label: 'mL',
-    },
-    {
-      value: 'G',
-      label: 'g',
-    },
-    {
-      value: 'PIECE',
-      label: 'pièce',
-    },
-    {
-      value: 'LEAF',
-      label: 'feuille',
-    },
-    {
-      value: 'SPRIG',
-      label: 'brin',
-    },
-    {
-      value: 'DASH',
-      label: 'dash',
-    },
-    {
-      value: 'DROP',
-      label: 'goutte',
-    },
-    {
-      value: 'BAR_SPOON',
-      label: 'cuillère de bar',
-    },
-    {
-      value: 'TEASPOON',
-      label: 'cuillère à café',
-    },
-    {
-      value: 'TABLESPOON',
-      label: 'cuillère à soupe',
-    },
-    {
-      value: 'SCOOP',
-      label: 'boule',
-    },
-    {
-      value: 'PINCH',
-      label: 'pincée',
-    },
-    {
-      value: 'TOP_UP',
-      label: 'compléter',
-    },
-  ];
+  readonly ingredientUnits = INGREDIENT_UNIT_OPTIONS;
 
-  readonly garnishUnits: UnitOption<GarnishInputUnit>[] = [
-    {
-      value: '',
-      label: 'Selon besoin',
-    },
-    ...this.ingredientUnits.filter(
-      (option): option is UnitOption<Exclude<IngredientInputUnit, 'TOP_UP'>> =>
-        option.value !== 'TOP_UP',
-    ),
-  ];
+  readonly garnishUnits = GARNISH_UNIT_OPTIONS;
 
   readonly form = this.formBuilder.group({
     name: this.formBuilder.nonNullable.control('', [
@@ -263,7 +170,7 @@ export class CocktailCreate {
       return;
     }
 
-    if (!this.hasAlcoholicIngredient(currentSelection)) {
+    if (!hasAlcoholicIngredient(this.ingredients.getRawValue(), currentSelection)) {
       this.form.controls.mainAlcoholName.setValue('');
     }
   }
@@ -307,18 +214,7 @@ export class CocktailCreate {
   }
 
   alcoholicIngredientOptions(): string[] {
-    return [
-      ...new Set(
-        this.ingredients.controls
-          .filter((ingredient) => {
-            const abv = ingredient.controls.ingredientDefaultAbv.value;
-
-            return typeof abv === 'number' && abv > 0;
-          })
-          .map((ingredient) => ingredient.controls.ingredientName.value.trim())
-          .filter((name) => name.length > 0),
-      ),
-    ];
+    return getAlcoholicIngredientOptions(this.ingredients.getRawValue());
   }
 
   rowNumber(index: number): string {
@@ -330,13 +226,19 @@ export class CocktailCreate {
 
     if (this.form.invalid || this.isSubmitting()) {
       this.form.markAllAsTouched();
+
       return;
     }
 
     this.isSubmitting.set(true);
+
     this.errorMessage.set(null);
 
-    const request = this.buildRequest();
+    const selectedIngredients = this.ingredients.controls.map((group) =>
+      this.selectedIngredients.get(group),
+    );
+
+    const request = buildCreateCocktailRequest(this.form.getRawValue(), selectedIngredients);
 
     this.cocktailsService
       .createPersonalCocktail(request)
@@ -349,6 +251,7 @@ export class CocktailCreate {
         next: (createdCocktail) => {
           void this.router.navigate(['/cocktails', createdCocktail.slug]);
         },
+
         error: (error: unknown) => {
           this.errorMessage.set(this.resolveErrorMessage(error));
         },
@@ -418,177 +321,6 @@ export class CocktailCreate {
       trimmedRequiredValidator(),
       Validators.maxLength(500),
     ]);
-  }
-
-  private hasAlcoholicIngredient(ingredientName: string): boolean {
-    const expectedSlug = toSlug(ingredientName);
-
-    if (!expectedSlug) {
-      return false;
-    }
-
-    return this.ingredients.controls.some((ingredient) => {
-      const abv = ingredient.controls.ingredientDefaultAbv.value;
-
-      if (typeof abv !== 'number' || abv <= 0) {
-        return false;
-      }
-
-      return toSlug(ingredient.controls.ingredientName.value) === expectedSlug;
-    });
-  }
-
-  private buildRequest(): CreateCocktailRequest {
-    const value = this.form.getRawValue();
-
-    const requestedMainAlcohol = this.optionalText(value.mainAlcoholName);
-
-    const validMainAlcohol =
-      requestedMainAlcohol && this.hasAlcoholicIngredient(requestedMainAlcohol)
-        ? requestedMainAlcohol
-        : undefined;
-
-    return {
-      name: value.name.trim(),
-
-      type: value.type,
-
-      family: this.optionalText(value.family),
-
-      method: value.method,
-
-      glass: value.glass.trim(),
-
-      ice: this.optionalText(value.ice),
-
-      mainAlcoholName: validMainAlcohol,
-
-      notes: this.optionalText(value.notes),
-
-      ingredients: value.ingredients.map((ingredient, index): CreateCocktailIngredientRequest => {
-        const measurement = this.normalizeIngredientMeasurement(ingredient.amount, ingredient.unit);
-
-        const group = this.ingredients.at(index);
-
-        const selectedIngredient = this.selectedIngredients.get(group);
-
-        const currentName = ingredient.ingredientName.trim();
-
-        const currentAbv = ingredient.ingredientDefaultAbv;
-
-        const stillUsesSelectedIngredient =
-          selectedIngredient !== undefined && toSlug(currentName) === selectedIngredient.slug;
-
-        const abvOverride =
-          stillUsesSelectedIngredient &&
-          currentAbv !== null &&
-          currentAbv !== selectedIngredient.defaultAbv
-            ? currentAbv
-            : undefined;
-
-        const catalogueAbv = stillUsesSelectedIngredient
-          ? selectedIngredient.defaultAbv
-          : currentAbv;
-
-        return {
-          ingredientName: currentName,
-
-          ingredientDefaultAbv: catalogueAbv,
-
-          amount: measurement.amount,
-
-          unit: measurement.unit,
-
-          specification: this.optionalText(ingredient.specification),
-
-          abvOverride,
-
-          notes: this.optionalText(ingredient.notes),
-        };
-      }),
-
-      garnishes: value.garnishes.map((garnish): CreateCocktailGarnishRequest => {
-        const measurement = this.normalizeGarnishMeasurement(garnish.amount, garnish.unit);
-
-        return {
-          ingredientName: garnish.ingredientName.trim(),
-
-          amount: measurement.amount,
-
-          unit: measurement.unit,
-
-          specification: this.optionalText(garnish.specification),
-
-          usage: garnish.usage.trim(),
-        };
-      }),
-
-      steps: value.steps.map((step) => step.trim()),
-    };
-  }
-
-  private normalizeIngredientMeasurement(
-    amount: number | null,
-    unit: IngredientInputUnit,
-  ): {
-    amount: number | null;
-    unit: MeasurementUnit;
-  } {
-    if (unit === 'TOP_UP') {
-      return {
-        amount: null,
-        unit: 'TOP_UP',
-      };
-    }
-
-    if (unit === 'CL') {
-      return {
-        amount: amount === null ? null : this.roundMillilitres(amount * 10),
-        unit: 'ML',
-      };
-    }
-
-    return {
-      amount,
-      unit,
-    };
-  }
-
-  private normalizeGarnishMeasurement(
-    amount: number | null,
-    unit: GarnishInputUnit,
-  ): {
-    amount: number | null;
-    unit: MeasurementUnit | null;
-  } {
-    if (unit === '') {
-      return {
-        amount: null,
-        unit: null,
-      };
-    }
-
-    if (unit === 'CL') {
-      return {
-        amount: amount === null ? null : this.roundMillilitres(amount * 10),
-        unit: 'ML',
-      };
-    }
-
-    return {
-      amount,
-      unit,
-    };
-  }
-
-  private roundMillilitres(value: number): number {
-    return Math.round(value * 1000) / 1000;
-  }
-
-  private optionalText(value: string): string | undefined {
-    const trimmedValue = value.trim();
-
-    return trimmedValue.length > 0 ? trimmedValue : undefined;
   }
 
   private resolveErrorMessage(error: unknown): string {

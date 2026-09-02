@@ -5,7 +5,7 @@ import {
   ValidationErrors,
   ValidatorFn,
 } from '@angular/forms';
-import { MeasurementUnit } from '../data-access/cocktail.models';
+import { CocktailType, MeasurementUnit, RecipeMethod } from '../data-access/cocktail.models';
 
 export const MAX_RECIPE_INGREDIENTS = 50;
 export const MAX_GARNISHES = 20;
@@ -17,9 +17,35 @@ export type IngredientInputUnit = MeasurementUnit | 'CL';
 
 export type GarnishInputUnit = '' | Exclude<IngredientInputUnit, 'TOP_UP'>;
 
-export interface UnitOption<T extends string> {
-  value: T;
-  label: string;
+export interface IngredientFormValue {
+  ingredientName: string;
+  ingredientDefaultAbv: number | null;
+  amount: number | null;
+  unit: IngredientInputUnit;
+  specification: string;
+  notes: string;
+}
+
+export interface GarnishFormValue {
+  ingredientName: string;
+  amount: number | null;
+  unit: GarnishInputUnit;
+  specification: string;
+  usage: string;
+}
+
+export interface CocktailCreateFormValue {
+  name: string;
+  type: CocktailType;
+  family: string;
+  method: RecipeMethod;
+  glass: string;
+  ice: string;
+  mainAlcoholName: string;
+  notes: string;
+  ingredients: IngredientFormValue[];
+  garnishes: GarnishFormValue[];
+  steps: string[];
 }
 
 export type IngredientFormGroup = FormGroup<{
