@@ -13,14 +13,23 @@
       </p>
     </div>
 
-    @if (
-      !isLoading() &&
-      !errorMessage()
-      ) {
-      <div class="cocktail-count">
-        {{ cocktailCountLabel() }}
-      </div>
-    }
+    <div class="header-actions">
+      @if (
+        !isLoading() &&
+        !errorMessage()
+        ) {
+        <div class="cocktail-count">
+          {{ cocktailCountLabel() }}
+        </div>
+      }
+
+      <a
+        class="create-link"
+        routerLink="/cocktails/new"
+      >
+        + Nouveau cocktail
+      </a>
+    </div>
   </header>
 
   @if (isLoading()) {
@@ -86,16 +95,21 @@
       </p>
 
       <h2>
-        Ton premier cocktail attend encore
+        Ton premier cocktail attend
         sa place.
       </h2>
 
       <p>
-        Ton Barbook est prêt, mais aucune recette
-        n’y est encore enregistrée. La création
-        de cocktails arrivera dans une prochaine
-        étape.
+        Commence ton Barbook en enregistrant
+        ta première recette.
       </p>
+
+      <a
+        class="empty-create-link"
+        routerLink="/cocktails/new"
+      >
+        Créer mon premier cocktail
+      </a>
     </section>
   } @else {
     <section

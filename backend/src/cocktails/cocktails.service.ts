@@ -290,7 +290,6 @@ export class CocktailsService {
       }
 
       totalVolume += ingredient.amount;
-
       alcoholWeightedVolume += ingredient.amount * ingredient.abv;
     }
 
@@ -303,11 +302,11 @@ export class CocktailsService {
     return Math.round(estimatedAbv * 100) / 100;
   }
 
-  private decimalToNumber(value: { toString(): string } | null): number | null {
-    if (value === null) {
-      return null;
-    }
-
-    return Number(value.toString());
+  private decimalToNumber(
+    value: {
+      toString(): string;
+    } | null,
+  ): number | null {
+    return value === null ? null : Number(value.toString());
   }
 }

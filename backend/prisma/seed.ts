@@ -1,5 +1,6 @@
 import { config as loadEnv } from 'dotenv';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { toSlug } from '../src/common/slug';
 import {
   CocktailType,
   MeasurementUnit,
@@ -49,67 +50,72 @@ interface SeedCocktail {
   steps: string[];
 }
 
+interface LegacySeedIngredientSlug {
+  legacySlug: string;
+  canonicalSlug: string;
+}
+
+function defineSeedIngredient(
+  name: string,
+  defaultAbv: number,
+): SeedIngredient {
+  const slug = toSlug(name);
+
+  if (!slug) {
+    throw new Error(`Invalid seed ingredient name "${name}".`);
+  }
+
+  return {
+    slug,
+    name,
+    defaultAbv,
+  };
+}
+
+function defineLegacySeedIngredientSlug(
+  legacySlug: string,
+  canonicalName: string,
+): LegacySeedIngredientSlug {
+  const canonicalSlug = toSlug(canonicalName);
+
+  if (!canonicalSlug) {
+    throw new Error(
+      `Invalid canonical seed ingredient name "${canonicalName}".`,
+    );
+  }
+
+  if (legacySlug === canonicalSlug) {
+    throw new Error(
+      `Legacy ingredient slug "${legacySlug}" must differ from its canonical slug.`,
+    );
+  }
+
+  return {
+    legacySlug,
+    canonicalSlug,
+  };
+}
+
 const seedIngredients: SeedIngredient[] = [
-  {
-    slug: 'gin',
-    name: 'Gin',
-    defaultAbv: 40,
-  },
-  {
-    slug: 'rhum-blanc',
-    name: 'Rhum blanc',
-    defaultAbv: 40,
-  },
-  {
-    slug: 'vodka',
-    name: 'Vodka',
-    defaultAbv: 40,
-  },
-  {
-    slug: 'jus-citron-vert',
-    name: 'Jus de citron vert',
-    defaultAbv: 0,
-  },
-  {
-    slug: 'citron-vert',
-    name: 'Citron vert',
-    defaultAbv: 0,
-  },
-  {
-    slug: 'sirop-sucre',
-    name: 'Sirop de sucre',
-    defaultAbv: 0,
-  },
-  {
-    slug: 'campari',
-    name: 'Campari',
-    defaultAbv: 25,
-  },
-  {
-    slug: 'vermouth-rouge',
-    name: 'Vermouth rouge',
-    defaultAbv: 16,
-  },
-  {
-    slug: 'orange',
-    name: 'Orange',
-    defaultAbv: 0,
-  },
-  {
-    slug: 'liqueur-cafe',
-    name: 'Liqueur de café',
-    defaultAbv: 20,
-  },
-  {
-    slug: 'espresso',
-    name: 'Espresso',
-    defaultAbv: 0,
-  },
-  {
-    slug: 'grains-cafe',
-    name: 'Grains de café',
-    defaultAbv: 0,
-  },
+  defineSeedIngredient('Gin', 40),
+  defineSeedIngredient('Rhum blanc', 40),
+  defineSeedIngredient('Vodka', 40),
+  defineSeedIngredient('Jus de citron vert', 0),
+  defineSeedIngredient('Citron vert', 0),
+  defineSeedIngredient('Sirop de sucre', 0),
+  defineSeedIngredient('Campari', 25),
+  defineSeedIngredient('Vermouth rouge', 16),
+  defineSeedIngredient('Orange', 0),
+  defineSeedIngredient('Liqueur de café', 20),
+  defineSeedIngredient('Espresso', 0),
+  defineSeedIngredient('Grains de café', 0),
+];
+
+const legacySeedIngredientSlugs: LegacySeedIngredientSlug[] = [
+  defineLegacySeedIngredientSlug('jus-citron-vert', 'Jus de citron vert'),
+  defineLegacySeedIngredientSlug('sirop-sucre', 'Sirop de sucre'),
+  defineLegacySeedIngredientSlug('liqueur-cafe', 'Liqueur de café'),
+  defineLegacySeedIngredientSlug('grains-cafe', 'Grains de café'),
 ];
 
 const seedTags = [
@@ -151,12 +157,12 @@ const seedCocktails: SeedCocktail[] = [
         unit: MeasurementUnit.ML,
       },
       {
-        ingredientSlug: 'jus-citron-vert',
+        ingredientSlug: 'jus-de-citron-vert',
         amount: 25,
         unit: MeasurementUnit.ML,
       },
       {
-        ingredientSlug: 'sirop-sucre',
+        ingredientSlug: 'sirop-de-sucre',
         amount: 15,
         unit: MeasurementUnit.ML,
         notes: 'Sirop simple 1:1.',
@@ -196,7 +202,7 @@ const seedCocktails: SeedCocktail[] = [
         unit: MeasurementUnit.ML,
       },
       {
-        ingredientSlug: 'liqueur-cafe',
+        ingredientSlug: 'liqueur-de-cafe',
         amount: 20,
         unit: MeasurementUnit.ML,
       },
@@ -206,7 +212,7 @@ const seedCocktails: SeedCocktail[] = [
         unit: MeasurementUnit.ML,
       },
       {
-        ingredientSlug: 'sirop-sucre',
+        ingredientSlug: 'sirop-de-sucre',
         amount: 10,
         unit: MeasurementUnit.ML,
         notes: 'Sirop simple 1:1.',
@@ -214,7 +220,7 @@ const seedCocktails: SeedCocktail[] = [
     ],
     garnishes: [
       {
-        ingredientSlug: 'grains-cafe',
+        ingredientSlug: 'grains-de-cafe',
         amount: 3,
         unit: MeasurementUnit.PIECE,
         usage: 'Déposer trois grains de café sur la mousse.',
@@ -430,6 +436,69 @@ async function main(): Promise<void> {
       const ingredientBySlug = new Map(
         ingredients.map((ingredient) => [ingredient.slug, ingredient.id]),
       );
+
+      for (const { legacySlug, canonicalSlug } of legacySeedIngredientSlugs) {
+        const canonicalIngredientId = requireMapValue(
+          ingredientBySlug,
+          canonicalSlug,
+          'ingredient',
+        );
+
+        const legacyIngredient = await transaction.ingredient.findUnique({
+          where: {
+            workspaceId_slug: {
+              workspaceId,
+              slug: legacySlug,
+            },
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        if (!legacyIngredient) {
+          continue;
+        }
+
+        if (legacyIngredient.id === canonicalIngredientId) {
+          throw new Error(
+            `Legacy ingredient "${legacySlug}" unexpectedly resolves to the canonical ingredient.`,
+          );
+        }
+
+        await transaction.cocktailIngredient.updateMany({
+          where: {
+            ingredientId: legacyIngredient.id,
+          },
+          data: {
+            ingredientId: canonicalIngredientId,
+          },
+        });
+
+        await transaction.garnishIngredient.updateMany({
+          where: {
+            ingredientId: legacyIngredient.id,
+          },
+          data: {
+            ingredientId: canonicalIngredientId,
+          },
+        });
+
+        await transaction.cocktail.updateMany({
+          where: {
+            mainAlcoholId: legacyIngredient.id,
+          },
+          data: {
+            mainAlcoholId: canonicalIngredientId,
+          },
+        });
+
+        await transaction.ingredient.delete({
+          where: {
+            id: legacyIngredient.id,
+          },
+        });
+      }
 
       const tagBySlug = new Map(tags.map((tag) => [tag.slug, tag.id]));
 

@@ -73,3 +73,8 @@ export interface CocktailDetail extends CocktailSummary {
   steps: CocktailDetailStep[];
   estimatedAbv: number | null;
 }
+
+export interface CreateCocktailResult {
+  id: string;
+  slug: string;
+}

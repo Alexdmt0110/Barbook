@@ -1,0 +1,21 @@
+<app-ui-autocomplete
+  [value]="value()"
+  [options]="options()"
+  [isLoading]="isLoading()"
+  [disabled]="disabled()"
+  [placeholder]="placeholder()"
+  [inputId]="inputId()"
+  [ariaLabel]="ariaLabel()"
+  [ariaLabelledBy]="ariaLabelledBy()"
+  [minSearchLength]="3"
+  (valueChange)="
+    handleValueChange($event)
+  "
+  (queryChange)="
+    handleQueryChange($event)
+  "
+  (optionSelected)="
+    handleOptionSelected($event)
+  "
+  (blurred)="handleBlur()"
+/>

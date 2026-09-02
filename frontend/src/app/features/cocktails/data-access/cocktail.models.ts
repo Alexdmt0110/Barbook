@@ -86,3 +86,40 @@ export interface CocktailDetail extends CocktailSummary {
   steps: CocktailDetailStep[];
   estimatedAbv: number | null;
 }
+
+export interface CreateCocktailIngredientRequest {
+  ingredientName: string;
+  ingredientDefaultAbv?: number | null;
+  amount?: number | null;
+  unit: MeasurementUnit;
+  specification?: string;
+  abvOverride?: number | null;
+  notes?: string;
+}
+
+export interface CreateCocktailGarnishRequest {
+  ingredientName: string;
+  amount?: number | null;
+  unit?: MeasurementUnit | null;
+  specification?: string;
+  usage: string;
+}
+
+export interface CreateCocktailRequest {
+  name: string;
+  type: CocktailType;
+  family?: string;
+  method: RecipeMethod;
+  glass: string;
+  ice?: string;
+  notes?: string;
+  mainAlcoholName?: string;
+  ingredients: CreateCocktailIngredientRequest[];
+  garnishes?: CreateCocktailGarnishRequest[];
+  steps: string[];
+}
+
+export interface CreateCocktailResult {
+  id: string;
+  slug: string;
+}

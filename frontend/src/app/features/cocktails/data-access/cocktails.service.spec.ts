@@ -1,11 +1,12 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { CocktailDetail, CocktailSummary } from './cocktail.models';
+import { CocktailDetail, CocktailSummary, CreateCocktailRequest } from './cocktail.models';
 import { CocktailsService } from './cocktails.service';
 
 describe('CocktailsService', () => {
   let service: CocktailsService;
+
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
@@ -108,5 +109,50 @@ describe('CocktailsService', () => {
     expect(request.request.method).toBe('GET');
 
     request.flush({});
+  });
+
+  it('creates a personal cocktail', () => {
+    const payload: CreateCocktailRequest = {
+      name: 'Tom Collins',
+      type: 'CLASSIC',
+      family: 'Collins',
+      method: 'SHAKER',
+      glass: 'Highball',
+      ice: 'Glaçons',
+      mainAlcoholName: 'Gin',
+      ingredients: [
+        {
+          ingredientName: 'Gin',
+          ingredientDefaultAbv: 40,
+          amount: 50,
+          unit: 'ML',
+        },
+        {
+          ingredientName: 'Eau gazeuse',
+          ingredientDefaultAbv: 0,
+          amount: null,
+          unit: 'TOP_UP',
+        },
+      ],
+      steps: ['Shaker.', 'Compléter avec l’eau gazeuse.'],
+    };
+
+    service.createPersonalCocktail(payload).subscribe((result) => {
+      expect(result).toEqual({
+        id: 'cocktail-new',
+        slug: 'tom-collins',
+      });
+    });
+
+    const request = httpTestingController.expectOne('/api/cocktails');
+
+    expect(request.request.method).toBe('POST');
+
+    expect(request.request.body).toEqual(payload);
+
+    request.flush({
+      id: 'cocktail-new',
+      slug: 'tom-collins',
+    });
   });
 });

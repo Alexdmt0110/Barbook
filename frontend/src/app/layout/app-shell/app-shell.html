@@ -1,9 +1,17 @@
 <div class="app-shell">
   <header class="app-header">
     <div class="header-content">
-      <a class="brand" routerLink="/">
-        <span class="brand-mark">B</span>
-        <span>Barbook</span>
+      <a
+        class="brand"
+        routerLink="/"
+      >
+        <span class="brand-mark">
+          B
+        </span>
+
+        <span>
+          Barbook
+        </span>
       </a>
 
       <nav
@@ -13,7 +21,9 @@
         <a
           routerLink="/"
           routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
+          [routerLinkActiveOptions]="{
+            exact: true
+          }"
         >
           Accueil
         </a>
@@ -27,13 +37,14 @@
       </nav>
 
       <div class="user-actions">
-        @if (authService.currentUser(); as user) {
+        @if (
+          authService.currentUser();
+          as user
+          ) {
           <span class="user-name">
             {{ user.displayName }}
           </span>
         }
-
-        <app-theme-switcher />
 
         <button
           type="button"
@@ -42,6 +53,8 @@
         >
           Déconnexion
         </button>
+
+        <app-theme-switcher />
       </div>
     </div>
   </header>

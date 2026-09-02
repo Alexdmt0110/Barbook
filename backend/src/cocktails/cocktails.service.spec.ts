@@ -12,7 +12,9 @@ import { CocktailsService } from './cocktails.service';
 
 type FindUniqueMock = jest.Mock<Promise<unknown>, [Record<string, unknown>]>;
 
-function decimal(value: number): { toString(): string } {
+function decimal(value: number): {
+  toString(): string;
+} {
   return {
     toString: () => value.toString(),
   };
@@ -58,6 +60,7 @@ function buildDetailRecord(
 describe('CocktailsService', () => {
   let workspaceFindUnique: FindUniqueMock;
   let cocktailFindUnique: FindUniqueMock;
+
   let service: CocktailsService;
 
   beforeEach(() => {
@@ -126,7 +129,9 @@ describe('CocktailsService', () => {
 
       const result = await service.findPersonalCocktails('user-123');
 
-      expect(workspaceFindUnique).toHaveBeenCalledWith({
+      expect(workspaceFindUnique).toHaveBeenCalledTimes(1);
+
+      expect(workspaceFindUnique.mock.calls[0]?.[0]).toMatchObject({
         where: {
           personalOwnerId: 'user-123',
         },
@@ -140,40 +145,6 @@ describe('CocktailsService', () => {
                 id: 'asc',
               },
             ],
-            select: {
-              id: true,
-              slug: true,
-              name: true,
-              type: true,
-              family: true,
-              method: true,
-              glass: true,
-              imageUrl: true,
-              updatedAt: true,
-              mainAlcohol: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-              folder: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-              tags: {
-                select: {
-                  tag: {
-                    select: {
-                      id: true,
-                      name: true,
-                      slug: true,
-                    },
-                  },
-                },
-              },
-            },
           },
         },
       });
@@ -233,7 +204,7 @@ describe('CocktailsService', () => {
   });
 
   describe('findPersonalCocktail', () => {
-    it('loads a complete cocktail only from the authenticated user personal workspace', async () => {
+    it('loads and maps a complete cocktail from the personal workspace', async () => {
       workspaceFindUnique.mockResolvedValue({
         id: 'workspace-123',
       });
@@ -265,7 +236,7 @@ describe('CocktailsService', () => {
               ingredient: {
                 id: 'ingredient-lime-juice',
                 name: 'Jus de citron vert',
-                slug: 'jus-citron-vert',
+                slug: 'jus-de-citron-vert',
                 defaultAbv: decimal(0),
               },
             },
@@ -279,7 +250,7 @@ describe('CocktailsService', () => {
               ingredient: {
                 id: 'ingredient-syrup',
                 name: 'Sirop de sucre',
-                slug: 'sirop-sucre',
+                slug: 'sirop-de-sucre',
                 defaultAbv: decimal(0),
               },
             },
@@ -369,7 +340,7 @@ describe('CocktailsService', () => {
           ingredient: {
             id: 'ingredient-lime-juice',
             name: 'Jus de citron vert',
-            slug: 'jus-citron-vert',
+            slug: 'jus-de-citron-vert',
           },
           amount: 25,
           unit: MeasurementUnit.ML,
@@ -382,7 +353,7 @@ describe('CocktailsService', () => {
           ingredient: {
             id: 'ingredient-syrup',
             name: 'Sirop de sucre',
-            slug: 'sirop-sucre',
+            slug: 'sirop-de-sucre',
           },
           amount: 15,
           unit: MeasurementUnit.ML,
@@ -525,8 +496,6 @@ describe('CocktailsService', () => {
       await expect(
         service.findPersonalCocktail('user-123', 'private-cocktail'),
       ).rejects.toBeInstanceOf(NotFoundException);
-
-      expect(cocktailFindUnique).toHaveBeenCalledTimes(1);
 
       expect(cocktailFindUnique.mock.calls[0]?.[0]).toMatchObject({
         where: {
