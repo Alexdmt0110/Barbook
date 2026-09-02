@@ -8,8 +8,16 @@ import { IngredientSuggestion } from './ingredient.types';
 
 const MIN_SEARCH_LENGTH = 3;
 const MAX_SEARCH_LENGTH = 120;
-const MAX_DATABASE_CANDIDATES = 24;
 const MAX_SUGGESTIONS = 8;
+
+interface IngredientSearchRecord {
+  id: string;
+  name: string;
+  slug: string;
+  defaultAbv: {
+    toString(): string;
+  } | null;
+}
 
 @Injectable()
 export class IngredientsService {
@@ -44,15 +52,72 @@ export class IngredientsService {
       );
     }
 
+    const suggestions: IngredientSuggestion[] = [];
+
+    const seenIngredientIds = new Set<string>();
+
+    await this.appendExactMatches(
+      personalWorkspace.id,
+      normalizedQuery,
+      suggestions,
+      seenIngredientIds,
+    );
+
+    await this.appendPrefixMatches(
+      personalWorkspace.id,
+      normalizedQuery,
+      suggestions,
+      seenIngredientIds,
+    );
+
+    if (suggestions.length >= MAX_SUGGESTIONS) {
+      return suggestions;
+    }
+
+    await this.appendWordStartMatches(
+      personalWorkspace.id,
+      normalizedQuery,
+      suggestions,
+      seenIngredientIds,
+    );
+
+    if (suggestions.length >= MAX_SUGGESTIONS) {
+      return suggestions;
+    }
+
+    await this.appendContainsMatches(
+      personalWorkspace.id,
+      normalizedQuery,
+      suggestions,
+      seenIngredientIds,
+    );
+
+    return suggestions;
+  }
+
+  private async appendExactMatches(
+    workspaceId: string,
+    query: string,
+    suggestions: IngredientSuggestion[],
+    seenIngredientIds: Set<string>,
+  ): Promise<void> {
     const ingredients = await this.prisma.ingredient.findMany({
       where: {
-        workspaceId: personalWorkspace.id,
+        workspaceId,
         name: {
-          contains: normalizedQuery,
+          equals: query,
           mode: 'insensitive',
         },
       },
-      take: MAX_DATABASE_CANDIDATES,
+      take: 1,
+      orderBy: [
+        {
+          name: 'asc',
+        },
+        {
+          id: 'asc',
+        },
+      ],
       select: {
         id: true,
         name: true,
@@ -61,48 +126,195 @@ export class IngredientsService {
       },
     });
 
-    const lowerQuery = normalizedQuery.toLocaleLowerCase('fr-FR');
-
-    return ingredients
-      .map((ingredient) => ({
-        suggestion: {
-          id: ingredient.id,
-          name: ingredient.name,
-          slug: ingredient.slug,
-          defaultAbv: this.decimalToNumber(ingredient.defaultAbv),
-        },
-        relevance: this.calculateRelevance(ingredient.name, lowerQuery),
-      }))
-      .sort(
-        (left, right) =>
-          left.relevance - right.relevance ||
-          left.suggestion.name.localeCompare(right.suggestion.name, 'fr-FR'),
-      )
-      .slice(0, MAX_SUGGESTIONS)
-      .map(({ suggestion }) => suggestion);
+    this.appendSuggestions(suggestions, seenIngredientIds, ingredients);
   }
 
-  private calculateRelevance(
-    ingredientName: string,
-    lowerQuery: string,
+  private async appendPrefixMatches(
+    workspaceId: string,
+    query: string,
+    suggestions: IngredientSuggestion[],
+    seenIngredientIds: Set<string>,
+  ): Promise<void> {
+    const remainingSlots = this.remainingSuggestionSlots(suggestions);
+
+    if (remainingSlots === 0) {
+      return;
+    }
+
+    const ingredients = await this.prisma.ingredient.findMany({
+      where: {
+        workspaceId,
+        ...this.excludedIngredientsFilter(seenIngredientIds),
+        name: {
+          startsWith: query,
+          mode: 'insensitive',
+        },
+      },
+      take: remainingSlots,
+      orderBy: [
+        {
+          name: 'asc',
+        },
+        {
+          id: 'asc',
+        },
+      ],
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        defaultAbv: true,
+      },
+    });
+
+    this.appendSuggestions(suggestions, seenIngredientIds, ingredients);
+  }
+
+  private async appendWordStartMatches(
+    workspaceId: string,
+    query: string,
+    suggestions: IngredientSuggestion[],
+    seenIngredientIds: Set<string>,
+  ): Promise<void> {
+    const remainingSlots = this.remainingSuggestionSlots(suggestions);
+
+    if (remainingSlots === 0) {
+      return;
+    }
+
+    const ingredients = await this.prisma.ingredient.findMany({
+      where: {
+        workspaceId,
+        ...this.excludedIngredientsFilter(seenIngredientIds),
+        OR: [
+          {
+            name: {
+              contains: ` ${query}`,
+              mode: 'insensitive',
+            },
+          },
+          {
+            name: {
+              contains: `-${query}`,
+              mode: 'insensitive',
+            },
+          },
+          {
+            name: {
+              contains: `'${query}`,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+      take: remainingSlots,
+      orderBy: [
+        {
+          name: 'asc',
+        },
+        {
+          id: 'asc',
+        },
+      ],
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        defaultAbv: true,
+      },
+    });
+
+    this.appendSuggestions(suggestions, seenIngredientIds, ingredients);
+  }
+
+  private async appendContainsMatches(
+    workspaceId: string,
+    query: string,
+    suggestions: IngredientSuggestion[],
+    seenIngredientIds: Set<string>,
+  ): Promise<void> {
+    const remainingSlots = this.remainingSuggestionSlots(suggestions);
+
+    if (remainingSlots === 0) {
+      return;
+    }
+
+    const ingredients = await this.prisma.ingredient.findMany({
+      where: {
+        workspaceId,
+        ...this.excludedIngredientsFilter(seenIngredientIds),
+        name: {
+          contains: query,
+          mode: 'insensitive',
+        },
+      },
+      take: remainingSlots,
+      orderBy: [
+        {
+          name: 'asc',
+        },
+        {
+          id: 'asc',
+        },
+      ],
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        defaultAbv: true,
+      },
+    });
+
+    this.appendSuggestions(suggestions, seenIngredientIds, ingredients);
+  }
+
+  private appendSuggestions(
+    suggestions: IngredientSuggestion[],
+    seenIngredientIds: Set<string>,
+    ingredients: IngredientSearchRecord[],
+  ): void {
+    for (const ingredient of ingredients) {
+      if (suggestions.length >= MAX_SUGGESTIONS) {
+        return;
+      }
+
+      if (seenIngredientIds.has(ingredient.id)) {
+        continue;
+      }
+
+      seenIngredientIds.add(ingredient.id);
+
+      suggestions.push({
+        id: ingredient.id,
+        name: ingredient.name,
+        slug: ingredient.slug,
+        defaultAbv: this.decimalToNumber(ingredient.defaultAbv),
+      });
+    }
+  }
+
+  private remainingSuggestionSlots(
+    suggestions: IngredientSuggestion[],
   ): number {
-    const lowerName = ingredientName.toLocaleLowerCase('fr-FR');
+    return Math.max(MAX_SUGGESTIONS - suggestions.length, 0);
+  }
 
-    if (lowerName === lowerQuery) {
-      return 0;
+  private excludedIngredientsFilter(seenIngredientIds: Set<string>):
+    | {
+        id: {
+          notIn: string[];
+        };
+      }
+    | Record<string, never> {
+    if (seenIngredientIds.size === 0) {
+      return {};
     }
 
-    if (lowerName.startsWith(lowerQuery)) {
-      return 1;
-    }
-
-    const words = lowerName.split(/[\s\-']/u);
-
-    if (words.some((word) => word.startsWith(lowerQuery))) {
-      return 2;
-    }
-
-    return 3;
+    return {
+      id: {
+        notIn: [...seenIngredientIds],
+      },
+    };
   }
 
   private decimalToNumber(

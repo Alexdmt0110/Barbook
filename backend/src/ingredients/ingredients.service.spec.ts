@@ -114,19 +114,23 @@ describe('IngredientsService', () => {
     expect(ingredientFindMany).not.toHaveBeenCalled();
   });
 
-  it('searches only inside the personal workspace with a bounded candidate set', async () => {
+  it('searches only inside the personal workspace', async () => {
     workspaceFindUnique.mockResolvedValue({
       id: 'workspace-123',
     });
 
-    ingredientFindMany.mockResolvedValue([
-      {
-        id: 'ingredient-lime',
-        name: 'Jus de citron vert',
-        slug: 'jus-de-citron-vert',
-        defaultAbv: decimal(0),
-      },
-    ]);
+    ingredientFindMany
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          id: 'ingredient-lime',
+          name: 'Citron vert',
+          slug: 'citron-vert',
+          defaultAbv: decimal(0),
+        },
+      ])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([]);
 
     const result = await service.searchPersonalIngredients(
       'user-123',
@@ -142,28 +146,39 @@ describe('IngredientsService', () => {
       },
     });
 
-    expect(ingredientFindMany).toHaveBeenCalledWith({
-      where: {
-        workspaceId: 'workspace-123',
-        name: {
-          contains: 'citron',
-          mode: 'insensitive',
+    expect(ingredientFindMany).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        where: {
+          workspaceId: 'workspace-123',
+          name: {
+            equals: 'citron',
+            mode: 'insensitive',
+          },
         },
-      },
-      take: 24,
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        defaultAbv: true,
-      },
-    });
+        take: 1,
+      }),
+    );
+
+    expect(ingredientFindMany).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        where: {
+          workspaceId: 'workspace-123',
+          name: {
+            startsWith: 'citron',
+            mode: 'insensitive',
+          },
+        },
+        take: 8,
+      }),
+    );
 
     expect(result).toEqual([
       {
         id: 'ingredient-lime',
-        name: 'Jus de citron vert',
-        slug: 'jus-de-citron-vert',
+        name: 'Citron vert',
+        slug: 'citron-vert',
         defaultAbv: 0,
       },
     ]);
@@ -174,20 +189,24 @@ describe('IngredientsService', () => {
       id: 'workspace-123',
     });
 
-    ingredientFindMany.mockResolvedValue([
-      {
-        id: 'ingredient-lemon',
-        name: 'Citron jaune',
-        slug: 'citron-jaune',
-        defaultAbv: null,
-      },
-      {
-        id: 'ingredient-lime',
-        name: 'Citron vert',
-        slug: 'citron-vert',
-        defaultAbv: decimal(0),
-      },
-    ]);
+    ingredientFindMany
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          id: 'ingredient-lemon',
+          name: 'Citron jaune',
+          slug: 'citron-jaune',
+          defaultAbv: null,
+        },
+        {
+          id: 'ingredient-lime',
+          name: 'Citron vert',
+          slug: 'citron-vert',
+          defaultAbv: decimal(0),
+        },
+      ])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([]);
 
     const result = await service.searchPersonalIngredients('user-123', 'cit');
 
@@ -207,43 +226,50 @@ describe('IngredientsService', () => {
     ]);
   });
 
-  it('orders suggestions by relevance before alphabetical order', async () => {
+  it('orders exact, prefix, word-start and contains matches by relevance', async () => {
     workspaceFindUnique.mockResolvedValue({
       id: 'workspace-123',
     });
 
-    ingredientFindMany.mockResolvedValue([
-      {
-        id: 'contains',
-        name: 'Recit aromatique',
-        slug: 'recit-aromatique',
-        defaultAbv: null,
-      },
-      {
-        id: 'word-start',
-        name: 'Jus de citron vert',
-        slug: 'jus-de-citron-vert',
-        defaultAbv: decimal(0),
-      },
-      {
-        id: 'prefix-b',
-        name: 'Citron vert',
-        slug: 'citron-vert',
-        defaultAbv: decimal(0),
-      },
-      {
-        id: 'exact',
-        name: 'Cit',
-        slug: 'cit',
-        defaultAbv: null,
-      },
-      {
-        id: 'prefix-a',
-        name: 'Citron jaune',
-        slug: 'citron-jaune',
-        defaultAbv: decimal(0),
-      },
-    ]);
+    ingredientFindMany
+      .mockResolvedValueOnce([
+        {
+          id: 'exact',
+          name: 'Cit',
+          slug: 'cit',
+          defaultAbv: null,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: 'prefix-a',
+          name: 'Citron jaune',
+          slug: 'citron-jaune',
+          defaultAbv: decimal(0),
+        },
+        {
+          id: 'prefix-b',
+          name: 'Citron vert',
+          slug: 'citron-vert',
+          defaultAbv: decimal(0),
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: 'word-start',
+          name: 'Jus de citron vert',
+          slug: 'jus-de-citron-vert',
+          defaultAbv: decimal(0),
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: 'contains',
+          name: 'Recit aromatique',
+          slug: 'recit-aromatique',
+          defaultAbv: null,
+        },
+      ]);
 
     const result = await service.searchPersonalIngredients('user-123', 'cit');
 
@@ -256,20 +282,164 @@ describe('IngredientsService', () => {
     ]);
   });
 
-  it('returns at most eight suggestions', async () => {
+  it('uses deterministic alphabetical ordering inside each relevance tier', async () => {
     workspaceFindUnique.mockResolvedValue({
       id: 'workspace-123',
     });
 
-    ingredientFindMany.mockResolvedValue(
+    ingredientFindMany
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          id: 'prefix-a',
+          name: 'Citron jaune',
+          slug: 'citron-jaune',
+          defaultAbv: decimal(0),
+        },
+        {
+          id: 'prefix-b',
+          name: 'Citron vert',
+          slug: 'citron-vert',
+          defaultAbv: decimal(0),
+        },
+      ])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([]);
+
+    await service.searchPersonalIngredients('user-123', 'cit');
+
+    expect(ingredientFindMany).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        orderBy: [
+          {
+            name: 'asc',
+          },
+          {
+            id: 'asc',
+          },
+        ],
+      }),
+    );
+  });
+
+  it('excludes already selected matches from lower relevance tiers', async () => {
+    workspaceFindUnique.mockResolvedValue({
+      id: 'workspace-123',
+    });
+
+    ingredientFindMany
+      .mockResolvedValueOnce([
+        {
+          id: 'exact',
+          name: 'Cit',
+          slug: 'cit',
+          defaultAbv: null,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: 'prefix',
+          name: 'Citron vert',
+          slug: 'citron-vert',
+          defaultAbv: decimal(0),
+        },
+      ])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([]);
+
+    await service.searchPersonalIngredients('user-123', 'cit');
+
+    expect(ingredientFindMany).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        where: {
+          workspaceId: 'workspace-123',
+          id: {
+            notIn: ['exact'],
+          },
+          name: {
+            startsWith: 'cit',
+            mode: 'insensitive',
+          },
+        },
+      }),
+    );
+
+    const wordStartQuery = ingredientFindMany.mock.calls[2]?.[0];
+
+    expect(wordStartQuery).toMatchObject({
+      where: {
+        id: {
+          notIn: ['exact', 'prefix'],
+        },
+      },
+    });
+  });
+
+  it('detects word starts after supported separators', async () => {
+    workspaceFindUnique.mockResolvedValue({
+      id: 'workspace-123',
+    });
+
+    ingredientFindMany
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          id: 'juice',
+          name: 'Jus de citron vert',
+          slug: 'jus-de-citron-vert',
+          defaultAbv: decimal(0),
+        },
+      ])
+      .mockResolvedValueOnce([]);
+
+    await service.searchPersonalIngredients('user-123', 'cit');
+
+    const wordStartQuery = ingredientFindMany.mock.calls[2]?.[0];
+
+    expect(wordStartQuery).toMatchObject({
+      where: {
+        workspaceId: 'workspace-123',
+        OR: [
+          {
+            name: {
+              contains: ' cit',
+              mode: 'insensitive',
+            },
+          },
+          {
+            name: {
+              contains: '-cit',
+              mode: 'insensitive',
+            },
+          },
+          {
+            name: {
+              contains: "'cit",
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+    });
+  });
+
+  it('stops querying lower relevance tiers once eight suggestions are found', async () => {
+    workspaceFindUnique.mockResolvedValue({
+      id: 'workspace-123',
+    });
+
+    ingredientFindMany.mockResolvedValueOnce([]).mockResolvedValueOnce(
       Array.from(
         {
-          length: 12,
+          length: 8,
         },
         (_, index) => ({
           id: `ingredient-${index}`,
-          name: `Citron test ${index}`,
-          slug: `citron-test-${index}`,
+          name: `Citron ${index}`,
+          slug: `citron-${index}`,
           defaultAbv: decimal(0),
         }),
       ),
@@ -278,38 +448,91 @@ describe('IngredientsService', () => {
     const result = await service.searchPersonalIngredients('user-123', 'cit');
 
     expect(result).toHaveLength(8);
+
+    expect(ingredientFindMany).toHaveBeenCalledTimes(2);
   });
 
-  it('returns fewer than eight suggestions when fewer ingredients match', async () => {
+  it('returns at most eight suggestions across all relevance tiers', async () => {
     workspaceFindUnique.mockResolvedValue({
       id: 'workspace-123',
     });
 
-    ingredientFindMany.mockResolvedValue([
-      {
-        id: 'lemon-juice',
-        name: 'Jus de citron jaune',
-        slug: 'jus-de-citron-jaune',
-        defaultAbv: decimal(0),
-      },
-      {
-        id: 'lime-juice',
-        name: 'Jus de citron vert',
-        slug: 'jus-de-citron-vert',
-        defaultAbv: decimal(0),
-      },
-    ]);
+    ingredientFindMany
+      .mockResolvedValueOnce([
+        {
+          id: 'exact',
+          name: 'Cit',
+          slug: 'cit',
+          defaultAbv: null,
+        },
+      ])
+      .mockResolvedValueOnce(
+        Array.from(
+          {
+            length: 7,
+          },
+          (_, index) => ({
+            id: `prefix-${index}`,
+            name: `Citron ${index}`,
+            slug: `citron-${index}`,
+            defaultAbv: decimal(0),
+          }),
+        ),
+      );
 
-    const result = await service.searchPersonalIngredients(
-      'user-123',
-      'jus de cit',
+    const result = await service.searchPersonalIngredients('user-123', 'cit');
+
+    expect(result).toHaveLength(8);
+
+    expect(ingredientFindMany).toHaveBeenCalledTimes(2);
+  });
+
+  it('uses the remaining capacity as the database limit for each tier', async () => {
+    workspaceFindUnique.mockResolvedValue({
+      id: 'workspace-123',
+    });
+
+    ingredientFindMany
+      .mockResolvedValueOnce([
+        {
+          id: 'exact',
+          name: 'Cit',
+          slug: 'cit',
+          defaultAbv: null,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: 'prefix',
+          name: 'Citron vert',
+          slug: 'citron-vert',
+          defaultAbv: decimal(0),
+        },
+      ])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([]);
+
+    await service.searchPersonalIngredients('user-123', 'cit');
+
+    expect(ingredientFindMany).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        take: 7,
+      }),
     );
 
-    expect(result).toHaveLength(2);
+    expect(ingredientFindMany).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({
+        take: 6,
+      }),
+    );
 
-    expect(result.map((ingredient) => ingredient.name)).toEqual([
-      'Jus de citron jaune',
-      'Jus de citron vert',
-    ]);
+    expect(ingredientFindMany).toHaveBeenNthCalledWith(
+      4,
+      expect.objectContaining({
+        take: 6,
+      }),
+    );
   });
 });
