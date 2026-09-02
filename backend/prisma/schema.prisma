@@ -179,6 +179,7 @@ model CocktailIngredient {
   cocktail   Cocktail   @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
   ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
 
+  @@unique([cocktailId, ingredientId])
   @@unique([cocktailId, sortOrder])
   @@index([ingredientId])
 }
