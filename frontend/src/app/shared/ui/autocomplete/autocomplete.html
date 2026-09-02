@@ -64,11 +64,13 @@
             [attr.aria-selected]="
               activeIndex() === index
             "
-            (pointerdown)="
-              selectOption(
-                $event,
-                option
+            (mousedown)="
+              preventOptionMouseDown(
+                $event
               )
+            "
+            (click)="
+              selectOption(option)
             "
           >
             <span

@@ -153,7 +153,7 @@ describe('UiAutocomplete', () => {
     expect(component.isOpen()).toBe(false);
   });
 
-  it('selects an option through pointer interaction without losing the combobox focus first', () => {
+  it('does not select an option on mouse press alone', () => {
     const fixture = TestBed.createComponent(UiAutocomplete);
 
     fixture.componentRef.setInput('value', 'cit');
@@ -178,14 +178,48 @@ describe('UiAutocomplete', () => {
       '.autocomplete-option',
     ) as HTMLElement;
 
-    const pointerEvent = new Event('pointerdown', {
+    const mouseDownEvent = new MouseEvent('mousedown', {
       bubbles: true,
       cancelable: true,
     });
 
-    renderedOption.dispatchEvent(pointerEvent);
+    renderedOption.dispatchEvent(mouseDownEvent);
 
-    expect(pointerEvent.defaultPrevented).toBe(true);
+    expect(mouseDownEvent.defaultPrevented).toBe(true);
+
+    expect(selectedOption).toBeNull();
+  });
+
+  it('selects an option on click', () => {
+    const fixture = TestBed.createComponent(UiAutocomplete);
+
+    fixture.componentRef.setInput('value', 'cit');
+
+    fixture.componentRef.setInput('options', options);
+
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance;
+
+    let selectedOption: UiAutocompleteOption | null = null;
+
+    component.optionSelected.subscribe((option) => {
+      selectedOption = option;
+    });
+
+    component.onFocus();
+
+    fixture.detectChanges();
+
+    const renderedOption = fixture.nativeElement.querySelector(
+      '.autocomplete-option',
+    ) as HTMLElement;
+
+    renderedOption.dispatchEvent(
+      new MouseEvent('click', {
+        bubbles: true,
+      }),
+    );
 
     expect(selectedOption).toEqual(options[0]);
 

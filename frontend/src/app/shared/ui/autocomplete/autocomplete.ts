@@ -151,12 +151,13 @@ export class UiAutocomplete {
     }
   }
 
-  selectOption(event: Event, option: UiAutocompleteOption): void {
-    // Conserve le focus sur la combobox :
-    // le blur ne doit pas fermer la liste
-    // avant que la sélection soit appliquée.
+  preventOptionMouseDown(event: MouseEvent): void {
+    // Sur desktop, évite que l'input perde
+    // son focus avant l'événement click.
     event.preventDefault();
+  }
 
+  selectOption(option: UiAutocompleteOption): void {
     this.commitOption(option);
   }
 
