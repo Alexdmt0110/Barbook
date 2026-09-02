@@ -14,26 +14,34 @@ import { ThemeSwitcher } from '../../../shared/ui/theme-switcher/theme-switcher'
 })
 export class Login {
   private readonly formBuilder = inject(FormBuilder);
+
   private readonly authService = inject(AuthService);
+
   private readonly router = inject(Router);
+
   private readonly route = inject(ActivatedRoute);
 
   readonly isSubmitting = signal(false);
+
   readonly errorMessage = signal<string | null>(null);
+
   readonly passwordVisible = signal(false);
 
   readonly form = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
+
     password: ['', [Validators.required, Validators.maxLength(128)]],
   });
 
   submit(): void {
     if (this.form.invalid || this.isSubmitting()) {
       this.form.markAllAsTouched();
+
       return;
     }
 
     this.isSubmitting.set(true);
+
     this.errorMessage.set(null);
 
     this.authService
@@ -47,6 +55,7 @@ export class Login {
         next: () => {
           void this.router.navigateByUrl(this.resolveReturnUrl());
         },
+
         error: (error: unknown) => {
           this.errorMessage.set(this.resolveErrorMessage(error));
         },
@@ -78,6 +87,10 @@ export class Login {
 
     if (error.status === 401) {
       return 'Adresse email ou mot de passe incorrect.';
+    }
+
+    if (error.status === 429) {
+      return 'Trop de tentatives de connexion. Réessaie dans quelques minutes.';
     }
 
     return 'La connexion a échoué. Réessaie dans quelques instants.';
