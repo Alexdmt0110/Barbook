@@ -51,14 +51,11 @@ export class CocktailCreationService {
 
     const slug = this.requireSlug(dto.name, 'Cocktail name');
 
-    this.validateRecipeIngredients(dto.ingredients);
-    this.validateGarnishes(dto.garnishes ?? []);
-
-    const recipeIngredientSlugs = new Set(
-      dto.ingredients.map((ingredient) =>
-        this.requireSlug(ingredient.ingredientName, 'Ingredient name'),
-      ),
+    const recipeIngredientSlugs = this.validateRecipeIngredients(
+      dto.ingredients,
     );
+
+    this.validateGarnishes(dto.garnishes ?? []);
 
     const mainAlcoholSlug =
       dto.mainAlcoholName !== undefined
@@ -301,9 +298,22 @@ export class CocktailCreationService {
 
   private validateRecipeIngredients(
     ingredients: CreateCocktailIngredientDto[],
-  ): void {
+  ): Set<string> {
+    const ingredientSlugs = new Set<string>();
+
     for (const ingredient of ingredients) {
-      this.requireSlug(ingredient.ingredientName, 'Ingredient name');
+      const ingredientSlug = this.requireSlug(
+        ingredient.ingredientName,
+        'Ingredient name',
+      );
+
+      if (ingredientSlugs.has(ingredientSlug)) {
+        throw new BadRequestException(
+          'A recipe cannot contain the same ingredient more than once.',
+        );
+      }
+
+      ingredientSlugs.add(ingredientSlug);
 
       const hasAmount =
         ingredient.amount !== undefined && ingredient.amount !== null;
@@ -324,6 +334,8 @@ export class CocktailCreationService {
         );
       }
     }
+
+    return ingredientSlugs;
   }
 
   private validateGarnishes(garnishes: CreateCocktailGarnishDto[]): void {

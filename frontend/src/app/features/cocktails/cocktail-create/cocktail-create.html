@@ -99,7 +99,9 @@
         <label class="field">
           <span>Méthode *</span>
 
-          <select formControlName="method">
+          <select
+            formControlName="method"
+          >
             @for (
               option of recipeMethods;
               track option.value
@@ -167,7 +169,8 @@
         formArrayName="ingredients"
       >
         @for (
-          ingredient of ingredients.controls;
+          ingredient
+            of ingredients.controls;
           track ingredient;
           let index = $index
           ) {
@@ -175,7 +178,9 @@
             class="dynamic-card"
             [formGroupName]="index"
           >
-            <header class="dynamic-card-header">
+            <header
+              class="dynamic-card-header"
+            >
               <strong>
                 Ingrédient
                 {{ rowNumber(index) }}
@@ -187,7 +192,11 @@
                 <button
                   class="remove-action"
                   type="button"
-                  (click)="removeIngredient(index)"
+                  (click)="
+                    removeIngredient(
+                      index
+                    )
+                  "
                 >
                   Supprimer
                 </button>
@@ -195,25 +204,33 @@
             </header>
 
             <div class="field-grid">
-              <div class="field field-wide">
+              <div
+                class="field field-wide"
+              >
                 <label
                   class="field-label"
                   [id]="
-      'recipe-ingredient-label-' +
-      index
-    "
+                    'recipe-ingredient-label-' +
+                    index
+                  "
                   [for]="
-      'recipe-ingredient-input-' +
-      index
-    "
+                    'recipe-ingredient-input-' +
+                    index
+                  "
                 >
                   Ingrédient *
                 </label>
 
                 <app-ingredient-autocomplete
                   formControlName="ingredientName"
-                  [inputId]=" 'recipe-ingredient-input-' + index"
-                  [ariaLabelledBy]=" 'recipe-ingredient-label-' + index"
+                  [inputId]="
+                    'recipe-ingredient-input-' +
+                    index
+                  "
+                  [ariaLabelledBy]="
+                    'recipe-ingredient-label-' +
+                    index
+                  "
                   placeholder="Gin, jus de citron jaune…"
                   (ingredientNameChanged)="
                     onIngredientNameChanged(
@@ -242,11 +259,14 @@
                   "
                 >
                   @for (
-                    option of ingredientUnits;
+                    option
+                      of ingredientUnits;
                     track option.value
                     ) {
                     <option
-                      [value]="option.value"
+                      [value]="
+                        option.value
+                      "
                     >
                       {{ option.label }}
                     </option>
@@ -255,11 +275,13 @@
               </label>
 
               @if (
-                ingredient.controls.unit.value !==
-                'TOP_UP'
+                ingredient.controls.unit
+                  .value !== 'TOP_UP'
                 ) {
                 <label class="field">
-                  <span>Quantité *</span>
+                  <span>
+                    Quantité *
+                  </span>
 
                   <input
                     type="number"
@@ -272,8 +294,12 @@
                   />
                 </label>
               } @else {
-                <div class="field top-up-info">
-                  <span>Quantité</span>
+                <div
+                  class="field top-up-info"
+                >
+                  <span>
+                    Quantité
+                  </span>
 
                   <p>
                     Compléter selon le
@@ -287,7 +313,9 @@
                   Degré alcoolique
                 </span>
 
-                <div class="number-suffix">
+                <div
+                  class="number-suffix"
+                >
                   <input
                     type="number"
                     formControlName="ingredientDefaultAbv"
@@ -312,7 +340,9 @@
               </label>
 
               <label class="field">
-                <span>Spécification</span>
+                <span>
+                  Spécification
+                </span>
 
                 <input
                   type="text"
@@ -322,7 +352,9 @@
                 />
               </label>
 
-              <label class="field field-wide">
+              <label
+                class="field field-wide"
+              >
                 <span>
                   Note ingrédient
                 </span>
@@ -363,6 +395,22 @@
           </article>
         }
       </div>
+
+      @if (
+        (
+          ingredients.dirty ||
+          ingredients.touched
+        ) &&
+        ingredients.hasError(
+          'duplicateCanonicalIngredient'
+        )
+        ) {
+        <p class="row-error">
+          Un même ingrédient ne peut
+          apparaître qu’une seule fois
+          dans la recette.
+        </p>
+      }
 
       <button
         class="add-row-action"
@@ -406,7 +454,9 @@
               track ingredientName
               ) {
               <option
-                [value]="ingredientName"
+                [value]="
+                  ingredientName
+                "
               >
                 {{ ingredientName }}
               </option>
@@ -447,7 +497,8 @@
 
             <label class="field">
               <span>
-                Étape {{ index + 1 }} *
+                Étape
+                {{ index + 1 }} *
               </span>
 
               <textarea
@@ -464,7 +515,9 @@
               <button
                 class="remove-action step-remove"
                 type="button"
-                (click)="removeStep(index)"
+                (click)="
+                  removeStep(index)
+                "
               >
                 Supprimer
               </button>
@@ -516,7 +569,8 @@
         garnishes.length === 0
         ) {
         <p class="section-empty">
-          Aucune garniture pour le moment.
+          Aucune garniture
+          pour le moment.
         </p>
       } @else {
         <div
@@ -524,7 +578,8 @@
           formArrayName="garnishes"
         >
           @for (
-            garnish of garnishes.controls;
+            garnish
+              of garnishes.controls;
             track garnish;
             let index = $index
             ) {
@@ -532,7 +587,9 @@
               class="dynamic-card"
               [formGroupName]="index"
             >
-              <header class="dynamic-card-header">
+              <header
+                class="dynamic-card-header"
+              >
                 <strong>
                   Garniture
                   {{ rowNumber(index) }}
@@ -541,26 +598,44 @@
                 <button
                   class="remove-action"
                   type="button"
-                  (click)="removeGarnish(index)"
+                  (click)="
+                    removeGarnish(
+                      index
+                    )
+                  "
                 >
                   Supprimer
                 </button>
               </header>
 
               <div class="field-grid">
-                <div class="field field-wide">
+                <div
+                  class="field field-wide"
+                >
                   <label
                     class="field-label"
-                    [id]=" 'garnish-ingredient-label-' + index"
-                    [for]=" 'garnish-ingredient-input-' + index"
+                    [id]="
+                      'garnish-ingredient-label-' +
+                      index
+                    "
+                    [for]="
+                      'garnish-ingredient-input-' +
+                      index
+                    "
                   >
                     Ingrédient *
                   </label>
 
                   <app-ingredient-autocomplete
                     formControlName="ingredientName"
-                    [inputId]=" 'garnish-ingredient-input-' + index"
-                    [ariaLabelledBy]=" 'garnish-ingredient-label-' + index"
+                    [inputId]="
+                      'garnish-ingredient-input-' +
+                      index
+                    "
+                    [ariaLabelledBy]="
+                      'garnish-ingredient-label-' +
+                      index
+                    "
                     placeholder="Citron jaune…"
                   />
                 </div>
@@ -577,11 +652,14 @@
                     "
                   >
                     @for (
-                      option of garnishUnits;
+                      option
+                        of garnishUnits;
                       track option.value
                       ) {
                       <option
-                        [value]="option.value"
+                        [value]="
+                          option.value
+                        "
                       >
                         {{ option.label }}
                       </option>
@@ -590,11 +668,13 @@
                 </label>
 
                 @if (
-                  garnish.controls.unit.value !==
-                  ''
+                  garnish.controls.unit
+                    .value !== ''
                   ) {
                   <label class="field">
-                    <span>Quantité</span>
+                    <span>
+                      Quantité
+                    </span>
 
                     <input
                       type="number"
@@ -619,7 +699,9 @@
                   />
                 </label>
 
-                <label class="field field-wide">
+                <label
+                  class="field field-wide"
+                >
                   <span>
                     Utilisation *
                   </span>

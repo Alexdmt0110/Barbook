@@ -311,6 +311,36 @@ describe('CocktailCreate', () => {
     expect(cocktailsService.requests).toHaveLength(0);
   });
 
+  it('does not submit duplicate canonical recipe ingredients', () => {
+    const component = createComponent();
+
+    fillRequiredFields(component);
+
+    const firstIngredient = component.ingredients.at(0);
+
+    firstIngredient.controls.ingredientName.setValue('Gin');
+
+    firstIngredient.controls.ingredientDefaultAbv.setValue(40);
+
+    firstIngredient.controls.amount.setValue(3);
+
+    component.addIngredient();
+
+    const secondIngredient = component.ingredients.at(1);
+
+    secondIngredient.controls.ingredientName.setValue(' GIN ');
+
+    secondIngredient.controls.ingredientDefaultAbv.setValue(40);
+
+    secondIngredient.controls.amount.setValue(2);
+
+    component.submit();
+
+    expect(cocktailsService.requests).toHaveLength(0);
+
+    expect(component.ingredients.hasError('duplicateCanonicalIngredient')).toBe(true);
+  });
+
   it('does not add more recipe rows than the API accepts', () => {
     const component = createComponent();
 

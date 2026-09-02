@@ -1,9 +1,10 @@
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import {
   garnishMeasurementValidator,
   ingredientMeasurementValidator,
   MAX_STORED_AMOUNT,
   trimmedRequiredValidator,
+  uniqueCanonicalIngredientsValidator,
 } from './cocktail-create.form';
 
 describe('cocktail creation form validators', () => {
@@ -28,6 +29,52 @@ describe('cocktail creation form validators', () => {
       control.setValue(' ab ');
 
       expect(control.valid).toBe(true);
+    });
+  });
+
+  describe('uniqueCanonicalIngredientsValidator', () => {
+    it('rejects duplicate canonical ingredient names', () => {
+      const ingredients = new FormArray(
+        [
+          new FormGroup({
+            ingredientName: new FormControl('Gin', {
+              nonNullable: true,
+            }),
+          }),
+          new FormGroup({
+            ingredientName: new FormControl(' GIN ', {
+              nonNullable: true,
+            }),
+          }),
+        ],
+        {
+          validators: [uniqueCanonicalIngredientsValidator],
+        },
+      );
+
+      expect(ingredients.hasError('duplicateCanonicalIngredient')).toBe(true);
+    });
+
+    it('accepts different canonical ingredients', () => {
+      const ingredients = new FormArray(
+        [
+          new FormGroup({
+            ingredientName: new FormControl('Gin', {
+              nonNullable: true,
+            }),
+          }),
+          new FormGroup({
+            ingredientName: new FormControl('Tonic', {
+              nonNullable: true,
+            }),
+          }),
+        ],
+        {
+          validators: [uniqueCanonicalIngredientsValidator],
+        },
+      );
+
+      expect(ingredients.valid).toBe(true);
     });
   });
 

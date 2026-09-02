@@ -100,6 +100,12 @@ Lorsqu'un ingrédient possédant déjà ce slug existe dans le workspace, il est
 
 La création d'une recette ne modifie pas silencieusement le nom ou le degré alcoolique par défaut d'un ingrédient existant.
 
+Une même recette ne peut pas contenir plusieurs lignes correspondant au même slug canonique d'ingrédient.
+
+Cette contrainte évite les ambiguïtés entre l'identité catalogue, les overrides de degré alcoolique et l'alcool principal.
+
+Lorsqu'un même ingrédient intervient à plusieurs moments de la préparation, la V1 conserve une seule ligne d'ingrédient et décrit la répartition dans les étapes ou les notes de la recette.
+
 ## Recherche d'ingrédients
 
 L'autocomplétion utilise :
@@ -114,7 +120,8 @@ La recherche :
 - utilise uniquement le workspace personnel de l'utilisateur ;
 - ignore les recherches de moins de 3 caractères ;
 - refuse les recherches de plus de 120 caractères ;
-- récupère au maximum 24 candidats depuis PostgreSQL ;
+- interroge PostgreSQL par niveaux de pertinence avec des requêtes bornées ;
+- s'arrête dès que 8 suggestions pertinentes sont obtenues ;
 - retourne au maximum 8 suggestions.
 
 L'ordre de pertinence est :
@@ -144,8 +151,10 @@ Il gère notamment :
 - `Enter` ;
 - `Escape` ;
 - les attributs ARIA de type combobox/listbox ;
+- l'association entre le libellé visible et le champ de saisie ;
 - le chargement ;
-- la sélection d'une option.
+- la sélection d'une option ;
+- les interactions pointer compatibles souris, tactile et stylet.
 
 Le composant spécifique aux ingrédients se trouve dans :
 
@@ -213,7 +222,15 @@ L'alcool principal est facultatif.
 
 Dans le formulaire, les choix sont dérivés des ingrédients de la recette dont le degré saisi est strictement supérieur à `0`.
 
-Le backend vérifie également que l'alcool principal appartient bien aux ingrédients de la recette.
+Le backend vérifie également que l'alcool principal appartient bien aux ingrédients de la recette et que son degré alcoolique effectif est strictement supérieur à `0`.
+
+Pour un ingrédient existant, le degré effectif est déterminé par :
+
+```text
+abvOverride ?? catalogue.defaultAbv
+```
+
+Le backend ne fait donc pas confiance à une valeur `ingredientDefaultAbv` fournie par le client pour modifier implicitement le catalogue existant.
 
 ## Volumes
 
@@ -282,6 +299,14 @@ Le DTO impose notamment :
 - des limites de taille sur les champs texte ;
 - des valeurs appartenant aux enums métier.
 
+Le service complète ces validations avec les invariants qui dépendent de plusieurs champs ou du catalogue :
+
+- cohérence quantité/unité ;
+- contraintes `TOP_UP` ;
+- unicité canonique des ingrédients de recette ;
+- appartenance de l'alcool principal à la recette ;
+- caractère réellement alcoolisé de l'alcool principal.
+
 Le `ValidationPipe` global utilise :
 
 ```text
@@ -338,6 +363,7 @@ La fonctionnalité est couverte côté backend pour :
 
 - la création complète ;
 - les validations métier ;
+- le rejet des ingrédients canoniques dupliqués ;
 - les conflits ;
 - la recherche d'ingrédients ;
 - le classement des suggestions ;
@@ -351,6 +377,8 @@ Le frontend couvre notamment :
 - l'autocomplétion générique ;
 - l'autocomplétion d'ingrédients ;
 - le formulaire de création ;
+- les validateurs de formulaire ;
+- le rejet des ingrédients canoniques dupliqués ;
 - la conversion des volumes ;
 - les listes dynamiques ;
 - l'alcool principal ;

@@ -5,6 +5,7 @@ import {
   ValidationErrors,
   ValidatorFn,
 } from '@angular/forms';
+import { toSlug } from '../../../shared/utils/slug';
 import { CocktailType, MeasurementUnit, RecipeMethod } from '../data-access/cocktail.models';
 
 export const MAX_RECIPE_INGREDIENTS = 50;
@@ -50,25 +51,35 @@ export interface CocktailCreateFormValue {
 
 export type IngredientFormGroup = FormGroup<{
   ingredientName: FormControl<string>;
+
   ingredientDefaultAbv: FormControl<number | null>;
+
   amount: FormControl<number | null>;
+
   unit: FormControl<IngredientInputUnit>;
+
   specification: FormControl<string>;
+
   notes: FormControl<string>;
 }>;
 
 export type GarnishFormGroup = FormGroup<{
   ingredientName: FormControl<string>;
+
   amount: FormControl<number | null>;
+
   unit: FormControl<GarnishInputUnit>;
+
   specification: FormControl<string>;
+
   usage: FormControl<string>;
 }>;
 
 export type StepFormControl = FormControl<string>;
 
 /**
- * Refuse les chaînes vides une fois les espaces périphériques retirés.
+ * Refuse les chaînes vides une fois
+ * les espaces périphériques retirés.
  */
 export function trimmedRequiredValidator(minimumLength = 1): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -89,7 +100,52 @@ export function trimmedRequiredValidator(minimumLength = 1): ValidatorFn {
 }
 
 /**
- * Vérifie la cohérence quantité/unité d'un ingrédient de recette.
+ * Refuse plusieurs lignes représentant
+ * le même ingrédient canonique.
+ */
+export function uniqueCanonicalIngredientsValidator(
+  control: AbstractControl,
+): ValidationErrors | null {
+  const value = control.value as unknown;
+
+  if (!Array.isArray(value)) {
+    return null;
+  }
+
+  const ingredientSlugs = new Set<string>();
+
+  for (const candidate of value) {
+    if (typeof candidate !== 'object' || candidate === null) {
+      continue;
+    }
+
+    const ingredientName = (candidate as Partial<IngredientFormValue>).ingredientName;
+
+    if (typeof ingredientName !== 'string') {
+      continue;
+    }
+
+    const ingredientSlug = toSlug(ingredientName);
+
+    if (!ingredientSlug) {
+      continue;
+    }
+
+    if (ingredientSlugs.has(ingredientSlug)) {
+      return {
+        duplicateCanonicalIngredient: true,
+      };
+    }
+
+    ingredientSlugs.add(ingredientSlug);
+  }
+
+  return null;
+}
+
+/**
+ * Vérifie la cohérence quantité/unité
+ * d'un ingrédient de recette.
  */
 export function ingredientMeasurementValidator(control: AbstractControl): ValidationErrors | null {
   const unit = control.get('unit')?.value;
@@ -122,7 +178,8 @@ export function ingredientMeasurementValidator(control: AbstractControl): Valida
 }
 
 /**
- * Vérifie la cohérence quantité/unité d'une garniture.
+ * Vérifie la cohérence quantité/unité
+ * d'une garniture.
  */
 export function garnishMeasurementValidator(control: AbstractControl): ValidationErrors | null {
   const unit = control.get('unit')?.value;

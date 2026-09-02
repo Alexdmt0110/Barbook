@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
+import { toSlug } from '../../../shared/utils/slug';
 import { IngredientSuggestion } from '../../ingredients/data-access/ingredient.models';
 import { IngredientAutocomplete } from '../../ingredients/ui/ingredient-autocomplete';
 import { CocktailType, RecipeMethod } from '../data-access/cocktail.models';
@@ -20,6 +21,7 @@ import {
   MAX_STORED_AMOUNT,
   StepFormControl,
   trimmedRequiredValidator,
+  uniqueCanonicalIngredientsValidator,
 } from './cocktail-create.form';
 import {
   buildCreateCocktailRequest,
@@ -32,7 +34,6 @@ import {
   INGREDIENT_UNIT_OPTIONS,
   RECIPE_METHOD_OPTIONS,
 } from './cocktail-create.options';
-import { toSlug } from '../../../shared/utils/slug';
 
 @Component({
   selector: 'app-cocktail-create',
@@ -92,7 +93,9 @@ export class CocktailCreate {
 
     notes: this.formBuilder.nonNullable.control('', [Validators.maxLength(4000)]),
 
-    ingredients: this.formBuilder.array<IngredientFormGroup>([this.createIngredientGroup()]),
+    ingredients: this.formBuilder.array<IngredientFormGroup>([this.createIngredientGroup()], {
+      validators: [uniqueCanonicalIngredientsValidator],
+    }),
 
     garnishes: this.formBuilder.array<GarnishFormGroup>([]),
 

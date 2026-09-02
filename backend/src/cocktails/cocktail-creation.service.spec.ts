@@ -119,16 +119,21 @@ function buildCreateDto(
 
 describe('CocktailCreationService', () => {
   let workspaceFindUnique: FindUniqueMock;
+
   let cocktailFindUnique: FindUniqueMock;
 
   let ingredientUpsert: IngredientUpsertMock;
+
   let cocktailCreate: CocktailCreateMock;
 
   let cocktailIngredientCreateMany: CreateManyMock;
+
   let garnishIngredientCreateMany: CreateManyMock;
+
   let preparationStepCreateMany: CreateManyMock;
 
   let prismaTransaction: PrismaTransactionMock;
+
   let transaction: TransactionMock;
 
   let service: CocktailCreationService;
@@ -469,6 +474,35 @@ describe('CocktailCreationService', () => {
     await expect(
       service.createPersonalCocktail('user-123', dto),
     ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(prismaTransaction).not.toHaveBeenCalled();
+  });
+
+  it('rejects duplicate canonical recipe ingredients', async () => {
+    const dto = buildCreateDto({
+      mainAlcoholName: 'Gin',
+      ingredients: [
+        {
+          ingredientName: 'Gin',
+          ingredientDefaultAbv: 40,
+          amount: 30,
+          unit: MeasurementUnit.ML,
+        },
+        {
+          ingredientName: ' GIN ',
+          ingredientDefaultAbv: 40,
+          amount: 20,
+          unit: MeasurementUnit.ML,
+        },
+      ],
+      garnishes: [],
+    });
+
+    await expect(
+      service.createPersonalCocktail('user-123', dto),
+    ).rejects.toThrow(
+      'A recipe cannot contain the same ingredient more than once.',
+    );
 
     expect(prismaTransaction).not.toHaveBeenCalled();
   });
