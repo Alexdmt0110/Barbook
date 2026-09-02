@@ -291,6 +291,54 @@ describe('CocktailCreate', () => {
     expect(component.form.controls.mainAlcoholName.value).toBe('');
   });
 
+  it('does not submit whitespace-only required fields', () => {
+    const component = createComponent();
+
+    component.form.controls.name.setValue('   ');
+
+    component.form.controls.glass.setValue('   ');
+
+    const ingredient = component.ingredients.at(0);
+
+    ingredient.controls.ingredientName.setValue('   ');
+
+    ingredient.controls.amount.setValue(5);
+
+    component.steps.at(0).setValue('   ');
+
+    component.submit();
+
+    expect(cocktailsService.requests).toHaveLength(0);
+  });
+
+  it('does not add more recipe rows than the API accepts', () => {
+    const component = createComponent();
+
+    while (component.ingredients.length < component.maxRecipeIngredients) {
+      component.addIngredient();
+    }
+
+    component.addIngredient();
+
+    expect(component.ingredients.length).toBe(component.maxRecipeIngredients);
+
+    while (component.garnishes.length < component.maxGarnishes) {
+      component.addGarnish();
+    }
+
+    component.addGarnish();
+
+    expect(component.garnishes.length).toBe(component.maxGarnishes);
+
+    while (component.steps.length < component.maxPreparationSteps) {
+      component.addStep();
+    }
+
+    component.addStep();
+
+    expect(component.steps.length).toBe(component.maxPreparationSteps);
+  });
+
   it('navigates to the created cocktail detail page', () => {
     const component = createComponent();
 

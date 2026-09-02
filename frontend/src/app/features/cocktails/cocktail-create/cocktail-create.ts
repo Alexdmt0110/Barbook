@@ -1,14 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { toSlug } from '../../../shared/utils/slug';
@@ -23,70 +15,21 @@ import {
   RecipeMethod,
 } from '../data-access/cocktail.models';
 import { CocktailsService } from '../data-access/cocktails.service';
-
-type IngredientInputUnit = MeasurementUnit | 'CL';
-
-type GarnishInputUnit = '' | Exclude<IngredientInputUnit, 'TOP_UP'>;
-
-interface UnitOption<T extends string> {
-  value: T;
-  label: string;
-}
-
-type IngredientFormGroup = FormGroup<{
-  ingredientName: FormControl<string>;
-  ingredientDefaultAbv: FormControl<number | null>;
-  amount: FormControl<number | null>;
-  unit: FormControl<IngredientInputUnit>;
-  specification: FormControl<string>;
-  notes: FormControl<string>;
-}>;
-
-type GarnishFormGroup = FormGroup<{
-  ingredientName: FormControl<string>;
-  amount: FormControl<number | null>;
-  unit: FormControl<GarnishInputUnit>;
-  specification: FormControl<string>;
-  usage: FormControl<string>;
-}>;
-
-type StepFormControl = FormControl<string>;
-
-function ingredientMeasurementValidator(control: AbstractControl): ValidationErrors | null {
-  const unit = control.get('unit')?.value;
-
-  const amount = control.get('amount')?.value;
-
-  if (unit === 'TOP_UP') {
-    return amount === null || amount === undefined
-      ? null
-      : {
-          topUpAmount: true,
-        };
-  }
-
-  return typeof amount === 'number' && amount > 0
-    ? null
-    : {
-        amountRequired: true,
-      };
-}
-
-function garnishMeasurementValidator(control: AbstractControl): ValidationErrors | null {
-  const unit = control.get('unit')?.value;
-
-  const amount = control.get('amount')?.value;
-
-  const hasUnit = typeof unit === 'string' && unit.length > 0;
-
-  const hasAmount = typeof amount === 'number';
-
-  return hasUnit === hasAmount
-    ? null
-    : {
-        amountUnitPair: true,
-      };
-}
+import {
+  GarnishFormGroup,
+  GarnishInputUnit,
+  garnishMeasurementValidator,
+  IngredientFormGroup,
+  IngredientInputUnit,
+  ingredientMeasurementValidator,
+  MAX_GARNISHES,
+  MAX_PREPARATION_STEPS,
+  MAX_RECIPE_INGREDIENTS,
+  MAX_STORED_AMOUNT,
+  StepFormControl,
+  trimmedRequiredValidator,
+  UnitOption,
+} from './cocktail-create.form';
 
 @Component({
   selector: 'app-cocktail-create',
@@ -106,6 +49,12 @@ export class CocktailCreate {
   readonly isSubmitting = signal(false);
 
   readonly errorMessage = signal<string | null>(null);
+
+  readonly maxRecipeIngredients = MAX_RECIPE_INGREDIENTS;
+
+  readonly maxGarnishes = MAX_GARNISHES;
+
+  readonly maxPreparationSteps = MAX_PREPARATION_STEPS;
 
   readonly cocktailTypes: UnitOption<CocktailType>[] = [
     {
@@ -213,8 +162,7 @@ export class CocktailCreate {
 
   readonly form = this.formBuilder.group({
     name: this.formBuilder.nonNullable.control('', [
-      Validators.required,
-      Validators.minLength(2),
+      trimmedRequiredValidator(2),
       Validators.maxLength(120),
     ]),
 
@@ -227,7 +175,7 @@ export class CocktailCreate {
     method: this.formBuilder.nonNullable.control<RecipeMethod>('SHAKER', [Validators.required]),
 
     glass: this.formBuilder.nonNullable.control('', [
-      Validators.required,
+      trimmedRequiredValidator(),
       Validators.maxLength(80),
     ]),
 
@@ -257,6 +205,10 @@ export class CocktailCreate {
   }
 
   addIngredient(): void {
+    if (this.ingredients.length >= MAX_RECIPE_INGREDIENTS) {
+      return;
+    }
+
     this.ingredients.push(this.createIngredientGroup());
   }
 
@@ -317,6 +269,10 @@ export class CocktailCreate {
   }
 
   addGarnish(): void {
+    if (this.garnishes.length >= MAX_GARNISHES) {
+      return;
+    }
+
     this.garnishes.push(this.createGarnishGroup());
   }
 
@@ -335,6 +291,10 @@ export class CocktailCreate {
   }
 
   addStep(): void {
+    if (this.steps.length >= MAX_PREPARATION_STEPS) {
+      return;
+    }
+
     this.steps.push(this.createStepControl());
   }
 
@@ -399,7 +359,7 @@ export class CocktailCreate {
     return this.formBuilder.group(
       {
         ingredientName: this.formBuilder.nonNullable.control('', [
-          Validators.required,
+          trimmedRequiredValidator(),
           Validators.maxLength(120),
         ]),
 
@@ -408,7 +368,10 @@ export class CocktailCreate {
           Validators.max(100),
         ]),
 
-        amount: this.formBuilder.control<number | null>(null, [Validators.min(0.001)]),
+        amount: this.formBuilder.control<number | null>(null, [
+          Validators.min(0.001),
+          Validators.max(MAX_STORED_AMOUNT),
+        ]),
 
         unit: this.formBuilder.nonNullable.control<IngredientInputUnit>('CL'),
 
@@ -426,18 +389,21 @@ export class CocktailCreate {
     return this.formBuilder.group(
       {
         ingredientName: this.formBuilder.nonNullable.control('', [
-          Validators.required,
+          trimmedRequiredValidator(),
           Validators.maxLength(120),
         ]),
 
-        amount: this.formBuilder.control<number | null>(null, [Validators.min(0.001)]),
+        amount: this.formBuilder.control<number | null>(null, [
+          Validators.min(0.001),
+          Validators.max(MAX_STORED_AMOUNT),
+        ]),
 
         unit: this.formBuilder.nonNullable.control<GarnishInputUnit>(''),
 
         specification: this.formBuilder.nonNullable.control('', [Validators.maxLength(160)]),
 
         usage: this.formBuilder.nonNullable.control('', [
-          Validators.required,
+          trimmedRequiredValidator(),
           Validators.maxLength(500),
         ]),
       },
@@ -449,7 +415,7 @@ export class CocktailCreate {
 
   private createStepControl(): StepFormControl {
     return this.formBuilder.nonNullable.control('', [
-      Validators.required,
+      trimmedRequiredValidator(),
       Validators.maxLength(500),
     ]);
   }

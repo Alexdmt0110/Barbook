@@ -62,7 +62,8 @@
             ) {
             <small class="field-error">
               Le nom doit contenir
-              entre 2 et 120 caractères.
+              entre 2 et 120 caractères
+              utiles.
             </small>
           }
         </label>
@@ -201,8 +202,18 @@
                   formControlName="ingredientName"
                   ariaLabel="Ingrédient de la recette"
                   placeholder="Gin, jus de citron jaune…"
-                  (ingredientNameChanged)="onIngredientNameChanged(index,$event)"
-                  (ingredientSelected)="onIngredientSelected(index,$event)"
+                  (ingredientNameChanged)="
+                    onIngredientNameChanged(
+                      index,
+                      $event
+                    )
+                  "
+                  (ingredientSelected)="
+                    onIngredientSelected(
+                      index,
+                      $event
+                    )
+                  "
                 />
               </div>
 
@@ -211,7 +222,11 @@
 
                 <select
                   formControlName="unit"
-                  (change)="onIngredientUnitChange(index)"
+                  (change)="
+                    onIngredientUnitChange(
+                      index
+                    )
+                  "
                 >
                   @for (
                     option of ingredientUnits;
@@ -237,6 +252,7 @@
                     type="number"
                     formControlName="amount"
                     min="0.001"
+                    max="99999.999"
                     step="0.01"
                     inputmode="decimal"
                     placeholder="5"
@@ -267,7 +283,9 @@
                     step="0.01"
                     inputmode="decimal"
                     placeholder="40"
-                    (input)="syncMainAlcoholSelection()"
+                    (input)="
+                      syncMainAlcoholSelection()
+                    "
                   />
 
                   <span>%</span>
@@ -317,6 +335,18 @@
                 « compléter ».
               </p>
             }
+
+            @if (
+              ingredient.touched &&
+              ingredient.hasError(
+                'amountMax'
+              )
+              ) {
+              <p class="row-error">
+                La quantité saisie dépasse
+                la valeur maximale autorisée.
+              </p>
+            }
           </article>
         }
       </div>
@@ -324,10 +354,25 @@
       <button
         class="add-row-action"
         type="button"
+        [disabled]="
+          ingredients.length >=
+          maxRecipeIngredients
+        "
         (click)="addIngredient()"
       >
         + Ajouter un ingrédient
       </button>
+
+      @if (
+        ingredients.length >=
+        maxRecipeIngredients
+        ) {
+        <p class="section-empty">
+          Limite de
+          {{ maxRecipeIngredients }}
+          ingrédients atteinte.
+        </p>
+      }
 
       <div class="main-alcohol-block">
         <label class="field">
@@ -418,10 +463,25 @@
       <button
         class="add-row-action"
         type="button"
+        [disabled]="
+          steps.length >=
+          maxPreparationSteps
+        "
         (click)="addStep()"
       >
         + Ajouter une étape
       </button>
+
+      @if (
+        steps.length >=
+        maxPreparationSteps
+        ) {
+        <p class="section-empty">
+          Limite de
+          {{ maxPreparationSteps }}
+          étapes atteinte.
+        </p>
+      }
     </section>
 
     <section class="form-card">
@@ -490,7 +550,11 @@
 
                   <select
                     formControlName="unit"
-                    (change)="onGarnishUnitChange(index)"
+                    (change)="
+                      onGarnishUnitChange(
+                        index
+                      )
+                    "
                   >
                     @for (
                       option of garnishUnits;
@@ -516,6 +580,7 @@
                       type="number"
                       formControlName="amount"
                       min="0.001"
+                      max="99999.999"
                       step="0.01"
                       inputmode="decimal"
                     />
@@ -560,6 +625,18 @@
                   ensemble.
                 </p>
               }
+
+              @if (
+                garnish.touched &&
+                garnish.hasError(
+                  'amountMax'
+                )
+                ) {
+                <p class="row-error">
+                  La quantité saisie dépasse
+                  la valeur maximale autorisée.
+                </p>
+              }
             </article>
           }
         </div>
@@ -568,10 +645,25 @@
       <button
         class="add-row-action"
         type="button"
+        [disabled]="
+          garnishes.length >=
+          maxGarnishes
+        "
         (click)="addGarnish()"
       >
         + Ajouter une garniture
       </button>
+
+      @if (
+        garnishes.length >=
+        maxGarnishes
+        ) {
+        <p class="section-empty">
+          Limite de
+          {{ maxGarnishes }}
+          garnitures atteinte.
+        </p>
+      }
     </section>
 
     <section class="form-card">
