@@ -23,6 +23,7 @@ interface ResolvedRecipeIngredient {
   ingredientId: string;
   ingredientSlug: string;
   defaultAbv: number | null;
+  abvOverride: number | null;
   ingredient: CreateCocktailIngredientDto;
 }
 
@@ -107,10 +108,17 @@ export class CocktailCreationService {
             ingredient.ingredientDefaultAbv,
           );
 
+          const abvOverride = this.resolveRecipeAbvOverride(
+            ingredient.ingredientDefaultAbv,
+            ingredient.abvOverride,
+            resolvedIngredient.defaultAbv,
+          );
+
           resolvedRecipeIngredients.push({
             ingredientId: resolvedIngredient.id,
             ingredientSlug,
             defaultAbv: resolvedIngredient.defaultAbv,
+            abvOverride,
             ingredient,
           });
         }
@@ -158,13 +166,13 @@ export class CocktailCreationService {
 
         await transaction.cocktailIngredient.createMany({
           data: resolvedRecipeIngredients.map(
-            ({ ingredientId, ingredient }, index) => ({
+            ({ ingredientId, abvOverride, ingredient }, index) => ({
               cocktailId: cocktail.id,
               ingredientId,
               amount: ingredient.amount ?? null,
               unit: ingredient.unit,
               specification: ingredient.specification ?? null,
-              abvOverride: ingredient.abvOverride ?? null,
+              abvOverride,
               notes: ingredient.notes ?? null,
               sortOrder: index + 1,
             }),
@@ -258,6 +266,36 @@ export class CocktailCreationService {
     return resolvedIngredient;
   }
 
+  /**
+   * Préserve la valeur saisie dans la recette
+   * sans modifier le catalogue existant.
+   *
+   * Lors d'une saisie libre, le client ne sait
+   * pas nécessairement si le slug existe déjà.
+   * Si le catalogue possède un degré différent,
+   * la valeur saisie devient donc un override
+   * propre à cette recette.
+   */
+  private resolveRecipeAbvOverride(
+    requestedDefaultAbv: number | null | undefined,
+    explicitAbvOverride: number | null | undefined,
+    persistedDefaultAbv: number | null,
+  ): number | null {
+    if (explicitAbvOverride !== undefined && explicitAbvOverride !== null) {
+      return explicitAbvOverride;
+    }
+
+    if (
+      requestedDefaultAbv === undefined ||
+      requestedDefaultAbv === null ||
+      requestedDefaultAbv === persistedDefaultAbv
+    ) {
+      return null;
+    }
+
+    return requestedDefaultAbv;
+  }
+
   private resolveMainAlcohol(
     mainAlcoholSlug: string | null,
     ingredientsBySlug: ReadonlyMap<string, ResolvedCatalogIngredient>,
@@ -276,12 +314,12 @@ export class CocktailCreationService {
     }
 
     const isAlcoholic = recipeIngredients.some(
-      ({ ingredientSlug, defaultAbv, ingredient }) => {
+      ({ ingredientSlug, defaultAbv, abvOverride }) => {
         if (ingredientSlug !== mainAlcoholSlug) {
           return false;
         }
 
-        const effectiveAbv = ingredient.abvOverride ?? defaultAbv;
+        const effectiveAbv = abvOverride ?? defaultAbv;
 
         return effectiveAbv !== null && effectiveAbv > 0;
       },

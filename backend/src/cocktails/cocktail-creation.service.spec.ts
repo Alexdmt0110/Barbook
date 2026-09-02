@@ -609,19 +609,19 @@ describe('CocktailCreationService', () => {
     expect(cocktailCreate).not.toHaveBeenCalled();
   });
 
-  it('uses the persisted catalogue ABV instead of trusting a client default', async () => {
+  it('preserves a free-text ABV as a recipe override when the catalogue already exists', async () => {
     ingredientUpsert.mockResolvedValue({
-      id: 'ingredient-tonic',
-      defaultAbv: decimal(0),
+      id: 'ingredient-gin',
+      defaultAbv: decimal(40),
     });
 
     const dto = buildCreateDto({
-      mainAlcoholName: 'Tonic',
+      mainAlcoholName: 'Gin',
       ingredients: [
         {
-          ingredientName: 'Tonic',
-          ingredientDefaultAbv: 40,
-          amount: 100,
+          ingredientName: 'Gin',
+          ingredientDefaultAbv: 47,
+          amount: 50,
           unit: MeasurementUnit.ML,
         },
       ],
@@ -630,7 +630,45 @@ describe('CocktailCreationService', () => {
 
     await expect(
       service.createPersonalCocktail('user-123', dto),
-    ).rejects.toBeInstanceOf(BadRequestException);
+    ).resolves.toEqual({
+      id: 'cocktail-new',
+      slug: 'whiskey-sour',
+    });
+
+    expect(ingredientUpsert).toHaveBeenCalledWith({
+      where: {
+        workspaceId_slug: {
+          workspaceId: 'workspace-123',
+          slug: 'gin',
+        },
+      },
+      update: {},
+      create: {
+        workspaceId: 'workspace-123',
+        slug: 'gin',
+        name: 'Gin',
+        defaultAbv: 47,
+      },
+      select: {
+        id: true,
+        defaultAbv: true,
+      },
+    });
+
+    expect(cocktailIngredientCreateMany).toHaveBeenCalledWith({
+      data: [
+        {
+          cocktailId: 'cocktail-new',
+          ingredientId: 'ingredient-gin',
+          amount: 50,
+          unit: MeasurementUnit.ML,
+          specification: null,
+          abvOverride: 47,
+          notes: null,
+          sortOrder: 1,
+        },
+      ],
+    });
   });
 
   it('allows a positive recipe ABV override for the selected main alcohol', async () => {
@@ -658,6 +696,21 @@ describe('CocktailCreationService', () => {
     ).resolves.toEqual({
       id: 'cocktail-new',
       slug: 'whiskey-sour',
+    });
+
+    expect(cocktailIngredientCreateMany).toHaveBeenCalledWith({
+      data: [
+        {
+          cocktailId: 'cocktail-new',
+          ingredientId: 'ingredient-gin',
+          amount: 50,
+          unit: MeasurementUnit.ML,
+          specification: null,
+          abvOverride: 47,
+          notes: null,
+          sortOrder: 1,
+        },
+      ],
     });
   });
 
