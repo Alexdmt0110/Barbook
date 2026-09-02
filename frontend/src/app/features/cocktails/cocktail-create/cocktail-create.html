@@ -196,11 +196,24 @@
 
             <div class="field-grid">
               <div class="field field-wide">
-                <span>Ingrédient *</span>
+                <label
+                  class="field-label"
+                  [id]="
+      'recipe-ingredient-label-' +
+      index
+    "
+                  [for]="
+      'recipe-ingredient-input-' +
+      index
+    "
+                >
+                  Ingrédient *
+                </label>
 
                 <app-ingredient-autocomplete
                   formControlName="ingredientName"
-                  ariaLabel="Ingrédient de la recette"
+                  [inputId]=" 'recipe-ingredient-input-' + index"
+                  [ariaLabelledBy]=" 'recipe-ingredient-label-' + index"
                   placeholder="Gin, jus de citron jaune…"
                   (ingredientNameChanged)="
                     onIngredientNameChanged(
@@ -536,11 +549,18 @@
 
               <div class="field-grid">
                 <div class="field field-wide">
-                  <span>Ingrédient *</span>
+                  <label
+                    class="field-label"
+                    [id]=" 'garnish-ingredient-label-' + index"
+                    [for]=" 'garnish-ingredient-input-' + index"
+                  >
+                    Ingrédient *
+                  </label>
 
                   <app-ingredient-autocomplete
                     formControlName="ingredientName"
-                    ariaLabel="Ingrédient de garniture"
+                    [inputId]=" 'garnish-ingredient-input-' + index"
+                    [ariaLabelledBy]=" 'garnish-ingredient-label-' + index"
                     placeholder="Citron jaune…"
                   />
                 </div>

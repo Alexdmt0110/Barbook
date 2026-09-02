@@ -194,4 +194,20 @@ describe('IngredientAutocomplete', () => {
 
     expect(controlValue).toBe('Purée de kumquat');
   });
+
+  it('forwards the visible label association to the underlying input', () => {
+    const fixture = TestBed.createComponent(IngredientAutocomplete);
+
+    fixture.componentRef.setInput('inputId', 'recipe-ingredient-input-0');
+
+    fixture.componentRef.setInput('ariaLabelledBy', 'recipe-ingredient-label-0');
+
+    fixture.detectChanges();
+
+    const input = fixture.nativeElement.querySelector('.autocomplete-input') as HTMLInputElement;
+
+    expect(input.id).toBe('recipe-ingredient-input-0');
+
+    expect(input.getAttribute('aria-labelledby')).toBe('recipe-ingredient-label-0');
+  });
 });

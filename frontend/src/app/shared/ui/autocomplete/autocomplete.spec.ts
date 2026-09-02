@@ -61,6 +61,44 @@ describe('UiAutocomplete', () => {
     expect(fixture.nativeElement.textContent).toContain('Citron vert');
   });
 
+  it('uses the visible label as the accessible name when provided', () => {
+    const fixture = TestBed.createComponent(UiAutocomplete);
+
+    fixture.componentRef.setInput('value', '');
+
+    fixture.componentRef.setInput('inputId', 'ingredient-input-1');
+
+    fixture.componentRef.setInput('ariaLabel', 'Fallback label');
+
+    fixture.componentRef.setInput('ariaLabelledBy', 'ingredient-label-1');
+
+    fixture.detectChanges();
+
+    const input = fixture.nativeElement.querySelector('.autocomplete-input') as HTMLInputElement;
+
+    expect(input.id).toBe('ingredient-input-1');
+
+    expect(input.getAttribute('aria-labelledby')).toBe('ingredient-label-1');
+
+    expect(input.hasAttribute('aria-label')).toBe(false);
+  });
+
+  it('keeps an aria-label fallback when no visible label is provided', () => {
+    const fixture = TestBed.createComponent(UiAutocomplete);
+
+    fixture.componentRef.setInput('value', '');
+
+    fixture.componentRef.setInput('ariaLabel', 'Recherche ingrédient');
+
+    fixture.detectChanges();
+
+    const input = fixture.nativeElement.querySelector('.autocomplete-input') as HTMLInputElement;
+
+    expect(input.getAttribute('aria-label')).toBe('Recherche ingrédient');
+
+    expect(input.hasAttribute('aria-labelledby')).toBe(false);
+  });
+
   it('navigates suggestions with the keyboard and selects with Enter', () => {
     const fixture = TestBed.createComponent(UiAutocomplete);
 
@@ -109,6 +147,45 @@ describe('UiAutocomplete', () => {
         key: 'Enter',
       }),
     );
+
+    expect(selectedOption).toEqual(options[0]);
+
+    expect(component.isOpen()).toBe(false);
+  });
+
+  it('selects an option through pointer interaction without losing the combobox focus first', () => {
+    const fixture = TestBed.createComponent(UiAutocomplete);
+
+    fixture.componentRef.setInput('value', 'cit');
+
+    fixture.componentRef.setInput('options', options);
+
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance;
+
+    let selectedOption: UiAutocompleteOption | null = null;
+
+    component.optionSelected.subscribe((option) => {
+      selectedOption = option;
+    });
+
+    component.onFocus();
+
+    fixture.detectChanges();
+
+    const renderedOption = fixture.nativeElement.querySelector(
+      '.autocomplete-option',
+    ) as HTMLElement;
+
+    const pointerEvent = new Event('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+    });
+
+    renderedOption.dispatchEvent(pointerEvent);
+
+    expect(pointerEvent.defaultPrevented).toBe(true);
 
     expect(selectedOption).toEqual(options[0]);
 

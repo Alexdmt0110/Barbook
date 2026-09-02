@@ -8,9 +8,9 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { catchError, of, Subject, switchMap, timer } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UiAutocomplete, UiAutocompleteOption } from '../../../shared/ui/autocomplete/autocomplete';
 import { IngredientSuggestion } from '../data-access/ingredient.models';
 import { IngredientsService } from '../data-access/ingredients.service';
@@ -45,7 +45,11 @@ export class IngredientAutocomplete implements ControlValueAccessor {
 
   readonly placeholder = input('Commence à écrire un ingrédient…');
 
-  readonly ariaLabel = input('Ingrédient');
+  readonly inputId = input<string | null>(null);
+
+  readonly ariaLabel = input<string | null>('Ingrédient');
+
+  readonly ariaLabelledBy = input<string | null>(null);
 
   readonly ingredientSelected = output<IngredientSuggestion>();
 
@@ -114,6 +118,7 @@ export class IngredientAutocomplete implements ControlValueAccessor {
 
   handleValueChange(value: string): void {
     this.value.set(value);
+
     this.onChange(value);
 
     this.ingredientNameChanged.emit(value);

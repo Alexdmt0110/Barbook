@@ -30,7 +30,11 @@ export class UiAutocomplete {
 
   readonly placeholder = input('');
 
-  readonly ariaLabel = input('Recherche');
+  readonly inputId = input<string | null>(null);
+
+  readonly ariaLabel = input<string | null>('Recherche');
+
+  readonly ariaLabelledBy = input<string | null>(null);
 
   readonly valueChange = output<string>();
 
@@ -45,6 +49,12 @@ export class UiAutocomplete {
   readonly activeIndex = signal(-1);
 
   readonly listboxId = `autocomplete-listbox-${this.instanceId}`;
+
+  readonly resolvedInputId = computed(() => {
+    const requestedId = this.inputId()?.trim();
+
+    return requestedId ? requestedId : `autocomplete-input-${this.instanceId}`;
+  });
 
   readonly panelVisible = computed(
     () => this.isOpen() && (this.isLoading() || this.options().length > 0),
@@ -61,6 +71,7 @@ export class UiAutocomplete {
 
     this.valueChange.emit(value);
     this.queryChange.emit(value);
+
     this.activeIndex.set(-1);
 
     this.isOpen.set(value.trim().length >= this.minSearchLength());
@@ -74,6 +85,7 @@ export class UiAutocomplete {
 
   onBlur(): void {
     this.close();
+
     this.blurred.emit();
   }
 
@@ -83,6 +95,7 @@ export class UiAutocomplete {
     if (event.key === 'Escape') {
       if (this.isOpen()) {
         event.preventDefault();
+
         this.close();
       }
 
@@ -95,6 +108,7 @@ export class UiAutocomplete {
 
     if (event.key === 'ArrowDown') {
       event.preventDefault();
+
       this.isOpen.set(true);
 
       if (options.length === 0) {
@@ -110,6 +124,7 @@ export class UiAutocomplete {
 
     if (event.key === 'ArrowUp') {
       event.preventDefault();
+
       this.isOpen.set(true);
 
       if (options.length === 0) {
@@ -136,7 +151,10 @@ export class UiAutocomplete {
     }
   }
 
-  selectOption(event: MouseEvent, option: UiAutocompleteOption): void {
+  selectOption(event: Event, option: UiAutocompleteOption): void {
+    // Conserve le focus sur la combobox :
+    // le blur ne doit pas fermer la liste
+    // avant que la sélection soit appliquée.
     event.preventDefault();
 
     this.commitOption(option);
@@ -170,6 +188,7 @@ export class UiAutocomplete {
 
   private close(): void {
     this.isOpen.set(false);
+
     this.activeIndex.set(-1);
   }
 }
