@@ -14,26 +14,34 @@ import { ThemeSwitcher } from '../../../shared/ui/theme-switcher/theme-switcher'
 })
 export class Register {
   private readonly formBuilder = inject(FormBuilder);
+
   private readonly authService = inject(AuthService);
+
   private readonly router = inject(Router);
 
   readonly isSubmitting = signal(false);
+
   readonly errorMessage = signal<string | null>(null);
+
   readonly passwordVisible = signal(false);
 
   readonly form = this.formBuilder.nonNullable.group({
     displayName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(80)]],
+
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
+
     password: ['', [Validators.required, Validators.minLength(15), Validators.maxLength(128)]],
   });
 
   submit(): void {
     if (this.form.invalid || this.isSubmitting()) {
       this.form.markAllAsTouched();
+
       return;
     }
 
     this.isSubmitting.set(true);
+
     this.errorMessage.set(null);
 
     this.authService
@@ -47,6 +55,7 @@ export class Register {
         next: () => {
           void this.router.navigateByUrl('/');
         },
+
         error: (error: unknown) => {
           this.errorMessage.set(this.resolveErrorMessage(error));
         },
@@ -72,6 +81,10 @@ export class Register {
 
     if (error.status === 400) {
       return 'Certaines informations ne sont pas valides.';
+    }
+
+    if (error.status === 429) {
+      return 'Trop de tentatives de création de compte. Réessaie plus tard.';
     }
 
     return 'La création du compte a échoué. Réessaie dans quelques instants.';
