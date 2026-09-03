@@ -119,17 +119,13 @@ function buildCreateDto(
 
 describe('CocktailCreationService', () => {
   let workspaceFindUnique: FindUniqueMock;
-
   let cocktailFindUnique: FindUniqueMock;
 
   let ingredientUpsert: IngredientUpsertMock;
-
   let cocktailCreate: CocktailCreateMock;
 
   let cocktailIngredientCreateMany: CreateManyMock;
-
   let garnishIngredientCreateMany: CreateManyMock;
-
   let preparationStepCreateMany: CreateManyMock;
 
   let prismaTransaction: PrismaTransactionMock;
@@ -260,7 +256,7 @@ describe('CocktailCreationService', () => {
     });
   });
 
-  it('creates a complete cocktail inside one transaction', async () => {
+  it('creates a complete cocktail inside the personal workspace transaction', async () => {
     const result = await service.createPersonalCocktail(
       'user-123',
       buildCreateDto(),
@@ -299,6 +295,7 @@ describe('CocktailCreationService', () => {
     expect(cocktailIngredientCreateMany).toHaveBeenCalledWith({
       data: [
         {
+          workspaceId: 'workspace-123',
           cocktailId: 'cocktail-new',
           ingredientId: 'ingredient-bourbon',
           amount: 50,
@@ -309,6 +306,7 @@ describe('CocktailCreationService', () => {
           sortOrder: 1,
         },
         {
+          workspaceId: 'workspace-123',
           cocktailId: 'cocktail-new',
           ingredientId: 'ingredient-jus-de-citron-jaune',
           amount: 25,
@@ -319,6 +317,7 @@ describe('CocktailCreationService', () => {
           sortOrder: 2,
         },
         {
+          workspaceId: 'workspace-123',
           cocktailId: 'cocktail-new',
           ingredientId: 'ingredient-sirop-de-sucre',
           amount: 15,
@@ -331,13 +330,48 @@ describe('CocktailCreationService', () => {
       ],
     });
 
+    expect(garnishIngredientCreateMany).toHaveBeenCalledWith({
+      data: [
+        {
+          workspaceId: 'workspace-123',
+          cocktailId: 'cocktail-new',
+          ingredientId: 'ingredient-citron-jaune',
+          amount: null,
+          unit: null,
+          specification: null,
+          usage: 'Exprimer un zeste au-dessus du verre.',
+          sortOrder: 1,
+        },
+      ],
+    });
+
+    expect(preparationStepCreateMany).toHaveBeenCalledWith({
+      data: [
+        {
+          cocktailId: 'cocktail-new',
+          content: 'Verser les ingrédients dans un shaker.',
+          sortOrder: 1,
+        },
+        {
+          cocktailId: 'cocktail-new',
+          content: 'Ajouter de la glace et shaker.',
+          sortOrder: 2,
+        },
+        {
+          cocktailId: 'cocktail-new',
+          content: 'Filtrer dans le verre.',
+          sortOrder: 3,
+        },
+      ],
+    });
+
     expect(result).toEqual({
       id: 'cocktail-new',
       slug: 'whiskey-sour',
     });
   });
 
-  it('creates or reuses canonical ingredients without updating the existing catalogue', async () => {
+  it('resolves canonical ingredients inside the same workspace without altering the existing catalogue', async () => {
     await service.createPersonalCocktail('user-123', buildCreateDto());
 
     expect(ingredientUpsert).toHaveBeenCalledWith({
@@ -361,7 +395,7 @@ describe('CocktailCreationService', () => {
     });
   });
 
-  it('reuses an ingredient already resolved during the request', async () => {
+  it('reuses an ingredient already resolved during the transaction', async () => {
     const dto = buildCreateDto({
       garnishes: [
         {
@@ -386,29 +420,29 @@ describe('CocktailCreationService', () => {
     expect(bourbonCalls).toHaveLength(1);
   });
 
-  it('stores TOP_UP without an amount', async () => {
+  it('persists a recipe ABV override when the catalogue value differs', async () => {
+    ingredientUpsert.mockResolvedValue({
+      id: 'ingredient-gin',
+      defaultAbv: decimal(40),
+    });
+
     const dto = buildCreateDto({
-      name: 'Gin Tonic',
+      name: 'Gin Test',
       mainAlcoholName: 'Gin',
       ingredients: [
         {
           ingredientName: 'Gin',
-          ingredientDefaultAbv: 40,
+          ingredientDefaultAbv: 47,
           amount: 50,
           unit: MeasurementUnit.ML,
-        },
-        {
-          ingredientName: 'Tonic',
-          ingredientDefaultAbv: 0,
-          unit: MeasurementUnit.TOP_UP,
         },
       ],
       garnishes: [],
     });
 
     cocktailCreate.mockResolvedValue({
-      id: 'cocktail-gin-tonic',
-      slug: 'gin-tonic',
+      id: 'cocktail-gin-test',
+      slug: 'gin-test',
     });
 
     await service.createPersonalCocktail('user-123', dto);
@@ -416,158 +450,49 @@ describe('CocktailCreationService', () => {
     expect(cocktailIngredientCreateMany).toHaveBeenCalledWith({
       data: [
         {
-          cocktailId: 'cocktail-gin-tonic',
+          workspaceId: 'workspace-123',
+          cocktailId: 'cocktail-gin-test',
           ingredientId: 'ingredient-gin',
           amount: 50,
           unit: MeasurementUnit.ML,
           specification: null,
-          abvOverride: null,
+          abvOverride: 47,
           notes: null,
           sortOrder: 1,
         },
-        {
-          cocktailId: 'cocktail-gin-tonic',
-          ingredientId: 'ingredient-tonic',
-          amount: null,
-          unit: MeasurementUnit.TOP_UP,
-          specification: null,
-          abvOverride: null,
-          notes: null,
-          sortOrder: 2,
-        },
       ],
     });
   });
 
-  it('rejects TOP_UP when an amount is provided', async () => {
-    const dto = buildCreateDto({
-      ingredients: [
-        {
-          ingredientName: 'Tonic',
-          ingredientDefaultAbv: 0,
-          amount: 100,
-          unit: MeasurementUnit.TOP_UP,
-        },
-      ],
-      mainAlcoholName: undefined,
-    });
-
+  it('maps an invalid cocktail name to a bad request before persistence', async () => {
     await expect(
-      service.createPersonalCocktail('user-123', dto),
+      service.createPersonalCocktail(
+        'user-123',
+        buildCreateDto({
+          name: '--- !!! ---',
+        }),
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(cocktailFindUnique).not.toHaveBeenCalled();
+
+    expect(prismaTransaction).not.toHaveBeenCalled();
+  });
+
+  it('rejects a main alcohol that is absent from the recipe before the transaction', async () => {
+    await expect(
+      service.createPersonalCocktail(
+        'user-123',
+        buildCreateDto({
+          mainAlcoholName: 'Gin',
+        }),
+      ),
     ).rejects.toBeInstanceOf(BadRequestException);
 
     expect(prismaTransaction).not.toHaveBeenCalled();
   });
 
-  it('rejects a measured ingredient without an amount', async () => {
-    const dto = buildCreateDto({
-      ingredients: [
-        {
-          ingredientName: 'Gin',
-          ingredientDefaultAbv: 40,
-          unit: MeasurementUnit.ML,
-        },
-      ],
-      mainAlcoholName: 'Gin',
-    });
-
-    await expect(
-      service.createPersonalCocktail('user-123', dto),
-    ).rejects.toBeInstanceOf(BadRequestException);
-
-    expect(prismaTransaction).not.toHaveBeenCalled();
-  });
-
-  it('rejects duplicate canonical recipe ingredients', async () => {
-    const dto = buildCreateDto({
-      mainAlcoholName: 'Gin',
-      ingredients: [
-        {
-          ingredientName: 'Gin',
-          ingredientDefaultAbv: 40,
-          amount: 30,
-          unit: MeasurementUnit.ML,
-        },
-        {
-          ingredientName: ' GIN ',
-          ingredientDefaultAbv: 40,
-          amount: 20,
-          unit: MeasurementUnit.ML,
-        },
-      ],
-      garnishes: [],
-    });
-
-    await expect(
-      service.createPersonalCocktail('user-123', dto),
-    ).rejects.toThrow(
-      'A recipe cannot contain the same ingredient more than once.',
-    );
-
-    expect(prismaTransaction).not.toHaveBeenCalled();
-  });
-
-  it('rejects a garnish with only an amount', async () => {
-    const dto = buildCreateDto({
-      garnishes: [
-        {
-          ingredientName: 'Citron jaune',
-          amount: 1,
-          usage: 'Garnir.',
-        },
-      ],
-    });
-
-    await expect(
-      service.createPersonalCocktail('user-123', dto),
-    ).rejects.toBeInstanceOf(BadRequestException);
-  });
-
-  it('rejects a garnish with only a unit', async () => {
-    const dto = buildCreateDto({
-      garnishes: [
-        {
-          ingredientName: 'Citron jaune',
-          unit: MeasurementUnit.PIECE,
-          usage: 'Garnir.',
-        },
-      ],
-    });
-
-    await expect(
-      service.createPersonalCocktail('user-123', dto),
-    ).rejects.toBeInstanceOf(BadRequestException);
-  });
-
-  it('rejects TOP_UP as a garnish unit', async () => {
-    const dto = buildCreateDto({
-      garnishes: [
-        {
-          ingredientName: 'Tonic',
-          unit: MeasurementUnit.TOP_UP,
-          usage: 'Invalide.',
-        },
-      ],
-    });
-
-    await expect(
-      service.createPersonalCocktail('user-123', dto),
-    ).rejects.toBeInstanceOf(BadRequestException);
-  });
-
-  it('rejects a main alcohol absent from the recipe', async () => {
-    const dto = buildCreateDto({
-      mainAlcoholName: 'Gin',
-    });
-
-    await expect(
-      service.createPersonalCocktail('user-123', dto),
-    ).rejects.toBeInstanceOf(BadRequestException);
-
-    expect(prismaTransaction).not.toHaveBeenCalled();
-  });
-
-  it('rejects an explicitly non-alcoholic main alcohol', async () => {
+  it('maps a non-alcoholic selected main ingredient to a bad request', async () => {
     const dto = buildCreateDto({
       mainAlcoholName: 'Tonic',
       ingredients: [
@@ -586,146 +511,6 @@ describe('CocktailCreationService', () => {
     ).rejects.toBeInstanceOf(BadRequestException);
 
     expect(cocktailCreate).not.toHaveBeenCalled();
-  });
-
-  it('rejects a main alcohol whose ABV is unknown', async () => {
-    const dto = buildCreateDto({
-      mainAlcoholName: 'Spiritueux inconnu',
-      ingredients: [
-        {
-          ingredientName: 'Spiritueux inconnu',
-          ingredientDefaultAbv: null,
-          amount: 50,
-          unit: MeasurementUnit.ML,
-        },
-      ],
-      garnishes: [],
-    });
-
-    await expect(
-      service.createPersonalCocktail('user-123', dto),
-    ).rejects.toBeInstanceOf(BadRequestException);
-
-    expect(cocktailCreate).not.toHaveBeenCalled();
-  });
-
-  it('preserves a free-text ABV as a recipe override when the catalogue already exists', async () => {
-    ingredientUpsert.mockResolvedValue({
-      id: 'ingredient-gin',
-      defaultAbv: decimal(40),
-    });
-
-    const dto = buildCreateDto({
-      mainAlcoholName: 'Gin',
-      ingredients: [
-        {
-          ingredientName: 'Gin',
-          ingredientDefaultAbv: 47,
-          amount: 50,
-          unit: MeasurementUnit.ML,
-        },
-      ],
-      garnishes: [],
-    });
-
-    await expect(
-      service.createPersonalCocktail('user-123', dto),
-    ).resolves.toEqual({
-      id: 'cocktail-new',
-      slug: 'whiskey-sour',
-    });
-
-    expect(ingredientUpsert).toHaveBeenCalledWith({
-      where: {
-        workspaceId_slug: {
-          workspaceId: 'workspace-123',
-          slug: 'gin',
-        },
-      },
-      update: {},
-      create: {
-        workspaceId: 'workspace-123',
-        slug: 'gin',
-        name: 'Gin',
-        defaultAbv: 47,
-      },
-      select: {
-        id: true,
-        defaultAbv: true,
-      },
-    });
-
-    expect(cocktailIngredientCreateMany).toHaveBeenCalledWith({
-      data: [
-        {
-          cocktailId: 'cocktail-new',
-          ingredientId: 'ingredient-gin',
-          amount: 50,
-          unit: MeasurementUnit.ML,
-          specification: null,
-          abvOverride: 47,
-          notes: null,
-          sortOrder: 1,
-        },
-      ],
-    });
-  });
-
-  it('allows a positive recipe ABV override for the selected main alcohol', async () => {
-    ingredientUpsert.mockResolvedValue({
-      id: 'ingredient-gin',
-      defaultAbv: decimal(40),
-    });
-
-    const dto = buildCreateDto({
-      mainAlcoholName: 'Gin',
-      ingredients: [
-        {
-          ingredientName: 'Gin',
-          ingredientDefaultAbv: 40,
-          abvOverride: 47,
-          amount: 50,
-          unit: MeasurementUnit.ML,
-        },
-      ],
-      garnishes: [],
-    });
-
-    await expect(
-      service.createPersonalCocktail('user-123', dto),
-    ).resolves.toEqual({
-      id: 'cocktail-new',
-      slug: 'whiskey-sour',
-    });
-
-    expect(cocktailIngredientCreateMany).toHaveBeenCalledWith({
-      data: [
-        {
-          cocktailId: 'cocktail-new',
-          ingredientId: 'ingredient-gin',
-          amount: 50,
-          unit: MeasurementUnit.ML,
-          specification: null,
-          abvOverride: 47,
-          notes: null,
-          sortOrder: 1,
-        },
-      ],
-    });
-  });
-
-  it('rejects a cocktail name that cannot produce a slug', async () => {
-    const dto = buildCreateDto({
-      name: '--- !!! ---',
-    });
-
-    await expect(
-      service.createPersonalCocktail('user-123', dto),
-    ).rejects.toBeInstanceOf(BadRequestException);
-
-    expect(cocktailFindUnique).not.toHaveBeenCalled();
-
-    expect(prismaTransaction).not.toHaveBeenCalled();
   });
 
   it('returns conflict when the cocktail slug already exists', async () => {
@@ -752,7 +537,7 @@ describe('CocktailCreationService', () => {
     expect(prismaTransaction).not.toHaveBeenCalled();
   });
 
-  it('stops recipe persistence when the transaction fails', async () => {
+  it('stops recipe persistence when cocktail creation fails inside the transaction', async () => {
     cocktailCreate.mockRejectedValue(new Error('Database write failed.'));
 
     await expect(

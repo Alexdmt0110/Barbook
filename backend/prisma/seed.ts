@@ -352,6 +352,7 @@ async function main(): Promise<void> {
   assertDevelopmentSeedAllowed();
 
   const email = readEmailArgument();
+
   const prisma = createPrismaClient();
 
   try {
@@ -468,6 +469,7 @@ async function main(): Promise<void> {
 
         await transaction.cocktailIngredient.updateMany({
           where: {
+            workspaceId,
             ingredientId: legacyIngredient.id,
           },
           data: {
@@ -477,6 +479,7 @@ async function main(): Promise<void> {
 
         await transaction.garnishIngredient.updateMany({
           where: {
+            workspaceId,
             ingredientId: legacyIngredient.id,
           },
           data: {
@@ -486,6 +489,7 @@ async function main(): Promise<void> {
 
         await transaction.cocktail.updateMany({
           where: {
+            workspaceId,
             mainAlcoholId: legacyIngredient.id,
           },
           data: {
@@ -546,11 +550,13 @@ async function main(): Promise<void> {
         await Promise.all([
           transaction.cocktailIngredient.deleteMany({
             where: {
+              workspaceId,
               cocktailId: cocktail.id,
             },
           }),
           transaction.garnishIngredient.deleteMany({
             where: {
+              workspaceId,
               cocktailId: cocktail.id,
             },
           }),
@@ -561,6 +567,7 @@ async function main(): Promise<void> {
           }),
           transaction.cocktailTag.deleteMany({
             where: {
+              workspaceId,
               cocktailId: cocktail.id,
             },
           }),
@@ -568,6 +575,7 @@ async function main(): Promise<void> {
 
         const recipeIngredients = cocktailSeed.ingredients.map(
           (ingredient, index) => ({
+            workspaceId,
             cocktailId: cocktail.id,
             ingredientId: requireMapValue(
               ingredientBySlug,
@@ -584,6 +592,7 @@ async function main(): Promise<void> {
         );
 
         const garnishes = cocktailSeed.garnishes.map((garnish, index) => ({
+          workspaceId,
           cocktailId: cocktail.id,
           ingredientId: requireMapValue(
             ingredientBySlug,
@@ -604,6 +613,7 @@ async function main(): Promise<void> {
         }));
 
         const cocktailTags = cocktailSeed.tagSlugs.map((tagSlug) => ({
+          workspaceId,
           cocktailId: cocktail.id,
           tagId: requireMapValue(tagBySlug, tagSlug, 'tag'),
         }));

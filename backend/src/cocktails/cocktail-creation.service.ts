@@ -4,27 +4,28 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { toSlug } from '../common/slug';
-import { MeasurementUnit, Prisma } from '../generated/prisma/client';
+import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { CreateCocktailResult } from './cocktail.types';
 import {
+  CocktailCreationInvariantError,
+  CocktailCreationValidationError,
+  requireCocktailCreationSlug,
+  ResolvedCatalogIngredient,
+  ResolvedRecipeIngredient,
+  resolveMainAlcoholId,
+  resolveRecipeAbvOverride,
+  validateGarnishes,
+  validateRecipeIngredients,
+} from './cocktail-creation.rules';
+import {
   CreateCocktailDto,
   CreateCocktailGarnishDto,
-  CreateCocktailIngredientDto,
 } from './dto/create-cocktail.dto';
 
-interface ResolvedCatalogIngredient {
-  id: string;
-  defaultAbv: number | null;
-}
-
-interface ResolvedRecipeIngredient {
+interface ResolvedGarnish {
   ingredientId: string;
-  ingredientSlug: string;
-  defaultAbv: number | null;
-  abvOverride: number | null;
-  ingredient: CreateCocktailIngredientDto;
+  garnish: CreateCocktailGarnishDto;
 }
 
 @Injectable()
@@ -50,17 +51,26 @@ export class CocktailCreationService {
       );
     }
 
-    const slug = this.requireSlug(dto.name, 'Cocktail name');
+    const workspaceId = personalWorkspace.id;
 
-    const recipeIngredientSlugs = this.validateRecipeIngredients(
-      dto.ingredients,
+    const slug = this.evaluateRule(() =>
+      requireCocktailCreationSlug(dto.name, 'Cocktail name'),
     );
 
-    this.validateGarnishes(dto.garnishes ?? []);
+    const recipeIngredientSlugs = this.evaluateRule(() =>
+      validateRecipeIngredients(dto.ingredients),
+    );
+
+    this.evaluateRule(() => validateGarnishes(dto.garnishes ?? []));
 
     const mainAlcoholSlug =
       dto.mainAlcoholName !== undefined
-        ? this.requireSlug(dto.mainAlcoholName, 'Main alcohol name')
+        ? this.evaluateRule(() =>
+            requireCocktailCreationSlug(
+              dto.mainAlcoholName as string,
+              'Main alcohol name',
+            ),
+          )
         : null;
 
     if (
@@ -75,7 +85,7 @@ export class CocktailCreationService {
     const existingCocktail = await this.prisma.cocktail.findUnique({
       where: {
         workspaceId_slug: {
-          workspaceId: personalWorkspace.id,
+          workspaceId,
           slug,
         },
       },
@@ -95,20 +105,23 @@ export class CocktailCreationService {
         const resolvedRecipeIngredients: ResolvedRecipeIngredient[] = [];
 
         for (const ingredient of dto.ingredients) {
-          const ingredientSlug = this.requireSlug(
-            ingredient.ingredientName,
-            'Ingredient name',
+          const ingredientSlug = this.evaluateRule(() =>
+            requireCocktailCreationSlug(
+              ingredient.ingredientName,
+              'Ingredient name',
+            ),
           );
 
           const resolvedIngredient = await this.resolveIngredient(
             transaction,
-            personalWorkspace.id,
+            workspaceId,
             ingredientsBySlug,
             ingredient.ingredientName,
+            ingredientSlug,
             ingredient.ingredientDefaultAbv,
           );
 
-          const abvOverride = this.resolveRecipeAbvOverride(
+          const abvOverride = resolveRecipeAbvOverride(
             ingredient.ingredientDefaultAbv,
             ingredient.abvOverride,
             resolvedIngredient.defaultAbv,
@@ -123,20 +136,30 @@ export class CocktailCreationService {
           });
         }
 
-        const mainAlcoholId = this.resolveMainAlcohol(
-          mainAlcoholSlug,
-          ingredientsBySlug,
-          resolvedRecipeIngredients,
+        const mainAlcoholId = this.evaluateRule(() =>
+          resolveMainAlcoholId(
+            mainAlcoholSlug,
+            ingredientsBySlug,
+            resolvedRecipeIngredients,
+          ),
         );
 
-        const resolvedGarnishes = [];
+        const resolvedGarnishes: ResolvedGarnish[] = [];
 
         for (const garnish of dto.garnishes ?? []) {
+          const garnishSlug = this.evaluateRule(() =>
+            requireCocktailCreationSlug(
+              garnish.ingredientName,
+              'Garnish ingredient name',
+            ),
+          );
+
           const resolvedIngredient = await this.resolveIngredient(
             transaction,
-            personalWorkspace.id,
+            workspaceId,
             ingredientsBySlug,
             garnish.ingredientName,
+            garnishSlug,
           );
 
           resolvedGarnishes.push({
@@ -147,7 +170,7 @@ export class CocktailCreationService {
 
         const cocktail = await transaction.cocktail.create({
           data: {
-            workspaceId: personalWorkspace.id,
+            workspaceId,
             slug,
             name: dto.name,
             type: dto.type,
@@ -167,6 +190,7 @@ export class CocktailCreationService {
         await transaction.cocktailIngredient.createMany({
           data: resolvedRecipeIngredients.map(
             ({ ingredientId, abvOverride, ingredient }, index) => ({
+              workspaceId,
               cocktailId: cocktail.id,
               ingredientId,
               amount: ingredient.amount ?? null,
@@ -182,6 +206,7 @@ export class CocktailCreationService {
         if (resolvedGarnishes.length > 0) {
           await transaction.garnishIngredient.createMany({
             data: resolvedGarnishes.map(({ ingredientId, garnish }, index) => ({
+              workspaceId,
               cocktailId: cocktail.id,
               ingredientId,
               amount: garnish.amount ?? null,
@@ -222,10 +247,9 @@ export class CocktailCreationService {
     workspaceId: string,
     ingredientsBySlug: Map<string, ResolvedCatalogIngredient>,
     name: string,
+    ingredientSlug: string,
     defaultAbv?: number | null,
   ): Promise<ResolvedCatalogIngredient> {
-    const ingredientSlug = this.requireSlug(name, 'Ingredient name');
-
     const cachedIngredient = ingredientsBySlug.get(ingredientSlug);
 
     if (cachedIngredient) {
@@ -240,8 +264,10 @@ export class CocktailCreationService {
         },
       },
 
-      // Une recette ne doit jamais altérer
-      // silencieusement le catalogue existant.
+      /*
+       * Une recette ne doit jamais altérer
+       * silencieusement le catalogue existant.
+       */
       update: {},
 
       create: {
@@ -266,146 +292,20 @@ export class CocktailCreationService {
     return resolvedIngredient;
   }
 
-  /**
-   * Préserve la valeur saisie dans la recette
-   * sans modifier le catalogue existant.
-   *
-   * Lors d'une saisie libre, le client ne sait
-   * pas nécessairement si le slug existe déjà.
-   * Si le catalogue possède un degré différent,
-   * la valeur saisie devient donc un override
-   * propre à cette recette.
-   */
-  private resolveRecipeAbvOverride(
-    requestedDefaultAbv: number | null | undefined,
-    explicitAbvOverride: number | null | undefined,
-    persistedDefaultAbv: number | null,
-  ): number | null {
-    if (explicitAbvOverride !== undefined && explicitAbvOverride !== null) {
-      return explicitAbvOverride;
-    }
-
-    if (
-      requestedDefaultAbv === undefined ||
-      requestedDefaultAbv === null ||
-      requestedDefaultAbv === persistedDefaultAbv
-    ) {
-      return null;
-    }
-
-    return requestedDefaultAbv;
-  }
-
-  private resolveMainAlcohol(
-    mainAlcoholSlug: string | null,
-    ingredientsBySlug: ReadonlyMap<string, ResolvedCatalogIngredient>,
-    recipeIngredients: readonly ResolvedRecipeIngredient[],
-  ): string | null {
-    if (mainAlcoholSlug === null) {
-      return null;
-    }
-
-    const mainAlcohol = ingredientsBySlug.get(mainAlcoholSlug);
-
-    if (!mainAlcohol) {
-      throw new InternalServerErrorException(
-        'Main alcohol could not be resolved.',
-      );
-    }
-
-    const isAlcoholic = recipeIngredients.some(
-      ({ ingredientSlug, defaultAbv, abvOverride }) => {
-        if (ingredientSlug !== mainAlcoholSlug) {
-          return false;
-        }
-
-        const effectiveAbv = abvOverride ?? defaultAbv;
-
-        return effectiveAbv !== null && effectiveAbv > 0;
-      },
-    );
-
-    if (!isAlcoholic) {
-      throw new BadRequestException(
-        'Main alcohol must reference an alcoholic recipe ingredient.',
-      );
-    }
-
-    return mainAlcohol.id;
-  }
-
-  private validateRecipeIngredients(
-    ingredients: CreateCocktailIngredientDto[],
-  ): Set<string> {
-    const ingredientSlugs = new Set<string>();
-
-    for (const ingredient of ingredients) {
-      const ingredientSlug = this.requireSlug(
-        ingredient.ingredientName,
-        'Ingredient name',
-      );
-
-      if (ingredientSlugs.has(ingredientSlug)) {
-        throw new BadRequestException(
-          'A recipe cannot contain the same ingredient more than once.',
-        );
+  private evaluateRule<T>(rule: () => T): T {
+    try {
+      return rule();
+    } catch (error: unknown) {
+      if (error instanceof CocktailCreationValidationError) {
+        throw new BadRequestException(error.message);
       }
 
-      ingredientSlugs.add(ingredientSlug);
-
-      const hasAmount =
-        ingredient.amount !== undefined && ingredient.amount !== null;
-
-      if (ingredient.unit === MeasurementUnit.TOP_UP) {
-        if (hasAmount) {
-          throw new BadRequestException(
-            'A TOP_UP ingredient must not define an amount.',
-          );
-        }
-
-        continue;
+      if (error instanceof CocktailCreationInvariantError) {
+        throw new InternalServerErrorException(error.message);
       }
 
-      if (!hasAmount) {
-        throw new BadRequestException(
-          'A recipe ingredient must define an amount unless its unit is TOP_UP.',
-        );
-      }
+      throw error;
     }
-
-    return ingredientSlugs;
-  }
-
-  private validateGarnishes(garnishes: CreateCocktailGarnishDto[]): void {
-    for (const garnish of garnishes) {
-      this.requireSlug(garnish.ingredientName, 'Garnish ingredient name');
-
-      if (garnish.unit === MeasurementUnit.TOP_UP) {
-        throw new BadRequestException('TOP_UP cannot be used for a garnish.');
-      }
-
-      const hasAmount = garnish.amount !== undefined && garnish.amount !== null;
-
-      const hasUnit = garnish.unit !== undefined && garnish.unit !== null;
-
-      if (hasAmount !== hasUnit) {
-        throw new BadRequestException(
-          'Garnish amount and unit must either both be defined or both be omitted.',
-        );
-      }
-    }
-  }
-
-  private requireSlug(value: string, fieldName: string): string {
-    const slug = toSlug(value);
-
-    if (!slug) {
-      throw new BadRequestException(
-        `${fieldName} must contain at least one letter or number.`,
-      );
-    }
-
-    return slug;
   }
 
   private decimalToNumber(
