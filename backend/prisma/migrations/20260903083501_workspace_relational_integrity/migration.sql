@@ -8,7 +8,13 @@
   Les tables de liaison existent déjà et contiennent des données.
   workspaceId est donc ajouté temporairement comme nullable,
   rétro-rempli depuis Cocktail, contrôlé, puis rendu NOT NULL.
+
+  La migration est explicitement transactionnelle afin qu'une
+  validation ou une opération DDL échouée annule l'ensemble des
+  modifications.
 */
+
+BEGIN;
 
 -- Ajouter workspaceId sans casser les lignes existantes.
 ALTER TABLE "CocktailIngredient"
@@ -241,3 +247,5 @@ DROP CONSTRAINT "GarnishIngredient_cocktailId_fkey";
 
 ALTER TABLE "GarnishIngredient"
 DROP CONSTRAINT "GarnishIngredient_ingredientId_fkey";
+
+COMMIT;
