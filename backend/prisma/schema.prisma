@@ -103,6 +103,7 @@ model Folder {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([workspaceId, id])
   @@unique([workspaceId, name])
 }
 
@@ -125,8 +126,8 @@ model Cocktail {
   mainAlcoholId String?
 
   workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  folder      Folder?     @relation(fields: [folderId], references: [id], onDelete: SetNull)
-  mainAlcohol Ingredient? @relation("CocktailMainAlcohol", fields: [mainAlcoholId], references: [id], onDelete: SetNull)
+  folder      Folder?     @relation(fields: [workspaceId, folderId], references: [workspaceId, id], onDelete: Restrict)
+  mainAlcohol Ingredient? @relation("CocktailMainAlcohol", fields: [workspaceId, mainAlcoholId], references: [workspaceId, id], onDelete: Restrict)
 
   ingredients CocktailIngredient[]
   garnishes   GarnishIngredient[]
@@ -136,6 +137,7 @@ model Cocktail {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([workspaceId, id])
   @@unique([workspaceId, slug])
   @@index([folderId])
   @@index([mainAlcoholId])
@@ -161,11 +163,13 @@ model Ingredient {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([workspaceId, id])
   @@unique([workspaceId, slug])
 }
 
 model CocktailIngredient {
   id           String @id @default(uuid())
+  workspaceId  String
   cocktailId   String
   ingredientId String
 
@@ -176,8 +180,8 @@ model CocktailIngredient {
   notes         String?
   sortOrder     Int
 
-  cocktail   Cocktail   @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
-  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+  cocktail   Cocktail   @relation(fields: [workspaceId, cocktailId], references: [workspaceId, id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [workspaceId, ingredientId], references: [workspaceId, id], onDelete: Restrict)
 
   @@unique([cocktailId, ingredientId])
   @@unique([cocktailId, sortOrder])
@@ -186,6 +190,7 @@ model CocktailIngredient {
 
 model GarnishIngredient {
   id           String @id @default(uuid())
+  workspaceId  String
   cocktailId   String
   ingredientId String
 
@@ -195,8 +200,8 @@ model GarnishIngredient {
   usage         String
   sortOrder     Int
 
-  cocktail   Cocktail   @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
-  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+  cocktail   Cocktail   @relation(fields: [workspaceId, cocktailId], references: [workspaceId, id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [workspaceId, ingredientId], references: [workspaceId, id], onDelete: Restrict)
 
   @@unique([cocktailId, sortOrder])
   @@index([ingredientId])
@@ -225,15 +230,17 @@ model Tag {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([workspaceId, id])
   @@unique([workspaceId, slug])
 }
 
 model CocktailTag {
-  cocktailId String
-  tagId      String
+  workspaceId String
+  cocktailId  String
+  tagId       String
 
-  cocktail Cocktail @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
-  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  cocktail Cocktail @relation(fields: [workspaceId, cocktailId], references: [workspaceId, id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [workspaceId, tagId], references: [workspaceId, id], onDelete: Cascade)
 
   @@id([cocktailId, tagId])
   @@index([tagId])
