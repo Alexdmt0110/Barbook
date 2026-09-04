@@ -2,15 +2,20 @@ import { INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { Server } from 'node:http';
 import * as request from 'supertest';
-import { DEFAULT_RATE_LIMIT } from '../common/rate-limit.config';
 import {
+  DEFAULT_RATE_LIMIT,
   LOGIN_RATE_LIMIT,
   REGISTER_RATE_LIMIT,
 } from '../common/rate-limit.config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+
+function getHttpServer(application: INestApplication): Server {
+  return application.getHttpServer() as Server;
+}
 
 describe('Auth rate limiting', () => {
   let app: INestApplication | undefined;
@@ -81,8 +86,10 @@ describe('Auth rate limiting', () => {
       throw new Error('Nest application was not initialized.');
     }
 
+    const httpServer = getHttpServer(app);
+
     for (let attempt = 0; attempt < LOGIN_RATE_LIMIT.limit; attempt += 1) {
-      await request(app.getHttpServer())
+      await request(httpServer)
         .post('/auth/login')
         .send({
           email: 'alex@barbook.local',
@@ -91,7 +98,7 @@ describe('Auth rate limiting', () => {
         .expect(200);
     }
 
-    await request(app.getHttpServer())
+    await request(httpServer)
       .post('/auth/login')
       .send({
         email: 'alex@barbook.local',
@@ -107,8 +114,10 @@ describe('Auth rate limiting', () => {
       throw new Error('Nest application was not initialized.');
     }
 
+    const httpServer = getHttpServer(app);
+
     for (let attempt = 0; attempt < REGISTER_RATE_LIMIT.limit; attempt += 1) {
-      await request(app.getHttpServer())
+      await request(httpServer)
         .post('/auth/register')
         .send({
           displayName: 'Alex',
@@ -118,7 +127,7 @@ describe('Auth rate limiting', () => {
         .expect(201);
     }
 
-    await request(app.getHttpServer())
+    await request(httpServer)
       .post('/auth/register')
       .send({
         displayName: 'Alex',
