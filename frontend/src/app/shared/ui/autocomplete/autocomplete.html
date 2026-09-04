@@ -54,6 +54,12 @@
           track option.id;
           let index = $index
           ) {
+          <!--
+            Le focus DOM reste volontairement sur le combobox.
+            La navigation et la sélection clavier sont gérées
+            par l'input via aria-activedescendant.
+          -->
+            <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
           <div
             class="autocomplete-option"
             role="option"
