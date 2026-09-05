@@ -3,12 +3,13 @@ import {
   ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { PrismaService } from '../database/prisma.service';
 import {
   CocktailType,
   MeasurementUnit,
+  Prisma,
   RecipeMethod,
 } from '../generated/prisma/client';
-import { PrismaService } from '../database/prisma.service';
 import { CocktailCreationService } from './cocktail-creation.service';
 import { CreateCocktailDto } from './dto/create-cocktail.dto';
 
@@ -67,6 +68,23 @@ function decimal(value: number): DecimalMock {
   return {
     toString: () => value.toString(),
   };
+}
+
+function createKnownRequestError(
+  code: string,
+): Prisma.PrismaClientKnownRequestError {
+  const error = Object.create(
+    Prisma.PrismaClientKnownRequestError.prototype,
+  ) as Prisma.PrismaClientKnownRequestError;
+
+  Object.defineProperty(error, 'code', {
+    configurable: false,
+    enumerable: true,
+    value: code,
+    writable: false,
+  });
+
+  return error;
 }
 
 function buildCreateDto(
@@ -523,6 +541,20 @@ describe('CocktailCreationService', () => {
     ).rejects.toBeInstanceOf(ConflictException);
 
     expect(prismaTransaction).not.toHaveBeenCalled();
+  });
+
+  it('maps a concurrent cocktail slug uniqueness violation to conflict', async () => {
+    cocktailCreate.mockRejectedValue(createKnownRequestError('P2002'));
+
+    await expect(
+      service.createPersonalCocktail('user-123', buildCreateDto()),
+    ).rejects.toBeInstanceOf(ConflictException);
+
+    expect(prismaTransaction).toHaveBeenCalledTimes(1);
+
+    expect(cocktailIngredientCreateMany).not.toHaveBeenCalled();
+    expect(garnishIngredientCreateMany).not.toHaveBeenCalled();
+    expect(preparationStepCreateMany).not.toHaveBeenCalled();
   });
 
   it('fails when the authenticated user has no personal workspace', async () => {
