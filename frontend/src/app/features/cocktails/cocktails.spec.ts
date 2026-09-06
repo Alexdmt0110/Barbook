@@ -6,12 +6,18 @@ import {
   CocktailListQuery,
   CocktailListResult,
   CocktailSummary,
+  CocktailSummaryFolder,
+  CocktailSummaryTag,
 } from './data-access/cocktail.models';
 import { CocktailsService } from './data-access/cocktails.service';
 import { Cocktails } from './cocktails';
 
 class CocktailsServiceStub {
   readonly queries: CocktailListQuery[] = [];
+
+  folderRequests = 0;
+
+  tagRequests = 0;
 
   handler: (query: CocktailListQuery) => Observable<CocktailListResult> = () =>
     of({
@@ -22,12 +28,48 @@ class CocktailsServiceStub {
       totalPages: 0,
     });
 
+  foldersResponse: Observable<CocktailSummaryFolder[]> = of([
+    {
+      id: 'folder-classics',
+      name: 'Classiques',
+    },
+    {
+      id: 'folder-favorites',
+      name: 'Favoris',
+    },
+  ]);
+
+  tagsResponse: Observable<CocktailSummaryTag[]> = of([
+    {
+      id: 'tag-bitter',
+      name: 'Amer',
+      slug: 'amer',
+    },
+    {
+      id: 'tag-citrus',
+      name: 'Agrumes',
+      slug: 'agrumes',
+    },
+  ]);
+
   getPersonalCocktails(query: CocktailListQuery = {}): Observable<CocktailListResult> {
     this.queries.push({
       ...query,
     });
 
     return this.handler(query);
+  }
+
+  getPersonalFolders(): Observable<CocktailSummaryFolder[]> {
+    this.folderRequests += 1;
+
+    return this.foldersResponse;
+  }
+
+  getPersonalTags(): Observable<CocktailSummaryTag[]> {
+    this.tagRequests += 1;
+
+    return this.tagsResponse;
   }
 }
 
@@ -48,7 +90,10 @@ describe('Cocktails', () => {
         id: 'ingredient-rum',
         name: 'Rhum blanc',
       },
-      folder: null,
+      folder: {
+        id: 'folder-classics',
+        name: 'Classiques',
+      },
       tags: [
         {
           id: 'tag-classic',
@@ -76,7 +121,10 @@ describe('Cocktails', () => {
         id: 'ingredient-gin',
         name: 'Gin',
       },
-      folder: null,
+      folder: {
+        id: 'folder-favorites',
+        name: 'Favoris',
+      },
       tags: [
         {
           id: 'tag-bitter',
@@ -103,7 +151,7 @@ describe('Cocktails', () => {
     cocktailsService = TestBed.inject(CocktailsService) as unknown as CocktailsServiceStub;
   });
 
-  it('loads and renders cocktails', () => {
+  it('loads and renders cocktails and organization filter catalogs', () => {
     cocktailsService.handler = () =>
       of({
         items: cocktails,
@@ -131,9 +179,15 @@ describe('Cocktails', () => {
       search: undefined,
       type: undefined,
       method: undefined,
+      folderId: undefined,
+      tagId: undefined,
       page: 1,
       pageSize: 24,
     });
+
+    expect(cocktailsService.folderRequests).toBe(1);
+
+    expect(cocktailsService.tagRequests).toBe(1);
 
     expect(cards.length).toBe(2);
 
@@ -158,6 +212,14 @@ describe('Cocktails', () => {
     expect(compiled.textContent).toContain('Nouveau cocktail');
 
     expect(compiled.querySelector('#cocktail-search')).not.toBeNull();
+
+    expect(compiled.querySelector('#cocktail-folder-filter')).not.toBeNull();
+
+    expect(compiled.querySelector('#cocktail-tag-filter')).not.toBeNull();
+
+    expect(compiled.textContent).toContain('Favoris');
+
+    expect(compiled.textContent).toContain('Agrumes');
   });
 
   it('renders the empty state with a creation action when no cocktail exists', () => {
@@ -295,6 +357,141 @@ describe('Cocktails', () => {
     });
   });
 
+  it('applies folder and tag filters immediately', () => {
+    cocktailsService.handler = () =>
+      of({
+        items: cocktails,
+        page: 1,
+        pageSize: 24,
+        total: 2,
+        totalPages: 1,
+      });
+
+    const fixture = TestBed.createComponent(Cocktails);
+
+    fixture.detectChanges();
+
+    const folderSelect = fixture.nativeElement.querySelector(
+      '#cocktail-folder-filter',
+    ) as HTMLSelectElement;
+
+    folderSelect.value = 'folder-favorites';
+
+    folderSelect.dispatchEvent(new Event('change'));
+
+    fixture.detectChanges();
+
+    expect(cocktailsService.queries[1]).toMatchObject({
+      folderId: 'folder-favorites',
+      tagId: undefined,
+      page: 1,
+    });
+
+    const tagSelect = fixture.nativeElement.querySelector(
+      '#cocktail-tag-filter',
+    ) as HTMLSelectElement;
+
+    tagSelect.value = 'tag-bitter';
+
+    tagSelect.dispatchEvent(new Event('change'));
+
+    fixture.detectChanges();
+
+    expect(cocktailsService.queries[2]).toMatchObject({
+      folderId: 'folder-favorites',
+      tagId: 'tag-bitter',
+      page: 1,
+    });
+  });
+
+  it('clears organization filters with the other filters', () => {
+    cocktailsService.handler = () =>
+      of({
+        items: cocktails,
+        page: 1,
+        pageSize: 24,
+        total: 2,
+        totalPages: 1,
+      });
+
+    const fixture = TestBed.createComponent(Cocktails);
+
+    fixture.detectChanges();
+
+    const folderSelect = fixture.nativeElement.querySelector(
+      '#cocktail-folder-filter',
+    ) as HTMLSelectElement;
+
+    folderSelect.value = 'folder-favorites';
+
+    folderSelect.dispatchEvent(new Event('change'));
+
+    fixture.detectChanges();
+
+    const resetButton = fixture.nativeElement.querySelector('.clear-filters') as HTMLButtonElement;
+
+    resetButton.click();
+
+    fixture.detectChanges();
+
+    const lastQuery = cocktailsService.queries.at(-1);
+
+    expect(lastQuery).toEqual({
+      search: undefined,
+      type: undefined,
+      method: undefined,
+      folderId: undefined,
+      tagId: undefined,
+      page: 1,
+      pageSize: 24,
+    });
+
+    expect(fixture.componentInstance.selectedFolderId()).toBe('');
+
+    expect(fixture.componentInstance.selectedTagId()).toBe('');
+  });
+
+  it('keeps the cocktail library usable when organization catalogs fail', () => {
+    cocktailsService.foldersResponse = throwError(
+      () =>
+        new HttpErrorResponse({
+          status: 0,
+          statusText: 'Unknown Error',
+        }),
+    );
+
+    cocktailsService.handler = () =>
+      of({
+        items: cocktails,
+        page: 1,
+        pageSize: 24,
+        total: 2,
+        totalPages: 1,
+      });
+
+    const fixture = TestBed.createComponent(Cocktails);
+
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.textContent).toContain('Daiquiri');
+
+    expect(compiled.textContent).toContain('Dossiers indisponibles');
+
+    expect(compiled.textContent).toContain('Tags indisponibles');
+
+    expect(compiled.textContent).toContain('Réessayer dossiers / tags');
+
+    const folderSelect = compiled.querySelector('#cocktail-folder-filter') as HTMLSelectElement;
+
+    const tagSelect = compiled.querySelector('#cocktail-tag-filter') as HTMLSelectElement;
+
+    expect(folderSelect.disabled).toBe(true);
+
+    expect(tagSelect.disabled).toBe(true);
+  });
+
   it('renders a dedicated empty result state when filters match nothing', () => {
     cocktailsService.handler = (query) => {
       if (query.type) {
@@ -339,7 +536,7 @@ describe('Cocktails', () => {
     expect(compiled.querySelector('.library-tools')).not.toBeNull();
   });
 
-  it('moves to the next page and keeps filters in the request', () => {
+  it('moves to the next page and keeps organization filters in the request', () => {
     cocktailsService.handler = (query) =>
       of({
         items: cocktails,
@@ -353,6 +550,26 @@ describe('Cocktails', () => {
 
     fixture.detectChanges();
 
+    const folderSelect = fixture.nativeElement.querySelector(
+      '#cocktail-folder-filter',
+    ) as HTMLSelectElement;
+
+    folderSelect.value = 'folder-favorites';
+
+    folderSelect.dispatchEvent(new Event('change'));
+
+    fixture.detectChanges();
+
+    const tagSelect = fixture.nativeElement.querySelector(
+      '#cocktail-tag-filter',
+    ) as HTMLSelectElement;
+
+    tagSelect.value = 'tag-bitter';
+
+    tagSelect.dispatchEvent(new Event('change'));
+
+    fixture.detectChanges();
+
     const nextButton = fixture.nativeElement.querySelector('.pagination-next') as HTMLButtonElement;
 
     expect(nextButton).not.toBeNull();
@@ -361,9 +578,11 @@ describe('Cocktails', () => {
 
     fixture.detectChanges();
 
-    expect(cocktailsService.queries).toHaveLength(2);
+    expect(cocktailsService.queries).toHaveLength(4);
 
-    expect(cocktailsService.queries[1]).toMatchObject({
+    expect(cocktailsService.queries[3]).toMatchObject({
+      folderId: 'folder-favorites',
+      tagId: 'tag-bitter',
       page: 2,
       pageSize: 24,
     });

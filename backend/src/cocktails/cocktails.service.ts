@@ -41,12 +41,14 @@ export class CocktailsService {
       );
     }
 
+    const workspaceId = personalWorkspace.id;
+
     const page = query.page ?? DEFAULT_PAGE;
     const pageSize = query.pageSize ?? DEFAULT_PAGE_SIZE;
     const normalizedSearch = query.search?.trim();
 
     const where: Prisma.CocktailWhereInput = {
-      workspaceId: personalWorkspace.id,
+      workspaceId,
       ...(normalizedSearch
         ? {
             name: {
@@ -63,6 +65,21 @@ export class CocktailsService {
       ...(query.method
         ? {
             method: query.method,
+          }
+        : {}),
+      ...(query.folderId
+        ? {
+            folderId: query.folderId,
+          }
+        : {}),
+      ...(query.tagId
+        ? {
+            tags: {
+              some: {
+                workspaceId,
+                tagId: query.tagId,
+              },
+            },
           }
         : {}),
     };

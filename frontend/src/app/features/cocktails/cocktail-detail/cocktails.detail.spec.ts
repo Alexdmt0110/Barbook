@@ -2,12 +2,21 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
-import { CocktailDetail as CocktailDetailModel } from '../data-access/cocktail.models';
+import {
+  CocktailDetail as CocktailDetailModel,
+  CocktailOrganizationResult,
+  CocktailSummaryFolder,
+  CocktailSummaryTag,
+} from '../data-access/cocktail.models';
 import { CocktailsService } from '../data-access/cocktails.service';
 import { CocktailDetail } from './cocktail-detail';
 
 class CocktailsServiceStub {
   response: Observable<CocktailDetailModel> = of(buildCocktail());
+
+  foldersResponse: Observable<CocktailSummaryFolder[]> = of([]);
+
+  tagsResponse: Observable<CocktailSummaryTag[]> = of([]);
 
   requestedSlugs: string[] = [];
 
@@ -15,6 +24,14 @@ class CocktailsServiceStub {
     this.requestedSlugs.push(slug);
 
     return this.response;
+  }
+
+  getPersonalFolders(): Observable<CocktailSummaryFolder[]> {
+    return this.foldersResponse;
+  }
+
+  getPersonalTags(): Observable<CocktailSummaryTag[]> {
+    return this.tagsResponse;
   }
 }
 
@@ -151,6 +168,49 @@ describe('CocktailDetail', () => {
     expect(compiled.textContent).toContain('Verser les ingrédients dans un shaker.');
 
     expect(compiled.textContent).toContain('Fine rondelle de citron vert.');
+
+    expect(compiled.querySelector('app-cocktail-organization-editor')).not.toBeNull();
+  });
+
+  it('updates displayed organization after the editor saves', () => {
+    const fixture = TestBed.createComponent(CocktailDetail);
+
+    fixture.detectChanges();
+
+    const organization: CocktailOrganizationResult = {
+      folder: {
+        id: 'folder-favorites',
+        name: 'Favoris',
+      },
+      tags: [
+        {
+          id: 'tag-tropical',
+          name: 'Tropical',
+          slug: 'tropical',
+        },
+      ],
+    };
+
+    fixture.componentInstance.onOrganizationUpdated(organization);
+
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.cocktail()?.folder).toEqual({
+      id: 'folder-favorites',
+      name: 'Favoris',
+    });
+
+    expect(fixture.componentInstance.cocktail()?.tags).toEqual([
+      {
+        id: 'tag-tropical',
+        name: 'Tropical',
+        slug: 'tropical',
+      },
+    ]);
+
+    expect(fixture.nativeElement.textContent).toContain('Favoris');
+
+    expect(fixture.nativeElement.textContent).toContain('Tropical');
   });
 
   it('formats canonical millilitres as centilitres', () => {
