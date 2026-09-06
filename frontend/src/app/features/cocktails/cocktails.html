@@ -122,6 +122,102 @@
         </select>
       </div>
 
+      <div class="filter-control">
+        <label for="cocktail-folder-filter">
+          Dossier
+        </label>
+
+        <select
+          #folderSelect
+          id="cocktail-folder-filter"
+          [value]="selectedFolderId()"
+          [disabled]="
+            isLoadingOrganizationFilters() ||
+            organizationFiltersErrorMessage() !== null
+          "
+          (change)="
+            onFolderChange(
+              folderSelect.value
+            )
+          "
+        >
+          @if (isLoadingOrganizationFilters()) {
+            <option value="">
+              Chargement…
+            </option>
+          } @else if (
+            organizationFiltersErrorMessage()
+            ) {
+            <option value="">
+              Dossiers indisponibles
+            </option>
+          } @else {
+            <option value="">
+              Tous les dossiers
+            </option>
+
+            @for (
+              folder of availableFolders();
+              track folder.id
+              ) {
+              <option
+                [value]="folder.id"
+              >
+                {{ folder.name }}
+              </option>
+            }
+          }
+        </select>
+      </div>
+
+      <div class="filter-control">
+        <label for="cocktail-tag-filter">
+          Tag
+        </label>
+
+        <select
+          #tagSelect
+          id="cocktail-tag-filter"
+          [value]="selectedTagId()"
+          [disabled]="
+            isLoadingOrganizationFilters() ||
+            organizationFiltersErrorMessage() !== null
+          "
+          (change)="
+            onTagChange(
+              tagSelect.value
+            )
+          "
+        >
+          @if (isLoadingOrganizationFilters()) {
+            <option value="">
+              Chargement…
+            </option>
+          } @else if (
+            organizationFiltersErrorMessage()
+            ) {
+            <option value="">
+              Tags indisponibles
+            </option>
+          } @else {
+            <option value="">
+              Tous les tags
+            </option>
+
+            @for (
+              tag of availableTags();
+              track tag.id
+              ) {
+              <option
+                [value]="tag.id"
+              >
+                {{ tag.name }}
+              </option>
+            }
+          }
+        </select>
+      </div>
+
       @if (hasActiveFilters()) {
         <button
           class="clear-filters"
@@ -129,6 +225,24 @@
           (click)="clearFilters()"
         >
           Réinitialiser
+        </button>
+      }
+
+      @if (
+        organizationFiltersErrorMessage()
+        ) {
+        <button
+          class="clear-filters"
+          type="button"
+          [title]="
+            organizationFiltersErrorMessage() ||
+            ''
+          "
+          (click)="
+            loadOrganizationFilters()
+          "
+        >
+          Réessayer dossiers / tags
         </button>
       }
     </section>

@@ -2,11 +2,22 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { catchError, debounceTime, distinctUntilChanged, map, of, Subject, switchMap } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  forkJoin,
+  map,
+  of,
+  Subject,
+  switchMap,
+} from 'rxjs';
 import {
   CocktailListQuery,
   CocktailListResult,
   CocktailSummary,
+  CocktailSummaryFolder,
+  CocktailSummaryTag,
   CocktailType,
   RecipeMethod,
 } from './data-access/cocktail.models';
@@ -37,15 +48,27 @@ export class Cocktails implements OnInit {
 
   readonly cocktails = signal<CocktailSummary[]>([]);
 
+  readonly availableFolders = signal<CocktailSummaryFolder[]>([]);
+
+  readonly availableTags = signal<CocktailSummaryTag[]>([]);
+
   readonly isLoading = signal(true);
 
+  readonly isLoadingOrganizationFilters = signal(true);
+
   readonly errorMessage = signal<string | null>(null);
+
+  readonly organizationFiltersErrorMessage = signal<string | null>(null);
 
   readonly searchTerm = signal('');
 
   readonly selectedType = signal<CocktailType | ''>('');
 
   readonly selectedMethod = signal<RecipeMethod | ''>('');
+
+  readonly selectedFolderId = signal('');
+
+  readonly selectedTagId = signal('');
 
   readonly currentPage = signal(1);
 
@@ -105,7 +128,9 @@ export class Cocktails implements OnInit {
     () =>
       this.appliedSearchTerm().length > 0 ||
       this.selectedType() !== '' ||
-      this.selectedMethod() !== '',
+      this.selectedMethod() !== '' ||
+      this.selectedFolderId() !== '' ||
+      this.selectedTagId() !== '',
   );
 
   readonly showLibraryTools = computed(() => this.hasCocktailLibrary() || this.hasActiveFilters());
@@ -120,6 +145,7 @@ export class Cocktails implements OnInit {
     this.observeLoadRequests();
     this.observeSearchChanges();
 
+    this.loadOrganizationFilters();
     this.loadCocktails();
   }
 
@@ -128,6 +154,34 @@ export class Cocktails implements OnInit {
     this.errorMessage.set(null);
 
     this.loadRequests.next(this.buildListQuery());
+  }
+
+  loadOrganizationFilters(): void {
+    this.isLoadingOrganizationFilters.set(true);
+
+    this.organizationFiltersErrorMessage.set(null);
+
+    forkJoin({
+      folders: this.cocktailsService.getPersonalFolders(),
+      tags: this.cocktailsService.getPersonalTags(),
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ folders, tags }) => {
+          this.availableFolders.set(folders);
+
+          this.availableTags.set(tags);
+
+          this.isLoadingOrganizationFilters.set(false);
+        },
+        error: (error: unknown) => {
+          this.isLoadingOrganizationFilters.set(false);
+
+          this.organizationFiltersErrorMessage.set(
+            this.resolveOrganizationFiltersErrorMessage(error),
+          );
+        },
+      });
   }
 
   onSearchInput(value: string): void {
@@ -161,11 +215,39 @@ export class Cocktails implements OnInit {
     this.loadCocktails();
   }
 
+  onFolderChange(value: string): void {
+    const folderId = this.availableFolders().some((folder) => folder.id === value) ? value : '';
+
+    if (folderId === this.selectedFolderId()) {
+      return;
+    }
+
+    this.selectedFolderId.set(folderId);
+    this.currentPage.set(1);
+
+    this.loadCocktails();
+  }
+
+  onTagChange(value: string): void {
+    const tagId = this.availableTags().some((tag) => tag.id === value) ? value : '';
+
+    if (tagId === this.selectedTagId()) {
+      return;
+    }
+
+    this.selectedTagId.set(tagId);
+    this.currentPage.set(1);
+
+    this.loadCocktails();
+  }
+
   clearFilters(): void {
     this.searchTerm.set('');
     this.appliedSearchTerm.set('');
     this.selectedType.set('');
     this.selectedMethod.set('');
+    this.selectedFolderId.set('');
+    this.selectedTagId.set('');
     this.currentPage.set(1);
 
     this.searchChanges.next('');
@@ -259,6 +341,8 @@ export class Cocktails implements OnInit {
       search: this.appliedSearchTerm() || undefined,
       type: this.selectedType() || undefined,
       method: this.selectedMethod() || undefined,
+      folderId: this.selectedFolderId() || undefined,
+      tagId: this.selectedTagId() || undefined,
       page: this.currentPage(),
       pageSize: this.pageSize(),
     };
@@ -266,9 +350,13 @@ export class Cocktails implements OnInit {
 
   private applyListResult(result: CocktailListResult): void {
     this.cocktails.set(result.items);
+
     this.currentPage.set(result.page);
+
     this.pageSize.set(result.pageSize);
+
     this.total.set(result.total);
+
     this.totalPages.set(result.totalPages);
 
     if (result.total > 0) {
@@ -290,5 +378,21 @@ export class Cocktails implements OnInit {
     }
 
     return 'Impossible de charger tes cocktails pour le moment.';
+  }
+
+  private resolveOrganizationFiltersErrorMessage(error: unknown): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return 'Impossible de charger les dossiers et les tags.';
+    }
+
+    if (error.status === 0) {
+      return 'Impossible de joindre Barbook pour charger les dossiers et les tags.';
+    }
+
+    if (error.status === 401) {
+      return 'Ta session n’est plus valide.';
+    }
+
+    return 'Impossible de charger les dossiers et les tags.';
   }
 }
