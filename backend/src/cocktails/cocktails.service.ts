@@ -3,70 +3,35 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { MeasurementUnit } from '../generated/prisma/client';
 import { PrismaService } from '../database/prisma.service';
+import { MeasurementUnit, Prisma } from '../generated/prisma/client';
 import {
   CocktailDetail,
   CocktailDetailGarnish,
   CocktailDetailIngredient,
   CocktailDetailStep,
+  CocktailListQuery,
+  CocktailListResult,
   CocktailSummary,
 } from './cocktail.types';
+
+const DEFAULT_PAGE = 1;
+const DEFAULT_PAGE_SIZE = 24;
 
 @Injectable()
 export class CocktailsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findPersonalCocktails(userId: string): Promise<CocktailSummary[]> {
+  async findPersonalCocktails(
+    userId: string,
+    query: CocktailListQuery = {},
+  ): Promise<CocktailListResult> {
     const personalWorkspace = await this.prisma.workspace.findUnique({
       where: {
         personalOwnerId: userId,
       },
       select: {
-        cocktails: {
-          orderBy: [
-            {
-              name: 'asc',
-            },
-            {
-              id: 'asc',
-            },
-          ],
-          select: {
-            id: true,
-            slug: true,
-            name: true,
-            type: true,
-            family: true,
-            method: true,
-            glass: true,
-            imageUrl: true,
-            updatedAt: true,
-            mainAlcohol: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-            folder: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-            tags: {
-              select: {
-                tag: {
-                  select: {
-                    id: true,
-                    name: true,
-                    slug: true,
-                  },
-                },
-              },
-            },
-          },
-        },
+        id: true,
       },
     });
 
@@ -76,12 +41,99 @@ export class CocktailsService {
       );
     }
 
-    return personalWorkspace.cocktails.map(
+    const page = query.page ?? DEFAULT_PAGE;
+    const pageSize = query.pageSize ?? DEFAULT_PAGE_SIZE;
+    const normalizedSearch = query.search?.trim();
+
+    const where: Prisma.CocktailWhereInput = {
+      workspaceId: personalWorkspace.id,
+      ...(normalizedSearch
+        ? {
+            name: {
+              contains: normalizedSearch,
+              mode: 'insensitive',
+            },
+          }
+        : {}),
+      ...(query.type
+        ? {
+            type: query.type,
+          }
+        : {}),
+      ...(query.method
+        ? {
+            method: query.method,
+          }
+        : {}),
+    };
+
+    const [total, cocktails] = await this.prisma.$transaction([
+      this.prisma.cocktail.count({
+        where,
+      }),
+      this.prisma.cocktail.findMany({
+        where,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        orderBy: [
+          {
+            name: 'asc',
+          },
+          {
+            id: 'asc',
+          },
+        ],
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          type: true,
+          family: true,
+          method: true,
+          glass: true,
+          imageUrl: true,
+          updatedAt: true,
+          mainAlcohol: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          folder: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          tags: {
+            select: {
+              tag: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    const items: CocktailSummary[] = cocktails.map(
       ({ tags, ...cocktail }): CocktailSummary => ({
         ...cocktail,
         tags: tags.map(({ tag }) => tag),
       }),
     );
+
+    return {
+      items,
+      page,
+      pageSize,
+      total,
+      totalPages: total === 0 ? 0 : Math.ceil(total / pageSize),
+    };
   }
 
   async findPersonalCocktail(
