@@ -1,8 +1,26 @@
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../database/prisma.service';
+import { Prisma } from '../generated/prisma/client';
 import { AuthService } from './auth.service';
 import { PasswordService } from './password.service';
+
+function createKnownRequestError(
+  code: string,
+): Prisma.PrismaClientKnownRequestError {
+  const error = Object.create(
+    Prisma.PrismaClientKnownRequestError.prototype,
+  ) as Prisma.PrismaClientKnownRequestError;
+
+  Object.defineProperty(error, 'code', {
+    configurable: false,
+    enumerable: true,
+    value: code,
+    writable: false,
+  });
+
+  return error;
+}
 
 describe('AuthService', () => {
   const registerDto = {
@@ -124,7 +142,7 @@ describe('AuthService', () => {
     expect(workspaceMemberCreate).toHaveBeenCalledWith({
       data: {
         workspaceId: 'workspace-123',
-        userId: createdUser.id,
+        userId: 'user-123',
         role: 'OWNER',
       },
     });
@@ -152,6 +170,20 @@ describe('AuthService', () => {
 
     expect(hashPassword).not.toHaveBeenCalled();
     expect(transaction).not.toHaveBeenCalled();
+  });
+
+  it('maps a concurrent email uniqueness violation to conflict', async () => {
+    userFindUnique.mockResolvedValue(null);
+    hashPassword.mockResolvedValue('hashed-password');
+
+    transaction.mockRejectedValue(createKnownRequestError('P2002'));
+
+    await expect(service.register(registerDto)).rejects.toBeInstanceOf(
+      ConflictException,
+    );
+
+    expect(transaction).toHaveBeenCalledTimes(1);
+    expect(signToken).not.toHaveBeenCalled();
   });
 
   it('logs in a user with valid credentials', async () => {

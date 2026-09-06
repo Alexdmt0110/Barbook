@@ -4,12 +4,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import {
-  Prisma,
-  WorkspaceKind,
-  WorkspaceRole,
-} from '../generated/prisma/client';
+import { isPrismaKnownRequestError } from '../common/prisma-errors';
 import { PrismaService } from '../database/prisma.service';
+import { WorkspaceKind, WorkspaceRole } from '../generated/prisma/client';
 import { AuthResponse, AuthenticatedUser, JwtPayload } from './auth.types';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -78,10 +75,7 @@ export class AuthService {
         return createdUser;
       });
     } catch (error: unknown) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
+      if (isPrismaKnownRequestError(error, 'P2002')) {
         throw new ConflictException(
           'An account already exists with this email.',
         );

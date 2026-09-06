@@ -4,9 +4,9 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { Prisma } from '../generated/prisma/client';
+import { isPrismaKnownRequestError } from '../common/prisma-errors';
 import { PrismaService } from '../database/prisma.service';
-import { CreateCocktailResult } from './cocktail.types';
+import { Prisma } from '../generated/prisma/client';
 import {
   CocktailCreationInvariantError,
   CocktailCreationValidationError,
@@ -18,6 +18,7 @@ import {
   validateGarnishes,
   validateRecipeIngredients,
 } from './cocktail-creation.rules';
+import { CreateCocktailResult } from './cocktail.types';
 import {
   CreateCocktailDto,
   CreateCocktailGarnishDto,
@@ -229,10 +230,7 @@ export class CocktailCreationService {
         return cocktail;
       });
     } catch (error: unknown) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
+      if (isPrismaKnownRequestError(error, 'P2002')) {
         throw new ConflictException(
           'A cocktail with this name already exists.',
         );
