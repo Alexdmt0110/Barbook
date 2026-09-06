@@ -12,11 +12,55 @@ import { CocktailsService } from './cocktails.service';
 
 type FindUniqueMock = jest.Mock<Promise<unknown>, [Record<string, unknown>]>;
 
+type FindManyMock = jest.Mock<Promise<unknown[]>, [Record<string, unknown>]>;
+
+type CountMock = jest.Mock<Promise<number>, [Record<string, unknown>]>;
+
+type TransactionMock = jest.Mock<Promise<unknown[]>, [Promise<unknown>[]]>;
+
 function decimal(value: number): {
   toString(): string;
 } {
   return {
     toString: () => value.toString(),
+  };
+}
+
+function buildListRecord() {
+  return {
+    id: 'cocktail-123',
+    slug: 'negroni',
+    name: 'Negroni',
+    type: CocktailType.CLASSIC,
+    family: 'Spirit-forward',
+    method: RecipeMethod.MIXING_GLASS,
+    glass: 'Old fashioned',
+    imageUrl: null,
+    updatedAt: new Date('2026-08-24T12:00:00.000Z'),
+    mainAlcohol: {
+      id: 'ingredient-gin',
+      name: 'Gin',
+    },
+    folder: {
+      id: 'folder-classics',
+      name: 'Classiques',
+    },
+    tags: [
+      {
+        tag: {
+          id: 'tag-bitter',
+          name: 'Amer',
+          slug: 'amer',
+        },
+      },
+      {
+        tag: {
+          id: 'tag-italian',
+          name: 'Italien',
+          slug: 'italien',
+        },
+      },
+    ],
   };
 }
 
@@ -60,6 +104,9 @@ function buildDetailRecord(
 describe('CocktailsService', () => {
   let workspaceFindUnique: FindUniqueMock;
   let cocktailFindUnique: FindUniqueMock;
+  let cocktailFindMany: FindManyMock;
+  let cocktailCount: CountMock;
+  let transaction: TransactionMock;
 
   let service: CocktailsService;
 
@@ -71,24 +118,85 @@ describe('CocktailsService', () => {
 
     cocktailFindUnique = jest.fn<Promise<unknown>, [Record<string, unknown>]>();
 
+    cocktailFindMany = jest.fn<Promise<unknown[]>, [Record<string, unknown>]>();
+
+    cocktailCount = jest.fn<Promise<number>, [Record<string, unknown>]>();
+
+    transaction = jest.fn(
+      async (operations: Promise<unknown>[]): Promise<unknown[]> =>
+        Promise.all(operations),
+    );
+
     const prismaService = {
       workspace: {
         findUnique: workspaceFindUnique,
       },
       cocktail: {
         findUnique: cocktailFindUnique,
+        findMany: cocktailFindMany,
+        count: cocktailCount,
       },
+      $transaction: transaction,
     } as unknown as PrismaService;
 
     service = new CocktailsService(prismaService);
   });
 
   describe('findPersonalCocktails', () => {
-    it('loads cocktails only from the authenticated user personal workspace', async () => {
+    it('loads the first page only from the authenticated user personal workspace', async () => {
       const updatedAt = new Date('2026-08-24T12:00:00.000Z');
 
       workspaceFindUnique.mockResolvedValue({
-        cocktails: [
+        id: 'workspace-123',
+      });
+
+      cocktailCount.mockResolvedValue(1);
+      cocktailFindMany.mockResolvedValue([
+        {
+          ...buildListRecord(),
+          updatedAt,
+        },
+      ]);
+
+      const result = await service.findPersonalCocktails('user-123');
+
+      expect(workspaceFindUnique).toHaveBeenCalledWith({
+        where: {
+          personalOwnerId: 'user-123',
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      expect(cocktailCount).toHaveBeenCalledWith({
+        where: {
+          workspaceId: 'workspace-123',
+        },
+      });
+
+      expect(cocktailFindMany).toHaveBeenCalledTimes(1);
+
+      expect(cocktailFindMany.mock.calls[0]?.[0]).toMatchObject({
+        where: {
+          workspaceId: 'workspace-123',
+        },
+        skip: 0,
+        take: 24,
+        orderBy: [
+          {
+            name: 'asc',
+          },
+          {
+            id: 'asc',
+          },
+        ],
+      });
+
+      expect(transaction).toHaveBeenCalledTimes(1);
+
+      expect(result).toEqual({
+        items: [
           {
             id: 'cocktail-123',
             slug: 'negroni',
@@ -109,89 +217,85 @@ describe('CocktailsService', () => {
             },
             tags: [
               {
-                tag: {
-                  id: 'tag-bitter',
-                  name: 'Amer',
-                  slug: 'amer',
-                },
+                id: 'tag-bitter',
+                name: 'Amer',
+                slug: 'amer',
               },
               {
-                tag: {
-                  id: 'tag-italian',
-                  name: 'Italien',
-                  slug: 'italien',
-                },
+                id: 'tag-italian',
+                name: 'Italien',
+                slug: 'italien',
               },
             ],
           },
         ],
+        page: 1,
+        pageSize: 24,
+        total: 1,
+        totalPages: 1,
       });
-
-      const result = await service.findPersonalCocktails('user-123');
-
-      expect(workspaceFindUnique).toHaveBeenCalledTimes(1);
-
-      expect(workspaceFindUnique.mock.calls[0]?.[0]).toMatchObject({
-        where: {
-          personalOwnerId: 'user-123',
-        },
-        select: {
-          cocktails: {
-            orderBy: [
-              {
-                name: 'asc',
-              },
-              {
-                id: 'asc',
-              },
-            ],
-          },
-        },
-      });
-
-      expect(result).toEqual([
-        {
-          id: 'cocktail-123',
-          slug: 'negroni',
-          name: 'Negroni',
-          type: CocktailType.CLASSIC,
-          family: 'Spirit-forward',
-          method: RecipeMethod.MIXING_GLASS,
-          glass: 'Old fashioned',
-          imageUrl: null,
-          updatedAt,
-          mainAlcohol: {
-            id: 'ingredient-gin',
-            name: 'Gin',
-          },
-          folder: {
-            id: 'folder-classics',
-            name: 'Classiques',
-          },
-          tags: [
-            {
-              id: 'tag-bitter',
-              name: 'Amer',
-              slug: 'amer',
-            },
-            {
-              id: 'tag-italian',
-              name: 'Italien',
-              slug: 'italien',
-            },
-          ],
-        },
-      ]);
     });
 
-    it('returns an empty list when the personal workspace has no cocktails', async () => {
+    it('applies search and enum filters before pagination', async () => {
       workspaceFindUnique.mockResolvedValue({
-        cocktails: [],
+        id: 'workspace-123',
       });
 
-      await expect(service.findPersonalCocktails('user-123')).resolves.toEqual(
-        [],
-      );
+      cocktailCount.mockResolvedValue(15);
+      cocktailFindMany.mockResolvedValue([]);
+
+      const result = await service.findPersonalCocktails('user-123', {
+        search: '  neg  ',
+        type: CocktailType.CLASSIC,
+        method: RecipeMethod.MIXING_GLASS,
+        page: 2,
+        pageSize: 10,
+      });
+
+      const expectedWhere = {
+        workspaceId: 'workspace-123',
+        name: {
+          contains: 'neg',
+          mode: 'insensitive',
+        },
+        type: CocktailType.CLASSIC,
+        method: RecipeMethod.MIXING_GLASS,
+      };
+
+      expect(cocktailCount).toHaveBeenCalledWith({
+        where: expectedWhere,
+      });
+
+      expect(cocktailFindMany.mock.calls[0]?.[0]).toMatchObject({
+        where: expectedWhere,
+        skip: 10,
+        take: 10,
+      });
+
+      expect(result).toEqual({
+        items: [],
+        page: 2,
+        pageSize: 10,
+        total: 15,
+        totalPages: 2,
+      });
+    });
+
+    it('returns an empty paginated result when no cocktail matches', async () => {
+      workspaceFindUnique.mockResolvedValue({
+        id: 'workspace-123',
+      });
+
+      cocktailCount.mockResolvedValue(0);
+      cocktailFindMany.mockResolvedValue([]);
+
+      await expect(service.findPersonalCocktails('user-123')).resolves.toEqual({
+        items: [],
+        page: 1,
+        pageSize: 24,
+        total: 0,
+        totalPages: 0,
+      });
     });
 
     it('fails when the authenticated user has no personal workspace', async () => {
@@ -200,6 +304,10 @@ describe('CocktailsService', () => {
       await expect(
         service.findPersonalCocktails('user-123'),
       ).rejects.toBeInstanceOf(InternalServerErrorException);
+
+      expect(cocktailCount).not.toHaveBeenCalled();
+      expect(cocktailFindMany).not.toHaveBeenCalled();
+      expect(transaction).not.toHaveBeenCalled();
     });
   });
 

@@ -1,14 +1,23 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { CurrentUserId } from '../auth/decorators/current-user-id.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CocktailCreationService } from './cocktail-creation.service';
 import {
   CocktailDetail,
-  CocktailSummary,
+  CocktailListResult,
   CreateCocktailResult,
 } from './cocktail.types';
 import { CocktailsService } from './cocktails.service';
 import { CreateCocktailDto } from './dto/create-cocktail.dto';
+import { ListCocktailsQueryDto } from './dto/list-cocktails-query.dto';
 
 @Controller('cocktails')
 @UseGuards(JwtAuthGuard)
@@ -29,8 +38,9 @@ export class CocktailsController {
   @Get()
   async findPersonalCocktails(
     @CurrentUserId() userId: string,
-  ): Promise<CocktailSummary[]> {
-    return this.cocktailsService.findPersonalCocktails(userId);
+    @Query() query: ListCocktailsQueryDto,
+  ): Promise<CocktailListResult> {
+    return this.cocktailsService.findPersonalCocktails(userId, query);
   }
 
   @Get(':slug')
