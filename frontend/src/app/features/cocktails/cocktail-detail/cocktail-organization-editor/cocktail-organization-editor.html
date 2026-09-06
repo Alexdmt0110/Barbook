@@ -1,0 +1,269 @@
+<section
+  class="organization-editor"
+  aria-labelledby="cocktail-organization-title"
+>
+  <div class="organization-heading">
+    <div>
+      <p class="organization-eyebrow">
+        Bibliothèque
+      </p>
+
+      <h2 id="cocktail-organization-title">
+        Organiser ce cocktail
+      </h2>
+
+      <p class="organization-introduction">
+        Classe la recette dans un dossier et
+        ajoute les tags qui t’aideront à la
+        retrouver.
+      </p>
+    </div>
+  </div>
+
+  @if (isLoadingCatalog()) {
+    <div
+      class="organization-state"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      Chargement des dossiers et des tags…
+    </div>
+  } @else if (catalogErrorMessage()) {
+    <div
+      class="organization-state error-state"
+      role="alert"
+    >
+      <p>
+        {{ catalogErrorMessage() }}
+      </p>
+
+      <button
+        type="button"
+        (click)="loadCatalogs()"
+      >
+        Réessayer
+      </button>
+    </div>
+  } @else {
+    <div class="organization-grid">
+      <section class="organization-group">
+        <div class="group-heading">
+          <div>
+            <p class="group-label">
+              Dossier
+            </p>
+
+            <h3>Classement principal</h3>
+          </div>
+        </div>
+
+        <label
+          class="field-label"
+          for="cocktail-folder"
+        >
+          Dossier actuel
+        </label>
+
+        <select
+          id="cocktail-folder"
+          [value]="selectedFolderId() || ''"
+          [disabled]="
+            isSaving() ||
+            isCreatingFolder()
+          "
+          (change)="onFolderChange($event)"
+        >
+          <option value="">
+            Sans dossier
+          </option>
+
+          @for (
+            folderOption of availableFolders();
+            track folderOption.id
+            ) {
+            <option
+              [value]="folderOption.id"
+            >
+              {{ folderOption.name }}
+            </option>
+          }
+        </select>
+
+        <div class="creation-row">
+          <input
+            type="text"
+            maxlength="80"
+            placeholder="Nouveau dossier"
+            aria-label="Nom du nouveau dossier"
+            [value]="newFolderName()"
+            [disabled]="
+              isSaving() ||
+              isCreatingFolder()
+            "
+            (input)="
+              onNewFolderNameChange($event)
+            "
+            (keydown.enter)="createFolder()"
+          />
+
+          <button
+            type="button"
+            class="secondary-action create-folder-button"
+            [disabled]="
+              isSaving() ||
+              isCreatingFolder()
+            "
+            (click)="createFolder()"
+          >
+            @if (isCreatingFolder()) {
+              Création…
+            } @else {
+              Créer
+            }
+          </button>
+        </div>
+      </section>
+
+      <section class="organization-group">
+        <div class="group-heading">
+          <div>
+            <p class="group-label">
+              Tags
+            </p>
+
+            <h3>Repères de recherche</h3>
+          </div>
+
+          <span class="tag-count">
+            {{ selectedTagNames().length }}
+            / 20
+          </span>
+        </div>
+
+        @if (availableTags().length > 0) {
+          <div
+            class="tag-options"
+            aria-label="Tags existants"
+          >
+            @for (
+              tag of availableTags();
+              track tag.id
+              ) {
+              <label class="tag-option">
+                <input
+                  type="checkbox"
+                  [checked]="
+                    isTagSelected(tag.name)
+                  "
+                  [disabled]="isSaving()"
+                  (change)="
+                    toggleTag(
+                      tag.name,
+                      $event
+                    )
+                  "
+                />
+
+                <span>{{ tag.name }}</span>
+              </label>
+            }
+          </div>
+        } @else {
+          <p class="empty-hint">
+            Aucun tag n’existe encore.
+          </p>
+        }
+
+        <div class="creation-row">
+          <input
+            type="text"
+            maxlength="40"
+            placeholder="Nouveau tag"
+            aria-label="Nom du nouveau tag"
+            [value]="newTagName()"
+            [disabled]="isSaving()"
+            (input)="
+              onNewTagNameChange($event)
+            "
+            (keydown.enter)="addTag()"
+          />
+
+          <button
+            type="button"
+            class="secondary-action add-tag-button"
+            [disabled]="isSaving()"
+            (click)="addTag()"
+          >
+            Ajouter
+          </button>
+        </div>
+
+        @if (selectedTagNames().length > 0) {
+          <div
+            class="selected-tags"
+            aria-label="Tags sélectionnés"
+          >
+            @for (
+              tagName of selectedTagNames();
+              track tagName
+              ) {
+              <span class="selected-tag">
+                {{ tagName }}
+
+                <button
+                  type="button"
+                  [attr.aria-label]="
+                    'Retirer le tag ' +
+                    tagName
+                  "
+                  [disabled]="isSaving()"
+                  (click)="
+                    removeTag(tagName)
+                  "
+                >
+                  ×
+                </button>
+              </span>
+            }
+          </div>
+        }
+      </section>
+    </div>
+
+    @if (actionErrorMessage()) {
+      <p
+        class="feedback error-feedback"
+        role="alert"
+      >
+        {{ actionErrorMessage() }}
+      </p>
+    }
+
+    @if (successMessage()) {
+      <p
+        class="feedback success-feedback"
+        aria-live="polite"
+      >
+        {{ successMessage() }}
+      </p>
+    }
+
+    <div class="editor-actions">
+      <button
+        type="button"
+        class="primary-action save-organization-button"
+        [disabled]="
+          isSaving() ||
+          isCreatingFolder()
+        "
+        (click)="saveOrganization()"
+      >
+        @if (isSaving()) {
+          Enregistrement…
+        } @else {
+          Enregistrer l’organisation
+        }
+      </button>
+    </div>
+  }
+</section>

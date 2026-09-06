@@ -4,15 +4,17 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import {
   CocktailDetail as CocktailDetailModel,
+  CocktailOrganizationResult,
   CocktailType,
   MeasurementUnit,
   RecipeMethod,
 } from '../data-access/cocktail.models';
 import { CocktailsService } from '../data-access/cocktails.service';
+import { CocktailOrganizationEditor } from './cocktail-organization-editor/cocktail-organization-editor';
 
 @Component({
   selector: 'app-cocktail-detail',
-  imports: [RouterLink],
+  imports: [RouterLink, CocktailOrganizationEditor],
   templateUrl: './cocktail-detail.html',
   styleUrl: './cocktail-detail.css',
 })
@@ -66,6 +68,20 @@ export class CocktailDetail implements OnInit {
           this.resolveError(error);
         },
       });
+  }
+
+  onOrganizationUpdated(organization: CocktailOrganizationResult): void {
+    this.cocktail.update((cocktail) => {
+      if (!cocktail) {
+        return null;
+      }
+
+      return {
+        ...cocktail,
+        folder: organization.folder,
+        tags: organization.tags,
+      };
+    });
   }
 
   typeLabel(type: CocktailType): string {

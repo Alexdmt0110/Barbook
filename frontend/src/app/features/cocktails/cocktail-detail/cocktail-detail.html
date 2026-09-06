@@ -123,6 +123,7 @@
         <dl class="service-grid">
           <div>
             <dt>Alcool principal</dt>
+
             <dd>
               {{
                 recipe.mainAlcohol?.name ||
@@ -133,9 +134,12 @@
 
           <div>
             <dt>Méthode</dt>
+
             <dd>
               {{
-                methodLabel(recipe.method)
+                methodLabel(
+                  recipe.method
+                )
               }}
             </dd>
           </div>
@@ -147,6 +151,7 @@
 
           <div>
             <dt>Glace</dt>
+
             <dd>
               {{
                 recipe.ice ||
@@ -157,6 +162,7 @@
 
           <div class="abv-item">
             <dt>Degré estimé</dt>
+
             <dd>
               {{
                 estimatedAbvLabel(
@@ -176,17 +182,35 @@
       </div>
     </header>
 
+    <app-cocktail-organization-editor
+      [slug]="recipe.slug"
+      [folder]="recipe.folder"
+      [tags]="recipe.tags"
+      (organizationUpdated)="
+        onOrganizationUpdated($event)
+      "
+    >
+    </app-cocktail-organization-editor>
+
     <div class="recipe-layout">
-      <section class="recipe-card ingredients-card">
+      <section
+        class="recipe-card ingredients-card"
+      >
         <div class="section-heading">
-          <p class="eyebrow">Recette</p>
+          <p class="eyebrow">
+            Recette
+          </p>
+
           <h2>Ingrédients</h2>
         </div>
 
-        @if (recipe.ingredients.length > 0) {
+        @if (
+          recipe.ingredients.length > 0
+          ) {
           <ul class="ingredient-list">
             @for (
-              ingredient of recipe.ingredients;
+              ingredient of
+                recipe.ingredients;
               track ingredient.id
               ) {
               <li>
@@ -207,7 +231,8 @@
                         class="ingredient-specification"
                       >
                         {{
-                          ingredient.specification
+                          ingredient
+                            .specification
                         }}
                       </span>
                     }
@@ -240,11 +265,14 @@
         }
       </section>
 
-      <section class="recipe-card preparation-card">
+      <section
+        class="recipe-card preparation-card"
+      >
         <div class="section-heading">
           <p class="eyebrow">
             Au bar
           </p>
+
           <h2>Préparation</h2>
         </div>
 
@@ -263,11 +291,16 @@
                   {{
                     (index + 1)
                       .toString()
-                      .padStart(2, '0')
+                      .padStart(
+                        2,
+                        '0'
+                      )
                   }}
                 </span>
 
-                <p>{{ step.content }}</p>
+                <p>
+                  {{ step.content }}
+                </p>
               </li>
             }
           </ol>
@@ -278,12 +311,17 @@
         }
       </section>
 
-      @if (recipe.garnishes.length > 0) {
-        <section class="recipe-card garnish-card">
+      @if (
+        recipe.garnishes.length > 0
+        ) {
+        <section
+          class="recipe-card garnish-card"
+        >
           <div class="section-heading">
             <p class="eyebrow">
               Finition
             </p>
+
             <h2>Garniture</h2>
           </div>
 
@@ -296,7 +334,9 @@
                 <div class="garnish-heading">
                   <strong>
                     {{
-                      garnish.ingredient.name
+                      garnish
+                        .ingredient
+                        .name
                     }}
                   </strong>
 
@@ -320,12 +360,15 @@
                   ) {
                   <p>
                     {{
-                      garnish.specification
+                      garnish
+                        .specification
                     }}
                   </p>
                 }
 
-                <p>{{ garnish.usage }}</p>
+                <p>
+                  {{ garnish.usage }}
+                </p>
               </li>
             }
           </ul>
@@ -333,11 +376,14 @@
       }
 
       @if (recipe.notes) {
-        <section class="recipe-card notes-card">
+        <section
+          class="recipe-card notes-card"
+        >
           <div class="section-heading">
             <p class="eyebrow">
               À retenir
             </p>
+
             <h2>Notes</h2>
           </div>
 
