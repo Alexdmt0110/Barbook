@@ -98,6 +98,96 @@
   font-weight: 650;
 }
 
+.library-tools {
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 1.7fr)
+    minmax(160px, 0.8fr)
+    minmax(180px, 0.9fr)
+    auto;
+  align-items: end;
+  min-width: 0;
+  gap: 14px;
+  margin-bottom: 32px;
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(var(--backdrop-blur));
+}
+
+.search-control,
+.filter-control {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.search-control label,
+.filter-control label {
+  color: var(--color-text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.search-control input,
+.filter-control select {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-field);
+  color: var(--color-text);
+  background: var(--color-field-background);
+  outline: none;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease;
+}
+
+.search-control input:hover,
+.filter-control select:hover {
+  background: var(--color-field-hover);
+}
+
+.search-control input:focus,
+.filter-control select:focus {
+  border-color: var(--color-border-strong);
+  background: var(--color-field-focus);
+}
+
+.search-control input::placeholder {
+  color: var(--color-placeholder);
+}
+
+.filter-control select {
+  cursor: pointer;
+}
+
+.clear-filters {
+  min-height: 46px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+  background: var(--color-surface-subtle);
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease;
+}
+
+.clear-filters:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-hover);
+}
+
 .cocktail-grid {
   display: grid;
   grid-template-columns:
@@ -276,7 +366,8 @@
   overflow-wrap: anywhere;
 }
 
-.error-state button {
+.error-state button,
+.no-results-state button {
   max-width: 100%;
   min-height: 44px;
   margin-top: 24px;
@@ -287,6 +378,50 @@
   background: var(--color-accent);
   font-weight: 750;
   cursor: pointer;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 38px;
+}
+
+.pagination p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+}
+
+.pagination strong {
+  color: var(--color-text);
+}
+
+.pagination button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+  background: var(--color-surface);
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    opacity 150ms ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-hover);
+}
+
+.pagination button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
 }
 
 .skeleton-card {
@@ -318,6 +453,19 @@
 }
 
 @media (max-width: 900px) {
+  .library-tools {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .search-control {
+    grid-column: 1 / -1;
+  }
+
+  .clear-filters {
+    justify-self: start;
+  }
+
   .cocktail-grid {
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
@@ -333,6 +481,20 @@
     align-items: start;
     flex-direction: column;
     margin-bottom: 34px;
+  }
+
+  .library-tools {
+    grid-template-columns: minmax(0, 1fr);
+    margin-bottom: 26px;
+    padding: 16px;
+  }
+
+  .search-control {
+    grid-column: auto;
+  }
+
+  .clear-filters {
+    width: 100%;
   }
 
   .cocktail-grid {
@@ -358,5 +520,20 @@
 
   .empty-create-link {
     width: 100%;
+  }
+
+  .pagination {
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .pagination p {
+    order: -1;
+    width: 100%;
+    text-align: center;
+  }
+
+  .pagination button {
+    flex: 1 1 0;
   }
 }

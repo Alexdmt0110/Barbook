@@ -48,6 +48,22 @@ export interface CocktailSummary {
   updatedAt: string;
 }
 
+export interface CocktailListQuery {
+  search?: string;
+  type?: CocktailType;
+  method?: RecipeMethod;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface CocktailListResult {
+  items: CocktailSummary[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
 export interface CocktailDetailIngredientReference {
   id: string;
   name: string;

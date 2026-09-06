@@ -1,7 +1,12 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { CocktailDetail, CocktailSummary, CreateCocktailRequest } from './cocktail.models';
+import {
+  CocktailDetail,
+  CocktailListResult,
+  CocktailSummary,
+  CreateCocktailRequest,
+} from './cocktail.models';
 import { CocktailsService } from './cocktails.service';
 
 describe('CocktailsService', () => {
@@ -50,8 +55,16 @@ describe('CocktailsService', () => {
       },
     ];
 
+    const response: CocktailListResult = {
+      items: cocktails,
+      page: 1,
+      pageSize: 24,
+      total: 1,
+      totalPages: 1,
+    };
+
     service.getPersonalCocktails().subscribe((result) => {
-      expect(result).toEqual(cocktails);
+      expect(result).toEqual(response);
     });
 
     const request = httpTestingController.expectOne('/api/cocktails');
@@ -60,7 +73,65 @@ describe('CocktailsService', () => {
 
     expect(request.request.params.keys()).toEqual([]);
 
-    request.flush(cocktails);
+    request.flush(response);
+  });
+
+  it('sends search filters and pagination as query parameters', () => {
+    service
+      .getPersonalCocktails({
+        search: '  negroni  ',
+        type: 'CLASSIC',
+        method: 'MIXING_GLASS',
+        page: 2,
+        pageSize: 24,
+      })
+      .subscribe();
+
+    const request = httpTestingController.expectOne(
+      (candidate) => candidate.url === '/api/cocktails',
+    );
+
+    expect(request.request.method).toBe('GET');
+
+    expect(request.request.params.get('search')).toBe('negroni');
+
+    expect(request.request.params.get('type')).toBe('CLASSIC');
+
+    expect(request.request.params.get('method')).toBe('MIXING_GLASS');
+
+    expect(request.request.params.get('page')).toBe('2');
+
+    expect(request.request.params.get('pageSize')).toBe('24');
+
+    request.flush({
+      items: [],
+      page: 2,
+      pageSize: 24,
+      total: 30,
+      totalPages: 2,
+    });
+  });
+
+  it('omits a blank search parameter', () => {
+    service
+      .getPersonalCocktails({
+        search: '   ',
+        page: 1,
+        pageSize: 24,
+      })
+      .subscribe();
+
+    const request = httpTestingController.expectOne('/api/cocktails?page=1&pageSize=24');
+
+    expect(request.request.params.has('search')).toBe(false);
+
+    request.flush({
+      items: [],
+      page: 1,
+      pageSize: 24,
+      total: 0,
+      totalPages: 0,
+    });
   });
 
   it('loads one personal cocktail by slug', () => {

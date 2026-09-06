@@ -32,6 +32,108 @@
     </div>
   </header>
 
+  @if (showLibraryTools()) {
+    <section
+      class="library-tools"
+      aria-label="Recherche et filtres"
+    >
+      <div class="search-control">
+        <label for="cocktail-search">
+          Rechercher
+        </label>
+
+        <input
+          #searchInput
+          id="cocktail-search"
+          type="search"
+          maxlength="120"
+          autocomplete="off"
+          placeholder="Nom du cocktail…"
+          [value]="searchTerm()"
+          (input)="
+            onSearchInput(
+              searchInput.value
+            )
+          "
+        />
+      </div>
+
+      <div class="filter-control">
+        <label for="cocktail-type-filter">
+          Type
+        </label>
+
+        <select
+          #typeSelect
+          id="cocktail-type-filter"
+          [value]="selectedType()"
+          (change)="
+            onTypeChange(
+              typeSelect.value
+            )
+          "
+        >
+          <option value="">
+            Tous les types
+          </option>
+
+          @for (
+            option of typeOptions;
+            track option.value
+            ) {
+            <option
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-control">
+        <label for="cocktail-method-filter">
+          Méthode
+        </label>
+
+        <select
+          #methodSelect
+          id="cocktail-method-filter"
+          [value]="selectedMethod()"
+          (change)="
+            onMethodChange(
+              methodSelect.value
+            )
+          "
+        >
+          <option value="">
+            Toutes les méthodes
+          </option>
+
+          @for (
+            option of methodOptions;
+            track option.value
+            ) {
+            <option
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </option>
+          }
+        </select>
+      </div>
+
+      @if (hasActiveFilters()) {
+        <button
+          class="clear-filters"
+          type="button"
+          (click)="clearFilters()"
+        >
+          Réinitialiser
+        </button>
+      }
+    </section>
+  }
+
   @if (isLoading()) {
     <section
       class="cocktail-grid"
@@ -49,11 +151,17 @@
 
           <div class="cocktail-card-content">
             <div
-              class="skeleton-line skeleton-line-small"
+              class="
+                skeleton-line
+                skeleton-line-small
+              "
             ></div>
 
             <div
-              class="skeleton-line skeleton-line-title"
+              class="
+                skeleton-line
+                skeleton-line-title
+              "
             ></div>
 
             <div
@@ -87,9 +195,39 @@
       </button>
     </section>
   } @else if (
+    cocktails().length === 0 &&
+    hasActiveFilters()
+    ) {
+    <section
+      class="state-card no-results-state"
+    >
+      <p class="state-eyebrow">
+        Aucun résultat
+      </p>
+
+      <h2>
+        Aucun cocktail ne correspond
+        à ta recherche.
+      </h2>
+
+      <p>
+        Essaie un autre nom ou retire
+        certains filtres.
+      </p>
+
+      <button
+        type="button"
+        (click)="clearFilters()"
+      >
+        Réinitialiser les filtres
+      </button>
+    </section>
+  } @else if (
     cocktails().length === 0
     ) {
-    <section class="state-card empty-state">
+    <section
+      class="state-card empty-state"
+    >
       <p class="state-eyebrow">
         Bibliothèque vide
       </p>
@@ -121,7 +259,10 @@
         track cocktail.id
         ) {
         <a
-          class="cocktail-card cocktail-card-link"
+          class="
+            cocktail-card
+            cocktail-card-link
+          "
           [routerLink]="[
             '/cocktails',
             cocktail.slug
@@ -218,5 +359,48 @@
         </a>
       }
     </section>
+
+    @if (totalPages() > 1) {
+      <nav
+        class="pagination"
+        aria-label="Pagination des cocktails"
+      >
+        <button
+          type="button"
+          [disabled]="!canGoPrevious()"
+          (click)="
+            goToPage(
+              currentPage() - 1
+            )
+          "
+        >
+          ← Précédent
+        </button>
+
+        <p aria-live="polite">
+          Page
+          <strong>
+            {{ currentPage() }}
+          </strong>
+          sur
+          <strong>
+            {{ totalPages() }}
+          </strong>
+        </p>
+
+        <button
+          class="pagination-next"
+          type="button"
+          [disabled]="!canGoNext()"
+          (click)="
+            goToPage(
+              currentPage() + 1
+            )
+          "
+        >
+          Suivant →
+        </button>
+      </nav>
+    }
   }
 </section>
