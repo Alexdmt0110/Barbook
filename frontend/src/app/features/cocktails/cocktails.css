@@ -88,7 +88,6 @@
 
 .cocktail-count {
   flex: 0 0 auto;
-  max-width: 100%;
   padding: 9px 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
@@ -106,7 +105,6 @@
     minmax(180px, 0.9fr)
     auto;
   align-items: end;
-  min-width: 0;
   gap: 14px;
   margin-bottom: 32px;
   padding: 18px;
@@ -192,12 +190,10 @@
   display: grid;
   grid-template-columns:
     repeat(3, minmax(0, 1fr));
-  min-width: 0;
   gap: 24px;
 }
 
 .cocktail-card {
-  width: 100%;
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--color-border);
@@ -229,7 +225,6 @@
 
 .cocktail-image-wrapper {
   position: relative;
-  width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-bottom: 1px solid var(--color-border);
@@ -243,7 +238,7 @@
   transition: transform 260ms ease;
 }
 
-.cocktail-card-link:hover
+.cocktail-card-link:hover,
 .cocktail-image {
   transform: scale(1.025);
 }
@@ -267,7 +262,6 @@
 }
 
 .cocktail-card-content {
-  min-width: 0;
   padding: 24px;
 }
 
@@ -299,7 +293,6 @@
 .main-alcohol {
   flex: 0 1 120px;
   min-width: 0;
-  max-width: 120px;
   overflow: hidden;
   color: var(--color-text-muted);
   font-size: 0.78rem;
@@ -313,7 +306,6 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  min-width: 0;
   gap: 8px;
   margin-top: 16px;
   color: var(--color-text-muted);
@@ -323,7 +315,6 @@
 .cocktail-tags {
   display: flex;
   flex-wrap: wrap;
-  min-width: 0;
   gap: 7px;
   margin-top: 20px;
 }
@@ -368,7 +359,6 @@
 
 .error-state button,
 .no-results-state button {
-  max-width: 100%;
   min-height: 44px;
   margin-top: 24px;
   padding: 0 18px;

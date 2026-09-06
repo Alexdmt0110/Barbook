@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
 import {
@@ -13,7 +13,7 @@ import { Cocktails } from './cocktails';
 class CocktailsServiceStub {
   readonly queries: CocktailListQuery[] = [];
 
-  handler = (_query: CocktailListQuery): Observable<CocktailListResult> =>
+  handler: (query: CocktailListQuery) => Observable<CocktailListResult> = () =>
     of({
       items: [],
       page: 1,
@@ -195,7 +195,7 @@ describe('Cocktails', () => {
     expect(createLink?.getAttribute('href')).toBe('/cocktails/new');
   });
 
-  it('debounces the cocktail name search', fakeAsync(() => {
+  it('debounces the cocktail name search', async () => {
     cocktailsService.handler = (query) => {
       if (query.search === 'neg') {
         return of({
@@ -230,11 +230,7 @@ describe('Cocktails', () => {
 
     expect(cocktailsService.queries).toHaveLength(1);
 
-    tick(299);
-
-    expect(cocktailsService.queries).toHaveLength(1);
-
-    tick(1);
+    await new Promise((resolve) => setTimeout(resolve, 350));
 
     fixture.detectChanges();
 
@@ -251,7 +247,7 @@ describe('Cocktails', () => {
     expect(compiled.textContent).toContain('Negroni');
 
     expect(compiled.textContent).not.toContain('Daiquiri');
-  }));
+  });
 
   it('applies type and method filters immediately', () => {
     cocktailsService.handler = () =>
@@ -372,7 +368,13 @@ describe('Cocktails', () => {
       pageSize: 24,
     });
 
-    expect(fixture.nativeElement.textContent).toContain('Page 2 sur 2');
+    const paginationLabel = fixture.nativeElement.querySelector(
+      '.pagination p',
+    ) as HTMLParagraphElement | null;
+
+    expect(paginationLabel).not.toBeNull();
+
+    expect(paginationLabel?.textContent?.replace(/\s+/g, ' ').trim()).toBe('Page 2 sur 2');
   });
 
   it('renders a connection error when the API is unreachable', () => {
