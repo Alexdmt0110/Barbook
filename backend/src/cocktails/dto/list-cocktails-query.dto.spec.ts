@@ -9,6 +9,8 @@ describe('ListCocktailsQueryDto', () => {
       search: '  negroni  ',
       type: CocktailType.CLASSIC,
       method: RecipeMethod.MIXING_GLASS,
+      folderId: '550e8400-e29b-41d4-a716-446655440000',
+      tagId: '550e8400-e29b-41d4-a716-446655440001',
       page: '2',
       pageSize: '24',
     });
@@ -18,6 +20,8 @@ describe('ListCocktailsQueryDto', () => {
     expect(dto.search).toBe('negroni');
     expect(dto.type).toBe(CocktailType.CLASSIC);
     expect(dto.method).toBe(RecipeMethod.MIXING_GLASS);
+    expect(dto.folderId).toBe('550e8400-e29b-41d4-a716-446655440000');
+    expect(dto.tagId).toBe('550e8400-e29b-41d4-a716-446655440001');
     expect(dto.page).toBe(2);
     expect(dto.pageSize).toBe(24);
   });
@@ -30,18 +34,24 @@ describe('ListCocktailsQueryDto', () => {
     expect(dto.search).toBeUndefined();
     expect(dto.type).toBeUndefined();
     expect(dto.method).toBeUndefined();
+    expect(dto.folderId).toBeUndefined();
+    expect(dto.tagId).toBeUndefined();
     expect(dto.page).toBeUndefined();
     expect(dto.pageSize).toBeUndefined();
   });
 
-  it('normalizes a blank search to an omitted value', async () => {
+  it('normalizes blank optional string filters to omitted values', async () => {
     const dto = plainToInstance(ListCocktailsQueryDto, {
       search: '   ',
+      folderId: '   ',
+      tagId: '   ',
     });
 
     await expect(validate(dto)).resolves.toHaveLength(0);
 
     expect(dto.search).toBeUndefined();
+    expect(dto.folderId).toBeUndefined();
+    expect(dto.tagId).toBeUndefined();
   });
 
   it('rejects a search longer than 120 characters', async () => {
@@ -58,6 +68,17 @@ describe('ListCocktailsQueryDto', () => {
     const dto = plainToInstance(ListCocktailsQueryDto, {
       type: 'UNKNOWN',
       method: 'STIRRED_BY_MAGIC',
+    });
+
+    const errors = await validate(dto);
+
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it('rejects invalid organization filter identifiers', async () => {
+    const dto = plainToInstance(ListCocktailsQueryDto, {
+      folderId: 'not-a-folder-uuid',
+      tagId: 'not-a-tag-uuid',
     });
 
     const errors = await validate(dto);

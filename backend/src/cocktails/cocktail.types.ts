@@ -39,6 +39,8 @@ export interface CocktailListQuery {
   search?: string;
   type?: CocktailType;
   method?: RecipeMethod;
+  folderId?: string;
+  tagId?: string;
   page?: number;
   pageSize?: number;
 }

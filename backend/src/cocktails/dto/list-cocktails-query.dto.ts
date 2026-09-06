@@ -4,6 +4,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUUID,
   Max,
   MaxLength,
   Min,
@@ -42,6 +43,16 @@ export class ListCocktailsQueryDto {
   @IsOptional()
   @IsEnum(RecipeMethod)
   method?: RecipeMethod;
+
+  @IsOptional()
+  @Transform(({ value }: TransformValue) => trimOptionalString(value))
+  @IsUUID()
+  folderId?: string;
+
+  @IsOptional()
+  @Transform(({ value }: TransformValue) => trimOptionalString(value))
+  @IsUUID()
+  tagId?: string;
 
   @IsOptional()
   @Type(() => Number)
