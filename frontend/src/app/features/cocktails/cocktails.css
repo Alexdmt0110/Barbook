@@ -238,8 +238,7 @@
   transition: transform 260ms ease;
 }
 
-.cocktail-card-link:hover,
-.cocktail-image {
+.cocktail-card-link:hover .cocktail-image {
   transform: scale(1.025);
 }
 
