@@ -52,6 +52,8 @@ export interface CocktailListQuery {
   search?: string;
   type?: CocktailType;
   method?: RecipeMethod;
+  folderId?: string;
+  tagId?: string;
   page?: number;
   pageSize?: number;
 }
@@ -138,4 +140,18 @@ export interface CreateCocktailRequest {
 export interface CreateCocktailResult {
   id: string;
   slug: string;
+}
+
+export interface CreateCocktailFolderRequest {
+  name: string;
+}
+
+export interface UpdateCocktailOrganizationRequest {
+  folderId: string | null;
+  tagNames: string[];
+}
+
+export interface CocktailOrganizationResult {
+  folder: CocktailSummaryFolder | null;
+  tags: CocktailSummaryTag[];
 }

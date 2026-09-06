@@ -76,12 +76,14 @@ describe('CocktailsService', () => {
     request.flush(response);
   });
 
-  it('sends search filters and pagination as query parameters', () => {
+  it('sends search, organization filters and pagination as query parameters', () => {
     service
       .getPersonalCocktails({
         search: '  negroni  ',
         type: 'CLASSIC',
         method: 'MIXING_GLASS',
+        folderId: '  550e8400-e29b-41d4-a716-446655440000  ',
+        tagId: '  550e8400-e29b-41d4-a716-446655440001  ',
         page: 2,
         pageSize: 24,
       })
@@ -99,6 +101,10 @@ describe('CocktailsService', () => {
 
     expect(request.request.params.get('method')).toBe('MIXING_GLASS');
 
+    expect(request.request.params.get('folderId')).toBe('550e8400-e29b-41d4-a716-446655440000');
+
+    expect(request.request.params.get('tagId')).toBe('550e8400-e29b-41d4-a716-446655440001');
+
     expect(request.request.params.get('page')).toBe('2');
 
     expect(request.request.params.get('pageSize')).toBe('24');
@@ -112,10 +118,12 @@ describe('CocktailsService', () => {
     });
   });
 
-  it('omits a blank search parameter', () => {
+  it('omits blank optional string filters', () => {
     service
       .getPersonalCocktails({
         search: '   ',
+        folderId: '   ',
+        tagId: '   ',
         page: 1,
         pageSize: 24,
       })
@@ -124,6 +132,10 @@ describe('CocktailsService', () => {
     const request = httpTestingController.expectOne('/api/cocktails?page=1&pageSize=24');
 
     expect(request.request.params.has('search')).toBe(false);
+
+    expect(request.request.params.has('folderId')).toBe(false);
+
+    expect(request.request.params.has('tagId')).toBe(false);
 
     request.flush({
       items: [],
@@ -172,7 +184,7 @@ describe('CocktailsService', () => {
     request.flush(cocktail);
   });
 
-  it('encodes the cocktail slug before building the request URL', () => {
+  it('encodes the cocktail slug before building the detail request URL', () => {
     service.getPersonalCocktail('création spéciale').subscribe();
 
     const request = httpTestingController.expectOne('/api/cocktails/cr%C3%A9ation%20sp%C3%A9ciale');
@@ -224,6 +236,133 @@ describe('CocktailsService', () => {
     request.flush({
       id: 'cocktail-new',
       slug: 'tom-collins',
+    });
+  });
+
+  it('loads personal cocktail folders', () => {
+    service.getPersonalFolders().subscribe((folders) => {
+      expect(folders).toEqual([
+        {
+          id: 'folder-classics',
+          name: 'Classiques',
+        },
+      ]);
+    });
+
+    const request = httpTestingController.expectOne('/api/folders');
+
+    expect(request.request.method).toBe('GET');
+
+    request.flush([
+      {
+        id: 'folder-classics',
+        name: 'Classiques',
+      },
+    ]);
+  });
+
+  it('creates a personal cocktail folder', () => {
+    service
+      .createPersonalFolder({
+        name: 'Créations',
+      })
+      .subscribe((folder) => {
+        expect(folder).toEqual({
+          id: 'folder-creations',
+          name: 'Créations',
+        });
+      });
+
+    const request = httpTestingController.expectOne('/api/folders');
+
+    expect(request.request.method).toBe('POST');
+
+    expect(request.request.body).toEqual({
+      name: 'Créations',
+    });
+
+    request.flush({
+      id: 'folder-creations',
+      name: 'Créations',
+    });
+  });
+
+  it('loads personal cocktail tags', () => {
+    service.getPersonalTags().subscribe((tags) => {
+      expect(tags).toEqual([
+        {
+          id: 'tag-citrus',
+          name: 'Agrumes',
+          slug: 'agrumes',
+        },
+      ]);
+    });
+
+    const request = httpTestingController.expectOne('/api/tags');
+
+    expect(request.request.method).toBe('GET');
+
+    request.flush([
+      {
+        id: 'tag-citrus',
+        name: 'Agrumes',
+        slug: 'agrumes',
+      },
+    ]);
+  });
+
+  it('replaces a cocktail organization', () => {
+    const payload = {
+      folderId: '550e8400-e29b-41d4-a716-446655440000',
+      tagNames: ['Classique', 'Agrumes'],
+    };
+
+    service.updatePersonalCocktailOrganization('création spéciale', payload).subscribe((result) => {
+      expect(result).toEqual({
+        folder: {
+          id: payload.folderId,
+          name: 'Classiques',
+        },
+        tags: [
+          {
+            id: 'tag-classic',
+            name: 'Classique',
+            slug: 'classique',
+          },
+          {
+            id: 'tag-citrus',
+            name: 'Agrumes',
+            slug: 'agrumes',
+          },
+        ],
+      });
+    });
+
+    const request = httpTestingController.expectOne(
+      '/api/cocktails/cr%C3%A9ation%20sp%C3%A9ciale/organization',
+    );
+
+    expect(request.request.method).toBe('PUT');
+
+    expect(request.request.body).toEqual(payload);
+
+    request.flush({
+      folder: {
+        id: payload.folderId,
+        name: 'Classiques',
+      },
+      tags: [
+        {
+          id: 'tag-classic',
+          name: 'Classique',
+          slug: 'classique',
+        },
+        {
+          id: 'tag-citrus',
+          name: 'Agrumes',
+          slug: 'agrumes',
+        },
+      ],
     });
   });
 });
