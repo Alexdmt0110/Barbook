@@ -97,8 +97,15 @@ model Folder {
   name        String
   workspaceId String
 
-  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  /**
+   * Relation historique temporairement conservée pendant
+   * la migration expand/contract.
+   */
   cocktails Cocktail[]
+
+  memberships CocktailFolder[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -125,14 +132,21 @@ model Cocktail {
   folderId      String?
   mainAlcoholId String?
 
-  workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  folder      Folder?     @relation(fields: [workspaceId, folderId], references: [workspaceId, id], onDelete: Restrict)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  /**
+   * Relation historique temporairement conservée pendant
+   * la migration expand/contract.
+   */
+  folder Folder? @relation(fields: [workspaceId, folderId], references: [workspaceId, id], onDelete: Restrict)
+
   mainAlcohol Ingredient? @relation("CocktailMainAlcohol", fields: [workspaceId, mainAlcoholId], references: [workspaceId, id], onDelete: Restrict)
 
-  ingredients CocktailIngredient[]
-  garnishes   GarnishIngredient[]
-  steps       PreparationStep[]
-  tags        CocktailTag[]
+  ingredients       CocktailIngredient[]
+  garnishes         GarnishIngredient[]
+  steps             PreparationStep[]
+  tags              CocktailTag[]
+  folderMemberships CocktailFolder[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -145,6 +159,18 @@ model Cocktail {
   @@index([workspaceId, type])
   @@index([workspaceId, mainAlcoholId])
   @@index([workspaceId, method])
+}
+
+model CocktailFolder {
+  workspaceId String
+  cocktailId  String
+  folderId    String
+
+  cocktail Cocktail @relation(fields: [workspaceId, cocktailId], references: [workspaceId, id], onDelete: Cascade)
+  folder   Folder   @relation(fields: [workspaceId, folderId], references: [workspaceId, id], onDelete: Cascade)
+
+  @@id([cocktailId, folderId])
+  @@index([workspaceId, folderId])
 }
 
 model Ingredient {
