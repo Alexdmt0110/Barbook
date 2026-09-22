@@ -42,6 +42,14 @@ interface TransactionMock {
     }>;
     findMany: QueryMock<TagRecord[]>;
   };
+  cocktailFolder: {
+    deleteMany: QueryMock<{
+      count: number;
+    }>;
+    createMany: QueryMock<{
+      count: number;
+    }>;
+  };
   cocktailTag: {
     deleteMany: QueryMock<{
       count: number;
@@ -103,6 +111,14 @@ describe('CocktailOrganizationService', () => {
   }>;
 
   let transactionTagFindMany: QueryMock<TagRecord[]>;
+
+  let cocktailFolderDeleteMany: QueryMock<{
+    count: number;
+  }>;
+
+  let cocktailFolderCreateMany: QueryMock<{
+    count: number;
+  }>;
 
   let cocktailTagDeleteMany: QueryMock<{
     count: number;
@@ -173,6 +189,20 @@ describe('CocktailOrganizationService', () => {
       [Record<string, unknown>]
     >();
 
+    cocktailFolderDeleteMany = jest.fn<
+      Promise<{
+        count: number;
+      }>,
+      [Record<string, unknown>]
+    >();
+
+    cocktailFolderCreateMany = jest.fn<
+      Promise<{
+        count: number;
+      }>,
+      [Record<string, unknown>]
+    >();
+
     cocktailTagDeleteMany = jest.fn<
       Promise<{
         count: number;
@@ -198,6 +228,10 @@ describe('CocktailOrganizationService', () => {
       tag: {
         createMany: transactionTagCreateMany,
         findMany: transactionTagFindMany,
+      },
+      cocktailFolder: {
+        deleteMany: cocktailFolderDeleteMany,
+        createMany: cocktailFolderCreateMany,
       },
       cocktailTag: {
         deleteMany: cocktailTagDeleteMany,
@@ -259,6 +293,14 @@ describe('CocktailOrganizationService', () => {
     });
 
     transactionTagFindMany.mockResolvedValue([]);
+
+    cocktailFolderDeleteMany.mockResolvedValue({
+      count: 0,
+    });
+
+    cocktailFolderCreateMany.mockResolvedValue({
+      count: 0,
+    });
 
     cocktailTagDeleteMany.mockResolvedValue({
       count: 0,
@@ -519,6 +561,23 @@ describe('CocktailOrganizationService', () => {
       },
     });
 
+    expect(cocktailFolderDeleteMany).toHaveBeenCalledWith({
+      where: {
+        workspaceId: 'workspace-123',
+        cocktailId: 'cocktail-123',
+      },
+    });
+
+    expect(cocktailFolderCreateMany).toHaveBeenCalledWith({
+      data: [
+        {
+          workspaceId: 'workspace-123',
+          cocktailId: 'cocktail-123',
+          folderId: 'folder-123',
+        },
+      ],
+    });
+
     expect(cocktailTagDeleteMany).toHaveBeenCalledWith({
       where: {
         workspaceId: 'workspace-123',
@@ -589,6 +648,15 @@ describe('CocktailOrganizationService', () => {
       },
     });
 
+    expect(cocktailFolderDeleteMany).toHaveBeenCalledWith({
+      where: {
+        workspaceId: 'workspace-123',
+        cocktailId: 'cocktail-123',
+      },
+    });
+
+    expect(cocktailFolderCreateMany).not.toHaveBeenCalled();
+
     expect(cocktailTagDeleteMany).toHaveBeenCalledTimes(1);
 
     expect(cocktailTagCreateMany).not.toHaveBeenCalled();
@@ -611,6 +679,9 @@ describe('CocktailOrganizationService', () => {
 
     expect(transactionCocktailUpdate).not.toHaveBeenCalled();
 
+    expect(cocktailFolderDeleteMany).not.toHaveBeenCalled();
+    expect(cocktailFolderCreateMany).not.toHaveBeenCalled();
+
     expect(cocktailTagDeleteMany).not.toHaveBeenCalled();
   });
 
@@ -631,6 +702,9 @@ describe('CocktailOrganizationService', () => {
     expect(transactionFolderFindUnique).not.toHaveBeenCalled();
 
     expect(transactionCocktailUpdate).not.toHaveBeenCalled();
+
+    expect(cocktailFolderDeleteMany).not.toHaveBeenCalled();
+    expect(cocktailFolderCreateMany).not.toHaveBeenCalled();
   });
 
   it('rejects a tag name that cannot produce a canonical slug', async () => {
@@ -661,6 +735,9 @@ describe('CocktailOrganizationService', () => {
     ).rejects.toBeInstanceOf(InternalServerErrorException);
 
     expect(transactionCocktailUpdate).not.toHaveBeenCalled();
+
+    expect(cocktailFolderDeleteMany).not.toHaveBeenCalled();
+    expect(cocktailFolderCreateMany).not.toHaveBeenCalled();
   });
 
   it('fails before accessing organization data when the personal workspace is missing', async () => {

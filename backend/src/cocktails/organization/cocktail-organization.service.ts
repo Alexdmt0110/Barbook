@@ -8,9 +8,11 @@ import {
 import { isPrismaKnownRequestError } from '../../common/prisma-errors';
 import { toSlug } from '../../common/slug';
 import { PrismaService } from '../../database/prisma.service';
-import { CocktailOrganizationResult } from './cocktail-organization.types';
-import { CocktailOrganizationFolder } from './cocktail-organization.types';
-import { CocktailOrganizationTag } from './cocktail-organization.types';
+import {
+  CocktailOrganizationFolder,
+  CocktailOrganizationResult,
+  CocktailOrganizationTag,
+} from './cocktail-organization.types';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import { UpdateCocktailOrganizationDto } from './dto/update-cocktail-organization.dto';
 
@@ -205,10 +207,13 @@ export class CocktailOrganizationService {
       }
 
       /*
-       * L'UPDATE verrouille la ligne du cocktail avant
-       * le remplacement des associations de tags.
-       * Deux modifications concurrentes du même cocktail
-       * sont ainsi sérialisées par PostgreSQL.
+       * L'UPDATE verrouille la ligne du cocktail avant le remplacement
+       * de ses relations d'organisation.
+       *
+       * Pendant la phase de transition expand/contract, folderId reste
+       * écrit en parallèle de CocktailFolder afin que l'ancien contrat
+       * frontend reste fonctionnel sans permettre aux deux modèles de
+       * diverger.
        */
       await transaction.cocktail.update({
         where: {
@@ -221,6 +226,25 @@ export class CocktailOrganizationService {
           folderId: folder?.id ?? null,
         },
       });
+
+      await transaction.cocktailFolder.deleteMany({
+        where: {
+          workspaceId,
+          cocktailId: cocktail.id,
+        },
+      });
+
+      if (folder) {
+        await transaction.cocktailFolder.createMany({
+          data: [
+            {
+              workspaceId,
+              cocktailId: cocktail.id,
+              folderId: folder.id,
+            },
+          ],
+        });
+      }
 
       await transaction.cocktailTag.deleteMany({
         where: {
