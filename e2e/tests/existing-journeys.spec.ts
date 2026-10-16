@@ -19,7 +19,10 @@ test('register, create, classify, filter, reload and log back in', async ({ page
   await page.getByLabel('Mot de passe', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Créer mon Barbook', exact: true }).click();
   await expect(page).toHaveURL('http://127.0.0.1:4200/');
-  await page.getByRole('link', { name: 'Mes cocktails', exact: true }).click();
+  await page
+    .getByRole('navigation', { name: 'Navigation principale' })
+    .getByRole('link', { name: 'Mes cocktails', exact: true })
+    .click();
   await page.getByRole('link', { name: /Nouveau cocktail/ }).click();
   await expect(page).toHaveURL(/\/cocktails\/new$/);
 
@@ -85,7 +88,10 @@ test('register, create, classify, filter, reload and log back in', async ({ page
     page.getByRole('button', { name: `Retirer le tag ${tagName}`, exact: true }),
   ).toBeVisible();
 
-  await page.getByRole('link', { name: 'Mes cocktails', exact: true }).click();
+  await page
+    .getByRole('navigation', { name: 'Navigation principale' })
+    .getByRole('link', { name: 'Mes cocktails', exact: true })
+    .click();
   const filteredResponse = page.waitForResponse((response) => {
     const url = new URL(response.url());
     return (
@@ -115,7 +121,10 @@ test('register, create, classify, filter, reload and log back in', async ({ page
   await page.getByLabel('Mot de passe', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Se connecter', exact: true }).click();
   await expect(page).toHaveURL('http://127.0.0.1:4200/');
-  await page.getByRole('link', { name: 'Mes cocktails', exact: true }).click();
+  await page
+    .getByRole('navigation', { name: 'Navigation principale' })
+    .getByRole('link', { name: 'Mes cocktails', exact: true })
+    .click();
   await expect(page.getByRole('heading', { name, exact: true })).toBeVisible();
 });
 
