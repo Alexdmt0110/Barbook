@@ -4,8 +4,8 @@ Autorisation explicite d'Alex, 16 octobre 2026 : commencer L0, puis L1 et L2. La
 
 | Lot | État initial | Critères de sortie | Branches |
 | --- | --- | --- | --- |
-| L0 — Reprise durable | EN_COURS | accès branche/commit/publication prouvé ; pilotage versionné ; handoff distant lisible ; branche dossiers préservée | docs/project-pilotage |
-| L1 — Socle | APPROUVE | slug réservé new et mainAlcoholName:null corrigés ; régressions ; dépendances analysées/corrigées proportionnellement ; verify réels | fix/cocktail-creation-boundaries ; hardening/runtime-dependencies et/ou hardening/toolchain-dependencies selon analyse |
+| L0 — Reprise durable | PR #20, CI verte ; merge à valider | accès branche/commit/publication prouvé ; pilotage versionné ; handoff distant lisible ; branche dossiers préservée | docs/project-pilotage |
+| L1 — Socle | EN_COURS : création corrigée/poussée ; dépendances ensuite | slug réservé new et mainAlcoholName:null corrigés ; régressions ; dépendances analysées/corrigées proportionnellement ; verify réels | fix/cocktail-creation-boundaries ; hardening/runtime-dependencies et/ou hardening/toolchain-dependencies selon analyse |
 | L2 — Intégration | APPROUVE | migrations PostgreSQL exécutées ; contraintes/transactions/isolation vérifiées ; vrais HTTP et E2E ; CI renforcée sans contourner les échecs | test/critical-persistence-flows ; test/critical-browser-flows |
 | L3 — Dossiers | SUSPENDUE_POUR_REMEDIATION_DU_SOCLE | checkpoint L2 et stratégie présentés au propriétaire ; autorisation de reprise à obtenir | feature/cocktail-folder-management existante |
 | L4–L11 | PROPOSE_NON_APPROUVE | décisions et périmètre à approuver au moment utile | voir archive phase A |
