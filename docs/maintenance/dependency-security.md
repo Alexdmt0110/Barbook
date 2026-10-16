@@ -1,5 +1,43 @@
 # Sécurité des dépendances
 
+## Contrôle du 16 octobre 2026 — L1
+
+Revue préventive : corriger les chaînes signalées sans changer de version majeure Angular/Nest/Prisma, conserver les contrôles et les overrides Prisma existants, puis vérifier les lockfiles, l'installation reproductible et les chemins affectés. Le passage Jest 29 → 30 est limité aux outils de tests et justifié par la suppression de la chaîne braces non corrigée ; Node 24 et TypeScript 5.9 satisfont ses prérequis. Aucun changement métier, API, schéma ou migration.
+
+Résultat observé après npm ci et vérifications :
+
+| Application | Audit complet initial phase A | Complet après correction | Production après correction |
+| --- | --- | --- | --- |
+| Backend | 38 paquets signalés (2 critiques, 34 hauts, 2 modérés) | 0 | 0 |
+| Frontend | 13 paquets signalés (3 critiques, 8 hauts, 2 modérés) | 0 | 0 |
+
+Ces nombres comptent des paquets signalés, pas des failles indépendantes. Ils sont datés, issus du registre npm et des lockfiles ; ils ne prouvent pas l'absence de faille ni l'état d'une image déployée. Les commandes, compteurs et versions sont dans [le relevé JSON](security-audit-2026-10-16.json).
+
+- Angular framework/compilateur/router : 21.2.25 ; CLI/build : 21.2.27, versions de patch compatibles. Les peers exacts du framework sont alignés.
+- Nest platform-express : 11.2.7 ; multer 2.4.0, proxy-addr 2.0.8, fast-uri 3.1.8, handlebars 4.7.10 et autres correctifs transitifs compatibles verrouillés.
+- Jest : 30.5.2, @types/jest 30.0.0 et ts-jest 29.4.15 (peer Jest 29/30). Les signatures et assertions des tests existants n'ont pas été amputées pour compiler.
+- Prisma/client/adapter-pg restent à 7.10.0 ; les overrides deepmerge-ts/mysql2 restent inchangés.
+
+Exposition analysée : Barbook ne fait pas de SSR, n'a pas d'endpoint upload et configure trust proxy avec un nombre de sauts, alors que certains avis supposent SSR, upload ou un sous-réseau IPv6 mal configuré. Ces préconditions n'ont pas été démontrées dans l'application. Les correctifs disponibles sont néanmoins appliqués ; les dépendances de build/test sont aussi traitées. La future image de production reste à auditer séparément.
+
+### Override NYC / js-yaml
+
+@istanbuljs/load-nyc-config 1.1.0 exige encore js-yaml 3, qui entraîne argparse 1 et sprintf-js sans correctif publié pour GHSA-hp3w-g68c-fv3c. Son unique appel au parseur est load(), conservé en js-yaml 4. Un override **limité à ce parent** impose js-yaml 4.3.2 et retire cette chaîne. Ne pas accepter le downgrade vers un ancien ts-jest suggéré par audit fix --force.
+
+Le script npm run test:dependency-compatibility vérifie réellement le chargement d'une configuration YAML avec héritage, CommonJS et le refus des balises JavaScript. Il est inclus dans npm run verify. npm ls js-yaml sprintf-js --all confirme l'override effectif et l'absence de sprintf-js ; un simple ajout à package.json ne suffisait pas tant que le lockfile conservait le parseur 3.
+
+Retirer cet override lorsque le lecteur NYC utilise nativement js-yaml corrigé sans argparse 1/sprintf-js, puis rejouer le test dédié, la couverture Jest et les deux audits.
+
+### Vérifications et CI
+
+Depuis chaque application : npm ci, npm run verify, npm run audit:security. Backend : 18 suites/124 tests, validation Prisma et test de compatibilité ; frontend : 17 fichiers/109 tests, lint/build. Les régressions de création de la PR distincte #21 ne sont pas dupliquées dans cette branche basée sur main.
+
+La CI Dependency Security exécute les audits complet et production des deux lockfiles ; seuil bloquant moderate, aucune exception ni continue-on-error. Les contrôles Backend Quality et Frontend Quality existants sont conservés. Les checks supplémentaires devront être ajoutés aux règles de protection de main après validation du propriétaire ; cette branche ne modifie aucune protection ni autorisation de merge.
+
+Sources : [Jest 30](https://jestjs.io/docs/upgrading-to-jest30), [braces](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm), [proxy-addr](https://github.com/advisories/GHSA-jqcg-44mw-7w3h), [sprintf-js](https://github.com/advisories/GHSA-hp3w-g68c-fv3c), code publié de @istanbuljs/load-nyc-config 1.1.0 et peerDependencies de ts-jest 29.4.15.
+
+Les sections suivantes conservent l'historique des choix antérieurs. Les commandes seed/migrate qui y sont citées ne sont pas annoncées comme exécutées dans ce bloc L1.
+
 ## Objectif
 
 Ce document décrit les décisions de sécurité liées aux dépendances de Barbook qui ne sont pas évidentes à la seule lecture des fichiers `package.json` et `package-lock.json`.
