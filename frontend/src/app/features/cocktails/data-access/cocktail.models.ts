@@ -131,7 +131,7 @@ export interface CreateCocktailRequest {
   glass: string;
   ice?: string;
   notes?: string;
-  mainAlcoholName?: string;
+  mainAlcoholName?: string | null;
   ingredients: CreateCocktailIngredientRequest[];
   garnishes?: CreateCocktailGarnishRequest[];
   steps: string[];

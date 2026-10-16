@@ -10,6 +10,7 @@ import { Prisma } from '../generated/prisma/client';
 import {
   CocktailCreationInvariantError,
   CocktailCreationValidationError,
+  createCocktailSlug,
   requireCocktailCreationSlug,
   ResolvedCatalogIngredient,
   ResolvedRecipeIngredient,
@@ -54,9 +55,7 @@ export class CocktailCreationService {
 
     const workspaceId = personalWorkspace.id;
 
-    const slug = this.evaluateRule(() =>
-      requireCocktailCreationSlug(dto.name, 'Cocktail name'),
-    );
+    const slug = this.evaluateRule(() => createCocktailSlug(dto.name));
 
     const recipeIngredientSlugs = this.evaluateRule(() =>
       validateRecipeIngredients(dto.ingredients),
@@ -64,13 +63,12 @@ export class CocktailCreationService {
 
     this.evaluateRule(() => validateGarnishes(dto.garnishes ?? []));
 
+    const mainAlcoholName = dto.mainAlcoholName;
+
     const mainAlcoholSlug =
-      dto.mainAlcoholName !== undefined
+      mainAlcoholName !== undefined && mainAlcoholName !== null
         ? this.evaluateRule(() =>
-            requireCocktailCreationSlug(
-              dto.mainAlcoholName as string,
-              'Main alcohol name',
-            ),
+            requireCocktailCreationSlug(mainAlcoholName, 'Main alcohol name'),
           )
         : null;
 
