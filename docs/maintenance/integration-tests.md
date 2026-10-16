@@ -1,4 +1,4 @@
-# Tests d'intégration PostgreSQL et HTTP
+# Tests d'intégration PostgreSQL, HTTP et navigateur
 
 Le workflow `Integration` démarre un PostgreSQL 16 jetable, sans volume persistant,
 sur chaque PR/main et sur la branche de travail L2. Il conserve les workflows
@@ -40,6 +40,41 @@ utiliser PostgreSQL. `test:integration:prepare` applique les migrations,
 répète deploy pour vérifier l'idempotence, vérifie leur statut et échoue si
 Prisma détecte un écart au schéma attendu. `test:e2e` doit réellement se connecter
 à PostgreSQL ; il ne saute aucun test lorsque la base manque.
+
+## Parcours navigateur
+
+Le job distinct `Browser Integration` utilise sa propre base jetable, le serveur
+API compilé et Angular. Le paquet privé `e2e` contient quatre essais Chromium :
+deux scénarios sur ordinateur et sur une fenêtre mobile tactile de 390 × 844.
+Ils vérifient l'inscription, la saisie clavier, la création d'une recette avec
+conversion CL/ML, l'échappement du nom, le classement dossier/tag, les filtres,
+le rechargement, la reconnexion et le rejet réel d'un JWT expiré. Les réponses
+HTTP et les données persistées sont contrôlées sans interception ni mock.
+
+Après préparation d'une autre base jetable et des mêmes variables de sécurité :
+
+```sh
+npm ci --prefix backend
+npm ci --prefix frontend
+npm ci --prefix e2e
+npm run build --prefix backend
+npm run test:integration:prepare --prefix backend
+cd e2e
+npm run typecheck
+npm run audit:security
+npx playwright install --with-deps chromium
+npm test
+```
+
+Playwright refuse de réutiliser un serveur déjà présent sur les ports 3000/4200.
+Le garde de configuration est exécuté avant tout lancement. Les données sont
+synthétiques et le secret JWT doit être propre à cette base de test. La CI
+conserve le rapport et, en cas d'échec, traces, vidéos et captures pendant sept
+jours. Ces sorties sont ignorées par Git. Aucun retry ne masque un échec.
+
+Ces quatre essais couvrent des parcours représentatifs existants ; ils ne
+prouvent pas une accessibilité exhaustive, ni une compatibilité Safari/iOS,
+Firefox ou appareil physique. Le scénario mobile utilise Chromium émulé.
 
 ## Couverture et limites
 
