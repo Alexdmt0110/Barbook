@@ -1,48 +1,64 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-16T14:12:14.282966+00:00"
+checkpoint_utc: "2026-10-16"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
 handoff_status: "EN_COURS"
-feature: "L2 — tests PostgreSQL/HTTP publiés ; corrections de la première CI en cours"
+feature: "L0/L1 en PR ; L2 PostgreSQL vert, qualification navigateur en CI"
 branch: "test/critical-integration-flows"
 base_branch: "main"
-remote_head_sha: "9e63d94adcfe0c7a6cdbcd0871d0c5129013f388"
-local_head_sha: "9e63d94adcfe0c7a6cdbcd0871d0c5129013f388"
-worktree: "propre sur la branche sécurité ; mise à jour de checkpoint sur docs/project-pilotage"
-pr: "#20 pilotage, #21 création, #22 sécurité : ouvertes, checks observés success ; aucun merge"
-tests: "L1 CI verte ; L2 local 124 unitaires + 10 sécurité/lint/build/Prisma/tsc passés ; CI migrations/drift verts, tests natifs 32 passés/3 échoués ; navigateur non exécuté"
-migrations: "3 migrations de main appliquées uniquement sur PostgreSQL CI jetable, run 38913055230, service détruit ; état base propriétaire/VPS inconnu"
-changes_pushed: "pilotage d3bf513 et 874ccbe ; correctif e925cbb ; sécurité ab756e6, SHA complets ci-dessous"
-unpushed_changes: "aucun applicatif ; mise à jour du présent journal sur sa branche de pilotage"
-decisions_validated: "L0–L2 ; suspension dossiers ; choix techniques ordinaires documentés ; aucun merge/production"
-decisions_pending: "D1–D8 ; reprise L3 après checkpoint L2"
-next_atomic_step: "corriger la course Ingredient par reprise bornée de transaction, ajouter CHECK garniture via migration additive, corriger la fixture ; tests et push puis revue entière"
-risks_and_blockers: "CI L2 rouge : 32 succès/3 échecs natifs ; aucune PR L2 autorisée tant que corrigée et entièrement revue ; PostgreSQL local indisponible"
+remote_head_sha: "688aeacbdbc0de57183408f24d0f9431eb3ce31b"
+local_head_sha: "688aeacbdbc0de57183408f24d0f9431eb3ce31b"
+worktree: "L2 propre ; checkpoint documentaire sur docs/project-pilotage"
+pr: "#20 pilotage, #21 création, #22 sécurité ouvertes ; L2 sans PR avant Review Gate complet"
+tests: "L1 vert ; L2 126 unitaires + 10 garde-fous + 36 tests PostgreSQL/HTTP natifs verts au commit bae6a3c ; navigateur typé, 4 essais détectés, audit zéro, exécution en cours"
+migrations: "4 migrations appliquées/réappliquées/status/drift verts uniquement sur PostgreSQL CI jetable ; aucune base propriétaire/VPS touchée"
+changes_pushed: "L0/L1 et trois commits L2 ; SHA complets et preuves ci-dessous"
+unpushed_changes: "aucun applicatif ; seul ce checkpoint documentaire en préparation"
+decisions_validated: "L0–L2 et décisions techniques ordinaires dans ce périmètre ; aucun merge/production"
+decisions_pending: "D1–D8 ; merges ; reprise L3 après checkpoint final L2"
+next_atomic_step: "lire le run navigateur 38916754084, corriger tout échec puis reprendre la revue entière contre main avant PR L2"
+risks_and_blockers: "résultat navigateur encore inconnu ; PostgreSQL et navigateur non exécutés localement ; ensemble des branches non mergé/non qualifié ensemble"
 production_effect: "aucun"
 ```
 
-## Branches et références de reprise
+## Références exactes
 
-- Main vérifié : `3f9dfdbd3115380960296db3c7025715d48db55c` ; aucun merge effectué.
-- Pilotage canonique : `docs/project-pilotage`, [PR #20](https://github.com/Alexdmt0110/Barbook/pull/20). Lire le SHA courant de cette branche : le présent fichier ne peut pas contenir le SHA du commit qui le porte.
-- Correctif création : `fix/cocktail-creation-boundaries`, commit `e925cbbe99e2ff3b93d26e32c3d41509726fb0a3`, 9 fichiers (règles/service/DTO backend et tests, contrat/test frontend, guide de création). Aucun changement non poussé sur cette branche.
-- Sécurité : `hardening/dependency-security`, [PR #22](https://github.com/Alexdmt0110/Barbook/pull/22), commit `ab756e690ee5817f2689c834afe4fdd1b3daf694`, 8 fichiers : manifestes/locks frontend/backend, workflow d’audit, test de compatibilité, guide et relevé. Audits à zéro ; CI complète verte.
-- L2 : `test/critical-integration-flows`, commit `9e63d94adcfe0c7a6cdbcd0871d0c5129013f388`, 16 fichiers, aucune PR. Run [38913055230](https://github.com/Alexdmt0110/Barbook/actions/runs/38913055230) en échec, corrections prévues dans review-log.md.
-- Dossiers : `feature/cocktail-folder-management` à `46321485d1d28351da7e0b555411199f40fa801a`, SUSPENDUE_POUR_REMEDIATION_DU_SOCLE. Commits `420357d2b0f7375c2121f9d62551607ef0cb561e`, `c5a87663cb3cd38815a661dcb89073034235ae55`, `46321485d1d28351da7e0b555411199f40fa801a` intacts.
+| Branche | SHA applicatif / preuve | État |
+| --- | --- | --- |
+| main | `3f9dfdbd3115380960296db3c7025715d48db55c` | inchangé, aucun merge effectué |
+| docs/project-pilotage | lire la ref distante ; ce fichier ne peut contenir son propre SHA | [PR #20](https://github.com/Alexdmt0110/Barbook/pull/20), journal canonique |
+| fix/cocktail-creation-boundaries | `e925cbbe99e2ff3b93d26e32c3d41509726fb0a3` | [PR #21](https://github.com/Alexdmt0110/Barbook/pull/21), CI verte |
+| hardening/dependency-security | `ab756e690ee5817f2689c834afe4fdd1b3daf694` | [PR #22](https://github.com/Alexdmt0110/Barbook/pull/22), CI et audits verts |
+| test/critical-integration-flows | `688aeacbdbc0de57183408f24d0f9431eb3ce31b` | CI navigateur en cours, aucune PR |
+| feature/cocktail-folder-management | `46321485d1d28351da7e0b555411199f40fa801a` | SUSPENDUE_POUR_REMEDIATION_DU_SOCLE, intacte |
 
-## Environnement et limites
+Les trois commits dossiers préservés sont `420357d2b0f7375c2121f9d62551607ef0cb561e`, `c5a87663cb3cd38815a661dcb89073034235ae55`, `46321485d1d28351da7e0b555411199f40fa801a`. Ne pas les réécrire, dupliquer ou supprimer.
 
-Accès GitHub réel rétabli : compte Alexdmt0110, création branche, objets commit, publication non forcée et relecture des refs réussies. Clone de travail ordinaire ; publication via API Git avec parent attendu. Le clone bare miroir de l'audit reste réservé à la lecture : aucun push miroir.
+## Preuves déjà obtenues et prochain contrôle
 
-Node 24.19.0/npm 11.9.0, npm ci réussi frontend/backend. Les vérifications applicatives ci-dessus sont locales et réelles. Aucun PostgreSQL ni navigateur de l'application testé à ce stade. La compilation produit backend/dist/src/main.js ; le script start:prod cible actuellement dist/main : vérifier ce défaut de démarrage dans L2 avant toute qualification déployable.
+L1 création : backend 18 suites/139 tests, frontend 17 fichiers/110 tests, lint/build/Prisma verts. Régression reproduite avant correction. Aucun changement de migration. Les éventuels anciens slugs `new` d'une base réelle restent à inventorier.
 
-## Protocole de reprise
+L1 sécurité : backend 124 tests et compatibilité NYC, frontend 109 tests, lint/build et quatre audits complets/production à zéro le 16 octobre 2026. Aucun avis ignoré ou contrôle désactivé. Les PR indépendantes sont basées sur le même main ; ces nombres ne s'additionnent pas en une exécution combinée.
 
-Lire les consignes privées fournies et ce journal, vérifier branches/commits/PR/CI et changements locaux avant d'écrire. Un seul responsable par branche/tranche ; la demande d'Alex reprend ici WORK, sans relais concurrent annoncé. Pour un transfert Work ↔ Chat classique, arrêter l'écrivain précédent, synchroniser, puis faire confirmer la passation par Alex. Toute divergence : diagnostic, sans force push ni duplication de commits.
+L2 initial `9e63d94adcfe0c7a6cdbcd0871d0c5129013f388`, run [38913055230](https://github.com/Alexdmt0110/Barbook/actions/runs/38913055230) : migrations vertes, 32 tests natifs passés/3 échoués. Deux anomalies confirmées et une fixture invalide corrigées dans `bae6a3cb6622db221ca1e13bbc7dcc981ba2675f` : reprise bornée des courses Ingredient, CHECK garniture TOP_UP, marqueur de test raccourci sans réduire les assertions.
 
-L0 → L1 → L2 uniquement. Les branches indépendantes partent de main tant que leurs merges ne sont pas validés. Après les merges autorisés, requalifier l'ensemble sur main ; ne pas recopier des correctifs entre branches. Après L2, présenter checkpoint et stratégie L3, sans commencer L3. D1–D8 restent ouvertes pour les phases concernées.
+Run correctif [38914620367](https://github.com/Alexdmt0110/Barbook/actions/runs/38914620367) entièrement vert : 126 unitaires, 10 garde-fous, 3 suites/36 tests réels PostgreSQL/HTTP, quatre migrations fraîches et seconde application sans migration restante, statut à jour, aucun drift, démarrage compilé `dist/main.js` et `/api` vérifiés. Le défaut initial d'empaquetage `dist/src/main.js` est corrigé par la limitation du build aux sources serveur.
 
-Git : 4 branches nouvelles publiées, PR #20/#21/#22 ouvertes et vertes, L2 sans PR en correction CI, aucun merge. VM : aucune intervention. SQL : 3 migrations uniquement sur CI jetable ; aucun seed/reset/base propriétaire/VPS. Infra : aucun changement de production.
+Le commit navigateur `688aeacbdbc0de57183408f24d0f9431eb3ce31b` est publié et ses huit blobs distants vérifiés. Installation reproductible, typage, audit zéro et détection des quatre essais réussis localement. Run [38916754084](https://github.com/Alexdmt0110/Barbook/actions/runs/38916754084) en cours : ne pas annoncer les parcours navigateur opérationnels avant lecture des résultats. La CI doit aussi tracer l'origine de la dépréciation pg observée ; ne pas la supprimer sans diagnostic.
+
+## Environnement, migrations et périmètre
+
+Accès rétabli avec le compte propriétaire Alexdmt0110 : branche/commit/publication non forcée réels puis relecture des SHA, messages et empreintes des blobs. Le transport Git CLI ne dispose pas d'identifiants ; utiliser les API Git avec parent attendu, puis fetch et synchronisation locale en avance rapide. Le miroir bare de l'audit reste en lecture seule, jamais de push miroir.
+
+Local : Node 24.19.0/npm 11.9.0. Pas de PostgreSQL/Docker utilisable ni de preuve navigateur locale ; les exécutions natives sont celles de GitHub Actions (Node 24, PostgreSQL 16 jetable). Aucun accès VM, seed/reset de propriétaire ou déploiement. Les bases réelles, sauvegardes et images de production ne sont pas qualifiées.
+
+La nouvelle migration additive `20261016141503_garnish_unit_integrity` n'altère aucune ligne : elle refuse les données historiques TOP_UP invalides et ajoute un CHECK conforme à l'API. Prévalidation et éventuelle réconciliation à décider avant toute application autorisée sur une base réelle. Les migrations antérieures sont inchangées. Les deux ordres d'upgrade avec l'EXPAND dossiers restent à qualifier en L3 sans renommer l'ancienne migration.
+
+## Protocole Work ↔ Chat classique
+
+Un seul écrivain actif par tranche/branche. Pour reprendre : lire les sources normatives privées, ce journal, roadmap, décisions et review-log ; vérifier refs, commits, PR, CI, worktrees et éventuels changements locaux. Si transfert vers Chat classique, arrêter WORK puis annoncer le nouveau responsable avec Alex et publier le checkpoint du nouveau détenteur. Aucun travail concurrent annoncé ici. Toute divergence exige un diagnostic ; jamais de force push ou copie de commits pour la masquer.
+
+Les merges et la production ne sont pas autorisés. Après merges explicitement approuvés de L0/L1/L2, requalifier leur combinaison sur main. Puis présenter la reprise L3, sans commencer les dossiers avant autorisation. D1–D8 restent ouvertes pour les phases concernées. Les nouveaux checks d'intégration et d'audit ne sont pas encore ajoutés au ruleset obligatoire de main : proposer leur activation après validation des workflows.
