@@ -9,17 +9,17 @@ handoff_status: "EN_COURS"
 feature: "L0/L1 en PR ; L2 PostgreSQL vert, qualification navigateur en CI"
 branch: "test/critical-integration-flows"
 base_branch: "main"
-remote_head_sha: "688aeacbdbc0de57183408f24d0f9431eb3ce31b"
-local_head_sha: "688aeacbdbc0de57183408f24d0f9431eb3ce31b"
+remote_head_sha: "634dc3d96776a0e4e08881033c6d515b8e49d91e"
+local_head_sha: "634dc3d96776a0e4e08881033c6d515b8e49d91e"
 worktree: "L2 propre ; checkpoint documentaire sur docs/project-pilotage"
 pr: "#20 pilotage, #21 création, #22 sécurité ouvertes ; L2 sans PR avant Review Gate complet"
 tests: "L1 vert ; L2 126 unitaires + 10 garde-fous + 36 tests PostgreSQL/HTTP natifs verts au commit bae6a3c ; navigateur typé, 4 essais détectés, audit zéro, exécution en cours"
 migrations: "4 migrations appliquées/réappliquées/status/drift verts uniquement sur PostgreSQL CI jetable ; aucune base propriétaire/VPS touchée"
-changes_pushed: "L0/L1 et trois commits L2 ; SHA complets et preuves ci-dessous"
+changes_pushed: "L0/L1 et quatre commits L2 ; SHA complets et preuves ci-dessous"
 unpushed_changes: "aucun applicatif ; seul ce checkpoint documentaire en préparation"
 decisions_validated: "L0–L2 et décisions techniques ordinaires dans ce périmètre ; aucun merge/production"
 decisions_pending: "D1–D8 ; merges ; reprise L3 après checkpoint final L2"
-next_atomic_step: "lire le run navigateur 38916754084, corriger tout échec puis reprendre la revue entière contre main avant PR L2"
+next_atomic_step: "lire le run navigateur correctif 38917424000, corriger tout échec puis reprendre la revue entière contre main avant PR L2"
 risks_and_blockers: "résultat navigateur encore inconnu ; PostgreSQL et navigateur non exécutés localement ; ensemble des branches non mergé/non qualifié ensemble"
 production_effect: "aucun"
 ```
@@ -32,7 +32,7 @@ production_effect: "aucun"
 | docs/project-pilotage | lire la ref distante ; ce fichier ne peut contenir son propre SHA | [PR #20](https://github.com/Alexdmt0110/Barbook/pull/20), journal canonique |
 | fix/cocktail-creation-boundaries | `e925cbbe99e2ff3b93d26e32c3d41509726fb0a3` | [PR #21](https://github.com/Alexdmt0110/Barbook/pull/21), CI verte |
 | hardening/dependency-security | `ab756e690ee5817f2689c834afe4fdd1b3daf694` | [PR #22](https://github.com/Alexdmt0110/Barbook/pull/22), CI et audits verts |
-| test/critical-integration-flows | `688aeacbdbc0de57183408f24d0f9431eb3ce31b` | CI navigateur en cours, aucune PR |
+| test/critical-integration-flows | `634dc3d96776a0e4e08881033c6d515b8e49d91e` | nouvelle CI navigateur en cours, aucune PR |
 | feature/cocktail-folder-management | `46321485d1d28351da7e0b555411199f40fa801a` | SUSPENDUE_POUR_REMEDIATION_DU_SOCLE, intacte |
 
 Les trois commits dossiers préservés sont `420357d2b0f7375c2121f9d62551607ef0cb561e`, `c5a87663cb3cd38815a661dcb89073034235ae55`, `46321485d1d28351da7e0b555411199f40fa801a`. Ne pas les réécrire, dupliquer ou supprimer.
@@ -47,7 +47,9 @@ L2 initial `9e63d94adcfe0c7a6cdbcd0871d0c5129013f388`, run [38913055230](https:/
 
 Run correctif [38914620367](https://github.com/Alexdmt0110/Barbook/actions/runs/38914620367) entièrement vert : 126 unitaires, 10 garde-fous, 3 suites/36 tests réels PostgreSQL/HTTP, quatre migrations fraîches et seconde application sans migration restante, statut à jour, aucun drift, démarrage compilé `dist/main.js` et `/api` vérifiés. Le défaut initial d'empaquetage `dist/src/main.js` est corrigé par la limitation du build aux sources serveur.
 
-Le commit navigateur `688aeacbdbc0de57183408f24d0f9431eb3ce31b` est publié et ses huit blobs distants vérifiés. Installation reproductible, typage, audit zéro et détection des quatre essais réussis localement. Run [38916754084](https://github.com/Alexdmt0110/Barbook/actions/runs/38916754084) en cours : ne pas annoncer les parcours navigateur opérationnels avant lecture des résultats. La CI doit aussi tracer l'origine de la dépréciation pg observée ; ne pas la supprimer sans diagnostic.
+Le premier commit navigateur `688aeacbdbc0de57183408f24d0f9431eb3ce31b`, run [38916754084](https://github.com/Alexdmt0110/Barbook/actions/runs/38916754084), a confirmé un défaut visuel de sélection de dossier et une attente de test d'expiration incorrecte. Le correctif `634dc3d96776a0e4e08881033c6d515b8e49d91e` est poussé et ses blobs vérifiés. Les deux nouvelles assertions DOM échouaient avant le correctif et passent ensuite ; frontend 109 tests/lint/build et typage E2E verts. Le guard conserve légitimement returnUrl, désormais vérifié exactement par le test.
+
+Run [38917424000](https://github.com/Alexdmt0110/Barbook/actions/runs/38917424000) : PostgreSQL Integration vert, Browser Integration en cours à ce checkpoint. Ne pas annoncer le navigateur réussi avant résultat. La trace de dépréciation pg passe par PgTransaction de @prisma/adapter-pg et l'interpréteur Prisma ; pas de filtre ni montée pg 9 engagée. Installation reproductible, audit E2E zéro et détection des quatre essais réussis localement.
 
 ## Environnement, migrations et périmètre
 
