@@ -66,14 +66,13 @@
 
         <select
           id="cocktail-folder"
-          [value]="selectedFolderId() || ''"
           [disabled]="
             isSaving() ||
             isCreatingFolder()
           "
           (change)="onFolderChange($event)"
         >
-          <option value="">
+          <option value="" [selected]="selectedFolderId() === null">
             Sans dossier
           </option>
 
@@ -83,6 +82,7 @@
             ) {
             <option
               [value]="folderOption.id"
+              [selected]="folderOption.id === selectedFolderId()"
             >
               {{ folderOption.name }}
             </option>

@@ -76,6 +76,19 @@ Ces quatre essais couvrent des parcours représentatifs existants ; ils ne
 prouvent pas une accessibilité exhaustive, ni une compatibilité Safari/iOS,
 Firefox ou appareil physique. Le scénario mobile utilise Chromium émulé.
 
+Le premier passage navigateur a révélé un décalage du select de dossier : sa
+valeur était affectée avant l'insertion des options Angular et restait vide,
+alors que l'état du composant contenait le bon identifiant. La sélection est
+désormais portée par chaque option, y compris « Sans dossier ». Deux assertions
+DOM ont reproduit l'échec au chargement et après création avant correction.
+Le scénario d'expiration vérifie également le `returnUrl` prévu par le guard.
+
+Avec `--trace-deprecation`, les tests natifs montrent un avertissement de
+requêtes concurrentes sur un client pg : la pile passe par `PgTransaction`
+dans `@prisma/adapter-pg` et l'interpréteur Prisma. Les tests passent sous pg 8 ;
+aucun avertissement n'est filtré. Requalifier cette chaîne avant une montée vers
+pg 9, sans conclure à une corruption à partir de cette seule dépréciation.
+
 ## Couverture et limites
 
 - Migrations fraîches, historique Prisma, upgrade de données historiques et

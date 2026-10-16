@@ -156,7 +156,7 @@ test('expired real JWT is rejected by the API, clears storage and returns to log
   );
   await page.goto('/cocktails');
   expect((await refused).status()).toBe(401);
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).toHaveURL('http://127.0.0.1:4200/login?returnUrl=%2Fcocktails');
   expect(await page.evaluate(() => sessionStorage.getItem('barbook.accessToken'))).toBeNull();
   await expect(page.getByRole('button', { name: 'Se connecter', exact: true })).toBeVisible();
 });
