@@ -16,6 +16,8 @@ const uniqueIngredientMigration = '20260902181646_unique_recipe_ingredient';
 const workspaceIntegrityMigration =
   '20260903083501_workspace_relational_integrity';
 
+const garnishUnitMigration = '20261016141503_garnish_unit_integrity';
+
 async function withLegacySchema(
   run: (client: Client, schema: string) => Promise<void>,
 ): Promise<void> {
@@ -127,6 +129,32 @@ describe('Real migration history and upgrade', () => {
         'SELECT "workspaceId" FROM "CocktailIngredient"',
       );
       expect(migrated.rows[0].workspaceId).toBe('ws-a');
+    });
+  });
+  it('refuses invalid historical garnish units without rewriting data and validates a corrected retry', async () => {
+    await withLegacySchema(async (client) => {
+      await legacyRows(client, false);
+      await client.query(sql(workspaceIntegrityMigration));
+      await client.query(
+        `UPDATE "GarnishIngredient" SET "unit"='TOP_UP', "amount"=1 WHERE "id"='garnish-a'`,
+      );
+      await expect(client.query(sql(garnishUnitMigration))).rejects.toThrow(
+        'Reconcile historical TOP_UP garnishes',
+      );
+      await client.query('ROLLBACK');
+      const preserved = await client.query<{ unit: string }>(
+        `SELECT "unit" FROM "GarnishIngredient" WHERE "id"='garnish-a'`,
+      );
+      expect(preserved.rows[0].unit).toBe('TOP_UP');
+      await client.query(
+        `UPDATE "GarnishIngredient" SET "unit"='PIECE' WHERE "id"='garnish-a'`,
+      );
+      await client.query(sql(garnishUnitMigration));
+      await expect(
+        client.query(
+          `UPDATE "GarnishIngredient" SET "unit"='TOP_UP' WHERE "id"='garnish-a'`,
+        ),
+      ).rejects.toMatchObject({ code: '23514' });
     });
   });
 });

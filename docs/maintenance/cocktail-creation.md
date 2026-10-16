@@ -64,6 +64,14 @@ Une erreur pendant l'une de ces opérations annule l'ensemble de la création.
 
 Une recette ne doit donc jamais être persistée partiellement.
 
+Si deux recettes distinctes créent simultanément le même ingrédient canonique,
+une collision d'unicité sur `Ingredient` reprend la transaction complète, au plus
+deux fois après la tentative initiale. Le catalogue relu après reprise reste la
+source de vérité ; le degré propre à chaque recette est recalculé en override.
+Une transaction PostgreSQL avortée n'est jamais réutilisée. Une collision du
+slug du cocktail reste un `409` ; une contention du catalogue qui persiste après
+trois tentatives retourne `503` et invite à réessayer.
+
 ## Slug du cocktail
 
 Le slug est calculé côté backend à partir du nom du cocktail avec le helper commun :

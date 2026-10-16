@@ -411,7 +411,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
       .send({ folderId: originalFolder.id, tagNames: ['Original'] })
       .expect(200);
     const suffix = randomUUID().replaceAll('-', '');
-    const marker = `rollback-${suffix}`;
+    const marker = `rb-${suffix}`;
     const name = `bb_tags_${suffix}`;
     await pool.query(
       `CREATE FUNCTION "${name}"() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF EXISTS (SELECT 1 FROM "Tag" WHERE "id"=NEW."tagId" AND "slug"='${marker}') THEN RAISE EXCEPTION 'synthetic organization failure'; END IF; RETURN NEW; END $$`,
@@ -467,25 +467,37 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
 
   it('keeps distinct concurrent recipes sharing a new ingredient', async () => {
     const ingredientName = `Shared ${randomUUID()}`;
-    const ingredients = [
-      {
-        ingredientName,
-        ingredientDefaultAbv: 40,
-        amount: 50,
-        unit: MeasurementUnit.ML,
-      },
-    ];
     const responses = await Promise.all(
-      [0, 1].map(() =>
+      [40, 47].map((abv) =>
         api()
           .post('/api/cocktails')
           .set('Authorization', bearer(alice))
           .send(
-            recipePayload({ ingredients, mainAlcoholName: ingredientName }),
+            recipePayload({
+              ingredients: [
+                {
+                  ingredientName,
+                  ingredientDefaultAbv: abv,
+                  amount: 50,
+                  unit: MeasurementUnit.ML,
+                },
+              ],
+              mainAlcoholName: ingredientName,
+            }),
           ),
       ),
     );
     expect(responses.map((response) => response.status)).toEqual([201, 201]);
+    for (const [index, created] of responses.entries()) {
+      const result = created.body as CreateCocktailResult;
+      const response = await api()
+        .get(`/api/cocktails/${result.slug}`)
+        .set('Authorization', bearer(alice))
+        .expect(200);
+      expect((response.body as CocktailDetail).ingredients[0].abv).toBe(
+        [40, 47][index],
+      );
+    }
     expect(
       await prisma.ingredient.count({
         where: { workspaceId: alice.workspaceId, name: ingredientName },

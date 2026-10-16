@@ -68,3 +68,22 @@ le serveur compilé. Le workflow démarre ce point d'entrée et vérifie `/api`.
 Une exécution réussie sur la base jetable ne valide ni l'état d'une base réelle,
 ni une migration/destruction de production, ni la stratégie de déploiement.
 Les résultats effectivement observés restent dans le handoff canonique.
+
+## Contrainte de garniture ajoutée dans L2
+
+La première exécution native a confirmé que PostgreSQL acceptait une garniture
+TOP_UP, alors que l'API la refuse déjà. La migration additive
+`20261016141503_garnish_unit_integrity` ajoute le CHECK correspondant. Elle ne
+supprime ni ne réécrit de ligne. Sa prévalidation interrompt transactionnellement
+la migration si une garniture historique TOP_UP existe ; sa réconciliation doit
+alors être décidée sur les données concernées avant une nouvelle tentative.
+
+Le test d'upgrade exerce réellement le refus sur données historiques invalides,
+leur conservation, une correction de fixture et la tentative suivante. La
+migration ne sera appliquée ici que sur des bases CI jetables. Toute base de
+propriétaire/VPS reste à inventorier séparément avant application autorisée.
+
+La migration dossiers EXPAND de septembre reste inchangée sur sa branche. Lors
+de L3, qualifier les deux ordres d'upgrade (main avec cette contrainte puis
+EXPAND, ou branche dossiers puis cette contrainte) ; ne pas renommer ou réécrire
+l'ancienne migration pour modifier artificiellement son ordre.
