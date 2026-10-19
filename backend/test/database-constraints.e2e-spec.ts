@@ -223,6 +223,76 @@ describe('PostgreSQL relational invariants', () => {
     expect(independent.workspaceId).toBe(bob.workspaceId);
   });
 
+  it('enforces the explicit folder membership workspace on both foreign keys', async () => {
+    await expect(
+      prisma.cocktailFolder.create({
+        data: {
+          workspaceId: alice.workspaceId,
+          cocktailId: recipe.id,
+          folderId: foreignFolder.id,
+        },
+      }),
+    ).rejects.toMatchObject({ code: 'P2003' });
+    await expect(
+      prisma.cocktailFolder.create({
+        data: {
+          workspaceId: bob.workspaceId,
+          cocktailId: recipe.id,
+          folderId: foreignFolder.id,
+        },
+      }),
+    ).rejects.toMatchObject({ code: 'P2003' });
+    await prisma.cocktailFolder.create({
+      data: {
+        workspaceId: alice.workspaceId,
+        cocktailId: recipe.id,
+        folderId: folder.id,
+      },
+    });
+    await expect(
+      prisma.cocktailFolder.create({
+        data: {
+          workspaceId: alice.workspaceId,
+          cocktailId: recipe.id,
+          folderId: folder.id,
+        },
+      }),
+    ).rejects.toMatchObject({ code: 'P2002' });
+    await expect(
+      pool.query(
+        'UPDATE "CocktailFolder" SET "workspaceId"=$1 WHERE "cocktailId"=$2',
+        [bob.workspaceId, recipe.id],
+      ),
+    ).rejects.toMatchObject({ code: '23503' });
+    await prisma.cocktail.delete({ where: { id: recipe.id } });
+    expect(
+      await prisma.cocktailFolder.count({ where: { cocktailId: recipe.id } }),
+    ).toBe(0);
+    expect(
+      await prisma.folder.findUnique({ where: { id: folder.id } }),
+    ).not.toBeNull();
+  });
+
+  it('initializes nonnegative organization and folder versions and enforces their CHECK constraints', async () => {
+    const cocktail = await prisma.cocktail.findUniqueOrThrow({
+      where: { id: recipe.id },
+    });
+    const existingFolder = await prisma.folder.findUniqueOrThrow({
+      where: { id: folder.id },
+    });
+    expect(cocktail.organizationVersion).toBe(0);
+    expect(existingFolder.version).toBe(0);
+    await expect(
+      pool.query(
+        'UPDATE "Cocktail" SET "organizationVersion"=-1 WHERE "id"=$1',
+        [recipe.id],
+      ),
+    ).rejects.toMatchObject({ code: '23514' });
+    await expect(
+      pool.query('UPDATE "Folder" SET "version"=-1 WHERE "id"=$1', [folder.id]),
+    ).rejects.toMatchObject({ code: '23514' });
+  });
+
   it('restricts referenced catalog/folder deletion and cascades only recipe children', async () => {
     await expect(
       prisma.folder.delete({ where: { id: folder.id } }),

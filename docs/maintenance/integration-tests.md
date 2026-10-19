@@ -145,3 +145,30 @@ puis vérifie que New Cocktail conserve le conflit canonique 409 sans doublon.
 Le parcours navigateur crée aussi New après reconnexion sur les deux formats,
 avec les dépendances corrigées. Il réutilise son compte synthétique pour ne pas
 contourner ou dépasser le quota d'inscription ; aucun contrôle n'est relâché.
+
+
+## L3 : transition et versions d'organisation
+
+La migration additive `20261019073922_folder_organization_versions` complète l'EXPAND partagé.
+Elle prend des verrous de table pendant sa prévalidation/backfill pour que les
+écritures concurrentes ne changent pas ce snapshot. Elle insère les liens legacy
+manquants, puis initialise des compteurs entiers non négatifs sur Cocktail et
+Folder. Aucun lien existant n'est supprimé ni champ retiré.
+
+Un lien obsolète ou un ensemble multiple déjà présent et incohérent avec
+folderId provoque un refus transactionnel. Ne pas contourner ce refus ou choisir
+silencieusement l'une des représentations sur une base réelle. L'inventaire,
+la réconciliation de données et la récupération éventuelle des métadonnées
+Prisma après échec exigent leur procédure et leur autorisation propres.
+
+Les tests utilisent des schémas jetables : deux ordres EXPAND/contrainte
+garniture, lien manquant, refus d'un lien obsolète ou multiple, conservation des
+données, absence de colonne partielle, décision corrective de fixture explicite
+et retry. Ils attaquent également les FK CocktailFolder, l'unicité/cascade et
+les CHECK des versions. La qualification native de ce nouveau bloc doit être
+lue dans le handoff ; une compilation locale ne vaut pas exécution PostgreSQL.
+
+Avant une bascule réelle vers des écritures multiples, arrêter tous les anciens
+écrivains incompatibles ; la compatibilité du nouveau serveur avec un ancien
+payload ne rend pas un ancien binaire compatible. Aucun déploiement, quiescement
+ou CONTRACT n'est effectué par ces tests.

@@ -107,6 +107,8 @@ model Folder {
 
   memberships CocktailFolder[]
 
+  version Int @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -147,6 +149,8 @@ model Cocktail {
   steps             PreparationStep[]
   tags              CocktailTag[]
   folderMemberships CocktailFolder[]
+
+  organizationVersion Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
