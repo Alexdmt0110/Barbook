@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, test/critical-integration-flows]
+    branches: [main, test/critical-integration-flows, feature/cocktail-folder-management]
 
 permissions:
   contents: read

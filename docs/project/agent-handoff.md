@@ -1,66 +1,46 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-19T07:07:44.205363+00:00"
+checkpoint_utc: "2026-10-19T07:33:57.966632+00:00"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
 handoff_status: "EN_COURS"
-feature: "Intégration autorisée L0–L2 puis reprise L3 B3a–B3c"
-branch: "test/critical-integration-flows"
+feature: "L3 B3a–B3c, reprise de la branche dossiers après intégration L0–L2"
+branch: "feature/cocktail-folder-management"
 base_branch: "main"
-remote_head_sha: "51cc4effad68954661750b816f5ae6c20ea0a30c"
-local_head_sha: "51cc4effad68954661750b816f5ae6c20ea0a30c"
-worktree: "propre avant ce mise à jour du journal sur #21 ; aucun applicatif non poussé"
-pr: "#20/#21/#22 mergées ; #23 actualisée et enrichie de régressions HTTP/navigateur, CI à qualifier"
-tests: "preuves de L0–L2 dans checkpoint-l0-l2.md ; nouvelle CI requise après chaque changement de base"
-migrations: "4 migrations uniquement en CI jetable ; aucune instance propriétaire/VPS utilisée"
-changes_pushed: "voir les SHA des quatre branches dans checkpoint-l0-l2.md ; lire la ref courante pour le présent journal"
-unpushed_changes: "uniquement le présent checkpoint avant publication ; aucun applicatif"
-decisions_validated: "Alex : je valide, après demande explicite de validation des merges #20–#23 et de la reprise L3 ; WORK reprend seul"
-decisions_pending: "nouveaux checks requis à valider séparément ; D1–D8 ; CONTRACT et production non autorisés"
-next_atomic_step: "attendre les six checks de #23 sur ce nouveau head, dont 37 natifs et les parcours New, puis Review Gate/diff réel et merge #23 autorisé"
-risks_and_blockers: "qualification combinée à faire ; états des bases réelles inconnus ; aucun transfert concurrent signalé"
+remote_head_sha: "69e54dc614a7c7241f58fe55370c5f877eab560e"
+local_head_sha: "69e54dc614a7c7241f58fe55370c5f877eab560e"
+worktree: "code propre ; configuration CI et checkpoint de conception à publier"
+pr: "#20–#23 mergées ; aucune PR L3 avant Review Gate complet"
+tests: "main combiné six checks verts ; baseline dossiers local 141 unitaires+NYC, 110 frontend, 10 garde-fous/lint/build/Prisma/tsc ; native dossiers en attente du nouveau workflow"
+migrations: "main 4 migrations en CI jetable ; branche contient EXPAND partagé, soit 5 à qualifier en CI ; aucune base propriétaire/VPS"
+changes_pushed: "quatre merges main et merge 69e54dc dans dossiers ; trois commits initiaux conservés"
+unpushed_changes: "ce checkpoint/plan/backlog et déclencheurs CI avant publication ; aucun changement applicatif L3 nouveau"
+decisions_validated: "merges #20–#23 et L3 B3a–B3c ; WORK seul ; décisions techniques ordinaires du Design Review"
+decisions_pending: "merge de la future PR L3 ; nouveaux checks requis ; D1–D8 ; CONTRACT/production non autorisés"
+next_atomic_step: "vérifier les six checks de baseline dossiers, puis migration additive de réconciliation/versions et tests des deux ordres de migration"
+risks_and_blockers: "fenêtre legacy entre EXPAND et dual-write ; prévalidation refuse les liens ambigus au lieu d’en effacer ; contrats/UI multi-dossiers restent à réaliser"
 production_effect: "aucun"
 ```
 
-## Reprise vérifiée le 19 octobre
+## Intégration vérifiée
 
-Main `3f9dfdbd3115380960296db3c7025715d48db55c`. PR #20 head `d6fd283bcca5d733a3915cdc5e4c52ce4441e620`, #21 `e925cbbe99e2ff3b93d26e32c3d41509726fb0a3`, #22 `ab756e690ee5817f2689c834afe4fdd1b3daf694`, #23 `e5cc3532d633009f0e4665bd13927f0f9a996534` : ouvertes, mergeables et vertes avant la présente mise à jour. Accès push/admin confirmé. Aucun changement distant inattendu, aucun écrivain concurrent annoncé.
+- #20 merge 75fea4888cd2644fb633832c6393d631b6290b93, 19 octobre 07:09:14Z.
+- #21 merge eaeeac8b9dc76b4b4af239e1b9d3063d424a30c8, 07:12:35Z.
+- #22 merge eea1a636dc91d470694c40aba15fecbd69ec23fc, 07:19:47Z.
+- #23 merge c0fc5fd3facd42c112673bbfc47285ba4547259b, 07:27:27Z, main actuel.
 
-Branche dossiers toujours `46321485d1d28351da7e0b555411199f40fa801a`. Les trois commits `420357d2b0f7375c2121f9d62551607ef0cb561e`, `c5a87663cb3cd38815a661dcb89073034235ae55`, `46321485d1d28351da7e0b555411199f40fa801a` doivent rester dans l'historique, sans réécriture ni duplication. L3 est maintenant autorisé selon B3a–B3c, après intégration et qualification du socle. CONTRACT reste une opération distincte non autorisée.
+Chaque branche a reçu le main précédent par merge sans réécriture, puis Review Gate/diff réel et CI avant merge. Les correctifs et dépendances sont qualifiés ensemble : 141 unitaires backend+NYC, 110 frontend, 10 garde-fous, 37 PostgreSQL/HTTP (New/null et conflit canonique inclus), quatre parcours Chromium desktop/mobile enrichis de New, audits zéro. Runs PR #23 39215667798/39215667848/39215667932 ; sur main 39216105309/39216105483/39216105591, tous success. La dernière revue complète L2 et les preuves sont dans review-log.md.
 
-## Protocole d'intégration
+## Branche L3 et prochain travail
 
-Ordre approuvé : #20 → #21 → #22 → #23. Merge commits, pas de squash/rebase. Après chaque merge : lire mergedAt/SHA/main et les checks push sur main ; actualiser la branche suivante par une fusion de main avec deux parents, sans force, puis revoir son diff complet contre la nouvelle base et attendre ses checks. En cas de conflit, diagnostic et résolution ciblée, tests et nouveau checkpoint avant merge. Après #23, requalifier tous les contrôles ensemble et les cas New/null via HTTP.
+Merge de main dans la branche existante : 69e54dc614a7c7241f58fe55370c5f877eab560e, parents 46321485d1d28351da7e0b555411199f40fa801a et c0fc5fd3facd42c112673bbfc47285ba4547259b ; arbre/blobs distants vérifiés et trois commits historiques encore ancêtres : 420357d2b0f7375c2121f9d62551607ef0cb561e, c5a87663cb3cd38815a661dcb89073034235ae55, 46321485d1d28351da7e0b555411199f40fa801a.
 
-GitHub fait foi. Publication par API avec parent attendu, ref non forcée et relecture des SHA/messages/fichiers/blobs ; clone ordinaire pour diffs/tests. Ne jamais pousser le miroir bare de l'audit. Les sources normatives privées, le checkpoint historique L0–L2, le backlog et review-log restent à lire à toute reprise. Le présent fichier remplace le statut PRET_A_PASSER précédent ; le checkpoint-l0-l2.md est la photographie de la livraison avant validation.
+Lire l3-design.md et le backlog F023/F024 avant code. Premier bloc : baseline branch CI puis nouvelle migration additive, sans modifier l'EXPAND ni supprimer les liens existants. Tester fresh, deux ordres d'upgrade et refus transactionnel sur ambiguïtés. Puis contrats/versions, gestion locale des dossiers et UI, chacun dans un bloc testé/poussé. La colonne legacy reste présente et les vieux payloads ne doivent jamais effacer plusieurs appartenances. Aucune PR avant Review Gate entier, aucun merge L3 encore autorisé.
 
-## Tests et limites inchangées
+Local : Node24/npm11 ; node_modules de travail liés aux installations verrouillées déjà vérifiées, non versionnés. PostgreSQL/navigateur non exécutables localement ; preuves réelles via Actions PostgreSQL16 jetable. Les déclencheurs push de la branche L3 sont ajoutés aux trois workflows, sans modifier main/PR ni retirer de contrôle. Aucun changement de protection GitHub.
 
-L2 natif CI : 126 unitaires backend, 10 garde-fous, 36 PostgreSQL/HTTP, quatre parcours Chromium ; frontend 109 tests. L1 création 139 backend/110 frontend, sécurité 124 backend + compatibilité NYC/109 frontend ; les nombres de branches indépendantes ne s'additionnent pas. Cinq audits relancés à zéro le 19 octobre. Ces résultats ne prouvent pas encore leur combinaison.
+GitHub fait foi ; relire refs/commits/PR/CI et ce journal avant reprise. Un seul écrivain WORK, aucun relais annoncé. API Git avec parent attendu, publication non forcée, relecture SHA/message/fichiers/blobs puis fetch/avance rapide locale. Jamais de push du miroir bare ni de réécriture des trois commits. Les sources normatives privées restent à lire dans le projet ChatGPT. Les checkpoints L0–L2 historiques ne valent pas description actuelle des PR désormais mergées.
 
-PostgreSQL/Docker et navigateur non exécutés localement dans Work ; preuves natives dans Actions avec PostgreSQL 16 jetable, Node 24. Pas de base propriétaire, seed/reset réel, VM, DNS/Nginx/firewall/certificat, déploiement, restauration ou image finale qualifiée. La nouvelle contrainte TOP_UP requiert une prévalidation avant toute application réelle autorisée ; la reprise de métadonnées Prisma après échec migrate deploy réel reste à qualifier en OPS. Avertissement pg tracé dans l'adaptateur Prisma, non filtré, requalification avant pg 9.
-
-Les nouveaux checks requis ne sont pas activés par l'approbation des merges/L3. D1–D8 ne sont pas fermées. Un transfert WORK ↔ CHAT_CLASSIQUE nécessite arrêt de l'ancien écrivain, désignation explicite par Alex et comparaison des références ; en cas de divergence préserver, diagnostiquer, jamais forcer.
-
-Git : checkpoint à publier puis merges autorisés avec CI. VM : aucune intervention. SQL : uniquement bases CI jetables. Infra : aucun changement de production.
-
-
-## Checkpoint intégration #20 et actualisation #21
-
-PR #20 effectivement mergée le 19 octobre à 07:09:14Z, main 75fea4888cd2644fb633832c6393d631b6290b93, Backend/Frontend Quality success sur ce main. #21 actualisée par merge commit 85e23e471445abd2f595bd1bbea233527f7b2650, parents e925cbbe99e2ff3b93d26e32c3d41509726fb0a3 et 75fea4888cd2644fb633832c6393d631b6290b93. Les 13 fichiers intégrés depuis main sont uniquement le pilotage ; le diff applicatif complet de neuf fichiers est strictement identique au diff revu avant validation. Pas de conflit ni de migration. CI de #21 à attendre avant merge, puis CI de main. Aucun changement VPS/SQL propriétaire.
-
-
-## Checkpoint intégration #21 et actualisation #22
-
-PR #21 mergée le 19 octobre à 07:12:35Z ; main eaeeac8b9dc76b4b4af239e1b9d3063d424a30c8 et ses Quality checks verts. #22 actualisée sans conflit par 19a2f551c670866ddf5a3dbd548503e61f855f91, parents ab756e690ee5817f2689c834afe4fdd1b3daf694 et eaeeac8b9dc76b4b4af239e1b9d3063d424a30c8. Arbre/blobs distants et filiation vérifiés. Le diff complet de huit fichiers est strictement identique au diff sécurité précédemment revu ; les nouvelles versions doivent maintenant exercer les régressions New/null de main. Verify locaux et CI en cours, aucun merge #22 avant succès. Aucune migration réelle.
-
-
-## Checkpoint intégration #22 et qualification combinée #23
-
-PR #22 mergée le 19 octobre à 07:19:47Z ; main eea1a636dc91d470694c40aba15fecbd69ec23fc, Quality et audits CI verts. Qualification locale #22 combinée : 139 unitaires + compatibilité NYC, 110 frontend, lint/build/Prisma et quatre audits zéro.
-
-#23 actualisée sans conflit par 51cc4effad68954661750b816f5ae6c20ea0a30c, parents e5cc3532d633009f0e4665bd13927f0f9a996534 et eea1a636dc91d470694c40aba15fecbd69ec23fc. Arbre et blobs distants contrôlés. Les correctifs New/null et les dépendances corrigées coexistent avec la reprise de course et le bootstrap partagé. Ajout d'un contrat HTTP New + mainAlcoholName:null + collision canonique 409, et création UI New dans les deux parcours existants, sans compte supplémentaire ni modification des assertions précédentes.
-
-Local combiné : 141 unitaires backend + compatibilité NYC, 10 garde-fous, 110 frontend, lint/build/Prisma/tsc et typage E2E passés ; audit E2E zéro. PostgreSQL 37 tests attendus et les quatre parcours enrichis doivent encore réellement passer dans la nouvelle CI avant #23. Aucun PostgreSQL/navigateur local annoncé, aucun déploiement. Prochain bloc après #23 et CI de main : reprendre et actualiser la branche dossiers préservée.
+Git : branche dossiers actualisée et pilotage/configuration à publier. VM : aucune intervention. SQL : seulement CI jetable, aucune migration/seed/reset de propriétaire. Infra : déclencheurs CI uniquement, aucun déploiement, DNS/Nginx/firewall/certificat. Données réelles, récupération Prisma après migrate deploy échoué, sauvegardes/restauration/rollback de production restent inconnus/non qualifiés.
