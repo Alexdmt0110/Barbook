@@ -2,6 +2,7 @@
 
 La phase A est validée comme base de travail. **Seuls L0, L1 et L2 sont autorisés au 16 octobre 2026.** Le catalogue ne vaut pas autorisation générale. Les merges, migrations destructives, décisions métier structurantes et opérations de production restent à valider par Alex.
 
+- [Checkpoint L0–L2, preuves et reprise L3 à valider](checkpoint-l0-l2.md)
 - [Roadmap et périmètre autorisé](roadmap.md)
 - [Backlog exécutable et critères](backlog.md)
 - [Catalogue complet : 66 fiches](audit/03-Vision-et-catalogue.md) ; [backlog structuré](backlog.json)

@@ -63,4 +63,13 @@ Les recommandations ci-dessous sont **des propositions**, aucune n'est considér
 
 **Recommandation initiale :** autoriser les branches/commits/push des lots approuvés et les décisions techniques courantes ; garder le merge et la production à validation explicite tant que le pipeline n'a pas été éprouvé. Option ultérieure : préautoriser les merges non destructifs après Review Gate complet et CI verte, en merge commit, avec vérification mergedAt et main post-merge.
 
-**À décider :** quels lots de phase B sont autorisés maintenant ; politique de merge automatique ou manuel ; phase B n'autorise jamais implicitement production, CONTRACT, suppression de données, réécriture d'historique ni coûts externes. Le droit d'écriture GitHub devra être disponible et vérifié sans test de mutation pendant cette phase A.
+**À décider :** autorisation de nouveaux lots après L2 et politique de merge des phases suivantes. L0–L2, branches/commits/push/PR sont déjà autorisés ; tous les merges restent à valider. Phase B n'autorise jamais implicitement production, CONTRACT, suppression de données, réécriture d'historique ni coûts externes. L'accès en écriture a été prouvé après autorisation de phase B, puis recontrôlé le 19 octobre.
+
+
+## Décisions de livraison à soumettre après L2
+
+Recommandation : valider les PR #20 à #23 dans cet ordre, actualiser et requalifier chaque branche après changement de main, puis vérifier l'ensemble intégré avant toute reprise L3. Alternative : demander des modifications ciblées ou conserver provisoirement les PR ouvertes ; main reste inchangé. Aucun merge n'a été exécuté.
+
+Recommandation séparée : après intégration et qualification des workflows, rendre requis PostgreSQL Integration, Browser Integration et Dependency Audit (backend/frontend), en gardant Backend Quality et Frontend Quality. Alternative : laisser provisoirement les checks supplémentaires informatifs ; ils ne bloqueraient alors pas un merge via le ruleset, même s'ils échouent. Aucun changement de protection effectué ici.
+
+L3 : reprise de la branche dossiers conservée, selon checkpoint-l0-l2.md, sans renommer l'EXPAND partagé et avec tests des deux ordres de migration. Cette proposition n'autorise pas le lot, sa fusion ni CONTRACT. D1–D8 ne sont pas fermées par les résultats de tests L0–L2.

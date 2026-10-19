@@ -2,11 +2,11 @@
 
 Autorisation explicite d'Alex, 16 octobre 2026 : commencer L0, puis L1 et L2. La validation de la phase A ne valide pas automatiquement les recommandations ou D1–D8.
 
-| Lot | État initial | Critères de sortie | Branches |
+| Lot | État au 19 octobre 2026 | Critères de sortie | Branches |
 | --- | --- | --- | --- |
 | L0 — Reprise durable | PR #20, CI verte ; merge à valider | accès branche/commit/publication prouvé ; pilotage versionné ; handoff distant lisible ; branche dossiers préservée | docs/project-pilotage |
 | L1 — Socle | PR #21/#22 ouvertes, checks verts ; merges à valider | slug réservé new et mainAlcoholName:null corrigés ; régressions ; dépendances analysées/corrigées proportionnellement ; verify réels | fix/cocktail-creation-boundaries ; hardening/dependency-security |
-| L2 — Intégration | EN_COURS : revue préventive terminée | migrations PostgreSQL exécutées ; contraintes/transactions/isolation vérifiées ; vrais HTTP et E2E ; CI renforcée sans contourner les échecs | test/critical-integration-flows |
+| L2 — Intégration | PR #23 ouverte, Quality/PostgreSQL/Browser verts ; merge à valider | migrations PostgreSQL exécutées ; contraintes/transactions/isolation vérifiées ; vrais HTTP et E2E ; CI renforcée sans contourner les échecs | test/critical-integration-flows |
 | L3 — Dossiers | SUSPENDUE_POUR_REMEDIATION_DU_SOCLE | checkpoint L2 et stratégie présentés au propriétaire ; autorisation de reprise à obtenir | feature/cocktail-folder-management existante |
 | L4–L11 | PROPOSE_NON_APPROUVE | décisions et périmètre à approuver au moment utile | voir archive phase A |
 
@@ -15,3 +15,8 @@ La branche dossiers reste à `46321485d1d28351da7e0b555411199f40fa801a`, trois c
 Les nouvelles branches partent du main distant vérifié. Les PR indépendantes peuvent être proposées sans merge automatique ; toute dépendance entre PR doit être explicite. Ne pas recopier un correctif d'une branche non mergée pour masquer une dépendance. Après intégration autorisée, rejouer les contrôles combinés sur main.
 
 Les lots suivants, leurs alternatives et le chemin critique restent dans [la roadmap historique de phase A](audit/05-Roadmap-et-decisions.md). Aucun déploiement, accès VPS ou coût tiers n'est autorisé par L0–L2.
+
+
+## Checkpoint de sortie proposé
+
+L0–L2 sont préparés en PR, sans intégration dans main ni production. Voir [checkpoint-l0-l2.md](checkpoint-l0-l2.md) pour les SHA, résultats, limites et le découpage B3a–B3d. Ordre d'intégration recommandé après accord : #20 → #21 → #22 → #23, en actualisant les branches sans réécriture, puis Review Gate et CI à chaque fois. La combinaison n'est pas encore qualifiée. L3 ne démarre qu'après autorisation distincte ; CONTRACT reste séparé et destructif.
