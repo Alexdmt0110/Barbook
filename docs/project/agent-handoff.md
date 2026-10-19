@@ -1,26 +1,26 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-19T08:06:50.170713+00:00"
+checkpoint_utc: "2026-10-19T08:23:15.954505+00:00"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
 handoff_status: "EN_COURS"
-feature: "L3 B3b — interface de classement multiple et conflits"
+feature: "L3 B3c — pages Dossiers et qualification complète"
 branch: "feature/cocktail-folder-management"
 base_branch: "main"
-remote_head_sha: "078475d73e142a629934ec137ae2c2dc70d6d5b9"
-local_head_sha: "078475d73e142a629934ec137ae2c2dc70d6d5b9"
+remote_head_sha: "c20e02f9520441ca8eaf1e71b1d6bf11edb221b0"
+local_head_sha: "c20e02f9520441ca8eaf1e71b1d6bf11edb221b0"
 worktree: "bloc organisation testé localement, contenu du présent commit ; résoudre le head distant à la reprise"
 pr: "#20–#23 mergées ; aucune PR L3 avant Review Gate complet"
-tests: "078475d six checks success :151 backend+NYC,110 frontend,59 natifs,4 Chromium ; interface local115 frontend/lint/build et typage E2E verts"
+tests: "c20e02f six checks success :151 backend+NYC,115 frontend,59 natifs,4 Chromium multi/conflit ; pages local131 frontend/lint/build et typage E2E/backend verts"
 migrations: "6 migrations fraîches/redeploy/status/drift CI verts ; aucune base propriétaire"
-changes_pushed: "backend dossiers et nettoyage DTO 078475d vérifiés ; interface classement/tests dans le présent commit"
+changes_pushed: "éditeur multi c20e02f vérifié ; pages/tests dans le présent commit"
 unpushed_changes: "aucun après publication vérifiée ; ne pas déduire un SHA à partir de cette phrase"
 decisions_validated: "merges #20–#23 et L3 B3a–B3c ; WORK seul"
 decisions_pending: "merge future PR L3 ; nouveaux checks requis ; D1–D8 ; CONTRACT/production"
-next_atomic_step: "contrôler CI du nouveau parcours navigateur multi/409 ; puis pages Dossiers/index/détail et gestion depuis dossier"
-risks_and_blockers: "backend dossiers qualifié ; interface classement en qualification ; pages Dossiers à réaliser ; anciens écrivains incompatibles lors future bascule"
+next_atomic_step: "contrôler 60 natifs et quatre Chromium complets ; récupérer les captures ; Review Gate de tout le diff main avant PR"
+risks_and_blockers: "pages et E2E de gestion en qualification ; aucun merge L3 autorisé ; récupération/rollout production non qualifiés ; anciens écrivains incompatibles lors future bascule"
 production_effect: "aucun"
 ```
 
@@ -61,3 +61,9 @@ Organisation 0c6f2dff03d5b4d04b6502157094c50bb82ebcab : six checks success, runs
 ## Checkpoint interface de classement multiple
 
 Backend48c3e3b :59 natifs/quatre Chromium verts (runs39219333793/39219334094/39219333781). Nettoyage078475d : arbre entier index/distant vérifié, six checks success,151 backend+NYC,59 natifs/quatre Chromium, runs39219608145/39219608144/39219608156. Nouveau bloc UI : modèles folders[]/version, éditeur avec catalogue paginé, sélection conservée à travers pages/création,409 avec brouillon conservé et rechargement explicite ; parent synchronisé et liens/cartes multi. FoldersService client dédié, création retirée du client cocktail.115 frontend/lint/build et typage E2E locaux verts. Le navigateur doit qualifier deux dossiers, filtres chacun et vrai conflit de version, sans inscription supplémentaire. Captures de succès prévues, non inspectées localement. Pages de gestion encore à réaliser.
+
+## Checkpoint pages Dossiers
+
+c20e02f : six checks success, runs39220507158/39220507333/39220507172 ;59 natifs et quatre navigateurs multi/conflit confirmés. Captures desktop/mobile récupérées et inspectées : sélection double, textes balisés échappés, pas de débordement observé ; plein écran initial avec header sticky à la position de scroll, prochaine capture remise en haut.
+
+Nouveau bloc : navigation, index paginé/création indépendante, détail/renommage/suppression versionnés, picker métier spécifique avec sélection sur pages/recherche et à la fermeture/réouverture. UI131 tests/lint/build verts ; typage E2E/backend et lint backend verts. Qualification native enrichie d'une course ajout-local/remplacement complet, d'un rollback multiple et du renommage sans changement de recette :60 natifs attendus, à lire en CI. Les quatre navigateurs sont enrichis de création à catalogue vide, deux vraies pages de12 candidates (fixtures API sans nouveau compte), ajout/retrait/rename/delete confirmé et recettes conservées ; trois thèmes/captures. Aucun code backend/DB/dépendance/infra supplémentaire. Attendre la CI et inspecter les captures puis Review Gate complet avant PR ; pas encore de verdict global.

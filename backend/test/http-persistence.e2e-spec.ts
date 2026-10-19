@@ -435,6 +435,17 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
       .set('Authorization', bearer(alice))
       .send({ folderId: originalFolder.id, tagNames: ['Original'] })
       .expect(200);
+    const otherOriginalFolder = await createFolder(alice);
+    await api()
+      .put(`/api/cocktails/${created.slug}/organization`)
+      .set('Authorization', bearer(alice))
+      .send({
+        folderIds: [originalFolder.id, otherOriginalFolder.id],
+        expectedVersion: 1,
+        tagNames: ['Original'],
+      })
+      .expect(200);
+
     const suffix = randomUUID().replaceAll('-', '');
     const marker = `rb-${suffix}`;
     const name = `bb_tags_${suffix}`;
@@ -448,7 +459,11 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
       await api()
         .put(`/api/cocktails/${created.slug}/organization`)
         .set('Authorization', bearer(alice))
-        .send({ folderId: replacement.id, tagNames: [marker] })
+        .send({
+          folderIds: [replacement.id],
+          expectedVersion: 2,
+          tagNames: [marker],
+        })
         .expect(500);
       const response = await api()
         .get(`/api/cocktails/${created.slug}`)
@@ -456,6 +471,10 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
         .expect(200);
       const detail = response.body as CocktailDetail;
       expect(detail.folder?.id).toBe(originalFolder.id);
+      expect(detail.folders.map((folder) => folder.id).sort()).toEqual(
+        [originalFolder.id, otherOriginalFolder.id].sort(),
+      );
+      expect(detail.organizationVersion).toBe(2);
       expect(detail.tags.map((tag) => tag.name)).toEqual(['Original']);
       expect(
         await prisma.tag.count({

@@ -256,6 +256,19 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
       .expect(200);
     expect((counted.body as FolderDetail).cocktailCount).toBe(2);
     await api()
+      .patch(`/api/folders/${b.id}`)
+      .set('Authorization', auth())
+      .send({ name: `${b.name} renamed`, expectedVersion: 0 })
+      .expect(200);
+    const afterRename = await getDetail(one.slug);
+    expect(afterRename.organizationVersion).toBe(3);
+    expect(afterRename.tags).toEqual(remaining.tags);
+    expect(afterRename.ingredients).toEqual(remaining.ingredients);
+    expect(afterRename.folders).toEqual([
+      { id: b.id, name: `${b.name} renamed` },
+    ]);
+
+    await api()
       .delete(`/api/folders/${b.id}/cocktails/${one.id}`)
       .set('Authorization', auth())
       .expect(200)
@@ -380,6 +393,37 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
       [0, 1],
     );
     expect((await getDetail(created.slug)).organizationVersion).toBe(1);
+  });
+
+  it('serializes a local addition against a complete versioned replacement without losing the added link', async () => {
+    const [a, b] = await Promise.all([folder(), folder()]);
+    const created = await recipe();
+    const marker = `race${randomUUID().replaceAll('-', '')}`;
+    const [full, local] = await Promise.all([
+      api()
+        .put(`/api/cocktails/${created.slug}/organization`)
+        .set('Authorization', auth())
+        .send({ folderIds: [a.id], tagNames: [marker], expectedVersion: 0 }),
+      api()
+        .put(`/api/folders/${b.id}/cocktails/${created.id}`)
+        .set('Authorization', auth()),
+    ]);
+    expect(local.status).toBe(200);
+    expect([200, 409]).toContain(full.status);
+    const stored = await getDetail(created.slug);
+    expect(stored.folders.map((item) => item.id).sort()).toEqual(
+      full.status === 200 ? [a.id, b.id].sort() : [b.id],
+    );
+    expect(stored.organizationVersion).toBe(full.status === 200 ? 2 : 1);
+    expect(stored.tags.map((item) => item.name)).toEqual(
+      full.status === 200 ? [marker] : [],
+    );
+    if (full.status === 409)
+      expect(
+        await prisma.tag.count({
+          where: { workspaceId: alice.workspaceId, slug: marker },
+        }),
+      ).toBe(0);
   });
 
   it('handles deletion racing an add without an orphan or lost recipe', async () => {

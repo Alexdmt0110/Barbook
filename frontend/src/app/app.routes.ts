@@ -25,6 +25,22 @@ export const routes: Routes = [
         loadComponent: () => import('./features/home/home').then((module) => module.Home),
       },
       {
+        path: 'folders',
+        title: 'Dossiers · Barbook',
+        loadComponent: () =>
+          import('./features/folders/folder-index/folder-index').then(
+            (module) => module.FolderIndex,
+          ),
+      },
+      {
+        path: 'folders/:id',
+        title: 'Dossier · Barbook',
+        loadComponent: () =>
+          import('./features/folders/folder-detail/folder-detail').then(
+            (module) => module.FolderDetail,
+          ),
+      },
+      {
         path: 'cocktails',
         title: 'Mes cocktails · Barbook',
         loadComponent: () =>
