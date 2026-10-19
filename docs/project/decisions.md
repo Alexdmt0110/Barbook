@@ -73,3 +73,10 @@ Recommandation : valider les PR #20 à #23 dans cet ordre, actualiser et requali
 Recommandation séparée : après intégration et qualification des workflows, rendre requis PostgreSQL Integration, Browser Integration et Dependency Audit (backend/frontend), en gardant Backend Quality et Frontend Quality. Alternative : laisser provisoirement les checks supplémentaires informatifs ; ils ne bloqueraient alors pas un merge via le ruleset, même s'ils échouent. Aucun changement de protection effectué ici.
 
 L3 : reprise de la branche dossiers conservée, selon checkpoint-l0-l2.md, sans renommer l'EXPAND partagé et avec tests des deux ordres de migration. Cette proposition n'autorise pas le lot, sa fusion ni CONTRACT. D1–D8 ne sont pas fermées par les résultats de tests L0–L2.
+
+
+## Validation du propriétaire — 19 octobre 2026, après checkpoint L0–L2
+
+Réponse « je valide » à la demande explicite de validation des quatre merges et de la reprise L3 : intégration #20 → #21 → #22 → #23, mises à jour de branches sans réécriture, Review Gates/CI et reprise de la branche dossiers existante selon B3a–B3c autorisées. WORK reprend seul ; aucune autre session d'écriture annoncée. Le périmètre inclut les migrations additives de test et les choix techniques courants nécessaires aux dossiers.
+
+Cette validation n'active pas les nouveaux checks requis, ne ferme pas D1–D8, n'autorise ni CONTRACT, ni migration destructive, ni application de migration/déploiement sur une instance propriétaire/VPS. La PR L3 sera proposée après Review Gate ; son merge reste à validation distincte.
