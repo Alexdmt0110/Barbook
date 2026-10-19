@@ -135,3 +135,13 @@ La migration dossiers EXPAND de septembre reste inchangée sur sa branche. Lors
 de L3, qualifier les deux ordres d'upgrade (main avec cette contrainte puis
 EXPAND, ou branche dossiers puis cette contrainte) ; ne pas renommer ou réécrire
 l'ancienne migration pour modifier artificiellement son ordre.
+
+
+## Qualification combinée des corrections de création
+
+Après intégration des branches L1, la suite HTTP crée réellement New avec
+mainAlcoholName:null, relit new-cocktail, vérifie le nom et l'absence d'alcool,
+puis vérifie que New Cocktail conserve le conflit canonique 409 sans doublon.
+Le parcours navigateur crée aussi New après reconnexion sur les deux formats,
+avec les dépendances corrigées. Il réutilise son compte synthétique pour ne pas
+contourner ou dépasser le quota d'inscription ; aucun contrôle n'est relâché.

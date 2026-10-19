@@ -243,6 +243,31 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     expect((toppedUp.body as CocktailDetail).estimatedAbv).toBeNull();
   });
 
+  it('keeps New routable, accepts null main alcohol and preserves canonical conflicts', async () => {
+    const created = await createRecipe(alice, {
+      name: 'New',
+      mainAlcoholName: null,
+    });
+    expect(created.slug).toBe('new-cocktail');
+    const response = await api()
+      .get('/api/cocktails/new-cocktail')
+      .set('Authorization', bearer(alice))
+      .expect(200);
+    const detail = response.body as CocktailDetail;
+    expect(detail.name).toBe('New');
+    expect(detail.mainAlcohol).toBeNull();
+    await api()
+      .post('/api/cocktails')
+      .set('Authorization', bearer(alice))
+      .send(recipePayload({ name: 'New Cocktail', mainAlcoholName: null }))
+      .expect(409);
+    expect(
+      await prisma.cocktail.count({
+        where: { workspaceId: alice.workspaceId, slug: 'new-cocktail' },
+      }),
+    ).toBe(1);
+  });
+
   it('rejects invalid DTOs without leaving a partial recipe', async () => {
     const before = await prisma.cocktail.count({
       where: { workspaceId: alice.workspaceId },

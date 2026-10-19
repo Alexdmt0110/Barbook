@@ -1,7 +1,19 @@
-import { expect, test } from '@playwright/test';
+import { expect, Page, test } from '@playwright/test';
 import { createHmac, randomUUID } from 'node:crypto';
 
 const password = 'Synthetic E2E fixture password 42!';
+
+async function fillRecipeForm(page: Page, name: string): Promise<void> {
+  await page.getByRole('textbox', { name: /^Nom \*/ }).fill(name);
+  await page.getByRole('textbox', { name: /^Verre/ }).fill('Coupe');
+  await page.getByRole('combobox', { name: /^Ingrédient/ }).fill('Fixture Gin');
+  await page.getByRole('combobox', { name: /^Unité/ }).selectOption('CL');
+  await page.getByRole('spinbutton', { name: /^Quantité/ }).fill('5');
+  await page.getByRole('spinbutton', { name: /^Degré alcoolique/ }).fill('40');
+  await page
+    .getByRole('textbox', { name: /Étape\s+1/ })
+    .fill('Shaker avec de la glace puis filtrer.');
+}
 
 test('register, create, classify, filter, reload and log back in', async ({ page }) => {
   const suffix = randomUUID().slice(0, 8);
@@ -26,15 +38,7 @@ test('register, create, classify, filter, reload and log back in', async ({ page
   await page.getByRole('link', { name: /Nouveau cocktail/ }).click();
   await expect(page).toHaveURL(/\/cocktails\/new$/);
 
-  await page.getByRole('textbox', { name: /^Nom \*/ }).fill(name);
-  await page.getByRole('textbox', { name: /^Verre/ }).fill('Coupe');
-  await page.getByRole('combobox', { name: /^Ingrédient/ }).fill('Fixture Gin');
-  await page.getByRole('combobox', { name: /^Unité/ }).selectOption('CL');
-  await page.getByRole('spinbutton', { name: /^Quantité/ }).fill('5');
-  await page.getByRole('spinbutton', { name: /^Degré alcoolique/ }).fill('40');
-  await page
-    .getByRole('textbox', { name: /Étape\s+1/ })
-    .fill('Shaker avec de la glace puis filtrer.');
+  await fillRecipeForm(page, name);
   const createdResponse = page.waitForResponse(
     (response) =>
       response.request().method() === 'POST' &&
@@ -126,6 +130,20 @@ test('register, create, classify, filter, reload and log back in', async ({ page
     .getByRole('link', { name: 'Mes cocktails', exact: true })
     .click();
   await expect(page.getByRole('heading', { name, exact: true })).toBeVisible();
+
+  await page.getByRole('link', { name: /Nouveau cocktail/ }).click();
+  await fillRecipeForm(page, 'New');
+  const reservedResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === 'POST' &&
+      new URL(response.url()).pathname === '/api/cocktails',
+  );
+  await page.getByRole('button', { name: 'Créer le cocktail', exact: true }).click();
+  const reserved = await reservedResponse;
+  expect(reserved.status()).toBe(201);
+  expect(((await reserved.json()) as { slug: string }).slug).toBe('new-cocktail');
+  await expect(page).toHaveURL('http://127.0.0.1:4200/cocktails/new-cocktail');
+  await expect(page.getByRole('heading', { name: 'New', exact: true, level: 1 })).toBeVisible();
 });
 
 test('expired real JWT is rejected by the API, clears storage and returns to login', async ({

@@ -99,3 +99,10 @@ Autorisation explicite des quatre merges et de L3 reçue après le checkpoint. A
 ## Intégration #22 — Review Gate sur base actualisée
 
 Main eaeeac8b9dc76b4b4af239e1b9d3063d424a30c8 après #21, Quality verts. Merge de main dans #22 sans conflit, deux parents et arbre/blobs distants vérifiés. Comparaison du diff entier : huit fichiers identiques à 3f9dfdb...ab756e6, les axes du Review Gate sécurité sont réévalués avec les mêmes modifications. Risque combiné principal : Jest 30 et Angular corrigé doivent exécuter les nouvelles régressions de #21 ; verify locaux et CI obligatoires avant le merge autorisé. Schéma/migrations/OPS inchangés. Ce checkpoint n'ajoute que du pilotage. Aucun BLOCKER/P1 de code identifié à la revue ; verdict conditionné aux checks réels.
+
+
+## Intégration #23 — revue préventive et nouvelle qualification de la branche complète
+
+Main eea1a636dc91d470694c40aba15fecbd69ec23fc après #22 : Quality/audits verts ; 139 tests backend + NYC/110 frontend et quatre audits zéro localement. Merge de main dans #23 sans conflit en 51cc4effad68954661750b816f5ae6c20ea0a30c, deux parents/arbre/blobs vérifiés. Revue de la composition : createCocktailSlug et garde null conservés avec persistRecipe/retry ; scripts verify/compatibilité et intégration coexistent ; anciennes migrations inchangées ; frontend et contrats alignés. L'ensemble des 27 fichiers L2 est réévalué sur cette base, pas uniquement le merge.
+
+Régressions complémentaires prévues avant leur code : vrai POST New/null, GET new-cocktail, nom inchangé, alcool absent et collision New Cocktail toujours 409 ; ajout du même cas UI après reconnexion sur desktop/mobile, sans nouvelle inscription (quota inchangé). Helpers limités à la saisie répétée, aucune interception de réponse. Local : 141 unitaires + NYC, 10 garde-fous, 110 frontend, lint/build/Prisma/tsc et typage/audit E2E verts. Nouveau head à publier puis six checks CI et revue de toute la branche avant merge #23. Aucun BLOCKER/P1 supplémentaire identifié statiquement ; la qualification PostgreSQL/navigateur reste obligatoire. Pas de migration/VM propriétaire.

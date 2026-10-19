@@ -7,19 +7,19 @@ phase: "B"
 work_owner: "WORK"
 handoff_status: "EN_COURS"
 feature: "Intégration autorisée L0–L2 puis reprise L3 B3a–B3c"
-branch: "hardening/dependency-security"
+branch: "test/critical-integration-flows"
 base_branch: "main"
-remote_head_sha: "19a2f551c670866ddf5a3dbd548503e61f855f91"
-local_head_sha: "19a2f551c670866ddf5a3dbd548503e61f855f91"
+remote_head_sha: "51cc4effad68954661750b816f5ae6c20ea0a30c"
+local_head_sha: "51cc4effad68954661750b816f5ae6c20ea0a30c"
 worktree: "propre avant ce mise à jour du journal sur #21 ; aucun applicatif non poussé"
-pr: "#20/#21 mergées ; #22 actualisée sur main, qualification combinée en cours ; #23 à actualiser"
+pr: "#20/#21/#22 mergées ; #23 actualisée et enrichie de régressions HTTP/navigateur, CI à qualifier"
 tests: "preuves de L0–L2 dans checkpoint-l0-l2.md ; nouvelle CI requise après chaque changement de base"
 migrations: "4 migrations uniquement en CI jetable ; aucune instance propriétaire/VPS utilisée"
 changes_pushed: "voir les SHA des quatre branches dans checkpoint-l0-l2.md ; lire la ref courante pour le présent journal"
 unpushed_changes: "uniquement le présent checkpoint avant publication ; aucun applicatif"
 decisions_validated: "Alex : je valide, après demande explicite de validation des merges #20–#23 et de la reprise L3 ; WORK reprend seul"
 decisions_pending: "nouveaux checks requis à valider séparément ; D1–D8 ; CONTRACT et production non autorisés"
-next_atomic_step: "attendre verify et CI combinés de #22, relire sa PR puis merger #22 avec SHA attendu ; vérifier main avant #23"
+next_atomic_step: "attendre les six checks de #23 sur ce nouveau head, dont 37 natifs et les parcours New, puis Review Gate/diff réel et merge #23 autorisé"
 risks_and_blockers: "qualification combinée à faire ; états des bases réelles inconnus ; aucun transfert concurrent signalé"
 production_effect: "aucun"
 ```
@@ -55,3 +55,12 @@ PR #20 effectivement mergée le 19 octobre à 07:09:14Z, main 75fea4888cd2644fb6
 ## Checkpoint intégration #21 et actualisation #22
 
 PR #21 mergée le 19 octobre à 07:12:35Z ; main eaeeac8b9dc76b4b4af239e1b9d3063d424a30c8 et ses Quality checks verts. #22 actualisée sans conflit par 19a2f551c670866ddf5a3dbd548503e61f855f91, parents ab756e690ee5817f2689c834afe4fdd1b3daf694 et eaeeac8b9dc76b4b4af239e1b9d3063d424a30c8. Arbre/blobs distants et filiation vérifiés. Le diff complet de huit fichiers est strictement identique au diff sécurité précédemment revu ; les nouvelles versions doivent maintenant exercer les régressions New/null de main. Verify locaux et CI en cours, aucun merge #22 avant succès. Aucune migration réelle.
+
+
+## Checkpoint intégration #22 et qualification combinée #23
+
+PR #22 mergée le 19 octobre à 07:19:47Z ; main eea1a636dc91d470694c40aba15fecbd69ec23fc, Quality et audits CI verts. Qualification locale #22 combinée : 139 unitaires + compatibilité NYC, 110 frontend, lint/build/Prisma et quatre audits zéro.
+
+#23 actualisée sans conflit par 51cc4effad68954661750b816f5ae6c20ea0a30c, parents e5cc3532d633009f0e4665bd13927f0f9a996534 et eea1a636dc91d470694c40aba15fecbd69ec23fc. Arbre et blobs distants contrôlés. Les correctifs New/null et les dépendances corrigées coexistent avec la reprise de course et le bootstrap partagé. Ajout d'un contrat HTTP New + mainAlcoholName:null + collision canonique 409, et création UI New dans les deux parcours existants, sans compte supplémentaire ni modification des assertions précédentes.
+
+Local combiné : 141 unitaires backend + compatibilité NYC, 10 garde-fous, 110 frontend, lint/build/Prisma/tsc et typage E2E passés ; audit E2E zéro. PostgreSQL 37 tests attendus et les quatre parcours enrichis doivent encore réellement passer dans la nouvelle CI avant #23. Aucun PostgreSQL/navigateur local annoncé, aucun déploiement. Prochain bloc après #23 et CI de main : reprendre et actualiser la branche dossiers préservée.
