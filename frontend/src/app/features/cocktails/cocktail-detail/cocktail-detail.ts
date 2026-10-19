@@ -79,6 +79,8 @@ export class CocktailDetail implements OnInit {
       return {
         ...cocktail,
         folder: organization.folder,
+        folders: organization.folders,
+        organizationVersion: organization.organizationVersion,
         tags: organization.tags,
       };
     });

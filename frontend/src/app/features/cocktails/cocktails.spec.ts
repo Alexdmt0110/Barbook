@@ -94,6 +94,12 @@ describe('Cocktails', () => {
         id: 'folder-classics',
         name: 'Classiques',
       },
+      folders: [
+        {
+          id: 'folder-classics',
+          name: 'Classiques',
+        },
+      ],
       tags: [
         {
           id: 'tag-classic',
@@ -125,6 +131,12 @@ describe('Cocktails', () => {
         id: 'folder-favorites',
         name: 'Favoris',
       },
+      folders: [
+        {
+          id: 'folder-favorites',
+          name: 'Favoris',
+        },
+      ],
       tags: [
         {
           id: 'tag-bitter',

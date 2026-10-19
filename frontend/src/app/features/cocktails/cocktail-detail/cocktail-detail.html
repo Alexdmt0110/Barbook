@@ -172,10 +172,16 @@
             </dd>
           </div>
 
-          @if (recipe.folder; as folder) {
+          @if (recipe.folders.length > 0) {
             <div>
-              <dt>Dossier</dt>
-              <dd>{{ folder.name }}</dd>
+              <dt>Dossiers</dt>
+              <dd class="folder-links" aria-label="Dossiers de la recette">
+                @for (folder of recipe.folders; track folder.id) {
+                  <a class="folder-badge" [routerLink]="['/folders', folder.id]">{{
+                    folder.name
+                  }}</a>
+                }
+              </dd>
             </div>
           }
         </dl>
@@ -184,7 +190,8 @@
 
     <app-cocktail-organization-editor
       [slug]="recipe.slug"
-      [folder]="recipe.folder"
+      [folders]="recipe.folders"
+      [organizationVersion]="recipe.organizationVersion"
       [tags]="recipe.tags"
       (organizationUpdated)="
         onOrganizationUpdated($event)

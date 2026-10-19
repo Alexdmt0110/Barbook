@@ -86,7 +86,6 @@
   text-transform: uppercase;
 }
 
-select,
 .creation-row input {
   width: 100%;
   min-width: 0;
@@ -101,21 +100,14 @@ select,
     background 150ms ease;
 }
 
-select {
-  padding: 0 12px;
-  cursor: pointer;
-}
-
 .creation-row input {
   padding: 0 13px;
 }
 
-select:hover,
 .creation-row input:hover {
   background: var(--color-field-hover);
 }
 
-select:focus,
 .creation-row input:focus {
   border-color: var(--color-border-strong);
   background: var(--color-field-focus);
@@ -125,7 +117,6 @@ select:focus,
   color: var(--color-placeholder);
 }
 
-select:disabled,
 .creation-row input:disabled,
 button:disabled {
   opacity: 0.55;
@@ -329,4 +320,37 @@ button:disabled {
   .editor-actions {
     display: block;
   }
+}
+
+.folder-options {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.folder-options .tag-option {
+  min-height: 44px;
+  border-radius: var(--radius-field);
+  overflow-wrap: anywhere;
+}
+.folder-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.creation-row .field-label {
+  grid-column: 1 / -1;
+}
+.folder-pagination span {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+.selected-tag {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.selected-tag button {
+  flex-shrink: 0;
 }

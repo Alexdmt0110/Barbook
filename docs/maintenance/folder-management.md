@@ -45,3 +45,9 @@ Toutes ces mutations prennent le même verrou workspace que l'organisation. La s
 Les commandes locales sont additives/retrait précis, sans remplacement global ni version de recette exigée ; un ancien brouillon complet détecte ensuite leur modification avec sa version. Pour un réseau interrompu après commit, répéter l'ajout/retrait est sûr ; en cas de suppression ou renommage ambigu, recharger le détail avant de poursuivre.
 
 `folder-management.e2e-spec.ts` exerce CRUD, trim/casse/doublon/concurrence, pagination/absence/isolation, lot hostile, idempotence/versions, conservation des recettes/tags/autres dossiers, rollback par panne DB et suppression concurrente avec ajout. Les tests tournent uniquement dans la base jetable gardée ; aucun appel sur une base propriétaire.
+
+## Interface de classement
+
+La fiche montre les liens de tous ses dossiers ; les cartes en montrent jusqu'à trois puis le nombre restant. L'éditeur utilise browse par pages25, recherche explicite et cases à cocher. Les choix restent dans le brouillon à travers recherche/pagination ; créer un dossier l'ajoute aux choix existants et nécessite encore Enregistrer pour classer la recette. Les tags conservent leur catalogue legacy (dette de pagination future, pas déclarée close).
+
+Sur409, brouillon conservé et sauvegarde bloquée jusqu'au rechargement explicite « Recharger et remplacer le brouillon ». Un rechargement échoué ne supprime pas la saisie ; une réussite utilise la dernière version et met à jour le parent. La création d'un dossier n'enlève aucun choix précédent. Tests DOM + quatre parcours Chromium enrichis qualifient les sélections/versions ; voir la CI du head, les captures ne valent pas revue visuelle manuelle.

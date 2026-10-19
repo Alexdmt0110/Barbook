@@ -15,7 +15,7 @@ async function fillRecipeForm(page: Page, name: string): Promise<void> {
     .fill('Shaker avec de la glace puis filtrer.');
 }
 
-test('register, create, classify, filter, reload and log back in', async ({ page }) => {
+test('register, create, classify, filter, reload and log back in', async ({ page }, testInfo) => {
   const suffix = randomUUID().slice(0, 8);
   const email = `browser-${randomUUID()}@example.test`;
   const prefix = `QA e2e ${suffix}`;
@@ -53,16 +53,24 @@ test('register, create, classify, filter, reload and log back in', async ({ page
   await expect(title).toBeVisible();
   await expect(title.locator('b')).toHaveCount(0);
 
-  await page.getByLabel('Nom du nouveau dossier', { exact: true }).fill(`E2E dossier ${suffix}`);
-  const folderResponse = page.waitForResponse(
-    (response) =>
-      response.request().method() === 'POST' && new URL(response.url()).pathname === '/api/folders',
+  const folderNames = [`E2E dossier ${suffix}`, `E2E autre <i>${suffix}</i>`];
+  const folders: { id: string; name: string }[] = [];
+  for (const folderName of folderNames) {
+    await page.getByLabel('Nom du nouveau dossier', { exact: true }).fill(folderName);
+    const response = page.waitForResponse(
+      (r) => r.request().method() === 'POST' && new URL(r.url()).pathname === '/api/folders',
+    );
+    await page.getByRole('button', { name: 'Créer', exact: true }).click();
+    const creation = await response;
+    expect(creation.status()).toBe(201);
+    folders.push((await creation.json()) as { id: string; name: string });
+    await expect(page.getByRole('checkbox', { name: folderName, exact: true })).toBeChecked();
+  }
+  const folder = folders[0];
+  await expect(page.getByRole('checkbox', { name: folderNames[0], exact: true })).toBeChecked();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
   );
-  await page.getByRole('button', { name: 'Créer', exact: true }).click();
-  const folderCreation = await folderResponse;
-  expect(folderCreation.status()).toBe(201);
-  const folder = (await folderCreation.json()) as { id: string };
-  await expect(page.getByLabel('Dossier actuel', { exact: true })).toHaveValue(folder.id);
   await page.getByLabel('Nom du nouveau tag', { exact: true }).fill(tagName);
   await page.getByRole('button', { name: 'Ajouter', exact: true }).click();
   const savedResponse = page.waitForResponse(
@@ -82,15 +90,56 @@ test('register, create, classify, filter, reload and log back in', async ({ page
   const detail = (await (await reloadedResponse).json()) as {
     ingredients: { amount: number }[];
     folder: { id: string };
+    folders: { id: string; name: string }[];
+    organizationVersion: number;
     tags: { id: string; name: string }[];
   };
   expect(detail.ingredients[0].amount).toBe(50);
-  expect(detail.folder.id).toBe(folder.id);
+  expect(detail.folders.map((f) => f.id).sort()).toEqual(folders.map((f) => f.id).sort());
+  expect(detail.organizationVersion).toBe(1);
   expect(detail.tags.map((tag) => tag.name)).toEqual([tagName]);
-  await expect(page.getByLabel('Dossier actuel', { exact: true })).toHaveValue(folder.id);
+  for (const folderName of folderNames)
+    await expect(page.getByRole('checkbox', { name: folderName, exact: true })).toBeChecked();
   await expect(
     page.getByRole('button', { name: `Retirer le tag ${tagName}`, exact: true }),
   ).toBeVisible();
+
+  // A second real client changes the version; the UI must preserve its stale draft.
+  const token = await page.evaluate(() => sessionStorage.getItem('barbook.accessToken'));
+  expect(token).toBeTruthy();
+  const remoteSave = await page.request.put(
+    `http://127.0.0.1:3000/api/cocktails/${created.slug}/organization`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      data: { folderIds: folders.map((f) => f.id), tagNames: [tagName], expectedVersion: 1 },
+    },
+  );
+  expect(remoteSave.status()).toBe(200);
+  await page.getByLabel('Nom du nouveau tag', { exact: true }).fill('Draft');
+  await page.getByRole('button', { name: 'Ajouter', exact: true }).click();
+  const conflictResponse = page.waitForResponse(
+    (r) => r.request().method() === 'PUT' && new URL(r.url()).pathname.endsWith('/organization'),
+  );
+  await page.getByRole('button', { name: 'Enregistrer l’organisation', exact: true }).click();
+  expect((await conflictResponse).status()).toBe(409);
+  await expect(
+    page.getByRole('button', { name: 'Retirer le tag Draft', exact: true }),
+  ).toBeVisible();
+  for (const folderName of folderNames)
+    await expect(page.getByRole('checkbox', { name: folderName, exact: true })).toBeChecked();
+  await page
+    .getByRole('button', { name: 'Recharger et remplacer le brouillon', exact: true })
+    .click();
+  await expect(page.getByRole('button', { name: 'Retirer le tag Draft', exact: true })).toHaveCount(
+    0,
+  );
+  await expect(
+    page.getByText('Classement rechargé. Tu peux modifier cette version.', { exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: testInfo.outputPath('multiple-folder-classification.png'),
+    fullPage: true,
+  });
 
   await page
     .getByRole('navigation', { name: 'Navigation principale' })
@@ -118,6 +167,22 @@ test('register, create, classify, filter, reload and log back in', async ({ page
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
+
+  const secondFilter = page.waitForResponse((r) => {
+    const url = new URL(r.url());
+    return (
+      url.pathname === '/api/cocktails' &&
+      url.searchParams.get('folderId') === folders[1].id &&
+      url.searchParams.get('tagId') === detail.tags[0].id
+    );
+  });
+  await page.getByLabel('Dossier', { exact: true }).selectOption(folders[1].id);
+  const secondList = (await (await secondFilter).json()) as {
+    total: number;
+    items: { id: string }[];
+  };
+  expect(secondList.total).toBe(1);
+  expect(secondList.items[0].id).toBe(created.id);
 
   await page.getByRole('button', { name: 'Déconnexion', exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);

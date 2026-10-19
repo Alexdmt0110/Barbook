@@ -44,6 +44,7 @@ describe('CocktailsService', () => {
           name: 'Rhum blanc',
         },
         folder: null,
+        folders: [],
         tags: [
           {
             id: 'tag-classic',
@@ -163,10 +164,12 @@ describe('CocktailsService', () => {
         name: 'Rhum blanc',
       },
       folder: null,
+      folders: [],
       tags: [],
       ingredients: [],
       garnishes: [],
       steps: [],
+      organizationVersion: 0,
       estimatedAbv: 22.22,
       updatedAt: '2026-08-24T12:00:00.000Z',
     };
@@ -261,32 +264,6 @@ describe('CocktailsService', () => {
     ]);
   });
 
-  it('creates a personal cocktail folder', () => {
-    service
-      .createPersonalFolder({
-        name: 'Créations',
-      })
-      .subscribe((folder) => {
-        expect(folder).toEqual({
-          id: 'folder-creations',
-          name: 'Créations',
-        });
-      });
-
-    const request = httpTestingController.expectOne('/api/folders');
-
-    expect(request.request.method).toBe('POST');
-
-    expect(request.request.body).toEqual({
-      name: 'Créations',
-    });
-
-    request.flush({
-      id: 'folder-creations',
-      name: 'Créations',
-    });
-  });
-
   it('loads personal cocktail tags', () => {
     service.getPersonalTags().subscribe((tags) => {
       expect(tags).toEqual([
@@ -313,16 +290,24 @@ describe('CocktailsService', () => {
 
   it('replaces a cocktail organization', () => {
     const payload = {
-      folderId: '550e8400-e29b-41d4-a716-446655440000',
+      folderIds: ['550e8400-e29b-41d4-a716-446655440000'],
+      expectedVersion: 0,
       tagNames: ['Classique', 'Agrumes'],
     };
 
     service.updatePersonalCocktailOrganization('création spéciale', payload).subscribe((result) => {
       expect(result).toEqual({
+        organizationVersion: 1,
         folder: {
-          id: payload.folderId,
+          id: payload.folderIds[0],
           name: 'Classiques',
         },
+        folders: [
+          {
+            id: payload.folderIds[0],
+            name: 'Classiques',
+          },
+        ],
         tags: [
           {
             id: 'tag-classic',
@@ -347,10 +332,17 @@ describe('CocktailsService', () => {
     expect(request.request.body).toEqual(payload);
 
     request.flush({
+      organizationVersion: 1,
       folder: {
-        id: payload.folderId,
+        id: payload.folderIds[0],
         name: 'Classiques',
       },
+      folders: [
+        {
+          id: payload.folderIds[0],
+          name: 'Classiques',
+        },
+      ],
       tags: [
         {
           id: 'tag-classic',

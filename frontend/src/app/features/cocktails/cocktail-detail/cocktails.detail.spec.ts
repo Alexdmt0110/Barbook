@@ -9,6 +9,7 @@ import {
   CocktailSummaryTag,
 } from '../data-access/cocktail.models';
 import { CocktailsService } from '../data-access/cocktails.service';
+import { FoldersService } from '../../folders/data-access/folders.service';
 import { CocktailDetail } from './cocktail-detail';
 
 class CocktailsServiceStub {
@@ -52,6 +53,7 @@ function buildCocktail(): CocktailDetailModel {
       name: 'Rhum blanc',
     },
     folder: null,
+    folders: [],
     tags: [
       {
         id: 'tag-classic',
@@ -111,6 +113,7 @@ function buildCocktail(): CocktailDetailModel {
         content: 'Shaker puis filtrer.',
       },
     ],
+    organizationVersion: 0,
     estimatedAbv: 22.22,
     updatedAt: '2026-08-24T12:00:00.000Z',
   };
@@ -123,6 +126,12 @@ describe('CocktailDetail', () => {
     await TestBed.configureTestingModule({
       imports: [CocktailDetail],
       providers: [
+        {
+          provide: FoldersService,
+          useValue: {
+            browse: () => of({ items: [], total: 0, totalPages: 0, page: 1, pageSize: 25 }),
+          },
+        },
         provideRouter([]),
         {
           provide: ActivatedRoute,
@@ -178,10 +187,17 @@ describe('CocktailDetail', () => {
     fixture.detectChanges();
 
     const organization: CocktailOrganizationResult = {
+      organizationVersion: 1,
       folder: {
         id: 'folder-favorites',
         name: 'Favoris',
       },
+      folders: [
+        {
+          id: 'folder-favorites',
+          name: 'Favoris',
+        },
+      ],
       tags: [
         {
           id: 'tag-tropical',

@@ -1,26 +1,26 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-19T07:56:40.396129+00:00"
+checkpoint_utc: "2026-10-19T08:06:50.170713+00:00"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
 handoff_status: "EN_COURS"
-feature: "L3 B3c backend — gestion locale des dossiers"
+feature: "L3 B3b — interface de classement multiple et conflits"
 branch: "feature/cocktail-folder-management"
 base_branch: "main"
-remote_head_sha: "0c6f2dff03d5b4d04b6502157094c50bb82ebcab"
-local_head_sha: "0c6f2dff03d5b4d04b6502157094c50bb82ebcab"
+remote_head_sha: "078475d73e142a629934ec137ae2c2dc70d6d5b9"
+local_head_sha: "078475d73e142a629934ec137ae2c2dc70d6d5b9"
 worktree: "bloc organisation testé localement, contenu du présent commit ; résoudre le head distant à la reprise"
 pr: "#20–#23 mergées ; aucune PR L3 avant Review Gate complet"
-tests: "0c6f2df six checks success,151 unitaires+NYC,110 frontend,48 natifs,4 Chromium ; gestion dossiers local151+NYC/lint/build/Prisma/tsc verts"
+tests: "078475d six checks success :151 backend+NYC,110 frontend,59 natifs,4 Chromium ; interface local115 frontend/lint/build et typage E2E verts"
 migrations: "6 migrations fraîches/redeploy/status/drift CI verts ; aucune base propriétaire"
-changes_pushed: "socle, données et contrats 0c6f2df vérifiés ; gestion dossiers/tests dans le présent commit"
+changes_pushed: "backend dossiers et nettoyage DTO 078475d vérifiés ; interface classement/tests dans le présent commit"
 unpushed_changes: "aucun après publication vérifiée ; ne pas déduire un SHA à partir de cette phrase"
 decisions_validated: "merges #20–#23 et L3 B3a–B3c ; WORK seul"
 decisions_pending: "merge future PR L3 ; nouveaux checks requis ; D1–D8 ; CONTRACT/production"
-next_atomic_step: "contrôler CI dossiers (59 natifs attendus), puis frontend multi-dossiers et pages dédiées selon design"
-risks_and_blockers: "contrats multiples qualifiés ; gestion dossiers en cours de qualification ; UI à réaliser ; anciens écrivains incompatibles lors future bascule"
+next_atomic_step: "contrôler CI du nouveau parcours navigateur multi/409 ; puis pages Dossiers/index/détail et gestion depuis dossier"
+risks_and_blockers: "backend dossiers qualifié ; interface classement en qualification ; pages Dossiers à réaliser ; anciens écrivains incompatibles lors future bascule"
 production_effect: "aucun"
 ```
 
@@ -57,3 +57,7 @@ Données e5852e89fe6699de9d9fa3558ad0e2764d78aefc : six checks success, runs3921
 ## Checkpoint gestion dossiers backend
 
 Organisation 0c6f2dff03d5b4d04b6502157094c50bb82ebcab : six checks success, runs39218601074/39218601102/39218601093 ;48 natifs et quatre Chromium confirmés. Nouveau bloc : FoldersService/Controller, DTO déplacé et responsabilités dossier retirées du service d'organisation ; browse/détail/rename/delete et ajouts/retraits locaux, verrou partagé et SQL groupé paramétré.151 unitaires+NYC/lint/build/Prisma/tsc locaux ;11 nouveaux natifs à exercer en CI (59 attendus). Aucun changement UI/DB/dépendance ; aucune base réelle.
+
+## Checkpoint interface de classement multiple
+
+Backend48c3e3b :59 natifs/quatre Chromium verts (runs39219333793/39219334094/39219333781). Nettoyage078475d : arbre entier index/distant vérifié, six checks success,151 backend+NYC,59 natifs/quatre Chromium, runs39219608145/39219608144/39219608156. Nouveau bloc UI : modèles folders[]/version, éditeur avec catalogue paginé, sélection conservée à travers pages/création,409 avec brouillon conservé et rechargement explicite ; parent synchronisé et liens/cartes multi. FoldersService client dédié, création retirée du client cocktail.115 frontend/lint/build et typage E2E locaux verts. Le navigateur doit qualifier deux dossiers, filtres chacun et vrai conflit de version, sans inscription supplémentaire. Captures de succès prévues, non inspectées localement. Pages de gestion encore à réaliser.
