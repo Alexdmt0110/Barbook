@@ -141,6 +141,10 @@ describe('CocktailOrganizationEditor', () => {
 
     expect(component.selectedFolderId()).toBe('folder-classics');
 
+    expect((fixture.nativeElement.querySelector('#cocktail-folder') as HTMLSelectElement).value).toBe(
+      'folder-classics',
+    );
+
     expect(component.selectedTagNames()).toEqual(['Classique']);
 
     expect(component.availableFolders()).toEqual([
@@ -185,6 +189,10 @@ describe('CocktailOrganizationEditor', () => {
     ]);
 
     expect(fixture.componentInstance.selectedFolderId()).toBe('folder-new');
+
+    expect((fixture.nativeElement.querySelector('#cocktail-folder') as HTMLSelectElement).value).toBe(
+      'folder-new',
+    );
 
     expect(fixture.componentInstance.availableFolders()).toContainEqual({
       id: 'folder-new',

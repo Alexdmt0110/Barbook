@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   InternalServerErrorException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import {
@@ -72,6 +73,7 @@ function decimal(value: number): DecimalMock {
 
 function createKnownRequestError(
   code: string,
+  meta?: Record<string, unknown>,
 ): Prisma.PrismaClientKnownRequestError {
   const error = Object.create(
     Prisma.PrismaClientKnownRequestError.prototype,
@@ -83,6 +85,8 @@ function createKnownRequestError(
     value: code,
     writable: false,
   });
+
+  Object.defineProperty(error, 'meta', { value: meta });
 
   return error;
 }
@@ -482,6 +486,45 @@ describe('CocktailCreationService', () => {
     });
   });
 
+  it.each([undefined, null])(
+    'creates a cocktail without a main alcohol when the optional value is %s',
+    async (mainAlcoholName) => {
+      await service.createPersonalCocktail(
+        'user-123',
+        buildCreateDto({ mainAlcoholName }),
+      );
+
+      expect(cocktailCreate.mock.calls[0]?.[0]['data']).toMatchObject({
+        mainAlcoholId: null,
+      });
+    },
+  );
+
+  it.each(['New', '  NÉW !!!  '])(
+    'keeps a cocktail named %s reachable outside the creation route',
+    async (name) => {
+      await service.createPersonalCocktail(
+        'user-123',
+        buildCreateDto({ name }),
+      );
+
+      expect(cocktailFindUnique).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            workspaceId_slug: {
+              workspaceId: 'workspace-123',
+              slug: 'new-cocktail',
+            },
+          },
+        }),
+      );
+      expect(cocktailCreate.mock.calls[0]?.[0]['data']).toMatchObject({
+        name,
+        slug: 'new-cocktail',
+      });
+    },
+  );
+
   it('maps an invalid cocktail name to a bad request before persistence', async () => {
     await expect(
       service.createPersonalCocktail(
@@ -543,8 +586,34 @@ describe('CocktailCreationService', () => {
     expect(prismaTransaction).not.toHaveBeenCalled();
   });
 
+  it('retries a rolled-back ingredient collision using a fresh transaction', async () => {
+    prismaTransaction.mockRejectedValueOnce(
+      createKnownRequestError('P2002', { modelName: 'Ingredient' }),
+    );
+
+    await expect(
+      service.createPersonalCocktail('user-123', buildCreateDto()),
+    ).resolves.toEqual({ id: 'cocktail-new', slug: 'whiskey-sour' });
+
+    expect(prismaTransaction).toHaveBeenCalledTimes(2);
+  });
+
+  it('bounds catalogue retries and reports temporary contention without a name conflict', async () => {
+    prismaTransaction.mockRejectedValue(
+      createKnownRequestError('P2002', { modelName: 'Ingredient' }),
+    );
+
+    await expect(
+      service.createPersonalCocktail('user-123', buildCreateDto()),
+    ).rejects.toBeInstanceOf(ServiceUnavailableException);
+
+    expect(prismaTransaction).toHaveBeenCalledTimes(3);
+  });
+
   it('maps a concurrent cocktail slug uniqueness violation to conflict', async () => {
-    cocktailCreate.mockRejectedValue(createKnownRequestError('P2002'));
+    cocktailCreate.mockRejectedValue(
+      createKnownRequestError('P2002', { modelName: 'Cocktail' }),
+    );
 
     await expect(
       service.createPersonalCocktail('user-123', buildCreateDto()),

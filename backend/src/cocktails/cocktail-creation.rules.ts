@@ -49,6 +49,13 @@ export function requireCocktailCreationSlug(
   return slug;
 }
 
+export function createCocktailSlug(name: string): string {
+  const slug = requireCocktailCreationSlug(name, 'Cocktail name');
+
+  // The frontend reserves /cocktails/new for the creation form.
+  return slug === 'new' ? 'new-cocktail' : slug;
+}
+
 export function validateRecipeIngredients(
   ingredients: readonly CreateCocktailIngredientDto[],
 ): Set<string> {

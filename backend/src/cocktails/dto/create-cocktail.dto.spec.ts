@@ -26,6 +26,34 @@ function buildPayload(amount: number): Record<string, unknown> {
 }
 
 describe('CreateCocktailDto', () => {
+  it.each([undefined, null, '', '   '])(
+    'accepts an absent optional main alcohol represented by %s',
+    async (mainAlcoholName) => {
+      const dto = plainToInstance(CreateCocktailDto, {
+        ...buildPayload(50),
+        mainAlcoholName,
+      });
+
+      await expect(validate(dto)).resolves.toHaveLength(0);
+    },
+  );
+
+  it.each([42, false, [], {}])(
+    'rejects a main alcohol with an invalid type: %p',
+    async (mainAlcoholName) => {
+      const dto = plainToInstance(CreateCocktailDto, {
+        ...buildPayload(50),
+        mainAlcoholName,
+      });
+
+      const errors = await validate(dto);
+
+      expect(errors.some((error) => error.property === 'mainAlcoholName')).toBe(
+        true,
+      );
+    },
+  );
+
   it('accepts the largest amount representable by Decimal(8,3)', async () => {
     const dto = plainToInstance(CreateCocktailDto, buildPayload(99_999.999));
 

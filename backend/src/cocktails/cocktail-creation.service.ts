@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { isPrismaKnownRequestError } from '../common/prisma-errors';
 import { PrismaService } from '../database/prisma.service';
@@ -10,6 +11,7 @@ import { Prisma } from '../generated/prisma/client';
 import {
   CocktailCreationInvariantError,
   CocktailCreationValidationError,
+  createCocktailSlug,
   requireCocktailCreationSlug,
   ResolvedCatalogIngredient,
   ResolvedRecipeIngredient,
@@ -28,6 +30,8 @@ interface ResolvedGarnish {
   ingredientId: string;
   garnish: CreateCocktailGarnishDto;
 }
+
+const MAX_CATALOG_RETRIES = 2;
 
 @Injectable()
 export class CocktailCreationService {
@@ -54,9 +58,7 @@ export class CocktailCreationService {
 
     const workspaceId = personalWorkspace.id;
 
-    const slug = this.evaluateRule(() =>
-      requireCocktailCreationSlug(dto.name, 'Cocktail name'),
-    );
+    const slug = this.evaluateRule(() => createCocktailSlug(dto.name));
 
     const recipeIngredientSlugs = this.evaluateRule(() =>
       validateRecipeIngredients(dto.ingredients),
@@ -64,13 +66,12 @@ export class CocktailCreationService {
 
     this.evaluateRule(() => validateGarnishes(dto.garnishes ?? []));
 
+    const mainAlcoholName = dto.mainAlcoholName;
+
     const mainAlcoholSlug =
-      dto.mainAlcoholName !== undefined
+      mainAlcoholName !== undefined && mainAlcoholName !== null
         ? this.evaluateRule(() =>
-            requireCocktailCreationSlug(
-              dto.mainAlcoholName as string,
-              'Main alcohol name',
-            ),
+            requireCocktailCreationSlug(mainAlcoholName, 'Main alcohol name'),
           )
         : null;
 
@@ -99,8 +100,8 @@ export class CocktailCreationService {
       throw new ConflictException('A cocktail with this name already exists.');
     }
 
-    try {
-      return await this.prisma.$transaction(async (transaction) => {
+    const persistRecipe = () =>
+      this.prisma.$transaction(async (transaction) => {
         const ingredientsBySlug = new Map<string, ResolvedCatalogIngredient>();
 
         const resolvedRecipeIngredients: ResolvedRecipeIngredient[] = [];
@@ -229,14 +230,32 @@ export class CocktailCreationService {
 
         return cocktail;
       });
-    } catch (error: unknown) {
-      if (isPrismaKnownRequestError(error, 'P2002')) {
-        throw new ConflictException(
-          'A cocktail with this name already exists.',
-        );
-      }
+    let catalogRetries = 0;
+    for (;;) {
+      try {
+        return await persistRecipe();
+      } catch (error: unknown) {
+        if (isPrismaKnownRequestError(error, 'P2002')) {
+          if (error.meta?.modelName === 'Ingredient') {
+            // PostgreSQL has aborted this transaction. Retry the whole operation
+            // with a fresh ingredient map and the catalogue committed by the winner.
+            if (catalogRetries < MAX_CATALOG_RETRIES) {
+              catalogRetries += 1;
+              continue;
+            }
 
-      throw error;
+            throw new ServiceUnavailableException(
+              'Ingredient catalogue changed concurrently. Please retry.',
+            );
+          }
+
+          throw new ConflictException(
+            'A cocktail with this name already exists.',
+          );
+        }
+
+        throw error;
+      }
     }
   }
 
