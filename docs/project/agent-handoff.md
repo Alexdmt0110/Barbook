@@ -7,19 +7,19 @@ phase: "B"
 work_owner: "WORK"
 handoff_status: "EN_COURS"
 feature: "Intégration autorisée L0–L2 puis reprise L3 B3a–B3c"
-branch: "docs/project-pilotage"
+branch: "fix/cocktail-creation-boundaries"
 base_branch: "main"
-remote_head_sha: "d6fd283bcca5d733a3915cdc5e4c52ce4441e620"
-local_head_sha: "d6fd283bcca5d733a3915cdc5e4c52ce4441e620"
-worktree: "propre avant ce checkpoint documentaire ; aucun applicatif non poussé"
-pr: "#20–#23 ouvertes et vertes avant actualisation, merges approuvés par Alex le 19 octobre"
+remote_head_sha: "85e23e471445abd2f595bd1bbea233527f7b2650"
+local_head_sha: "85e23e471445abd2f595bd1bbea233527f7b2650"
+worktree: "propre avant ce mise à jour du journal sur #21 ; aucun applicatif non poussé"
+pr: "#20 mergée ; #21 actualisée sur main et CI en cours ; #22/#23 en attente d’actualisation"
 tests: "preuves de L0–L2 dans checkpoint-l0-l2.md ; nouvelle CI requise après chaque changement de base"
 migrations: "4 migrations uniquement en CI jetable ; aucune instance propriétaire/VPS utilisée"
 changes_pushed: "voir les SHA des quatre branches dans checkpoint-l0-l2.md ; lire la ref courante pour le présent journal"
 unpushed_changes: "uniquement le présent checkpoint avant publication ; aucun applicatif"
 decisions_validated: "Alex : je valide, après demande explicite de validation des merges #20–#23 et de la reprise L3 ; WORK reprend seul"
 decisions_pending: "nouveaux checks requis à valider séparément ; D1–D8 ; CONTRACT et production non autorisés"
-next_atomic_step: "publier ce checkpoint, attendre sa CI puis merger #20 avec SHA attendu et contrôler main/CI avant actualisation de #21"
+next_atomic_step: "attendre la CI du head actualisé de #21, relire sa PR puis merger #21 avec SHA attendu ; vérifier main avant #22"
 risks_and_blockers: "qualification combinée à faire ; états des bases réelles inconnus ; aucun transfert concurrent signalé"
 production_effect: "aucun"
 ```
@@ -45,3 +45,8 @@ PostgreSQL/Docker et navigateur non exécutés localement dans Work ; preuves na
 Les nouveaux checks requis ne sont pas activés par l'approbation des merges/L3. D1–D8 ne sont pas fermées. Un transfert WORK ↔ CHAT_CLASSIQUE nécessite arrêt de l'ancien écrivain, désignation explicite par Alex et comparaison des références ; en cas de divergence préserver, diagnostiquer, jamais forcer.
 
 Git : checkpoint à publier puis merges autorisés avec CI. VM : aucune intervention. SQL : uniquement bases CI jetables. Infra : aucun changement de production.
+
+
+## Checkpoint intégration #20 et actualisation #21
+
+PR #20 effectivement mergée le 19 octobre à 07:09:14Z, main 75fea4888cd2644fb633832c6393d631b6290b93, Backend/Frontend Quality success sur ce main. #21 actualisée par merge commit 85e23e471445abd2f595bd1bbea233527f7b2650, parents e925cbbe99e2ff3b93d26e32c3d41509726fb0a3 et 75fea4888cd2644fb633832c6393d631b6290b93. Les 13 fichiers intégrés depuis main sont uniquement le pilotage ; le diff applicatif complet de neuf fichiers est strictement identique au diff revu avant validation. Pas de conflit ni de migration. CI de #21 à attendre avant merge, puis CI de main. Aucun changement VPS/SQL propriétaire.
