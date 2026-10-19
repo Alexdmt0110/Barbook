@@ -2,7 +2,9 @@
 
 La phase A est validée comme base de travail. **L0–L2 sont intégrés ; L3 B3a–B3c est autorisé depuis le 19 octobre 2026.** Le catalogue ne vaut pas autorisation générale. Les merges, migrations destructives, décisions métier structurantes et opérations de production restent à valider par Alex.
 
-- [Checkpoint L0–L2, preuves et reprise L3 à valider](checkpoint-l0-l2.md)
+- [Checkpoint courant L3, résultats, limites et décisions](checkpoint-l3.md)
+- [Review Gate complet L3](reviews/l3-review-gate.md)
+- [Photographie historique L0–L2 avant merges](checkpoint-l0-l2.md)
 - [Design Review et découpage L3](l3-design.md)
 - [Roadmap et périmètre autorisé](roadmap.md)
 - [Backlog exécutable et critères](backlog.md)

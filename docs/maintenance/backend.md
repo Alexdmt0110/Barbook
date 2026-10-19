@@ -393,14 +393,19 @@ Le backend utilise Prisma au runtime pour :
 - le détail des cocktails ;
 - la création des cocktails ;
 - la résolution du catalogue d'ingrédients ;
-- la recherche d'ingrédients.
+- la recherche d'ingrédients ;
+- le classement multi-dossiers/tags et la gestion des dossiers dans le périmètre L3 de la branche active.
 
 Les principaux invariants d'isolation des workspaces sont également protégés au niveau PostgreSQL.
 
 Les prochaines évolutions fonctionnelles prévues concernent notamment :
 
-- recherche et filtrage de la bibliothèque ;
-- organisation par tags et dossiers ;
 - gestion des images ;
-- tests de parcours critiques ;
 - préparation du déploiement de production.
+
+
+## Gestion des dossiers L3
+
+FoldersController/FoldersService portent les routes `/api/folders` (catalogue/création, browse paginé, détail/renommage/suppression et commandes locales de recettes), fournis par CocktailsModule avec AuthModule/PrismaModule. CocktailOrganizationService garde les tags et le remplacement de classement versionné ; aucun relais de service dossier inutile. Les deux services prennent le helper de verrou transactionnel du workspace avant leurs mutations.
+
+Les contrats/erreurs et limites sont centralisés dans [folder-management.md](folder-management.md), les données/qualifications dans [integration-tests.md](integration-tests.md) et l'état de livraison dans le [handoff](../project/agent-handoff.md). Cette documentation ne vaut pas déploiement : main reste au socle L0–L2 tant que la PR L3 n'est pas mergée, aucune base propriétaire n'est migrée.

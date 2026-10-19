@@ -653,14 +653,14 @@
       "id": "BB-F-023",
       "titre": "Appartenances multiples aux dossiers",
       "statut_observe": "partielle — branche active, S13.",
-      "statut_execution": "EN_COURS_LOT_L3",
+      "statut_execution": "A_REVOIR",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
       "branche_actuelle": "feature/cocktail-folder-management",
       "branche_proposee": null,
       "pr_actuelle": null,
-      "commit_preuve": "69e54dc614a7c7241f58fe55370c5f877eab560e",
+      "commit_preuve": "b0bb7574e373a2876b93cf67abf22f671ae7fca3",
       "valeur_parcours": "depuis une fiche, cocher plusieurs collections puis retrouver la même recette dans chacune.",
       "regles_cas_limites": "0..n dossiers plats ; déduplication des IDs ; relation unique, FK composites ; remplacer l'ensemble depuis la fiche atomiquement avec version attendue ; filtre folderId inchangé mais lecture via CocktailFolder. Liste vide retire seulement les appartenances, pas les tags/recette.",
       "donnees_api_droits": "reprendre la branche existante ; PUT `{folderIds: UUID[], tagNames: string[], expectedVersion}` et réponses `folders[]` ; compatibilité de `folder`/`folderId` explicitement temporisée ; aucun vieux client ne doit écraser un ensemble multiple.",
@@ -672,22 +672,35 @@
         "BB-F-057"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Baseline native de la branche conservée, migrations/versions puis contrats et parcours selon l3-design.md ; pas de CONTRACT ni de production.",
-      "autorisation": "LOT_L3_B3A_B3C_SANS_CONTRACT"
+      "documentation": "docs/maintenance/folder-management.md ; docs/project/checkpoint-l3.md ; docs/project/reviews/l3-review-gate.md",
+      "prochain_bloc": "Revue de la PR L3 puis accord distinct de merge. CONTRACT et production exclus.",
+      "autorisation": "LOT_L3_B3A_B3C_SANS_CONTRACT",
+      "perimetre_execute": "L3 B3a–B3c, qualifié en CI ; merge encore à valider.",
+      "preuves_execution": [
+        {
+          "sha": "b0bb7574e373a2876b93cf67abf22f671ae7fca3",
+          "date": "2026-10-19",
+          "runs": [
+            39223198122,
+            39223198121,
+            39223198101
+          ],
+          "resultat": "151 backend+NYC,131 frontend,10 garde-fous,61 PostgreSQL/HTTP/migrations,4 Chromium desktop/mobile complets ; six checks success ; lot100/pages/clavier/3 thèmes ; captures inspectées ; aucune production."
+        }
+      ]
     },
     {
       "id": "BB-F-024",
       "titre": "Navigation et gestion complète des dossiers",
       "statut_observe": "partielle — création dans la fiche, pas de page dédiée.",
-      "statut_execution": "EN_COURS_LOT_L3",
+      "statut_execution": "A_REVOIR",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
       "branche_actuelle": "feature/cocktail-folder-management",
       "branche_proposee": null,
       "pr_actuelle": null,
-      "commit_preuve": "69e54dc614a7c7241f58fe55370c5f877eab560e",
+      "commit_preuve": "b0bb7574e373a2876b93cf67abf22f671ae7fca3",
       "valeur_parcours": "onglet Dossiers dans le header, liste et création visibles, ouverture, recherche des cocktails, ajout multiple, retrait local, renommage et suppression sûrs.",
       "regles_cas_limites": "nom trim 1–80, unicité exacte par workspace selon ADR actuel, case policy explicite ; 0 recette = vrai état vide ; ajout en lot borné (proposition 100 IDs), validé entièrement ou rollback ; retirer ne modifie ni tags ni autres dossiers. Suppression confirmée détache les liens, jamais les recettes.",
       "donnees_api_droits": "GET/PATCH/DELETE folder par ID, GET cocktails paginés du dossier ; PUT `/folders/:id/cocktails/:cocktailId` et DELETE idempotents, endpoint lot additive ; 409 doublon, 404 hors scope ; verrouillage/version cohérent avec F023.",
@@ -699,9 +712,22 @@
         "BB-F-049"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Baseline native de la branche conservée, migrations/versions puis contrats et parcours selon l3-design.md ; pas de CONTRACT ni de production.",
-      "autorisation": "LOT_L3_B3A_B3C_SANS_CONTRACT"
+      "documentation": "docs/maintenance/folder-management.md ; docs/project/checkpoint-l3.md ; docs/project/reviews/l3-review-gate.md",
+      "prochain_bloc": "Revue de la PR L3 puis accord distinct de merge. CONTRACT et production exclus.",
+      "autorisation": "LOT_L3_B3A_B3C_SANS_CONTRACT",
+      "perimetre_execute": "L3 B3a–B3c, qualifié en CI ; merge encore à valider.",
+      "preuves_execution": [
+        {
+          "sha": "b0bb7574e373a2876b93cf67abf22f671ae7fca3",
+          "date": "2026-10-19",
+          "runs": [
+            39223198122,
+            39223198121,
+            39223198101
+          ],
+          "resultat": "151 backend+NYC,131 frontend,10 garde-fous,61 PostgreSQL/HTTP/migrations,4 Chromium desktop/mobile complets ; six checks success ; lot100/pages/clavier/3 thèmes ; captures inspectées ; aucune production."
+        }
+      ]
     },
     {
       "id": "BB-F-025",
@@ -1620,7 +1646,7 @@
       ],
       "decisions": [],
       "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation des PR #21/#22/#23, requalification combinée après merges autorisés ; nouveaux checks requis à proposer. Aucun merge ou déploiement automatique.",
+      "prochain_bloc": "Checks supplémentaires requis à proposer séparément ; qualification future des contrats/release selon lots autorisés. L0–L2 mergés et L3 qualifié sur sa branche, aucune production.",
       "autorisation": "PARTIELLE_LOTS_L0_L2",
       "preuves_execution": [
         {
@@ -1719,7 +1745,7 @@
       "dependances_ids": [],
       "decisions": [],
       "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Lire la ref distante du pilotage et agent-handoff.md, puis attendre validation des merges/L3. Un seul écrivain ; aucun transfert présumé.",
+      "prochain_bloc": "Lire le handoff consolidé de la branche dossiers et la PR/CI distantes ; confirmer l’arrêt du précédent écrivain avant tout relais. Merge L3 soumis à accord distinct.",
       "autorisation": "PARTIELLE_LOTS_L0_L2",
       "preuves_execution": [
         {

@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepté.
+Accepté comme architecture. Au 19 octobre 2026, L3 B3a–B3c est implémenté/qualifié sur la branche dossiers ; la PR reste à fusionner après accord. L’EXPAND historique et les champs legacy sont conservés. Le CONTRACT décrit dans la cible ci-dessous nécessite une autorisation distincte et n’est pas implémenté. Voir [checkpoint L3](../project/checkpoint-l3.md) et [contrats de transition](../maintenance/folder-management.md).
 
 ## Contexte
 

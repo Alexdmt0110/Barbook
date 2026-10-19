@@ -1,73 +1,57 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-19T08:29:43.019082+00:00"
+checkpoint_utc: "2026-10-19T08:43:44.739540+00:00"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
 handoff_status: "EN_COURS"
-feature: "L3 — qualification finale avant Review Gate et PR"
+feature: "L3 B3a–B3c développé et qualifié — Review Gate favorable à une PR"
 branch: "feature/cocktail-folder-management"
 base_branch: "main"
-remote_head_sha: "439bd60034354520722823dcec81f75ddc832e32"
-local_head_sha: "439bd60034354520722823dcec81f75ddc832e32"
-worktree: "complément de qualification testé localement, contenu du présent commit ; résoudre le head distant à la reprise"
-pr: "#20–#23 mergées ; aucune PR L3 avant Review Gate complet"
-tests: "439bd60 six checks success :151 backend+NYC,131 frontend,60 natifs,4 Chromium complets ; nouveau natif61 attendu ; lint/typage backend et E2E verts"
-migrations: "6 migrations fraîches/redeploy/status/drift CI verts ; aucune base propriétaire"
-changes_pushed: "pages439bd60 vérifiées ; lot100/clavier/captures dans le présent commit"
-unpushed_changes: "aucun après publication vérifiée ; ne pas déduire un SHA à partir de cette phrase"
-decisions_validated: "merges #20–#23 et L3 B3a–B3c ; WORK seul"
-decisions_pending: "merge future PR L3 ; nouveaux checks requis ; D1–D8 ; CONTRACT/production"
-next_atomic_step: "contrôler 61 natifs, clavier et captures de thème stabilisées ; reprendre le Review Gate entier contre main avant PR"
-risks_and_blockers: "pages et E2E de gestion en qualification ; aucun merge L3 autorisé ; récupération/rollout production non qualifiés ; anciens écrivains incompatibles lors future bascule"
+remote_head_sha: "b0bb7574e373a2876b93cf67abf22f671ae7fca3"
+local_head_sha: "b0bb7574e373a2876b93cf67abf22f671ae7fca3"
+worktree: "code propre ; consolidation documentaire décrite ci-dessous à publier"
+pr: "#20–#23 mergées ; aucune PR L3 encore ouverte"
+tests: "verify backend 151+NYC, frontend 131,10 garde-fous ;61 natifs et 4 Chromium réels en CI ; lint/build/Prisma/tsc verts ; audits zéro"
+migrations: "6 migrations en CI jetable seulement ; aucune base propriétaire/VPS migrée ; CONTRACT absent"
+changes_pushed: "trois commits initiaux, merge69e54dc et blocs L3 jusqu’à b0bb757 ; SHA/message/blobs/arbre vérifiés"
+unpushed_changes: "consolidation docs/project et maintenance/ADR seulement, contenu du présent checkpoint"
+decisions_validated: "merges #20–#23 et développement L3 B3a–B3c ; WORK seul pendant cette exécution"
+decisions_pending: "merge L3 ; checks supplémentaires requis ; L4 et D1–D8 ; CONTRACT et toute production"
+next_atomic_step: "publier les docs, vérifier la CI puis ouvrir et relire la vraie PR L3 sans la merger"
+risks_and_blockers: "aucun BLOCKER/P1 du diff identifié ; bascule/Prisma recovery/backup/restore réels non qualifiés ; limites legacy et A015/A016 documentées"
 production_effect: "aucun"
 ```
 
-## Intégration vérifiée
+Les champs SHA sont la photographie réellement vérifiée avant publication de ce checkpoint ; un document ne peut contenir son propre hash. Résoudre la ref GitHub courante et comparer les commits documentaires suivants au code qualifié ci-dessous, au lieu de supposer un état à partir du seul YAML. Le handoff n'est pas un verrou technique.
 
-- #20 merge 75fea4888cd2644fb633832c6393d631b6290b93, 19 octobre 07:09:14Z.
-- #21 merge eaeeac8b9dc76b4b4af239e1b9d3063d424a30c8, 07:12:35Z.
-- #22 merge eea1a636dc91d470694c40aba15fecbd69ec23fc, 07:19:47Z.
-- #23 merge c0fc5fd3facd42c112673bbfc47285ba4547259b, 07:27:27Z, main actuel.
+## État et preuves
 
-Chaque branche a reçu le main précédent par merge sans réécriture, puis Review Gate/diff réel et CI avant merge. Les correctifs et dépendances sont qualifiés ensemble : 141 unitaires backend+NYC, 110 frontend, 10 garde-fous, 37 PostgreSQL/HTTP (New/null et conflit canonique inclus), quatre parcours Chromium desktop/mobile enrichis de New, audits zéro. Runs PR #23 39215667798/39215667848/39215667932 ; sur main 39216105309/39216105483/39216105591, tous success. La dernière revue complète L2 et les preuves sont dans review-log.md.
+Main : `c0fc5fd3facd42c112673bbfc47285ba4547259b`, #20–#23 mergées dans l'ordre autorisé et six checks verts. [Checkpoint L3](checkpoint-l3.md) : SHA des quatre merges, résultats combinés et périmètre B3a–B3c. Les anciens checkpoints L0–L2 sont des photographies antérieures, pas des états courants.
 
-## Branche L3 et prochain travail
+Branche dossiers conservée, jamais supprimée/rebasée/réécrite :420357d2b0f7375c2121f9d62551607ef0cb561e, c5a87663cb3cd38815a661dcb89073034235ae55,46321485d1d28351da7e0b555411199f40fa801a sont ancêtres. Main intégré par merge69e54dc614a7c7241f58fe55370c5f877eab560e ; l'EXPAND partagé est inchangé.
 
-Merge de main dans la branche existante : 69e54dc614a7c7241f58fe55370c5f877eab560e, parents 46321485d1d28351da7e0b555411199f40fa801a et c0fc5fd3facd42c112673bbfc47285ba4547259b ; arbre/blobs distants vérifiés et trois commits historiques encore ancêtres : 420357d2b0f7375c2121f9d62551607ef0cb561e, c5a87663cb3cd38815a661dcb89073034235ae55, 46321485d1d28351da7e0b555411199f40fa801a.
+Blocs publiés : ba84b0f pilotage/CI/design ; e5852e8 données/versions ;0c6f2df contrats/concurrence ;48c3e3b gestion dossiers ;078475d retrait des anciennes copies DTO ; c20e02f éditeur multi ;439bd60 pages/parcours ; b0bb757 qualification plafond de 100/clavier/captures. Les SHA complets sont dans GitHub et les preuves intermédiaires dans review-log.md. Aucun fichier applicatif non poussé à cette photographie.
 
-Lire l3-design.md et le backlog F023/F024 avant code. Premier bloc : baseline branch CI puis nouvelle migration additive, sans modifier l'EXPAND ni supprimer les liens existants. Tester fresh, deux ordres d'upgrade et refus transactionnel sur ambiguïtés. Puis contrats/versions, gestion locale des dossiers et UI, chacun dans un bloc testé/poussé. La colonne legacy reste présente et les vieux payloads ne doivent jamais effacer plusieurs appartenances. Aucune PR avant Review Gate entier, aucun merge L3 encore autorisé.
+Code qualifié : `b0bb7574e373a2876b93cf67abf22f671ae7fca3`, six checks success. Runs39223198122 Integration,39223198121 CI,39223198101 Dependency Security.151 tests backend/18 suites +1 compatibilité NYC,131 frontend/21 fichiers,10 garde-fous,61 natifs/5 suites et 4 Chromium. Six migrations fresh/redeploy/status/drift et smoke dist/main.js verts. Audits complets/production backend/frontend et e2e : zéro, aucun package/lock modifié par L3.
 
-Local : Node24/npm11 ; node_modules de travail liés aux installations verrouillées déjà vérifiées, non versionnés. PostgreSQL/navigateur non exécutables localement ; preuves réelles via Actions PostgreSQL16 jetable. Les déclencheurs push de la branche L3 sont ajoutés aux trois workflows, sans modifier main/PR ni retirer de contrôle. Aucun changement de protection GitHub.
+Tests locaux réellement exécutés : `npm --prefix backend run verify`, lint/tsc backend, `npm --prefix frontend run verify`, typage e2e, Prisma generate/validate et diff check. PostgreSQL/Chromium ne sont pas exécutables dans ce Work local : seuls les jobs CI jetables constituent leurs preuves. Pas de Safari/appareil physique/lecteur d'écran/zoom 200 % ou benchmark de charge prétendu.
 
-GitHub fait foi ; relire refs/commits/PR/CI et ce journal avant reprise. Un seul écrivain WORK, aucun relais annoncé. API Git avec parent attendu, publication non forcée, relecture SHA/message/fichiers/blobs puis fetch/avance rapide locale. Jamais de push du miroir bare ni de réécriture des trois commits. Les sources normatives privées restent à lire dans le projet ChatGPT. Les checkpoints L0–L2 historiques ne valent pas description actuelle des PR désormais mergées.
+Captures b0bb757, artefact 12172691949 du run39223198122 : récupérées et inspectées sur desktop/mobile, index/vide, classement et détail. Thèmes clair/contrasté stabilisés et sombres inspectés ; les transitions étaient en cours sur les premières captures du header, sans bug produit déduit. Rétention GitHub 7 jours, aucune capture privée ni secret.
 
-Git : branche dossiers actualisée et pilotage/configuration à publier. VM : aucune intervention. SQL : seulement CI jetable, aucune migration/seed/reset de propriétaire. Infra : déclencheurs CI uniquement, aucun déploiement, DNS/Nginx/firewall/certificat. Données réelles, récupération Prisma après migrate deploy échoué, sauvegardes/restauration/rollback de production restent inconnus/non qualifiés.
+## Compatibilité, données et portée
 
+folders[] et organizationVersion sont la référence du nouveau frontend. Le nouveau serveur garde folder nullable et l'ancien payload pour zéro/un dossier ; plusieurs liens avec vieux payload → 409 sans perte. Les commandes locales sont idempotentes et préservent tags/recettes/autres liens. Verrou de workspace partagé et versions avant mutation. Contrats, limites1000/100/20 et erreurs dans [folder-management.md](../maintenance/folder-management.md).
 
-## Checkpoint données L3
+L'EXPAND historique et la nouvelle migration20261019073922_folder_organization_versions ajoutent seulement liens/versions ; aucune ancienne migration modifiée et aucune colonne retirée. Ambiguïtés legacy refusées sans effacement, à réconcilier sur décision des données concernées avant une migration réelle autorisée. Tous les anciens binaires incompatibles doivent cesser d'écrire avant une bascule multi réelle. Récupération Prisma après échec, rollback de backend ancien, images, staging et sauvegarde/restauration restent non qualifiés.
 
-Baseline ba84b0f0d3b850a687f15924663ea9927731a6e1 : six checks success, runs39217043698/39217043827/39217043832 ; EXPAND partagé et parcours legacy requalifiés. Nouveau bloc : migration 20261019073922_folder_organization_versions, deux champs Prisma, quatre cas d'upgrade et deux cas de contraintes ajoutés. Pas d'ancienne migration modifiée. Local :141 unitaires+NYC,10 garde-fous/lint/build/Prisma/tsc passés. Six migrations fraîches et43 natifs attendus dans la prochaine CI, pas annoncés réussis avant lecture. Le nouveau contrat/app UI n'est pas encore implémenté.
+Git : publication API avec parent attendu, aucun force ; relecture ref/message/fichiers/blobs et comparaison de l'arbre entier à l'index avant publication. Un clone ordinaire sert aux tests/diffs ; ne jamais pousser le miroir bare. VM/SQL/OPS : aucune intervention propriétaire, aucun seed/reset ou déploiement ; services CI jetables uniquement. Ruleset public 22294305 lu : PR et deux Quality requis, strict ; inchangé. Lecture administrative branch-protection 403 avec cette intégration, écritures de contenu prouvées ; nouveaux checks requis à décider séparément.
 
-## Checkpoint contrats L3
+## Reprise et arrêt
 
-Données e5852e89fe6699de9d9fa3558ad0e2764d78aefc : six checks success, runs39217611527/39217611428/39217611427.43 natifs et quatre Chromium, six migrations fresh/redeploy/status/drift confirmés. Nouveau bloc : lectures folders[], filtre relationnel, version de détail et résultat, DTO/compatibilité legacy, verrou de workspace avant versions et mutation, transactions conservées.151 unitaires+NYC/lint/build/Prisma/tsc locaux ; cinq nouveaux tests natifs à exercer en CI (48 attendus). Pas de changement UI ou migration dans ce bloc. Gestion dossiers encore dans l'ancien service à déplacer au prochain bloc cohérent.
+Lire les cinq sources normatives privées du projet ChatGPT, puis le dépôt, main, la branche, PR/checks et ce checkpoint ; elles ne sont pas recopiées publiquement. Le catalogue garde 66 fiches et D1–D8 ouvertes. [Review Gate](reviews/l3-review-gate.md) favorable à une PR après relecture entière ; la vraie PR reste à contrôler.
 
-## Checkpoint gestion dossiers backend
+Le prochain acte reste dans le périmètre L3 : finir la publication documentaire, ouvrir/relire la PR et publier son état. Aucun merge L3 n'est autorisé. Après décision explicite de merge, vérifier head/base/discussions/checks, actualiser sans réécriture si nécessaire et reprendre tout le gate/CI ; vérifier main après merge. L4 nécessite son propre cadrage D1/D2 et son autorisation. CONTRACT/production demandent leurs accords distincts.
 
-Organisation 0c6f2dff03d5b4d04b6502157094c50bb82ebcab : six checks success, runs39218601074/39218601102/39218601093 ;48 natifs et quatre Chromium confirmés. Nouveau bloc : FoldersService/Controller, DTO déplacé et responsabilités dossier retirées du service d'organisation ; browse/détail/rename/delete et ajouts/retraits locaux, verrou partagé et SQL groupé paramétré.151 unitaires+NYC/lint/build/Prisma/tsc locaux ;11 nouveaux natifs à exercer en CI (59 attendus). Aucun changement UI/DB/dépendance ; aucune base réelle.
-
-## Checkpoint interface de classement multiple
-
-Backend48c3e3b :59 natifs/quatre Chromium verts (runs39219333793/39219334094/39219333781). Nettoyage078475d : arbre entier index/distant vérifié, six checks success,151 backend+NYC,59 natifs/quatre Chromium, runs39219608145/39219608144/39219608156. Nouveau bloc UI : modèles folders[]/version, éditeur avec catalogue paginé, sélection conservée à travers pages/création,409 avec brouillon conservé et rechargement explicite ; parent synchronisé et liens/cartes multi. FoldersService client dédié, création retirée du client cocktail.115 frontend/lint/build et typage E2E locaux verts. Le navigateur doit qualifier deux dossiers, filtres chacun et vrai conflit de version, sans inscription supplémentaire. Captures de succès prévues, non inspectées localement. Pages de gestion encore à réaliser.
-
-## Checkpoint pages Dossiers
-
-c20e02f : six checks success, runs39220507158/39220507333/39220507172 ;59 natifs et quatre navigateurs multi/conflit confirmés. Captures desktop/mobile récupérées et inspectées : sélection double, textes balisés échappés, pas de débordement observé ; plein écran initial avec header sticky à la position de scroll, prochaine capture remise en haut.
-
-Nouveau bloc : navigation, index paginé/création indépendante, détail/renommage/suppression versionnés, picker métier spécifique avec sélection sur pages/recherche et à la fermeture/réouverture. UI131 tests/lint/build verts ; typage E2E/backend et lint backend verts. Qualification native enrichie d'une course ajout-local/remplacement complet, d'un rollback multiple et du renommage sans changement de recette :60 natifs attendus, à lire en CI. Les quatre navigateurs sont enrichis de création à catalogue vide, deux vraies pages de12 candidates (fixtures API sans nouveau compte), ajout/retrait/rename/delete confirmé et recettes conservées ; trois thèmes/captures. Aucun code backend/DB/dépendance/infra supplémentaire. Attendre la CI et inspecter les captures puis Review Gate complet avant PR ; pas encore de verdict global.
-
-## Qualification complémentaire avant livraison
-
-439bd60 : six checks verts,151 backend+NYC/131 frontend,60 natifs/quatre Chromium complets ; run39222463488. Revue de69 fichiers et inspection de captures index/détail desktop/mobile : aucun BLOCKER/P1 identifié, fin des transitions CSS à stabiliser pour les seules captures. Le présent complément ajoute la preuve du lot maximal100 (retry/pages sans troncature), clavier réel et captures stables.61 natifs attendus après publication ; pas de code produit/DB/dépendance modifié. Attendre cette CI et refaire le Review Gate entier avant PR. Handoff final à réécrire de manière consolidée ; historique dans review-log.md.
+Un seul écrivain. Work écrit encore ce checkpoint ; aucun relais n'est annoncé à cet instant. À l'arrêt, publier PRET_A_PASSER et confirmer l'absence de tâche d'écriture. Chat classique peut inspecter, mais doit obtenir confirmation de l'arrêt de Work et de la transition avant de modifier cette branche. Au retour, Work reçoit la confirmation d'arrêt de Chat classique et vérifie les refs/PR/CI avant reprise ; ne jamais forcer une divergence. Tous les éléments inconnus restent décrits comme tels, GitHub fait foi.

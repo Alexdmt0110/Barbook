@@ -1,6 +1,6 @@
-# L3 — Design Review avant développement
+# L3 — Design Review et contrats
 
-Statut : plan technique retenu dans le périmètre B3a–B3c autorisé le 19 octobre. Les fonctionnalités décrites ci-dessous sont à réaliser et à prouver, pas déclarées opérationnelles. F023/F024 font foi pour les critères métier ; ce document précise les contrats et limites techniques. D1–D8 restent ouvertes, CONTRACT/production et merge de la future PR L3 exclus.
+Statut : plan technique retenu dans le périmètre B3a–B3c autorisé le 19 octobre. Ce plan a précédé le code ; B3a–B3c est maintenant réalisé et qualifié au commit b0bb7574e373a2876b93cf67abf22f671ae7fca3. Les preuves et limites actuelles sont dans checkpoint-l3.md, pas déduites du seul plan. F023/F024 font foi pour les critères métier ; ce document précise les contrats et limites techniques. D1–D8 restent ouvertes, CONTRACT/production et merge de la future PR L3 exclus.
 
 ## Responsabilités et blocs cohérents
 

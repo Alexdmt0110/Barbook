@@ -27,9 +27,22 @@ Les dettes A005–A024 restent visibles dans l'audit ; A017 reçoit une correcti
 | BB-L2-07 / A026 | même branche / #23 | CHECK garniture TOP_UP et refus/rollback historique testés | aucun déploiement/migration propriétaire ; prévalidation et récupération Prisma avant toute opération réelle |
 | BB-L2-08 / A027 | même branche / #23 | sélection DOM du dossier au chargement et après création corrigée, assertions rouges avant/vertes après | dossiers multiples réservés à L3 |
 
-Le [checkpoint détaillé L0–L2](checkpoint-l0-l2.md) contient les preuves CI, limites, décisions attendues et stratégie L3. Les quatre PR restent ouvertes ; aucun statut MERGE ou VERIFIE_DANS_ENVIRONNEMENT de propriétaire n'est acquis.
+Le [checkpoint détaillé L0–L2](checkpoint-l0-l2.md) contient les preuves CI, limites, décisions attendues et stratégie L3. Les quatre PR sont mergées et main qualifié ; aucun environnement propriétaire/VPS n’a été vérifié.
 
 
-## L3 autorisé — F023/F024
+## L3 — F023/F024 développées dans le périmètre approuvé
 
-B3a–B3c sont autorisés par « je valide » après livraison du checkpoint. Statut EN_COURS sur la branche dossiers préservée, main intégré c0fc5fd3facd42c112673bbfc47285ba4547259b. Ordre et critères détaillés dans l3-design.md : migrations/versions sans perte, contrats/read switch, mutations locales de dossiers, UI et vrais tests. Les mentions PR ouverte/validation à attendre des paragraphes historiques ne décrivent plus L0–L2 ; les quatre PR sont mergées. CONTRACT et merge de la future PR L3 restent à valider séparément.
+Statut A_REVOIR, même branche `feature/cocktail-folder-management`, code qualifié `b0bb7574e373a2876b93cf67abf22f671ae7fca3`, base main `c0fc5fd3facd42c112673bbfc47285ba4547259b`. B3a–B3c autorisés le 19 octobre sont réalisés ; la PR actuelle et son head final seront dans le handoff. Aucun merge L3 ou CONTRACT autorisé.
+
+| Sous-lot | Résultat / acceptation vérifiée | État |
+| --- | --- | --- |
+| BB-L3-01 | trois commits originaux conservés et main fusionné sans réécriture | qualifié |
+| BB-L3-02 | migration additive, deux ordres SQL, refus sans perte, FK/versions | qualifié en CI uniquement |
+| BB-L3-03 | classement complet multi/version, compatibilité legacy sûre, courses et rollback | qualifié |
+| BB-L3-04 | fiche multi, sélection/recherche/pagination,409 conserve le brouillon | qualifié desktop/mobile |
+| BB-L3-05 | index/détail/CRUD, ajout jusqu'à 100 recettes, retrait local/idempotence et suppression sans recette perdue | qualifié API/DB/UI |
+| BB-L3-06 |131 frontend,151 backend+NYC,61 natifs,4 Chromium, trois thèmes et clavier, documentation/revue | Review Gate favorable à la PR ; aucun merge implicite |
+
+Preuves et limites : [checkpoint-l3.md](checkpoint-l3.md), [Review Gate](reviews/l3-review-gate.md), [contrats](../maintenance/folder-management.md). F023 garde le CONTRACT futur ; A006 garde la bascule réelle à qualifier, A015 est partiel et A016 reste ouvert. Les autres fiches/décisions ne sont pas autorisées par ces résultats.
+
+Prochaine étape : revue de la vraie PR et décision distincte du propriétaire sur son merge. Après accord, vérifier/actualiser la base sans réécriture et qualifier main. L4 doit être cadré avec D1/D2 avant autorisation ; aucun code de session, photo, suppression de recette ou production ajouté ici.

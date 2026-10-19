@@ -71,6 +71,8 @@ type
 famille
 image
 tags
+folders[]
+organizationVersion
 alcool principal
 méthode
 verre
@@ -166,20 +168,11 @@ Clair
 Contraste élevé
 ```
 
-## Responsive
+## Organisation et responsive
 
-La fiche utilise une présentation en deux colonnes sur grand écran puis une colonne sur tablette et mobile.
+La fiche expose tous les dossiers comme liens navigables. L'éditeur enregistre folders[]/tagNames avec expectedVersion ; sur 409 il conserve le brouillon et propose un rechargement explicite. Le parent reçoit le nouvel ensemble et organizationVersion sans recharger toute la recette. Voir [folder-management.md](folder-management.md) pour les contrats et la fenêtre legacy.
 
-Les contrôles manuels comprennent notamment :
-
-```text
-390 px
-430 px
-768 px
-desktop
-```
-
-Le document global ne doit pas produire de débordement horizontal.
+Présentation deux colonnes puis une sur écran étroit. Qualification L3 observée : Chromium desktop 1365×900/mobile 390×844, clavier natif, trois thèmes et captures inspectées ; pas de débordement horizontal sur ces parcours. 430/768px, lecteur d'écran, zoom 200 %, Safari et appareil physique restent à exercer dans L7. Les contrôles historiques cités dans d'anciennes versions ne sont pas présentés comme exécutés dans cette session.
 
 ## Seed de développement
 
