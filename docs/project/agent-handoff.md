@@ -1,26 +1,26 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-16"
+checkpoint_utc: "2026-10-19"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
 handoff_status: "EN_COURS"
-feature: "L0/L1 en PR ; L2 PostgreSQL vert, qualification navigateur en CI"
+feature: "L0/L1 en PR ; L2 entièrement vert et Review Gate complet passé"
 branch: "test/critical-integration-flows"
 base_branch: "main"
-remote_head_sha: "634dc3d96776a0e4e08881033c6d515b8e49d91e"
-local_head_sha: "634dc3d96776a0e4e08881033c6d515b8e49d91e"
+remote_head_sha: "e5cc3532d633009f0e4665bd13927f0f9a996534"
+local_head_sha: "e5cc3532d633009f0e4665bd13927f0f9a996534"
 worktree: "L2 propre ; checkpoint documentaire sur docs/project-pilotage"
-pr: "#20 pilotage, #21 création, #22 sécurité ouvertes ; L2 sans PR avant Review Gate complet"
-tests: "L1 vert ; L2 126 unitaires + 10 garde-fous + 36 tests PostgreSQL/HTTP natifs verts au commit bae6a3c ; navigateur typé, 4 essais détectés, audit zéro, exécution en cours"
+pr: "#20 pilotage, #21 création, #22 sécurité ouvertes ; L2 sans PR ; ouverture après Review Gate validé"
+tests: "L1 vert ; L2 126 unitaires + 10 garde-fous + 36 tests PostgreSQL/HTTP natifs verts au commit bae6a3c ; 4 parcours navigateur réellement verts au head e5cc353 ; audits recontrôlés à zéro le 19 octobre"
 migrations: "4 migrations appliquées/réappliquées/status/drift verts uniquement sur PostgreSQL CI jetable ; aucune base propriétaire/VPS touchée"
-changes_pushed: "L0/L1 et quatre commits L2 ; SHA complets et preuves ci-dessous"
+changes_pushed: "L0/L1 et cinq commits L2 ; SHA complets et preuves ci-dessous"
 unpushed_changes: "aucun applicatif ; seul ce checkpoint documentaire en préparation"
 decisions_validated: "L0–L2 et décisions techniques ordinaires dans ce périmètre ; aucun merge/production"
 decisions_pending: "D1–D8 ; merges ; reprise L3 après checkpoint final L2"
-next_atomic_step: "lire le run navigateur correctif 38917424000, corriger tout échec puis reprendre la revue entière contre main avant PR L2"
-risks_and_blockers: "résultat navigateur encore inconnu ; PostgreSQL et navigateur non exécutés localement ; ensemble des branches non mergé/non qualifié ensemble"
+next_atomic_step: "ouvrir la PR L2 après ce Review Gate, lire son vrai diff et ses checks puis publier le checkpoint final et attendre les validations"
+risks_and_blockers: "PostgreSQL et navigateur non exécutés localement ; ensemble des branches non mergé/non qualifié ensemble"
 production_effect: "aucun"
 ```
 
@@ -64,3 +64,10 @@ La nouvelle migration additive `20261016141503_garnish_unit_integrity` n'altère
 Un seul écrivain actif par tranche/branche. Pour reprendre : lire les sources normatives privées, ce journal, roadmap, décisions et review-log ; vérifier refs, commits, PR, CI, worktrees et éventuels changements locaux. Si transfert vers Chat classique, arrêter WORK puis annoncer le nouveau responsable avec Alex et publier le checkpoint du nouveau détenteur. Aucun travail concurrent annoncé ici. Toute divergence exige un diagnostic ; jamais de force push ou copie de commits pour la masquer.
 
 Les merges et la production ne sont pas autorisés. Après merges explicitement approuvés de L0/L1/L2, requalifier leur combinaison sur main. Puis présenter la reprise L3, sans commencer les dossiers avant autorisation. D1–D8 restent ouvertes pour les phases concernées. Les nouveaux checks d'intégration et d'audit ne sont pas encore ajoutés au ruleset obligatoire de main : proposer leur activation après validation des workflows.
+
+
+## Reprise du 19 octobre — Review Gate validé
+
+Les références distantes sont inchangées depuis les commits publiés. Accès propriétaire push/admin toujours disponible, aucune divergence locale ni transfert à un autre écrivain annoncé. Le head L2 réel est e5cc3532d633009f0e4665bd13927f0f9a996534. Run 38917878420 terminé success : 126 unitaires, 10 garde-fous, 36 natifs PostgreSQL/HTTP et quatre parcours navigateur verts, migrations et smoke verts. Le run 38917424000 s'était terminé avec deux succès d'expiration et deux erreurs de sélecteur de navigation ; le dernier commit corrige ce sélecteur sans modifier le produit.
+
+Review Gate complet contre main repris sur les 27 fichiers et passé le 19 octobre, voir review-log.md ; aucune PR L2 ouverte à cet instant. Les cinq audits L1 complet/production et E2E sont de nouveau à zéro aujourd'hui. Le résultat navigateur n'est plus inconnu ; les mentions EN_COURS plus haut décrivent les checkpoints historiques.
