@@ -89,3 +89,8 @@ PR #20/#21/#22 toujours ouvertes, heads attendus et checks applicables verts ; m
 ## Intégration L0–L2 et reprise L3 — revue préventive du 19 octobre
 
 Autorisation explicite des quatre merges et de L3 reçue après le checkpoint. Aucun état distant inattendu ; mêmes main/heads et branche dossiers, permissions push/admin disponibles. Vérifier chaque head et chaque check avant merge, fournir le SHA attendu au merge GitHub et conserver les merge commits. Actualiser ensuite la branche suivante sans force ; comparer et tester la combinaison contre la nouvelle base. Ne pas activer des protections non explicitement validées ni toucher une base réelle. Reprise L3 seulement après socle combiné vert, conservation des trois commits et tests des deux ordres de migration. Le périmètre fonctionnel de B3a–B3c sera détaillé avant son code ; CONTRACT reste exclu.
+
+
+## Intégration #21 — Review Gate sur base actualisée
+
+#20 mergée en 75fea4888cd2644fb633832c6393d631b6290b93, ses deux Quality checks sur main verts. #21 actualisée sans conflit en 85e23e471445abd2f595bd1bbea233527f7b2650, deux parents vérifiés, arbre distant identique au merge calculé, 13 blobs de pilotage contrôlés. Comparaison binaire du diff complet : 3f9dfdb...e925cbb identique à main...85e23e4 pour les neuf fichiers applicatifs ; le Review Gate fonctionnel/validation/DB/erreurs/sécurité/tests/maintenabilité/dépendances/frontend/performance/OPS précédent est donc réévalué sur le même changement, sans risque supplémentaire identifié. Le présent ajout est le checkpoint documentaire, sans modification applicative ni migration ; git diff --check passé. Aucun BLOCKER/P1 du diff identifié ; attendre la nouvelle CI et relire base/head/fichiers avant le merge autorisé #21.
