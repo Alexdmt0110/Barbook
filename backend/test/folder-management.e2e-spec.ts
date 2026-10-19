@@ -446,6 +446,63 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     expect(remaining.organizationVersion).toBe(added.status === 200 ? 2 : 0);
   });
 
+  it('accepts the full 100-recipe batch with complete counts, bounded pages and idempotent versions', async () => {
+    const target = await folder();
+    const marker = randomUUID();
+    const rows = Array.from({ length: 100 }, (_, index) => ({
+      id: randomUUID(),
+      workspaceId: alice.workspaceId,
+      name: `Volume ${marker} ${index}`,
+      slug: `volume-${marker}-${index}`,
+      type: 'CLASSIC' as const,
+      method: 'BUILD' as const,
+      glass: 'Coupe',
+    }));
+    await prisma.cocktail.createMany({ data: rows });
+    const cocktailIds = rows.map((row) => row.id);
+    await api()
+      .post(`/api/folders/${target.id}/cocktails`)
+      .set('Authorization', auth())
+      .send({ cocktailIds })
+      .expect(200)
+      .expect({ added: 100 });
+    await api()
+      .post(`/api/folders/${target.id}/cocktails`)
+      .set('Authorization', auth())
+      .send({ cocktailIds })
+      .expect(200)
+      .expect({ added: 0 });
+    expect(
+      await prisma.cocktail.count({
+        where: {
+          workspaceId: alice.workspaceId,
+          id: { in: cocktailIds },
+          organizationVersion: 1,
+          folderId: target.id,
+        },
+      }),
+    ).toBe(100);
+    const detail = await api()
+      .get(`/api/folders/${target.id}`)
+      .set('Authorization', auth())
+      .expect(200);
+    expect((detail.body as FolderDetail).cocktailCount).toBe(100);
+    const seen = new Set<string>();
+    for (let page = 1; page <= 5; page++) {
+      const response = await api()
+        .get('/api/cocktails')
+        .query({ folderId: target.id, page, pageSize: 24 })
+        .set('Authorization', auth())
+        .expect(200);
+      const result = response.body as CocktailListResult;
+      expect(result.total).toBe(100);
+      expect(result.totalPages).toBe(5);
+      expect(result.items.length).toBe(page === 5 ? 4 : 24);
+      result.items.forEach((item) => seen.add(item.id));
+    }
+    expect(seen.size).toBe(100);
+  });
+
   it('rejects invalid command bodies, versions, queries and spoofed workspace IDs', async () => {
     const target = await folder();
     const path = `/api/folders/${target.id}`;

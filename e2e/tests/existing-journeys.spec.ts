@@ -43,7 +43,8 @@ test('register, create, classify, manage folders and log back in', async ({ page
   const emptyFolderResponse = page.waitForResponse(
     (r) => r.request().method() === 'POST' && new URL(r.url()).pathname === '/api/folders',
   );
-  await page.getByRole('button', { name: 'Créer le dossier', exact: true }).click();
+  await page.getByLabel('Nom du dossier', { exact: true }).focus();
+  await page.keyboard.press('Enter');
   const emptyFolderCreation = await emptyFolderResponse;
   expect(emptyFolderCreation.status()).toBe(201);
   const collection = (await emptyFolderCreation.json()) as { id: string };
@@ -55,7 +56,11 @@ test('register, create, classify, manage folders and log back in', async ({ page
     page.getByRole('heading', { name: 'Aucune recette à afficher', exact: true }),
   ).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, 0));
-  await page.screenshot({ path: testInfo.outputPath('empty-folder.png'), fullPage: true });
+  await page.screenshot({
+    animations: 'disabled',
+    path: testInfo.outputPath('empty-folder.png'),
+    fullPage: true,
+  });
   await page
     .getByRole('navigation', { name: 'Navigation principale' })
     .getByRole('link', { name: 'Mes cocktails', exact: true })
@@ -163,6 +168,7 @@ test('register, create, classify, manage folders and log back in', async ({ page
   ).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
+    animations: 'disabled',
     path: testInfo.outputPath('multiple-folder-classification.png'),
     fullPage: true,
   });
@@ -261,7 +267,11 @@ test('register, create, classify, manage folders and log back in', async ({ page
     .click();
   await expect(page.getByRole('heading', { name: collectionName, exact: true })).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, 0));
-  await page.screenshot({ path: testInfo.outputPath('folders-index.png'), fullPage: true });
+  await page.screenshot({
+    animations: 'disabled',
+    path: testInfo.outputPath('folders-index.png'),
+    fullPage: true,
+  });
   await page.getByLabel('Rechercher un dossier', { exact: true }).fill(folderNames[0]);
   const searchedFolders = page.waitForResponse(
     (r) =>
@@ -281,7 +291,9 @@ test('register, create, classify, manage folders and log back in', async ({ page
   ).toBeVisible();
   await page.getByRole('button', { name: 'Ajouter des cocktails', exact: true }).click();
   const firstCandidate = `Batch ${suffix} 00`;
-  await page.getByRole('checkbox', { name: firstCandidate, exact: true }).check();
+  await page.getByRole('checkbox', { name: firstCandidate, exact: true }).focus();
+  await page.keyboard.press('Space');
+  await expect(page.getByRole('checkbox', { name: firstCandidate, exact: true })).toBeChecked();
   await page
     .getByRole('navigation', { name: 'Pagination des recettes disponibles' })
     .getByRole('button', { name: 'Suivant', exact: true })
@@ -357,7 +369,11 @@ test('register, create, classify, manage folders and log back in', async ({ page
     page.getByRole('heading', { name: renamedName, level: 1, exact: true }),
   ).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, 0));
-  await page.screenshot({ path: testInfo.outputPath('folder-detail-dark.png'), fullPage: true });
+  await page.screenshot({
+    animations: 'disabled',
+    path: testInfo.outputPath('folder-detail-dark.png'),
+    fullPage: true,
+  });
   for (const [theme, file] of [
     ['Clair', 'light'],
     ['Contraste élevé', 'contrast'],
@@ -372,6 +388,7 @@ test('register, create, classify, manage folders and log back in', async ({ page
     ).toBe(true);
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({
+      animations: 'disabled',
       path: testInfo.outputPath(`folder-detail-${file}.png`),
       fullPage: true,
     });

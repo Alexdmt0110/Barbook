@@ -1,25 +1,25 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-19T08:23:15.954505+00:00"
+checkpoint_utc: "2026-10-19T08:29:43.019082+00:00"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
 handoff_status: "EN_COURS"
-feature: "L3 B3c — pages Dossiers et qualification complète"
+feature: "L3 — qualification finale avant Review Gate et PR"
 branch: "feature/cocktail-folder-management"
 base_branch: "main"
-remote_head_sha: "c20e02f9520441ca8eaf1e71b1d6bf11edb221b0"
-local_head_sha: "c20e02f9520441ca8eaf1e71b1d6bf11edb221b0"
-worktree: "bloc organisation testé localement, contenu du présent commit ; résoudre le head distant à la reprise"
+remote_head_sha: "439bd60034354520722823dcec81f75ddc832e32"
+local_head_sha: "439bd60034354520722823dcec81f75ddc832e32"
+worktree: "complément de qualification testé localement, contenu du présent commit ; résoudre le head distant à la reprise"
 pr: "#20–#23 mergées ; aucune PR L3 avant Review Gate complet"
-tests: "c20e02f six checks success :151 backend+NYC,115 frontend,59 natifs,4 Chromium multi/conflit ; pages local131 frontend/lint/build et typage E2E/backend verts"
+tests: "439bd60 six checks success :151 backend+NYC,131 frontend,60 natifs,4 Chromium complets ; nouveau natif61 attendu ; lint/typage backend et E2E verts"
 migrations: "6 migrations fraîches/redeploy/status/drift CI verts ; aucune base propriétaire"
-changes_pushed: "éditeur multi c20e02f vérifié ; pages/tests dans le présent commit"
+changes_pushed: "pages439bd60 vérifiées ; lot100/clavier/captures dans le présent commit"
 unpushed_changes: "aucun après publication vérifiée ; ne pas déduire un SHA à partir de cette phrase"
 decisions_validated: "merges #20–#23 et L3 B3a–B3c ; WORK seul"
 decisions_pending: "merge future PR L3 ; nouveaux checks requis ; D1–D8 ; CONTRACT/production"
-next_atomic_step: "contrôler 60 natifs et quatre Chromium complets ; récupérer les captures ; Review Gate de tout le diff main avant PR"
+next_atomic_step: "contrôler 61 natifs, clavier et captures de thème stabilisées ; reprendre le Review Gate entier contre main avant PR"
 risks_and_blockers: "pages et E2E de gestion en qualification ; aucun merge L3 autorisé ; récupération/rollout production non qualifiés ; anciens écrivains incompatibles lors future bascule"
 production_effect: "aucun"
 ```
@@ -67,3 +67,7 @@ Backend48c3e3b :59 natifs/quatre Chromium verts (runs39219333793/39219334094/392
 c20e02f : six checks success, runs39220507158/39220507333/39220507172 ;59 natifs et quatre navigateurs multi/conflit confirmés. Captures desktop/mobile récupérées et inspectées : sélection double, textes balisés échappés, pas de débordement observé ; plein écran initial avec header sticky à la position de scroll, prochaine capture remise en haut.
 
 Nouveau bloc : navigation, index paginé/création indépendante, détail/renommage/suppression versionnés, picker métier spécifique avec sélection sur pages/recherche et à la fermeture/réouverture. UI131 tests/lint/build verts ; typage E2E/backend et lint backend verts. Qualification native enrichie d'une course ajout-local/remplacement complet, d'un rollback multiple et du renommage sans changement de recette :60 natifs attendus, à lire en CI. Les quatre navigateurs sont enrichis de création à catalogue vide, deux vraies pages de12 candidates (fixtures API sans nouveau compte), ajout/retrait/rename/delete confirmé et recettes conservées ; trois thèmes/captures. Aucun code backend/DB/dépendance/infra supplémentaire. Attendre la CI et inspecter les captures puis Review Gate complet avant PR ; pas encore de verdict global.
+
+## Qualification complémentaire avant livraison
+
+439bd60 : six checks verts,151 backend+NYC/131 frontend,60 natifs/quatre Chromium complets ; run39222463488. Revue de69 fichiers et inspection de captures index/détail desktop/mobile : aucun BLOCKER/P1 identifié, fin des transitions CSS à stabiliser pour les seules captures. Le présent complément ajoute la preuve du lot maximal100 (retry/pages sans troncature), clavier réel et captures stables.61 natifs attendus après publication ; pas de code produit/DB/dépendance modifié. Attendre cette CI et refaire le Review Gate entier avant PR. Handoff final à réécrire de manière consolidée ; historique dans review-log.md.
