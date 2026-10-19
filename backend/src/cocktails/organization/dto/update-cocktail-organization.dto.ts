@@ -2,9 +2,11 @@ import { Transform } from 'class-transformer';
 import {
   ArrayMaxSize,
   IsArray,
+  IsInt,
   IsString,
   IsUUID,
   Length,
+  Min,
   ValidateIf,
 } from 'class-validator';
 
@@ -24,10 +26,27 @@ function trimStringArray(value: unknown): unknown {
 
 export class UpdateCocktailOrganizationDto {
   @ValidateIf(
-    (object: UpdateCocktailOrganizationDto) => object.folderId !== null,
+    (object: UpdateCocktailOrganizationDto) =>
+      object.folderId !== undefined && object.folderId !== null,
   )
   @IsUUID()
-  folderId!: string | null;
+  folderId?: string | null;
+
+  @ValidateIf(
+    (object: UpdateCocktailOrganizationDto) => object.folderIds !== undefined,
+  )
+  @IsArray()
+  @ArrayMaxSize(1000)
+  @IsUUID('all', { each: true })
+  folderIds?: string[];
+
+  @ValidateIf(
+    (object: UpdateCocktailOrganizationDto) =>
+      object.expectedVersion !== undefined,
+  )
+  @IsInt()
+  @Min(0)
+  expectedVersion?: number;
 
   @Transform(({ value }: TransformValue) => trimStringArray(value))
   @IsArray()

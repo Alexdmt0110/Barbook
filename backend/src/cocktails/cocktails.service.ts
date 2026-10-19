@@ -69,7 +69,9 @@ export class CocktailsService {
         : {}),
       ...(query.folderId
         ? {
-            folderId: query.folderId,
+            folderMemberships: {
+              some: { workspaceId, folderId: query.folderId },
+            },
           }
         : {}),
       ...(query.tagId
@@ -122,6 +124,10 @@ export class CocktailsService {
               name: true,
             },
           },
+          folderMemberships: {
+            orderBy: { folderId: 'asc' },
+            select: { folder: { select: { id: true, name: true } } },
+          },
           tags: {
             select: {
               tag: {
@@ -138,8 +144,9 @@ export class CocktailsService {
     ]);
 
     const items: CocktailSummary[] = cocktails.map(
-      ({ tags, ...cocktail }): CocktailSummary => ({
+      ({ tags, folderMemberships, ...cocktail }): CocktailSummary => ({
         ...cocktail,
+        folders: folderMemberships.map(({ folder }) => folder),
         tags: tags.map(({ tag }) => tag),
       }),
     );
@@ -181,6 +188,7 @@ export class CocktailsService {
       },
       select: {
         id: true,
+        organizationVersion: true,
         slug: true,
         name: true,
         type: true,
@@ -202,6 +210,10 @@ export class CocktailsService {
             id: true,
             name: true,
           },
+        },
+        folderMemberships: {
+          orderBy: { folderId: 'asc' },
+          select: { folder: { select: { id: true, name: true } } },
         },
         tags: {
           select: {
@@ -318,6 +330,8 @@ export class CocktailsService {
       imageUrl: cocktail.imageUrl,
       mainAlcohol: cocktail.mainAlcohol,
       folder: cocktail.folder,
+      folders: cocktail.folderMemberships.map(({ folder }) => folder),
+      organizationVersion: cocktail.organizationVersion,
       tags: cocktail.tags.map(({ tag }) => tag),
       ingredients,
       garnishes,

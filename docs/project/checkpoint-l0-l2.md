@@ -1,5 +1,7 @@
 # Checkpoint L0–L2 — 19 octobre 2026
 
+> Photographie conservée avant les validations de merge. Depuis, #20–#23 sont mergées et L3 est qualifié sur sa branche ; [checkpoint-l3.md](checkpoint-l3.md) et le handoff donnent l’état courant. Les demandes de validation et SHA de branches ci-dessous décrivent cette étape antérieure.
+
 Les lots autorisés sont développés, testés et proposés dans quatre PR. **Aucun merge ni déploiement effectué.** Les corrections sont sur leurs branches ; main reste à `3f9dfdbd3115380960296db3c7025715d48db55c`. Le catalogue complet et D1–D8 restent soumis aux autorisations de leurs phases.
 
 ## Livraison proposée

@@ -483,3 +483,15 @@
     min-height: 280px;
   }
 }
+
+.folder-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+.folder-links a {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: var(--color-accent);
+}

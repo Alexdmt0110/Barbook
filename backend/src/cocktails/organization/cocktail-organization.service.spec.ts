@@ -8,682 +8,245 @@ import { PrismaService } from '../../database/prisma.service';
 import { Prisma } from '../../generated/prisma/client';
 import { CocktailOrganizationService } from './cocktail-organization.service';
 
-type QueryMock<TResult> = jest.Mock<
-  Promise<TResult>,
-  [Record<string, unknown>]
->;
-
-interface FolderRecord {
+const query = <T>(value: T) =>
+  jest.fn<Promise<T>, [unknown]>().mockResolvedValue(value);
+interface Folder {
   id: string;
   name: string;
 }
-
-interface TagRecord {
-  id: string;
-  name: string;
+interface Tag extends Folder {
   slug: string;
 }
-
-interface TransactionMock {
-  cocktail: {
-    findUnique: QueryMock<{
-      id: string;
-    } | null>;
-    update: QueryMock<{
-      id: string;
-    }>;
-  };
-  folder: {
-    findUnique: QueryMock<FolderRecord | null>;
-  };
-  tag: {
-    createMany: QueryMock<{
-      count: number;
-    }>;
-    findMany: QueryMock<TagRecord[]>;
-  };
-  cocktailTag: {
-    deleteMany: QueryMock<{
-      count: number;
-    }>;
-    createMany: QueryMock<{
-      count: number;
-    }>;
-  };
+interface Organization {
+  id: string;
+  folderId: string | null;
+  organizationVersion: number;
+  _count: { folderMemberships: number };
 }
-
-type TransactionCallback = (transaction: TransactionMock) => Promise<unknown>;
-
-type PrismaTransactionMock = jest.Mock<Promise<unknown>, [TransactionCallback]>;
-
-function createKnownRequestError(
-  code: string,
-): Prisma.PrismaClientKnownRequestError {
-  const error = Object.create(
-    Prisma.PrismaClientKnownRequestError.prototype,
-  ) as Prisma.PrismaClientKnownRequestError;
-
-  Object.defineProperty(error, 'code', {
-    configurable: false,
-    enumerable: true,
-    value: code,
-    writable: false,
-  });
-
-  return error;
+function fixture() {
+  return {
+    $queryRaw: query([{ id: 'workspace' }]),
+    cocktail: {
+      findUnique: query<Organization | null>({
+        id: 'cocktail',
+        folderId: null,
+        organizationVersion: 0,
+        _count: { folderMemberships: 0 },
+      }),
+      update: query({ organizationVersion: 1 }),
+    },
+    folder: { findMany: query<Folder[]>([{ id: 'a', name: 'A' }]) },
+    tag: { createMany: query({ count: 0 }), findMany: query<Tag[]>([]) },
+    cocktailFolder: {
+      deleteMany: query({ count: 0 }),
+      createMany: query({ count: 0 }),
+    },
+    cocktailTag: {
+      deleteMany: query({ count: 0 }),
+      createMany: query({ count: 0 }),
+    },
+  };
 }
 
 describe('CocktailOrganizationService', () => {
-  let workspaceFindUnique: QueryMock<{
-    id: string;
-  } | null>;
-
-  let folderFindMany: QueryMock<FolderRecord[]>;
-
-  let folderFindUnique: QueryMock<{
-    id: string;
-  } | null>;
-
-  let folderCreate: QueryMock<FolderRecord>;
-
-  let tagFindMany: QueryMock<TagRecord[]>;
-
-  let transactionCocktailFindUnique: QueryMock<{
-    id: string;
-  } | null>;
-
-  let transactionCocktailUpdate: QueryMock<{
-    id: string;
-  }>;
-
-  let transactionFolderFindUnique: QueryMock<FolderRecord | null>;
-
-  let transactionTagCreateMany: QueryMock<{
-    count: number;
-  }>;
-
-  let transactionTagFindMany: QueryMock<TagRecord[]>;
-
-  let cocktailTagDeleteMany: QueryMock<{
-    count: number;
-  }>;
-
-  let cocktailTagCreateMany: QueryMock<{
-    count: number;
-  }>;
-
-  let prismaTransaction: PrismaTransactionMock;
-
-  let transaction: TransactionMock;
-
+  let tx: ReturnType<typeof fixture>;
+  let workspace: ReturnType<typeof query<{ id: string } | null>>;
   let service: CocktailOrganizationService;
-
   beforeEach(() => {
-    workspaceFindUnique = jest.fn<
-      Promise<{
-        id: string;
-      } | null>,
-      [Record<string, unknown>]
-    >();
-
-    folderFindMany = jest.fn<
-      Promise<FolderRecord[]>,
-      [Record<string, unknown>]
-    >();
-
-    folderFindUnique = jest.fn<
-      Promise<{
-        id: string;
-      } | null>,
-      [Record<string, unknown>]
-    >();
-
-    folderCreate = jest.fn<Promise<FolderRecord>, [Record<string, unknown>]>();
-
-    tagFindMany = jest.fn<Promise<TagRecord[]>, [Record<string, unknown>]>();
-
-    transactionCocktailFindUnique = jest.fn<
-      Promise<{
-        id: string;
-      } | null>,
-      [Record<string, unknown>]
-    >();
-
-    transactionCocktailUpdate = jest.fn<
-      Promise<{
-        id: string;
-      }>,
-      [Record<string, unknown>]
-    >();
-
-    transactionFolderFindUnique = jest.fn<
-      Promise<FolderRecord | null>,
-      [Record<string, unknown>]
-    >();
-
-    transactionTagCreateMany = jest.fn<
-      Promise<{
-        count: number;
-      }>,
-      [Record<string, unknown>]
-    >();
-
-    transactionTagFindMany = jest.fn<
-      Promise<TagRecord[]>,
-      [Record<string, unknown>]
-    >();
-
-    cocktailTagDeleteMany = jest.fn<
-      Promise<{
-        count: number;
-      }>,
-      [Record<string, unknown>]
-    >();
-
-    cocktailTagCreateMany = jest.fn<
-      Promise<{
-        count: number;
-      }>,
-      [Record<string, unknown>]
-    >();
-
-    transaction = {
-      cocktail: {
-        findUnique: transactionCocktailFindUnique,
-        update: transactionCocktailUpdate,
-      },
-      folder: {
-        findUnique: transactionFolderFindUnique,
-      },
-      tag: {
-        createMany: transactionTagCreateMany,
-        findMany: transactionTagFindMany,
-      },
-      cocktailTag: {
-        deleteMany: cocktailTagDeleteMany,
-        createMany: cocktailTagCreateMany,
-      },
-    };
-
-    prismaTransaction = jest.fn<Promise<unknown>, [TransactionCallback]>();
-
-    prismaTransaction.mockImplementation((callback) => callback(transaction));
-
-    const prismaService = {
-      workspace: {
-        findUnique: workspaceFindUnique,
-      },
-      folder: {
-        findMany: folderFindMany,
-        findUnique: folderFindUnique,
-        create: folderCreate,
-      },
-      tag: {
-        findMany: tagFindMany,
-      },
-      $transaction: prismaTransaction,
+    tx = fixture();
+    workspace = query<{ id: string } | null>({ id: 'workspace' });
+    const prisma = {
+      workspace: { findUnique: workspace },
+      $transaction: (
+        callback: (transaction: Prisma.TransactionClient) => Promise<unknown>,
+      ) => callback(tx as unknown as Prisma.TransactionClient),
     } as unknown as PrismaService;
-
-    service = new CocktailOrganizationService(prismaService);
-
-    workspaceFindUnique.mockResolvedValue({
-      id: 'workspace-123',
-    });
-
-    folderFindMany.mockResolvedValue([]);
-
-    folderFindUnique.mockResolvedValue(null);
-
-    folderCreate.mockResolvedValue({
-      id: 'folder-new',
-      name: 'Classiques',
-    });
-
-    tagFindMany.mockResolvedValue([]);
-
-    transactionCocktailFindUnique.mockResolvedValue({
-      id: 'cocktail-123',
-    });
-
-    transactionCocktailUpdate.mockResolvedValue({
-      id: 'cocktail-123',
-    });
-
-    transactionFolderFindUnique.mockResolvedValue({
-      id: 'folder-123',
-      name: 'Classiques',
-    });
-
-    transactionTagCreateMany.mockResolvedValue({
-      count: 0,
-    });
-
-    transactionTagFindMany.mockResolvedValue([]);
-
-    cocktailTagDeleteMany.mockResolvedValue({
-      count: 0,
-    });
-
-    cocktailTagCreateMany.mockResolvedValue({
-      count: 0,
-    });
+    service = new CocktailOrganizationService(prisma);
   });
 
-  it('lists folders only from the personal workspace', async () => {
-    folderFindMany.mockResolvedValue([
-      {
-        id: 'folder-1',
-        name: 'Classiques',
-      },
-      {
-        id: 'folder-2',
-        name: 'Créations',
-      },
+  it('replaces deduplicated folders and canonical tags, preserving the representative', async () => {
+    tx.cocktail.findUnique.mockResolvedValue({
+      id: 'cocktail',
+      folderId: 'b',
+      organizationVersion: 0,
+      _count: { folderMemberships: 1 },
+    });
+    tx.folder.findMany.mockResolvedValue([
+      { id: 'a', name: 'A' },
+      { id: 'b', name: 'B' },
     ]);
-
-    const result = await service.listPersonalFolders('user-123');
-
-    expect(workspaceFindUnique).toHaveBeenCalledWith({
-      where: {
-        personalOwnerId: 'user-123',
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    expect(folderFindMany).toHaveBeenCalledWith({
-      where: {
-        workspaceId: 'workspace-123',
-      },
-      orderBy: [
-        {
-          name: 'asc',
-        },
-        {
-          id: 'asc',
-        },
-      ],
-      select: {
-        id: true,
-        name: true,
-      },
-    });
-
-    expect(result).toEqual([
-      {
-        id: 'folder-1',
-        name: 'Classiques',
-      },
-      {
-        id: 'folder-2',
-        name: 'Créations',
-      },
+    tx.tag.findMany.mockResolvedValue([
+      { id: 'tag-cafe', name: 'Café', slug: 'cafe' },
+      { id: 'tag-agrumes', name: 'Agrumes', slug: 'agrumes' },
     ]);
-  });
-
-  it('creates a trimmed folder inside the personal workspace', async () => {
-    const result = await service.createPersonalFolder('user-123', {
-      name: '  Classiques  ',
-    });
-
-    expect(folderFindUnique).toHaveBeenCalledWith({
-      where: {
-        workspaceId_name: {
-          workspaceId: 'workspace-123',
-          name: 'Classiques',
-        },
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    expect(folderCreate).toHaveBeenCalledWith({
-      data: {
-        workspaceId: 'workspace-123',
-        name: 'Classiques',
-      },
-      select: {
-        id: true,
-        name: true,
-      },
-    });
-
-    expect(result).toEqual({
-      id: 'folder-new',
-      name: 'Classiques',
-    });
-  });
-
-  it('rejects an existing folder before creation', async () => {
-    folderFindUnique.mockResolvedValue({
-      id: 'folder-existing',
-    });
-
-    await expect(
-      service.createPersonalFolder('user-123', {
-        name: 'Classiques',
-      }),
-    ).rejects.toBeInstanceOf(ConflictException);
-
-    expect(folderCreate).not.toHaveBeenCalled();
-  });
-
-  it('maps a concurrent folder uniqueness violation to conflict', async () => {
-    folderCreate.mockRejectedValue(createKnownRequestError('P2002'));
-
-    await expect(
-      service.createPersonalFolder('user-123', {
-        name: 'Classiques',
-      }),
-    ).rejects.toBeInstanceOf(ConflictException);
-  });
-
-  it('lists tags only from the personal workspace', async () => {
-    tagFindMany.mockResolvedValue([
-      {
-        id: 'tag-1',
-        name: 'Agrumes',
-        slug: 'agrumes',
-      },
-      {
-        id: 'tag-2',
-        name: 'Classique',
-        slug: 'classique',
-      },
-    ]);
-
-    const result = await service.listPersonalTags('user-123');
-
-    expect(tagFindMany).toHaveBeenCalledWith({
-      where: {
-        workspaceId: 'workspace-123',
-      },
-      orderBy: [
-        {
-          name: 'asc',
-        },
-        {
-          id: 'asc',
-        },
-      ],
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-      },
-    });
-
-    expect(result).toEqual([
-      {
-        id: 'tag-1',
-        name: 'Agrumes',
-        slug: 'agrumes',
-      },
-      {
-        id: 'tag-2',
-        name: 'Classique',
-        slug: 'classique',
-      },
-    ]);
-  });
-
-  it('replaces the cocktail folder and tags atomically', async () => {
-    transactionTagFindMany.mockResolvedValue([
-      {
-        id: 'tag-cafe',
-        name: 'Café',
-        slug: 'cafe',
-      },
-      {
-        id: 'tag-agrumes',
-        name: 'Agrumes',
-        slug: 'agrumes',
-      },
-    ]);
-
     const result = await service.updatePersonalCocktailOrganization(
-      'user-123',
-      'espresso-martini',
+      'user',
+      'negroni',
       {
-        folderId: '550e8400-e29b-41d4-a716-446655440000',
+        folderIds: ['B', 'a', 'b'],
+        expectedVersion: 0,
         tagNames: [' Café ', 'Cafe', 'Agrumes'],
       },
     );
-
-    expect(transactionCocktailFindUnique).toHaveBeenCalledWith({
-      where: {
-        workspaceId_slug: {
-          workspaceId: 'workspace-123',
-          slug: 'espresso-martini',
-        },
-      },
-      select: {
-        id: true,
-      },
+    expect(tx.$queryRaw).toHaveBeenCalledTimes(1);
+    expect(tx.folder.findMany.mock.calls[0][0]).toMatchObject({
+      where: { workspaceId: 'workspace', id: { in: ['b', 'a'] } },
     });
-
-    expect(transactionFolderFindUnique).toHaveBeenCalledWith({
-      where: {
-        workspaceId_id: {
-          workspaceId: 'workspace-123',
-          id: '550e8400-e29b-41d4-a716-446655440000',
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-      },
-    });
-
-    expect(transactionTagCreateMany).toHaveBeenCalledWith({
+    expect(tx.tag.createMany).toHaveBeenCalledWith({
       data: [
-        {
-          workspaceId: 'workspace-123',
-          name: 'Café',
-          slug: 'cafe',
-        },
-        {
-          workspaceId: 'workspace-123',
-          name: 'Agrumes',
-          slug: 'agrumes',
-        },
+        { workspaceId: 'workspace', name: 'Café', slug: 'cafe' },
+        { workspaceId: 'workspace', name: 'Agrumes', slug: 'agrumes' },
       ],
       skipDuplicates: true,
     });
-
-    expect(transactionTagFindMany).toHaveBeenCalledWith({
-      where: {
-        workspaceId: 'workspace-123',
-        slug: {
-          in: ['cafe', 'agrumes'],
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-      },
+    expect(tx.cocktail.update.mock.calls[0][0]).toMatchObject({
+      where: { workspaceId_id: { workspaceId: 'workspace', id: 'cocktail' } },
+      data: { folderId: 'b', organizationVersion: { increment: 1 } },
     });
-
-    expect(transactionCocktailUpdate).toHaveBeenCalledWith({
-      where: {
-        workspaceId_id: {
-          workspaceId: 'workspace-123',
-          id: 'cocktail-123',
-        },
-      },
-      data: {
-        folderId: 'folder-123',
-      },
-    });
-
-    expect(cocktailTagDeleteMany).toHaveBeenCalledWith({
-      where: {
-        workspaceId: 'workspace-123',
-        cocktailId: 'cocktail-123',
-      },
-    });
-
-    expect(cocktailTagCreateMany).toHaveBeenCalledWith({
+    expect(tx.cocktailFolder.createMany).toHaveBeenCalledWith({
       data: [
-        {
-          workspaceId: 'workspace-123',
-          cocktailId: 'cocktail-123',
-          tagId: 'tag-cafe',
-        },
-        {
-          workspaceId: 'workspace-123',
-          cocktailId: 'cocktail-123',
-          tagId: 'tag-agrumes',
-        },
+        { workspaceId: 'workspace', cocktailId: 'cocktail', folderId: 'a' },
+        { workspaceId: 'workspace', cocktailId: 'cocktail', folderId: 'b' },
       ],
     });
-
     expect(result).toEqual({
-      folder: {
-        id: 'folder-123',
-        name: 'Classiques',
-      },
+      folder: { id: 'b', name: 'B' },
+      folders: [
+        { id: 'a', name: 'A' },
+        { id: 'b', name: 'B' },
+      ],
+      organizationVersion: 1,
       tags: [
-        {
-          id: 'tag-agrumes',
-          name: 'Agrumes',
-          slug: 'agrumes',
-        },
-        {
-          id: 'tag-cafe',
-          name: 'Café',
-          slug: 'cafe',
-        },
+        { id: 'tag-agrumes', name: 'Agrumes', slug: 'agrumes' },
+        { id: 'tag-cafe', name: 'Café', slug: 'cafe' },
       ],
     });
   });
 
-  it('removes the folder and every tag when the replacement is empty', async () => {
-    const result = await service.updatePersonalCocktailOrganization(
-      'user-123',
+  it('accepts a legacy single folder and an empty replacement', async () => {
+    const single = await service.updatePersonalCocktailOrganization(
+      'user',
       'negroni',
-      {
-        folderId: null,
-        tagNames: [],
-      },
+      { folderId: 'a', tagNames: [] },
     );
-
-    expect(transactionFolderFindUnique).not.toHaveBeenCalled();
-
-    expect(transactionTagCreateMany).not.toHaveBeenCalled();
-
-    expect(transactionTagFindMany).not.toHaveBeenCalled();
-
-    expect(transactionCocktailUpdate).toHaveBeenCalledWith({
-      where: {
-        workspaceId_id: {
-          workspaceId: 'workspace-123',
-          id: 'cocktail-123',
-        },
-      },
-      data: {
-        folderId: null,
-      },
-    });
-
-    expect(cocktailTagDeleteMany).toHaveBeenCalledTimes(1);
-
-    expect(cocktailTagCreateMany).not.toHaveBeenCalled();
-
-    expect(result).toEqual({
+    expect(single.folders).toEqual([{ id: 'a', name: 'A' }]);
+    const empty = await service.updatePersonalCocktailOrganization(
+      'user',
+      'negroni',
+      { folderId: null, tagNames: [] },
+    );
+    expect(empty).toEqual({
+      folders: [],
       folder: null,
       tags: [],
+      organizationVersion: 1,
+    });
+    expect(tx.cocktailFolder.deleteMany).toHaveBeenCalledWith({
+      where: { workspaceId: 'workspace', cocktailId: 'cocktail' },
+    });
+    expect(tx.cocktailTag.deleteMany).toHaveBeenCalledWith({
+      where: { workspaceId: 'workspace', cocktailId: 'cocktail' },
     });
   });
 
-  it('rejects a folder that is unavailable in the personal workspace', async () => {
-    transactionFolderFindUnique.mockResolvedValue(null);
-
-    await expect(
-      service.updatePersonalCocktailOrganization('user-123', 'negroni', {
-        folderId: '550e8400-e29b-41d4-a716-446655440000',
-        tagNames: [],
-      }),
-    ).rejects.toBeInstanceOf(BadRequestException);
-
-    expect(transactionCocktailUpdate).not.toHaveBeenCalled();
-
-    expect(cocktailTagDeleteMany).not.toHaveBeenCalled();
+  it('rejects stale versions and legacy writes over a multiple set before creating tags or links', async () => {
+    tx.cocktail.findUnique.mockResolvedValue({
+      id: 'cocktail',
+      folderId: 'a',
+      organizationVersion: 2,
+      _count: { folderMemberships: 2 },
+    });
+    for (const dto of [
+      { folderIds: [], expectedVersion: 1, tagNames: ['Unwritten'] },
+      { folderId: null, tagNames: ['Unwritten'] },
+    ]) {
+      await expect(
+        service.updatePersonalCocktailOrganization('user', 'negroni', dto),
+      ).rejects.toBeInstanceOf(ConflictException);
+    }
+    expect(tx.tag.createMany).not.toHaveBeenCalled();
+    expect(tx.cocktail.update).not.toHaveBeenCalled();
+    expect(tx.cocktailFolder.deleteMany).not.toHaveBeenCalled();
   });
 
-  it('returns not found when the cocktail does not belong to the personal workspace', async () => {
-    transactionCocktailFindUnique.mockResolvedValue(null);
-
+  it.each([
+    { folderIds: [], tagNames: [] },
+    { folderIds: [], folderId: null, expectedVersion: 0, tagNames: [] },
+    { tagNames: [] },
+  ])('rejects an incomplete or mixed contract %j', async (dto) => {
     await expect(
-      service.updatePersonalCocktailOrganization(
-        'user-123',
-        'unknown-cocktail',
-        {
-          folderId: null,
-          tagNames: [],
-        },
-      ),
+      service.updatePersonalCocktailOrganization('user', 'negroni', dto),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(tx.$queryRaw).not.toHaveBeenCalled();
+  });
+
+  it('rejects unavailable folders before writing tags', async () => {
+    tx.folder.findMany.mockResolvedValue([]);
+    await expect(
+      service.updatePersonalCocktailOrganization('user', 'negroni', {
+        folderIds: ['foreign'],
+        expectedVersion: 0,
+        tagNames: ['Unwritten'],
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(tx.tag.createMany).not.toHaveBeenCalled();
+    expect(tx.cocktail.update).not.toHaveBeenCalled();
+  });
+
+  it('returns the same not found result for an unavailable cocktail', async () => {
+    tx.cocktail.findUnique.mockResolvedValue(null);
+    await expect(
+      service.updatePersonalCocktailOrganization('user', 'missing', {
+        folderId: null,
+        tagNames: [],
+      }),
     ).rejects.toBeInstanceOf(NotFoundException);
-
-    expect(transactionFolderFindUnique).not.toHaveBeenCalled();
-
-    expect(transactionCocktailUpdate).not.toHaveBeenCalled();
+    expect(tx.folder.findMany).not.toHaveBeenCalled();
   });
 
-  it('rejects a tag name that cannot produce a canonical slug', async () => {
+  it.each([
+    ['--- !!! ---'],
+    ['a'.repeat(41)],
+    ['   '],
+    Array.from({ length: 21 }, (_, i) => `Tag${i}`),
+  ])(
+    'rejects noncanonical or excessive tags %j',
+    async (...tagNames: string[]) => {
+      await expect(
+        service.updatePersonalCocktailOrganization('user', 'negroni', {
+          folderId: null,
+          tagNames,
+        }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(tx.$queryRaw).not.toHaveBeenCalled();
+    },
+  );
+
+  it('fails atomically if stored tags cannot all be resolved', async () => {
     await expect(
-      service.updatePersonalCocktailOrganization('user-123', 'negroni', {
+      service.updatePersonalCocktailOrganization('user', 'negroni', {
         folderId: null,
-        tagNames: ['--- !!! ---'],
-      }),
-    ).rejects.toBeInstanceOf(BadRequestException);
-
-    expect(prismaTransaction).not.toHaveBeenCalled();
-  });
-
-  it('fails when persisted tags cannot all be resolved', async () => {
-    transactionTagFindMany.mockResolvedValue([
-      {
-        id: 'tag-1',
-        name: 'Classique',
-        slug: 'classique',
-      },
-    ]);
-
-    await expect(
-      service.updatePersonalCocktailOrganization('user-123', 'negroni', {
-        folderId: null,
-        tagNames: ['Classique', 'Amer'],
+        tagNames: ['Missing'],
       }),
     ).rejects.toBeInstanceOf(InternalServerErrorException);
-
-    expect(transactionCocktailUpdate).not.toHaveBeenCalled();
+    expect(tx.cocktail.update).not.toHaveBeenCalled();
   });
 
-  it('fails before accessing organization data when the personal workspace is missing', async () => {
-    workspaceFindUnique.mockResolvedValue(null);
-
+  it('fails when the workspace is missing or disappears before locking', async () => {
+    workspace.mockResolvedValueOnce(null);
     await expect(
-      service.listPersonalFolders('user-123'),
-    ).rejects.toBeInstanceOf(InternalServerErrorException);
-
-    await expect(service.listPersonalTags('user-123')).rejects.toBeInstanceOf(
-      InternalServerErrorException,
-    );
-
-    await expect(
-      service.updatePersonalCocktailOrganization('user-123', 'negroni', {
+      service.updatePersonalCocktailOrganization('user', 'negroni', {
         folderId: null,
         tagNames: [],
       }),
     ).rejects.toBeInstanceOf(InternalServerErrorException);
-
-    expect(folderFindMany).not.toHaveBeenCalled();
-    expect(tagFindMany).not.toHaveBeenCalled();
-
-    expect(prismaTransaction).not.toHaveBeenCalled();
+    tx.$queryRaw.mockResolvedValue([]);
+    await expect(
+      service.updatePersonalCocktailOrganization('user', 'negroni', {
+        folderId: null,
+        tagNames: [],
+      }),
+    ).rejects.toBeInstanceOf(InternalServerErrorException);
+    expect(tx.cocktail.findUnique).not.toHaveBeenCalled();
   });
 });

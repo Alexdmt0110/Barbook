@@ -4,7 +4,7 @@
 
 - Phase A validée comme base, lots L0–L2 approuvés ; décisions techniques ordinaires, branches, commits atomiques, push et PR dans ce périmètre autorisés.
 - Merges, migrations destructives, décisions métier structurantes et production conservés par Alex ; aucun accès ni déploiement VPS demandé par ces lots.
-- Branche dossiers préservée et temporairement suspendue. Reprise L3 à présenter après L2.
+- Suspension initiale des dossiers levée le 19 octobre après intégration L0–L2 ; branche et trois commits conservés sans réécriture.
 - Responsable actif : WORK dans cette conversation, sur demande d'Alex ; tout transfert vers Chat classique exige l'arrêt de l'écrivain précédent et le contrôle GitHub.
 
 ## Choix techniques ordinaires L0
@@ -63,17 +63,16 @@ Les recommandations ci-dessous sont **des propositions**, aucune n'est considér
 
 **Recommandation initiale :** autoriser les branches/commits/push des lots approuvés et les décisions techniques courantes ; garder le merge et la production à validation explicite tant que le pipeline n'a pas été éprouvé. Option ultérieure : préautoriser les merges non destructifs après Review Gate complet et CI verte, en merge commit, avec vérification mergedAt et main post-merge.
 
-**À décider :** autorisation de nouveaux lots après L2 et politique de merge des phases suivantes. L0–L2, branches/commits/push/PR sont déjà autorisés ; tous les merges restent à valider. Phase B n'autorise jamais implicitement production, CONTRACT, suppression de données, réécriture d'historique ni coûts externes. L'accès en écriture a été prouvé après autorisation de phase B, puis recontrôlé le 19 octobre.
+**À décider :** autorisation des lots après L3 et politique de merge des phases suivantes. Branches/commits/push/PR de L0–L3 sont autorisés ; seuls les merges #20–#23 ont reçu un accord et ont été exécutés. Tout merge suivant reste à valider. Phase B n'autorise jamais implicitement production, CONTRACT, suppression de données, réécriture d'historique ni coûts externes. L'accès en écriture a été prouvé après autorisation de phase B, puis recontrôlé le 19 octobre.
 
 
-## Décisions de livraison à soumettre après L2
+## Livraison courante et validations encore ouvertes
 
-Recommandation : valider les PR #20 à #23 dans cet ordre, actualiser et requalifier chaque branche après changement de main, puis vérifier l'ensemble intégré avant toute reprise L3. Alternative : demander des modifications ciblées ou conserver provisoirement les PR ouvertes ; main reste inchangé. Aucun merge n'a été exécuté.
+#20–#23 ont été mergées avec accord le 19 octobre et main qualifié ; [checkpoint-l3.md](checkpoint-l3.md) conserve les SHA/preuves. L3 B3a–B3c est développé et qualifié, Review Gate favorable à une PR. Son merge nécessite un accord distinct ; aucune décision D1–D8 n'est close par la CI.
 
-Recommandation séparée : après intégration et qualification des workflows, rendre requis PostgreSQL Integration, Browser Integration et Dependency Audit (backend/frontend), en gardant Backend Quality et Frontend Quality. Alternative : laisser provisoirement les checks supplémentaires informatifs ; ils ne bloqueraient alors pas un merge via le ruleset, même s'ils échouent. Aucun changement de protection effectué ici.
+Recommandation séparée : rendre requis PostgreSQL Integration, Browser Integration et Dependency Audit (backend/frontend), en gardant Backend Quality et Frontend Quality. Alternative : conserver les quatre supplémentaires informatifs ; ils ne bloquent alors pas un merge par le ruleset. Aucun changement de protection effectué. Un accord de merge L3 ne devra pas être interprété comme validation de ce ruleset.
 
-L3 : reprise de la branche dossiers conservée, selon checkpoint-l0-l2.md, sans renommer l'EXPAND partagé et avec tests des deux ordres de migration. Cette proposition n'autorise pas le lot, sa fusion ni CONTRACT. D1–D8 ne sont pas fermées par les résultats de tests L0–L2.
-
+Après L3, cadrer D1/D2 pour L4. D3/D4 concernent la collaboration, D5 le cycle de recette/rétention, D6 les médias et D7/D8 l'exploitation/livraison. Ni CONTRACT ni accès/migration/déploiement de propriétaire/VPS autorisés. Les choix techniques ordinaires des dossiers sont documentés dans l3-design.md ; ils ne décident pas de ces politiques métier.
 
 ## Validation du propriétaire — 19 octobre 2026, après checkpoint L0–L2
 

@@ -1,312 +1,165 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Observable, of, throwError } from 'rxjs';
-import {
-  CocktailOrganizationResult,
-  CocktailSummaryFolder,
-  CocktailSummaryTag,
-  CreateCocktailFolderRequest,
-  UpdateCocktailOrganizationRequest,
-} from '../../data-access/cocktail.models';
-import { CocktailsService } from '../../data-access/cocktails.service';
+import { CocktailOrganizationResult } from '../../data-access/cocktail.models';
 import { CocktailOrganizationEditor } from './cocktail-organization-editor';
 
-class CocktailsServiceStub {
-  readonly createdFolders: CreateCocktailFolderRequest[] = [];
-
-  readonly organizationRequests: {
-    slug: string;
-    organization: UpdateCocktailOrganizationRequest;
-  }[] = [];
-
-  foldersResponse: Observable<CocktailSummaryFolder[]> = of([
-    {
-      id: 'folder-classics',
-      name: 'Classiques',
-    },
-  ]);
-
-  tagsResponse: Observable<CocktailSummaryTag[]> = of([
-    {
-      id: 'tag-classic',
-      name: 'Classique',
-      slug: 'classique',
-    },
-    {
-      id: 'tag-citrus',
-      name: 'Agrumes',
-      slug: 'agrumes',
-    },
-  ]);
-
-  createFolderHandler = (folder: CreateCocktailFolderRequest): Observable<CocktailSummaryFolder> =>
-    of({
-      id: 'folder-new',
-      name: folder.name,
-    });
-
-  updateOrganizationHandler = (
-    organization: UpdateCocktailOrganizationRequest,
-  ): Observable<CocktailOrganizationResult> =>
-    of({
-      folder:
-        organization.folderId === null
-          ? null
-          : {
-              id: organization.folderId,
-              name: 'Classiques',
-            },
-      tags: organization.tagNames.map((name, index) => ({
-        id: `tag-${index + 1}`,
-        name,
-        slug: name
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, ''),
-      })),
-    });
-
-  getPersonalFolders(): Observable<CocktailSummaryFolder[]> {
-    return this.foldersResponse;
-  }
-
-  getPersonalTags(): Observable<CocktailSummaryTag[]> {
-    return this.tagsResponse;
-  }
-
-  createPersonalFolder(folder: CreateCocktailFolderRequest): Observable<CocktailSummaryFolder> {
-    this.createdFolders.push({
-      ...folder,
-    });
-
-    return this.createFolderHandler(folder);
-  }
-
-  updatePersonalCocktailOrganization(
-    slug: string,
-    organization: UpdateCocktailOrganizationRequest,
-  ): Observable<CocktailOrganizationResult> {
-    this.organizationRequests.push({
-      slug,
-      organization: {
-        folderId: organization.folderId,
-        tagNames: [...organization.tagNames],
-      },
-    });
-
-    return this.updateOrganizationHandler(organization);
-  }
-}
+const a = { id: 'a', name: 'Classiques' };
+const b = { id: 'b', name: 'Favoris' };
+const tag = { id: 'tag', name: 'Classique', slug: 'classique' };
 
 describe('CocktailOrganizationEditor', () => {
-  let cocktailsService: CocktailsServiceStub;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  let http: HttpTestingController;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
       imports: [CocktailOrganizationEditor],
-      providers: [
-        {
-          provide: CocktailsService,
-          useClass: CocktailsServiceStub,
-        },
-      ],
-    }).compileComponents();
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+    http = TestBed.inject(HttpTestingController);
+  });
+  afterEach(() => http.verify());
+  function catalog(items = [a, b], pages = 1) {
+    http.expectOne('/api/tags').flush([tag]);
+    http
+      .expectOne((req) => req.url === '/api/folders/browse')
+      .flush({ items, total: items.length, page: 1, pageSize: 25, totalPages: pages });
+  }
+  function setup() {
+    const fixture = TestBed.createComponent(CocktailOrganizationEditor);
+    fixture.componentRef.setInput('slug', 'daiquiri');
+    fixture.componentRef.setInput('organizationVersion', 4);
+    fixture.componentRef.setInput('folders', [a]);
+    fixture.componentRef.setInput('tags', [tag]);
+    fixture.detectChanges();
+    catalog();
+    fixture.detectChanges();
+    return fixture;
+  }
+  function checkbox(root: HTMLElement, name: string) {
+    const label = [...root.querySelectorAll('label')].find((el) => el.textContent?.trim() === name);
+    return label?.querySelector('input') as HTMLInputElement;
+  }
 
-    cocktailsService = TestBed.inject(CocktailsService) as unknown as CocktailsServiceStub;
+  it('renders the checked folder and canonical selected tags', () => {
+    const fixture = setup();
+    expect(checkbox(fixture.nativeElement, 'Classiques').checked).toBe(true);
+    expect(checkbox(fixture.nativeElement, 'Favoris').checked).toBe(false);
+    expect(fixture.componentInstance.selectedTagNames()).toEqual(['Classique']);
   });
 
-  it('loads catalogs and initializes the current organization', () => {
-    const fixture = TestBed.createComponent(CocktailOrganizationEditor);
-
-    fixture.componentRef.setInput('slug', 'daiquiri');
-
-    fixture.componentRef.setInput('folder', {
-      id: 'folder-classics',
-      name: 'Classiques',
-    });
-
-    fixture.componentRef.setInput('tags', [
-      {
-        id: 'tag-classic',
-        name: 'Classique',
-        slug: 'classique',
-      },
-    ]);
-
+  it('creates and selects a new folder without losing existing selections in the DOM', () => {
+    const fixture = setup();
+    fixture.componentInstance.newFolderName.set('  Soirée  ');
+    fixture.componentInstance.createFolder();
+    const request = http.expectOne('/api/folders');
+    expect(request.request.body).toEqual({ name: 'Soirée' });
+    request.flush({ id: 'c', name: 'Soirée' });
     fixture.detectChanges();
-
-    const component = fixture.componentInstance;
-
-    expect(component.selectedFolderId()).toBe('folder-classics');
-
-    expect((fixture.nativeElement.querySelector('#cocktail-folder') as HTMLSelectElement).value).toBe(
-      'folder-classics',
-    );
-
-    expect(component.selectedTagNames()).toEqual(['Classique']);
-
-    expect(component.availableFolders()).toEqual([
-      {
-        id: 'folder-classics',
-        name: 'Classiques',
-      },
-    ]);
-
-    expect(component.availableTags().map((tag) => tag.name)).toEqual(['Agrumes', 'Classique']);
+    expect(checkbox(fixture.nativeElement, 'Classiques').checked).toBe(true);
+    expect(checkbox(fixture.nativeElement, 'Soirée').checked).toBe(true);
+    expect(fixture.componentInstance.selectedFolderIds()).toEqual(['a', 'c']);
   });
 
-  it('creates a folder and selects it', () => {
-    const fixture = TestBed.createComponent(CocktailOrganizationEditor);
-
-    fixture.componentRef.setInput('slug', 'daiquiri');
-
-    fixture.detectChanges();
-
-    const input = fixture.nativeElement.querySelector(
-      'input[aria-label="Nom du nouveau dossier"]',
-    ) as HTMLInputElement;
-
-    input.value = 'Favoris';
-
-    input.dispatchEvent(new Event('input'));
-
-    fixture.detectChanges();
-
-    const button = fixture.nativeElement.querySelector(
-      '.create-folder-button',
-    ) as HTMLButtonElement;
-
-    button.click();
-
-    fixture.detectChanges();
-
-    expect(cocktailsService.createdFolders).toEqual([
-      {
-        name: 'Favoris',
-      },
-    ]);
-
-    expect(fixture.componentInstance.selectedFolderId()).toBe('folder-new');
-
-    expect((fixture.nativeElement.querySelector('#cocktail-folder') as HTMLSelectElement).value).toBe(
-      'folder-new',
-    );
-
-    expect(fixture.componentInstance.availableFolders()).toContainEqual({
-      id: 'folder-new',
-      name: 'Favoris',
+  it('sends the entire set and expected version, applies the returned version for a consecutive save', () => {
+    const fixture = setup();
+    checkbox(fixture.nativeElement, 'Favoris').click();
+    fixture.componentInstance.newTagName.set(' Tropical ');
+    fixture.componentInstance.addTag();
+    fixture.componentInstance.saveOrganization();
+    const request = http.expectOne('/api/cocktails/daiquiri/organization');
+    expect(request.request.body).toEqual({
+      folderIds: ['a', 'b'],
+      tagNames: ['Classique', 'Tropical'],
+      expectedVersion: 4,
     });
-  });
-
-  it('adds a new tag and saves the complete organization', () => {
-    const fixture = TestBed.createComponent(CocktailOrganizationEditor);
-
-    fixture.componentRef.setInput('slug', 'daiquiri');
-
-    fixture.componentRef.setInput('folder', {
-      id: 'folder-classics',
-      name: 'Classiques',
-    });
-
-    fixture.componentRef.setInput('tags', [
-      {
-        id: 'tag-classic',
-        name: 'Classique',
-        slug: 'classique',
-      },
-    ]);
-
+    const result: CocktailOrganizationResult = {
+      folder: a,
+      folders: [a, b],
+      tags: [tag],
+      organizationVersion: 5,
+    };
+    request.flush(result);
     fixture.detectChanges();
-
-    const emittedOrganizations: CocktailOrganizationResult[] = [];
-
-    fixture.componentInstance.organizationUpdated.subscribe((organization) => {
-      emittedOrganizations.push(organization);
-    });
-
-    const input = fixture.nativeElement.querySelector(
-      'input[aria-label="Nom du nouveau tag"]',
-    ) as HTMLInputElement;
-
-    input.value = ' Tropical ';
-
-    input.dispatchEvent(new Event('input'));
-
-    fixture.detectChanges();
-
-    const addButton = fixture.nativeElement.querySelector('.add-tag-button') as HTMLButtonElement;
-
-    addButton.click();
-
-    fixture.detectChanges();
-
-    const saveButton = fixture.nativeElement.querySelector(
-      '.save-organization-button',
-    ) as HTMLButtonElement;
-
-    saveButton.click();
-
-    fixture.detectChanges();
-
-    expect(cocktailsService.organizationRequests).toEqual([
-      {
-        slug: 'daiquiri',
-        organization: {
-          folderId: 'folder-classics',
-          tagNames: ['Classique', 'Tropical'],
-        },
-      },
-    ]);
-
-    expect(emittedOrganizations).toHaveLength(1);
-
     expect(fixture.nativeElement.textContent).toContain('Organisation enregistrée.');
+    fixture.componentInstance.saveOrganization();
+    const second = http.expectOne('/api/cocktails/daiquiri/organization');
+    expect(second.request.body.expectedVersion).toBe(5);
+    second.flush({ ...result, organizationVersion: 6 });
   });
 
-  it('removes an existing tag from the replacement state', () => {
-    const fixture = TestBed.createComponent(CocktailOrganizationEditor);
-
-    fixture.componentRef.setInput('slug', 'daiquiri');
-
-    fixture.componentRef.setInput('tags', [
-      {
-        id: 'tag-classic',
-        name: 'Classique',
-        slug: 'classique',
-      },
-    ]);
-
-    fixture.detectChanges();
-
+  it('removes a folder or tag locally without changing the other draft fields', () => {
+    const fixture = setup();
+    checkbox(fixture.nativeElement, 'Favoris').click();
+    fixture.componentInstance.removeFolder('a');
+    expect(fixture.componentInstance.selectedFolderIds()).toEqual(['b']);
+    expect(fixture.componentInstance.selectedTagNames()).toEqual(['Classique']);
     fixture.componentInstance.removeTag('Classique');
-
     expect(fixture.componentInstance.selectedTagNames()).toEqual([]);
   });
 
-  it('renders a conflict error when a folder already exists', () => {
-    cocktailsService.createFolderHandler = () =>
-      throwError(
-        () =>
-          new HttpErrorResponse({
-            status: 409,
-            statusText: 'Conflict',
-          }),
-      );
-
-    const fixture = TestBed.createComponent(CocktailOrganizationEditor);
-
-    fixture.componentRef.setInput('slug', 'daiquiri');
-
-    fixture.detectChanges();
-
+  it('keeps the name and selections when creation collides', () => {
+    const fixture = setup();
     fixture.componentInstance.newFolderName.set('Classiques');
-
     fixture.componentInstance.createFolder();
-
+    http.expectOne('/api/folders').flush({}, { status: 409, statusText: 'Conflict' });
     fixture.detectChanges();
-
     expect(fixture.nativeElement.textContent).toContain('Un dossier portant ce nom existe déjà.');
+    expect(fixture.componentInstance.newFolderName()).toBe('Classiques');
+    expect(fixture.componentInstance.selectedFolderIds()).toEqual(['a']);
+  });
+
+  it('keeps the full draft on 409 and replaces it only on explicit, successful reload', () => {
+    const fixture = setup();
+    checkbox(fixture.nativeElement, 'Favoris').click();
+    fixture.componentInstance.newTagName.set('Draft');
+    fixture.componentInstance.addTag();
+    fixture.componentInstance.saveOrganization();
+    http
+      .expectOne('/api/cocktails/daiquiri/organization')
+      .flush({}, { status: 409, statusText: 'Conflict' });
+    fixture.detectChanges();
+    expect(fixture.componentInstance.selectedFolderIds()).toEqual(['a', 'b']);
+    expect(fixture.componentInstance.selectedTagNames()).toEqual(['Classique', 'Draft']);
+    expect(fixture.nativeElement.textContent).toContain('Ton brouillon est conservé.');
+    fixture.componentInstance.reloadOrganization();
+    http.expectOne('/api/cocktails/daiquiri').flush({}, { status: 503, statusText: 'Unavailable' });
+    expect(fixture.componentInstance.selectedFolderIds()).toEqual(['a', 'b']);
+    fixture.componentInstance.reloadOrganization();
+    http
+      .expectOne('/api/cocktails/daiquiri')
+      .flush({ folder: b, folders: [b], tags: [], organizationVersion: 8 });
+    expect(fixture.componentInstance.selectedFolderIds()).toEqual(['b']);
+    expect(fixture.componentInstance.selectedTagNames()).toEqual([]);
+    fixture.componentInstance.saveOrganization();
+    const request = http.expectOne('/api/cocktails/daiquiri/organization');
+    expect(request.request.body).toEqual({ folderIds: ['b'], tagNames: [], expectedVersion: 8 });
+    request.flush({ folder: b, folders: [b], tags: [], organizationVersion: 9 });
+  });
+
+  it('preserves selected IDs across catalog pages and search without resetting the draft', () => {
+    const fixture = setup();
+    fixture.componentInstance.loadCatalogs(2);
+    catalog([{ id: 'c', name: 'Soirée' }], 2);
+    fixture.detectChanges();
+    checkbox(fixture.nativeElement, 'Soirée').click();
+    fixture.componentInstance.folderSearch.set('Favoris');
+    fixture.componentInstance.loadCatalogs(1);
+    catalog([b]);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.selectedFolderIds()).toEqual(['a', 'c']);
+    expect(fixture.componentInstance.selectedTagNames()).toEqual(['Classique']);
+    expect(
+      fixture.nativeElement.querySelector('[aria-label="Dossiers sélectionnés"]').textContent,
+    ).toContain('Soirée');
+  });
+
+  it('keeps a partially typed tag when selecting a known tag', () => {
+    const fixture = setup();
+    fixture.componentInstance.removeTag('Classique');
+    fixture.componentInstance.newTagName.set('Unfinished');
+    fixture.detectChanges();
+    checkbox(fixture.nativeElement, 'Classique').click();
+    expect(fixture.componentInstance.newTagName()).toBe('Unfinished');
+    expect(fixture.componentInstance.selectedTagNames()).toEqual(['Classique']);
   });
 });

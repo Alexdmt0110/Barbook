@@ -6,11 +6,12 @@
     "lots": [
       "L0",
       "L1",
-      "L2"
+      "L2",
+      "L3_B3a_B3c"
     ],
-    "merges": false,
+    "merges": "PR_20_21_22_23_UNIQUEMENT",
     "production": false,
-    "decisions_D1_D8": "OUVERTES_SAUF_GARDE_FOUS_EXPLICITES_L0_L2"
+    "decisions_D1_D8": "OUVERTES_SAUF_AUTORISATIONS_EXPLICITES"
   },
   "sources": "audit/03-Vision-et-catalogue.md ; roadmap.md ; backlog.md",
   "features": [
@@ -652,14 +653,14 @@
       "id": "BB-F-023",
       "titre": "Appartenances multiples aux dossiers",
       "statut_observe": "partielle — branche active, S13.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
+      "statut_execution": "PR_OUVERTE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
       "branche_actuelle": "feature/cocktail-folder-management",
       "branche_proposee": null,
-      "pr_actuelle": null,
-      "commit_preuve": "46321485d1d28351da7e0b555411199f40fa801a",
+      "pr_actuelle": "#24",
+      "commit_preuve": "b0bb7574e373a2876b93cf67abf22f671ae7fca3",
       "valeur_parcours": "depuis une fiche, cocher plusieurs collections puis retrouver la même recette dans chacune.",
       "regles_cas_limites": "0..n dossiers plats ; déduplication des IDs ; relation unique, FK composites ; remplacer l'ensemble depuis la fiche atomiquement avec version attendue ; filtre folderId inchangé mais lecture via CocktailFolder. Liste vide retire seulement les appartenances, pas les tags/recette.",
       "donnees_api_droits": "reprendre la branche existante ; PUT `{folderIds: UUID[], tagNames: string[], expectedVersion}` et réponses `folders[]` ; compatibilité de `folder`/`folderId` explicitement temporisée ; aucun vieux client ne doit écraser un ensemble multiple.",
@@ -671,22 +672,46 @@
         "BB-F-057"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "docs/maintenance/folder-management.md ; docs/project/checkpoint-l3.md ; docs/project/reviews/l3-review-gate.md",
+      "prochain_bloc": "Attendre l’accord explicite de merge #24 ; puis relire head/base/discussions/checks courants et qualifier main. CONTRACT, L4 et production exclus.",
+      "autorisation": "LOT_L3_B3A_B3C_SANS_CONTRACT",
+      "perimetre_execute": "L3 B3a–B3c, qualifié en CI ; merge encore à valider.",
+      "preuves_execution": [
+        {
+          "sha": "b0bb7574e373a2876b93cf67abf22f671ae7fca3",
+          "date": "2026-10-19",
+          "runs": [
+            39223198122,
+            39223198121,
+            39223198101
+          ],
+          "resultat": "151 backend+NYC,131 frontend,10 garde-fous,61 PostgreSQL/HTTP/migrations,4 Chromium desktop/mobile complets ; six checks success ; lot100/pages/clavier/3 thèmes ; captures inspectées ; aucune production."
+        },
+        {
+          "pr": 24,
+          "sha": "cbe399d07c157073bfd5d4137310c9b40c0d0c9a",
+          "date": "2026-10-19",
+          "runs": [
+            39225651026,
+            39225650860,
+            39225651014
+          ],
+          "resultat": "Vrai diff : 76 fichiers/blobs et 13 commits vérifiés, aucun commentaire/revue, mergeable/clean ; six checks PR success, logs 61 natifs et 4 Chromium relus ; merge non autorisé."
+        }
+      ]
     },
     {
       "id": "BB-F-024",
       "titre": "Navigation et gestion complète des dossiers",
       "statut_observe": "partielle — création dans la fiche, pas de page dédiée.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
+      "statut_execution": "PR_OUVERTE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
       "branche_actuelle": "feature/cocktail-folder-management",
       "branche_proposee": null,
-      "pr_actuelle": null,
-      "commit_preuve": "46321485d1d28351da7e0b555411199f40fa801a",
+      "pr_actuelle": "#24",
+      "commit_preuve": "b0bb7574e373a2876b93cf67abf22f671ae7fca3",
       "valeur_parcours": "onglet Dossiers dans le header, liste et création visibles, ouverture, recherche des cocktails, ajout multiple, retrait local, renommage et suppression sûrs.",
       "regles_cas_limites": "nom trim 1–80, unicité exacte par workspace selon ADR actuel, case policy explicite ; 0 recette = vrai état vide ; ajout en lot borné (proposition 100 IDs), validé entièrement ou rollback ; retirer ne modifie ni tags ni autres dossiers. Suppression confirmée détache les liens, jamais les recettes.",
       "donnees_api_droits": "GET/PATCH/DELETE folder par ID, GET cocktails paginés du dossier ; PUT `/folders/:id/cocktails/:cocktailId` et DELETE idempotents, endpoint lot additive ; 409 doublon, 404 hors scope ; verrouillage/version cohérent avec F023.",
@@ -698,9 +723,33 @@
         "BB-F-049"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "docs/maintenance/folder-management.md ; docs/project/checkpoint-l3.md ; docs/project/reviews/l3-review-gate.md",
+      "prochain_bloc": "Attendre l’accord explicite de merge #24 ; puis relire head/base/discussions/checks courants et qualifier main. CONTRACT, L4 et production exclus.",
+      "autorisation": "LOT_L3_B3A_B3C_SANS_CONTRACT",
+      "perimetre_execute": "L3 B3a–B3c, qualifié en CI ; merge encore à valider.",
+      "preuves_execution": [
+        {
+          "sha": "b0bb7574e373a2876b93cf67abf22f671ae7fca3",
+          "date": "2026-10-19",
+          "runs": [
+            39223198122,
+            39223198121,
+            39223198101
+          ],
+          "resultat": "151 backend+NYC,131 frontend,10 garde-fous,61 PostgreSQL/HTTP/migrations,4 Chromium desktop/mobile complets ; six checks success ; lot100/pages/clavier/3 thèmes ; captures inspectées ; aucune production."
+        },
+        {
+          "pr": 24,
+          "sha": "cbe399d07c157073bfd5d4137310c9b40c0d0c9a",
+          "date": "2026-10-19",
+          "runs": [
+            39225651026,
+            39225650860,
+            39225651014
+          ],
+          "resultat": "Vrai diff : 76 fichiers/blobs et 13 commits vérifiés, aucun commentaire/revue, mergeable/clean ; six checks PR success, logs 61 natifs et 4 Chromium relus ; merge non autorisé."
+        }
+      ]
     },
     {
       "id": "BB-F-025",
@@ -1600,14 +1649,14 @@
       "id": "BB-F-057",
       "titre": "CI, contrats, DB, sécurité et dépendances",
       "statut_observe": "partielle — deux quality jobs réellement verts, couverture incomplète.",
-      "statut_execution": "PR_OUVERTE_PERIMETRE_L0_L2",
+      "statut_execution": "MERGE_PARTIEL_L0_L2",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
       "branche_actuelle": "test/critical-integration-flows",
       "branche_proposee": null,
       "pr_actuelle": "#23",
-      "commit_preuve": "e5cc3532d633009f0e4665bd13927f0f9a996534",
+      "commit_preuve": "c0fc5fd3facd42c112673bbfc47285ba4547259b",
       "valeur_parcours": "chaque PR donne une preuve reproductible avant merge.",
       "regles_cas_limites": "conserver noms requis et actions épinglées ; Node/lockfiles contrôlés, zéro warning lint ; lint/build/unit frontend/backend, validation Prisma, DB migrations et tests hostiles, contrats HTTP et navigateur critique ; audit deps actuel avec exceptions motivées, jamais faux green si tests ignorés.",
       "donnees_api_droits": "PostgreSQL éphémère, fixtures synthétiques et secrets CI non réutilisés ; OpenAPI ou schéma de contrat versionné et vérifié ; permissions lecture en CI non trusted, secrets de déploiement indisponibles aux PR.",
@@ -1619,7 +1668,7 @@
       ],
       "decisions": [],
       "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation des PR #21/#22/#23, requalification combinée après merges autorisés ; nouveaux checks requis à proposer. Aucun merge ou déploiement automatique.",
+      "prochain_bloc": "Checks supplémentaires requis à proposer séparément ; qualification future des contrats/release selon lots autorisés. L0–L2 mergés et L3 qualifié sur sa branche, aucune production.",
       "autorisation": "PARTIELLE_LOTS_L0_L2",
       "preuves_execution": [
         {
@@ -1631,6 +1680,10 @@
           "pr": 23,
           "sha": "e5cc3532d633009f0e4665bd13927f0f9a996534",
           "resultat": "126 unitaires, 10 garde-fous, 36 PostgreSQL/HTTP et 4 Chromium verts ; migrations/drift et smoke verts ; CI PR 39212891892 et 39212891925 verte."
+        },
+        {
+          "sha": "c0fc5fd3facd42c112673bbfc47285ba4547259b",
+          "resultat": "#20–#23 mergées après accord ; six checks sur main verts, 141 unitaires + NYC, 110 frontend, 10 garde-fous, 37 natifs et 4 parcours Chromium."
         }
       ]
     },
@@ -1697,14 +1750,14 @@
       "id": "BB-F-060",
       "titre": "Pilotage versionné et relais Work ↔ Chat",
       "statut_observe": "prévue uniquement par les documents de cadrage, pas de journal versionné actuel.",
-      "statut_execution": "PR_OUVERTE_PERIMETRE_L0",
+      "statut_execution": "MERGE_PARTIEL_L0_L2",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "S.",
       "branche_actuelle": "docs/project-pilotage",
       "branche_proposee": null,
       "pr_actuelle": "#20",
-      "commit_preuve": "0c0961b939ff1f31f175ae3a231971cf412387fa",
+      "commit_preuve": "c0fc5fd3facd42c112673bbfc47285ba4547259b",
       "valeur_parcours": "reprendre un bloc autorisé après interruption sans réécrire ni perdre des commits.",
       "regles_cas_limites": "GitHub source du poussé ; un responsable actif par branche ; passation explicitement confirmée ; état local non poussé distinct ; documents roadmap/backlog/decisions/handoff cohérents et sans secrets. Aucun pourcentage de progression inventé.",
       "donnees_api_droits": "documents canoniques `docs/project/` proposés ; SHA complets, branche, base, PR/CI/tests/migrations réels, prochain micro-bloc et conditions d'arrêt ; créée seulement après accord phase B.",
@@ -1714,13 +1767,17 @@
       "dependances_ids": [],
       "decisions": [],
       "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Lire la ref distante du pilotage et agent-handoff.md, puis attendre validation des merges/L3. Un seul écrivain ; aucun transfert présumé.",
+      "prochain_bloc": "Lire le handoff consolidé de la branche dossiers et la PR/CI distantes ; confirmer l’arrêt du précédent écrivain avant tout relais. Merge L3 soumis à accord distinct.",
       "autorisation": "PARTIELLE_LOTS_L0_L2",
       "preuves_execution": [
         {
           "pr": 20,
           "sha": "0c0961b939ff1f31f175ae3a231971cf412387fa",
           "resultat": "Pilotage et Review Gate L2 publiés, SHA/message/blobs distants vérifiés ; journal final consultable sur la ref docs/project-pilotage."
+        },
+        {
+          "sha": "c0fc5fd3facd42c112673bbfc47285ba4547259b",
+          "resultat": "#20–#23 mergées après accord ; six checks sur main verts, 141 unitaires + NYC, 110 frontend, 10 garde-fous, 37 natifs et 4 parcours Chromium."
         }
       ]
     },

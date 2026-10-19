@@ -11,5 +11,7 @@ export interface CocktailOrganizationTag {
 
 export interface CocktailOrganizationResult {
   folder: CocktailOrganizationFolder | null;
+  folders: CocktailOrganizationFolder[];
+  organizationVersion: number;
   tags: CocktailOrganizationTag[];
 }

@@ -1,0 +1,143 @@
+<section class="folders-page">
+  <a class="back-link" routerLink="/folders">← Tous les dossiers</a>
+  @if (isLoading()) {
+    <p role="status" class="panel" aria-busy="true">Chargement du dossier…</p>
+  } @else if (notFound()) {
+    <section class="panel">
+      <h1>Dossier introuvable</h1>
+      <p>Ce dossier n’existe pas dans ton Barbook.</p>
+      <a routerLink="/folders">Revenir aux dossiers</a>
+    </section>
+  } @else if (loadError()) {
+    <section class="panel" role="alert">
+      <h1>Impossible d’ouvrir ce dossier</h1>
+      <p>{{ loadError() }}</p>
+      <button type="button" (click)="reload()">Réessayer</button>
+    </section>
+  } @else if (folder(); as current) {
+    <header class="page-heading">
+      <p class="eyebrow">Dossier</p>
+      <h1>{{ current.name }}</h1>
+      <p aria-live="polite">
+        {{ current.cocktailCount }} cocktail(s). Chaque recette garde ses tags et ses autres
+        dossiers.
+      </p>
+    </header>
+    <section class="panel" aria-labelledby="folder-management-title">
+      <h2 id="folder-management-title">Gérer le dossier</h2>
+      <form class="inline-form" (submit)="$event.preventDefault(); rename()">
+        <div class="field">
+          <label for="folder-rename-name">Nom du dossier</label
+          ><input
+            #name
+            id="folder-rename-name"
+            type="text"
+            required
+            maxlength="80"
+            [value]="renameName()"
+            (input)="renameName.set(name.value)"
+            [disabled]="busy()"
+          />
+        </div>
+        <button type="submit" [disabled]="busy()">Renommer</button>
+      </form>
+      <div class="toolbar">
+        <button type="button" [disabled]="busy()" (click)="reload()">
+          Recharger le dossier et sa saisie</button
+        ><button type="button" class="danger" [disabled]="busy()" (click)="remove()">
+          Supprimer le dossier
+        </button>
+      </div>
+      <p class="hint">
+        La suppression enlève uniquement ce dossier et ses liens. Les recettes sont conservées.
+      </p>
+      @if (actionError()) {
+        <p class="feedback error" role="alert">{{ actionError() }}</p>
+      }
+      @if (success()) {
+        <p class="feedback" role="status">{{ success() }}</p>
+      }
+    </section>
+    <div class="toolbar">
+      <h2>Recettes du dossier</h2>
+      <button
+        type="button"
+        class="primary"
+        [attr.aria-expanded]="showPicker()"
+        aria-controls="folder-picker"
+        [disabled]="busy()"
+        (click)="togglePicker()"
+      >
+        {{ showPicker() ? 'Fermer la sélection' : 'Ajouter des cocktails' }}
+      </button>
+    </div>
+    <div id="folder-picker" [hidden]="!showPicker()">
+      @if (pickerOpened()) {
+        <app-folder-cocktail-picker
+          [folderId]="current.id"
+          [disabled]="metadataLoading() || isMutating()"
+          [refreshKey]="pickerRefresh()"
+          (busyChanged)="isAdding.set($event)"
+          (added)="onAdded($event)"
+        />
+      }
+    </div>
+    <form class="inline-form search-form" (submit)="$event.preventDefault(); search()">
+      <div class="field">
+        <label for="folder-member-search">Rechercher dans ce dossier</label
+        ><input
+          #query
+          id="folder-member-search"
+          type="search"
+          maxlength="120"
+          [value]="searchTerm()"
+          (input)="searchTerm.set(query.value)"
+        />
+      </div>
+      <button type="submit">Rechercher</button>
+    </form>
+    @if (membersLoading()) {
+      <p role="status" aria-busy="true">Chargement des recettes du dossier…</p>
+    } @else if (membersError()) {
+      <div class="panel" role="alert">
+        <p>{{ membersError() }}</p>
+        <button type="button" (click)="loadMembers()">Réessayer les recettes</button>
+      </div>
+    } @else if (members(); as catalog) {
+      <section class="recipe-rows" aria-label="Recettes du dossier">
+        @for (cocktail of catalog.items; track cocktail.id) {
+          <article class="recipe-row">
+            <a [routerLink]="['/cocktails', cocktail.slug]">{{ cocktail.name }}</a
+            ><button
+              type="button"
+              [disabled]="busy()"
+              [attr.aria-label]="'Retirer ' + cocktail.name + ' de ce dossier'"
+              (click)="removeCocktail(cocktail.id)"
+            >
+              Retirer de ce dossier
+            </button>
+          </article>
+        } @empty {
+          <section class="panel">
+            <h3>Aucune recette à afficher</h3>
+            <p>Ajoute des cocktails avec le bouton ci-dessus ou essaie une autre recherche.</p>
+          </section>
+        }
+      </section>
+      @if (catalog.totalPages > 1) {
+        <nav class="pagination" aria-label="Pagination des recettes du dossier">
+          <button type="button" [disabled]="page() <= 1" (click)="loadMembers(page() - 1)">
+            Précédent</button
+          ><span>Page {{ page() }} sur {{ catalog.totalPages }}</span
+          ><button
+            type="button"
+            [disabled]="page() >= catalog.totalPages"
+            (click)="loadMembers(page() + 1)"
+          >
+            Suivant
+          </button>
+        </nav>
+      }
+    }
+  }
+</section>

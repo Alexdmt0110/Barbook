@@ -8,7 +8,6 @@ import {
   CocktailOrganizationResult,
   CocktailSummaryFolder,
   CocktailSummaryTag,
-  CreateCocktailFolderRequest,
   CreateCocktailRequest,
   CreateCocktailResult,
   UpdateCocktailOrganizationRequest,
@@ -70,10 +69,6 @@ export class CocktailsService {
 
   getPersonalFolders(): Observable<CocktailSummaryFolder[]> {
     return this.http.get<CocktailSummaryFolder[]>('/api/folders');
-  }
-
-  createPersonalFolder(folder: CreateCocktailFolderRequest): Observable<CocktailSummaryFolder> {
-    return this.http.post<CocktailSummaryFolder>('/api/folders', folder);
   }
 
   getPersonalTags(): Observable<CocktailSummaryTag[]> {

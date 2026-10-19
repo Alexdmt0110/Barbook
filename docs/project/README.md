@@ -1,8 +1,11 @@
 # Pilotage Barbook
 
-La phase A est validée comme base de travail. **Seuls L0, L1 et L2 sont autorisés au 16 octobre 2026.** Le catalogue ne vaut pas autorisation générale. Les merges, migrations destructives, décisions métier structurantes et opérations de production restent à valider par Alex.
+La phase A est validée comme base de travail. **L0–L2 sont intégrés ; L3 B3a–B3c est autorisé depuis le 19 octobre 2026.** Le catalogue ne vaut pas autorisation générale. Les merges, migrations destructives, décisions métier structurantes et opérations de production restent à valider par Alex.
 
-- [Checkpoint L0–L2, preuves et reprise L3 à valider](checkpoint-l0-l2.md)
+- [Checkpoint courant L3, résultats, limites et décisions](checkpoint-l3.md)
+- [Review Gate complet L3](reviews/l3-review-gate.md)
+- [Photographie historique L0–L2 avant merges](checkpoint-l0-l2.md)
+- [Design Review et découpage L3](l3-design.md)
 - [Roadmap et périmètre autorisé](roadmap.md)
 - [Backlog exécutable et critères](backlog.md)
 - [Catalogue complet : 66 fiches](audit/03-Vision-et-catalogue.md) ; [backlog structuré](backlog.json)
@@ -11,7 +14,7 @@ La phase A est validée comme base de travail. **Seuls L0, L1 et L2 sont autoris
 - [Handoff canonique : lire ici à chaque reprise](agent-handoff.md)
 - [Revues préventives et Review Gates](review-log.md)
 
-Ces documents sont sur `docs/project-pilotage` tant que sa PR n'est pas mergée. Les branches de code basées sur main doivent consulter cette branche pour le pilotage canonique. Ne pas créer de journaux concurrents sur chaque branche.
+La PR de pilotage #20 est mergée : ces documents font partie de main. Pendant L3, le checkpoint le plus récent est sur la branche active `feature/cocktail-folder-management`, au même chemin canonique. Un seul écrivain actualise ce journal ; confronter toujours le checkpoint de main et celui de la branche active aux références GitHub, sans créer un autre chemin de journal.
 
 ## Méthode
 

@@ -95,4 +95,34 @@ describe('UpdateCocktailOrganizationDto', () => {
 
     expect(errors.length).toBeGreaterThan(0);
   });
+  it('accepts the versioned empty set', async () => {
+    await expect(
+      validate(
+        plainToInstance(UpdateCocktailOrganizationDto, {
+          folderIds: [],
+          expectedVersion: 0,
+          tagNames: [],
+        }),
+      ),
+    ).resolves.toHaveLength(0);
+  });
+  it.each([
+    { folderIds: null },
+    { folderIds: ['invalid'] },
+    { folderIds: Array(1001).fill('550e8400-e29b-41d4-a716-446655440000') },
+    { expectedVersion: null },
+    { expectedVersion: -1 },
+    { expectedVersion: 0.5 },
+    { expectedVersion: '0' },
+  ])('rejects malformed versioned organization %j', async (change) => {
+    const errors = await validate(
+      plainToInstance(UpdateCocktailOrganizationDto, {
+        folderIds: [],
+        expectedVersion: 0,
+        tagNames: [],
+        ...change,
+      }),
+    );
+    expect(errors.length).toBeGreaterThan(0);
+  });
 });

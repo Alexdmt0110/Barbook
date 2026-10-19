@@ -71,7 +71,9 @@ describe('CocktailsService organization filtering', () => {
 
     const expectedWhere = {
       workspaceId: 'workspace-123',
-      folderId: FOLDER_ID,
+      folderMemberships: {
+        some: { workspaceId: 'workspace-123', folderId: FOLDER_ID },
+      },
     };
 
     expect(cocktailCount).toHaveBeenCalledWith({
@@ -119,7 +121,9 @@ describe('CocktailsService organization filtering', () => {
 
     const expectedWhere = {
       workspaceId: 'workspace-123',
-      folderId: FOLDER_ID,
+      folderMemberships: {
+        some: { workspaceId: 'workspace-123', folderId: FOLDER_ID },
+      },
       tags: {
         some: {
           workspaceId: 'workspace-123',

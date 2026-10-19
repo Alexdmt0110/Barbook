@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '../database/prisma.module';
+import { FoldersController } from '../folders/folders.controller';
+import { FoldersService } from '../folders/folders.service';
 import { CocktailCreationService } from './cocktail-creation.service';
 import { CocktailsController } from './cocktails.controller';
 import { CocktailsService } from './cocktails.service';
@@ -9,8 +11,13 @@ import { CocktailOrganizationService } from './organization/cocktail-organizatio
 
 @Module({
   imports: [AuthModule, PrismaModule],
-  controllers: [CocktailsController, CocktailOrganizationController],
+  controllers: [
+    CocktailsController,
+    CocktailOrganizationController,
+    FoldersController,
+  ],
   providers: [
+    FoldersService,
     CocktailsService,
     CocktailCreationService,
     CocktailOrganizationService,

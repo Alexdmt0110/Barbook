@@ -44,6 +44,7 @@ export interface CocktailSummary {
   imageUrl: string | null;
   mainAlcohol: CocktailSummaryIngredient | null;
   folder: CocktailSummaryFolder | null;
+  folders: CocktailSummaryFolder[];
   tags: CocktailSummaryTag[];
   updatedAt: string;
 }
@@ -97,6 +98,7 @@ export interface CocktailDetailStep {
 }
 
 export interface CocktailDetail extends CocktailSummary {
+  organizationVersion: number;
   ice: string | null;
   notes: string | null;
   ingredients: CocktailDetailIngredient[];
@@ -142,16 +144,15 @@ export interface CreateCocktailResult {
   slug: string;
 }
 
-export interface CreateCocktailFolderRequest {
-  name: string;
-}
-
 export interface UpdateCocktailOrganizationRequest {
-  folderId: string | null;
+  folderIds: string[];
+  expectedVersion: number;
   tagNames: string[];
 }
 
 export interface CocktailOrganizationResult {
+  organizationVersion: number;
   folder: CocktailSummaryFolder | null;
+  folders: CocktailSummaryFolder[];
   tags: CocktailSummaryTag[];
 }

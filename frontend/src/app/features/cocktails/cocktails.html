@@ -449,6 +449,16 @@
               </span>
             </div>
 
+            @if (cocktail.folders.length > 0) {
+              <div class="cocktail-tags" [attr.aria-label]="'Dossiers de ' + cocktail.name">
+                @for (folder of cocktail.folders.slice(0, 3); track folder.id) {
+                  <span>{{ folder.name }}</span>
+                }
+                @if (cocktail.folders.length > 3) {
+                  <span>+ {{ cocktail.folders.length - 3 }} dossiers</span>
+                }
+              </div>
+            }
             @if (
               cocktail.tags.length > 0
               ) {

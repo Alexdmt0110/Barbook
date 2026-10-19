@@ -1,7 +1,7 @@
 # Tests d'intégration PostgreSQL, HTTP et navigateur
 
 Le workflow `Integration` démarre un PostgreSQL 16 jetable, sans volume persistant,
-sur chaque PR/main et sur la branche de travail L2. Il conserve les workflows
+sur chaque PR/main et sur les branches de travail L2 et dossiers. Il conserve les workflows
 Backend Quality, Frontend Quality et l'audit des dépendances de leurs branches
 respectives. Aucun déploiement n'est déclenché.
 
@@ -76,11 +76,13 @@ Ces quatre essais couvrent des parcours représentatifs existants ; ils ne
 prouvent pas une accessibilité exhaustive, ni une compatibilité Safari/iOS,
 Firefox ou appareil physique. Le scénario mobile utilise Chromium émulé.
 
-Le premier passage navigateur a révélé un décalage du select de dossier : sa
+Lors de L2, le premier passage navigateur a révélé un décalage du select de dossier : sa
 valeur était affectée avant l'insertion des options Angular et restait vide,
 alors que l'état du composant contenait le bon identifiant. La sélection est
 désormais portée par chaque option, y compris « Sans dossier ». Deux assertions
 DOM ont reproduit l'échec au chargement et après création avant correction.
+Dans L3, ces sélections sont devenues des cases multiples ; les tests DOM vérifient
+les choix cochés au chargement et après création, puis les conflits/rechargements.
 Le scénario d'expiration vérifie également le `returnUrl` prévu par le guard.
 
 Avec `--trace-deprecation`, les tests natifs montrent un avertissement de
@@ -102,11 +104,11 @@ pg 9, sans conclure à une corruption à partir de cette seule dépréciation.
 - CHECK et FK composites exercés directement par SQL, unicités et cascades,
   suppression de références restreinte selon le modèle actuel.
 
-Ces tests portent sur le modèle actuel de main (un dossier facultatif). La
-migration EXPAND et les trois commits de la branche dossiers restent préservés
-pour L3. Leurs nouvelles associations devront recevoir leurs propres tests au
-moment de la reprise autorisée. Les PR L1 sont indépendantes : les contrôles
-combinés seront rejoués après les merges approuvés.
+Le socle L0–L2 est intégré et qualifié ensemble. La branche dossiers conserve
+les trois commits originaux et ajoute sa qualification multi-dossiers : contrats,
+versions/courses, FK hostiles, ajouts/retraits/CRUD, lot de 100/retry/cinq pages et
+rollback multiple. Le code b0bb757 y passe 61 natifs et quatre Chromium complets ;
+main reste au socle tant que la PR L3 n’est pas mergée.
 
 Le bootstrap HTTP est centralisé dans `src/configure-application.ts`. La
 compilation Nest se limite aux sources `src/`, pour produire `dist/main.js`,
@@ -131,10 +133,10 @@ leur conservation, une correction de fixture et la tentative suivante. La
 migration ne sera appliquée ici que sur des bases CI jetables. Toute base de
 propriétaire/VPS reste à inventorier séparément avant application autorisée.
 
-La migration dossiers EXPAND de septembre reste inchangée sur sa branche. Lors
-de L3, qualifier les deux ordres d'upgrade (main avec cette contrainte puis
-EXPAND, ou branche dossiers puis cette contrainte) ; ne pas renommer ou réécrire
-l'ancienne migration pour modifier artificiellement son ordre.
+La migration dossiers EXPAND de septembre reste inchangée. Les deux ordres
+d’upgrade SQL (main avec cette contrainte puis EXPAND, ou EXPAND puis cette
+contrainte) sont qualifiés en CI L3 ; ne pas renommer/réécrire l’ancienne
+migration pour modifier artificiellement son ordre.
 
 
 ## Qualification combinée des corrections de création
@@ -145,3 +147,46 @@ puis vérifie que New Cocktail conserve le conflit canonique 409 sans doublon.
 Le parcours navigateur crée aussi New après reconnexion sur les deux formats,
 avec les dépendances corrigées. Il réutilise son compte synthétique pour ne pas
 contourner ou dépasser le quota d'inscription ; aucun contrôle n'est relâché.
+
+
+## L3 : transition et versions d'organisation
+
+La migration additive `20261019073922_folder_organization_versions` complète l'EXPAND partagé.
+Elle prend des verrous de table pendant sa prévalidation/backfill pour que les
+écritures concurrentes ne changent pas ce snapshot. Elle insère les liens legacy
+manquants, puis initialise des compteurs entiers non négatifs sur Cocktail et
+Folder. Aucun lien existant n'est supprimé ni champ retiré.
+
+Un lien obsolète ou un ensemble multiple déjà présent et incohérent avec
+folderId provoque un refus transactionnel. Ne pas contourner ce refus ou choisir
+silencieusement l'une des représentations sur une base réelle. L'inventaire,
+la réconciliation de données et la récupération éventuelle des métadonnées
+Prisma après échec exigent leur procédure et leur autorisation propres.
+
+Les tests utilisent des schémas jetables : deux ordres EXPAND/contrainte
+garniture, lien manquant, refus d'un lien obsolète ou multiple, conservation des
+données, absence de colonne partielle, décision corrective de fixture explicite
+et retry. Ils attaquent également les FK CocktailFolder, l'unicité/cascade et
+les CHECK des versions. La qualification native de ce nouveau bloc doit être
+lue dans le handoff ; une compilation locale ne vaut pas exécution PostgreSQL.
+
+Avant une bascule réelle vers des écritures multiples, arrêter tous les anciens
+écrivains incompatibles ; la compatibilité du nouveau serveur avec un ancien
+payload ne rend pas un ancien binaire compatible. Aucun déploiement, quiescement
+ou CONTRACT n'est effectué par ces tests.
+
+
+## Qualification L3 courante
+
+Le parcours principal, toujours sur desktop/mobile, crée un dossier à catalogue vide
+par clavier avant une recette, classe dans deux dossiers, provoque un vrai 409,
+filtre chaque dossier et se reconnecte. Douze fixtures API supplémentaires du même
+compte permettent deux vraies pages de sélection ; ajout/retrait/réajout/rename
+et suppression confirmée gardent recettes/tags/autres liens. Le rejet d'un dossier
+absent et d'un JWT expiré est vérifié. Quatre inscriptions au total, limite de 5 intacte.
+
+Les trois thèmes utilisent les contrôles réels. Des captures de succès sont
+conservées 7 jours ; animations finies désactivées pour ces seules captures,
+afin d’inspecter les couleurs stabilisées. Les résultats et inspections réellement
+faits sont dans le [checkpoint L3](../project/checkpoint-l3.md), les 61 natifs
+comprennent aussi le lot maximal de 100 et cinq pages complètes sans doublon.
