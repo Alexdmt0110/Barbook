@@ -32,7 +32,7 @@ Le [checkpoint détaillé L0–L2](checkpoint-l0-l2.md) contient les preuves CI,
 
 ## L3 — F023/F024 développées dans le périmètre approuvé
 
-Statut A_REVOIR, même branche `feature/cocktail-folder-management`, code qualifié `b0bb7574e373a2876b93cf67abf22f671ae7fca3`, base main `c0fc5fd3facd42c112673bbfc47285ba4547259b`. B3a–B3c autorisés le 19 octobre sont réalisés ; la PR actuelle et son head final seront dans le handoff. Aucun merge L3 ou CONTRACT autorisé.
+Statut PR_OUVERTE, [PR #24](https://github.com/Alexdmt0110/Barbook/pull/24), même branche `feature/cocktail-folder-management`, code qualifié `b0bb7574e373a2876b93cf67abf22f671ae7fca3`, base main `c0fc5fd3facd42c112673bbfc47285ba4547259b`. B3a–B3c autorisés le 19 octobre sont réalisés ; vrai diff et six checks PR contrôlés, head documentaire à résoudre depuis GitHub et le handoff. Aucun merge L3 ou CONTRACT autorisé.
 
 | Sous-lot | Résultat / acceptation vérifiée | État |
 | --- | --- | --- |
@@ -41,8 +41,8 @@ Statut A_REVOIR, même branche `feature/cocktail-folder-management`, code qualif
 | BB-L3-03 | classement complet multi/version, compatibilité legacy sûre, courses et rollback | qualifié |
 | BB-L3-04 | fiche multi, sélection/recherche/pagination,409 conserve le brouillon | qualifié desktop/mobile |
 | BB-L3-05 | index/détail/CRUD, ajout jusqu'à 100 recettes, retrait local/idempotence et suppression sans recette perdue | qualifié API/DB/UI |
-| BB-L3-06 |131 frontend,151 backend+NYC,61 natifs,4 Chromium, trois thèmes et clavier, documentation/revue | Review Gate favorable à la PR ; aucun merge implicite |
+| BB-L3-06 |131 frontend,151 backend+NYC,61 natifs,4 Chromium, trois thèmes et clavier, documentation/revue | Review Gate et vraie PR contrôlés ; six checks PR success ; aucun merge implicite |
 
 Preuves et limites : [checkpoint-l3.md](checkpoint-l3.md), [Review Gate](reviews/l3-review-gate.md), [contrats](../maintenance/folder-management.md). F023 garde le CONTRACT futur ; A006 garde la bascule réelle à qualifier, A015 est partiel et A016 reste ouvert. Les autres fiches/décisions ne sont pas autorisées par ces résultats.
 
-Prochaine étape : revue de la vraie PR et décision distincte du propriétaire sur son merge. Après accord, vérifier/actualiser la base sans réécriture et qualifier main. L4 doit être cadré avec D1/D2 avant autorisation ; aucun code de session, photo, suppression de recette ou production ajouté ici.
+Prochaine étape : décision distincte du propriétaire sur le merge de #24. Après accord, relire la PR et ses contrôles courants, vérifier/actualiser la base sans réécriture et qualifier main. L4 doit être cadré avec D1/D2 avant autorisation ; aucun code de session, photo, suppression de recette ou production ajouté ici.

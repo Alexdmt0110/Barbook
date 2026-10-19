@@ -1,57 +1,59 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-19T08:43:44.739540+00:00"
+checkpoint_utc: "2026-10-19T13:33:29.277Z"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
-work_owner: "WORK"
-handoff_status: "EN_COURS"
-feature: "L3 B3a–B3c développé et qualifié — Review Gate favorable à une PR"
+work_owner: "AUCUN"
+handoff_status: "PRET_A_PASSER"
+feature: "L3 B3a–B3c qualifié — PR #24 ouverte, merge en attente d’Alex"
 branch: "feature/cocktail-folder-management"
 base_branch: "main"
-remote_head_sha: "b0bb7574e373a2876b93cf67abf22f671ae7fca3"
-local_head_sha: "b0bb7574e373a2876b93cf67abf22f671ae7fca3"
-worktree: "code propre ; consolidation documentaire décrite ci-dessous à publier"
-pr: "#20–#23 mergées ; aucune PR L3 encore ouverte"
-tests: "verify backend 151+NYC, frontend 131,10 garde-fous ;61 natifs et 4 Chromium réels en CI ; lint/build/Prisma/tsc verts ; audits zéro"
+remote_head_sha: "cbe399d07c157073bfd5d4137310c9b40c0d0c9a"
+local_head_sha: "cbe399d07c157073bfd5d4137310c9b40c0d0c9a"
+worktree: "propre à la reprise ; seul le checkpoint documentaire décrit ci-dessous est en cours de publication"
+pr: "https://github.com/Alexdmt0110/Barbook/pull/24 ; ouverte, non mergée, mergeable/clean ; six checks PR success sur cbe399d"
+tests: "CI PR : 151 backend+NYC,131 frontend,10 garde-fous,61 PostgreSQL/HTTP/migrations et 4 Chromium ; lint/build/Prisma verts ; audits zéro"
 migrations: "6 migrations en CI jetable seulement ; aucune base propriétaire/VPS migrée ; CONTRACT absent"
-changes_pushed: "trois commits initiaux, merge69e54dc et blocs L3 jusqu’à b0bb757 ; SHA/message/blobs/arbre vérifiés"
-unpushed_changes: "consolidation docs/project et maintenance/ADR seulement, contenu du présent checkpoint"
+changes_pushed: "trois commits initiaux, merge69e54dc et blocs L3 jusqu’à cbe399d ; SHA/message/blobs/arbre vérifiés"
+unpushed_changes: "ce checkpoint documentaire uniquement avant publication ; aucun code non poussé retrouvé"
 decisions_validated: "merges #20–#23 et développement L3 B3a–B3c ; WORK seul pendant cette exécution"
-decisions_pending: "merge L3 ; checks supplémentaires requis ; L4 et D1–D8 ; CONTRACT et toute production"
-next_atomic_step: "publier les docs, vérifier la CI puis ouvrir et relire la vraie PR L3 sans la merger"
-risks_and_blockers: "aucun BLOCKER/P1 du diff identifié ; bascule/Prisma recovery/backup/restore réels non qualifiés ; limites legacy et A015/A016 documentées"
+decisions_pending: "merge #24 ; checks supplémentaires requis ; L4 et D1–D8 ; CONTRACT et toute production"
+next_atomic_step: "attendre l’accord explicite d’Alex pour merger #24 ; avant toute action, relire main/head/discussions et les six checks courants"
+risks_and_blockers: "aucun BLOCKER/P1 du diff identifié ; bascule/Prisma recovery/backup/restore réels non qualifiés ; limites legacy et A015/A016 ouvertes"
 production_effect: "aucun"
 ```
 
-Les champs SHA sont la photographie réellement vérifiée avant publication de ce checkpoint ; un document ne peut contenir son propre hash. Résoudre la ref GitHub courante et comparer les commits documentaires suivants au code qualifié ci-dessous, au lieu de supposer un état à partir du seul YAML. Le handoff n'est pas un verrou technique.
+Les champs SHA sont la photographie réellement vérifiée avant publication de ce checkpoint ; un document ne peut contenir son propre hash. Résoudre la ref GitHub courante : le commit contenant ce document doit être son seul successeur documentaire, sans changement applicatif. Contrôler sa publication et ses checks avant de conclure à un état vert. Après publication confirmée et fast-forward du clone, aucun changement non poussé ne doit subsister. Le handoff n'est pas un verrou technique.
 
 ## État et preuves
 
-Main : `c0fc5fd3facd42c112673bbfc47285ba4547259b`, #20–#23 mergées dans l'ordre autorisé et six checks verts. [Checkpoint L3](checkpoint-l3.md) : SHA des quatre merges, résultats combinés et périmètre B3a–B3c. Les anciens checkpoints L0–L2 sont des photographies antérieures, pas des états courants.
+Main : `c0fc5fd3facd42c112673bbfc47285ba4547259b`, #20–#23 mergées dans l'ordre autorisé et six checks verts. [Checkpoint L3](checkpoint-l3.md) : SHA des quatre merges, résultats combinés et périmètre B3a–B3c. Les anciens checkpoints L0–L2 sont des photographies antérieures.
 
-Branche dossiers conservée, jamais supprimée/rebasée/réécrite :420357d2b0f7375c2121f9d62551607ef0cb561e, c5a87663cb3cd38815a661dcb89073034235ae55,46321485d1d28351da7e0b555411199f40fa801a sont ancêtres. Main intégré par merge69e54dc614a7c7241f58fe55370c5f877eab560e ; l'EXPAND partagé est inchangé.
+[PR #24](https://github.com/Alexdmt0110/Barbook/pull/24) vérifiée après création : base main ci-dessus, head `cbe399d07c157073bfd5d4137310c9b40c0d0c9a`, ouverte/non mergée, mergeable=true/clean. Les 76 fichiers et leurs blobs correspondent au clone qualifié ; 74 patchs contrôlés et deux déplacements DTO sans modification. Treize commits avant ce checkpoint, aucun commentaire de revue, revue ou commentaire d'issue. La nouvelle publication documentaire modifiera le head et le nombre de commits ; relire les faits distants.
 
-Blocs publiés : ba84b0f pilotage/CI/design ; e5852e8 données/versions ;0c6f2df contrats/concurrence ;48c3e3b gestion dossiers ;078475d retrait des anciennes copies DTO ; c20e02f éditeur multi ;439bd60 pages/parcours ; b0bb757 qualification plafond de 100/clavier/captures. Les SHA complets sont dans GitHub et les preuves intermédiaires dans review-log.md. Aucun fichier applicatif non poussé à cette photographie.
+Les trois commits historiques sont toujours ancêtres :420357d2b0f7375c2121f9d62551607ef0cb561e, c5a87663cb3cd38815a661dcb89073034235ae55,46321485d1d28351da7e0b555411199f40fa801a. Main intégré par merge69e54dc614a7c7241f58fe55370c5f877eab560e ; l'EXPAND partagé est inchangé. Aucun rebase, force-push ou suppression de branche.
 
-Code qualifié : `b0bb7574e373a2876b93cf67abf22f671ae7fca3`, six checks success. Runs39223198122 Integration,39223198121 CI,39223198101 Dependency Security.151 tests backend/18 suites +1 compatibilité NYC,131 frontend/21 fichiers,10 garde-fous,61 natifs/5 suites et 4 Chromium. Six migrations fresh/redeploy/status/drift et smoke dist/main.js verts. Audits complets/production backend/frontend et e2e : zéro, aucun package/lock modifié par L3.
+Blocs publiés : ba84b0f pilotage/CI/design ; e5852e8 données/versions ;0c6f2df contrats/concurrence ;48c3e3b gestion dossiers ;078475d retrait des anciennes copies DTO ; c20e02f éditeur multi ;439bd60 pages/parcours ; b0bb757 qualification plafond100/clavier/captures ; cbe399d consolidation/revue. SHA complets dans GitHub, preuves intermédiaires dans [review-log.md](review-log.md).
 
-Tests locaux réellement exécutés : `npm --prefix backend run verify`, lint/tsc backend, `npm --prefix frontend run verify`, typage e2e, Prisma generate/validate et diff check. PostgreSQL/Chromium ne sont pas exécutables dans ce Work local : seuls les jobs CI jetables constituent leurs preuves. Pas de Safari/appareil physique/lecteur d'écran/zoom 200 % ou benchmark de charge prétendu.
+Code qualifié : `b0bb7574e373a2876b93cf67abf22f671ae7fca3`, inchangé par les commits documentaires. Six checks PR success sur cbe399d : [Integration39225651026](https://github.com/Alexdmt0110/Barbook/actions/runs/39225651026), [CI39225650860](https://github.com/Alexdmt0110/Barbook/actions/runs/39225650860), [Security39225651014](https://github.com/Alexdmt0110/Barbook/actions/runs/39225651014). Logs PR relus :151 backend/18 suites,61 natifs/5 suites,4 Chromium, drift nul et redeploy sans migration pending.131 frontend/21 fichiers,1 compatibilité NYC et10 garde-fous complètent ces contrôles. Aucun package/lock modifié par L3.
 
-Captures b0bb757, artefact 12172691949 du run39223198122 : récupérées et inspectées sur desktop/mobile, index/vide, classement et détail. Thèmes clair/contrasté stabilisés et sombres inspectés ; les transitions étaient en cours sur les premières captures du header, sans bug produit déduit. Rétention GitHub 7 jours, aucune capture privée ni secret.
+Dans la session de développement précédente : `npm --prefix backend run verify`, lint/tsc backend, `npm --prefix frontend run verify`, typage e2e, Prisma generate/validate et diff check réellement exécutés. Après réinitialisation de l'espace local, clone reconstruit depuis GitHub, base/head/ascendance/blobs/diff vérifiés ; ces verify applicatifs n'ont pas été réexécutés localement pour ce seul checkpoint documentaire. PostgreSQL/Chromium : preuves des jobs CI jetables, pas d'exécution locale ou propriétaire prétendue.
+
+Captures b0bb757, artefact12172691949 du run39223198122 : récupérées et inspectées dans la session précédente sur desktop/mobile, index/vide, classement et détail. Thèmes clair/contrasté stabilisés et sombre inspecté ; rétention GitHub7 jours. Pas de preuve Safari/appareil physique/lecteur d'écran/zoom200%/charge. Les captures locales ont disparu avec la réinitialisation, les sources sont sur GitHub.
 
 ## Compatibilité, données et portée
 
-folders[] et organizationVersion sont la référence du nouveau frontend. Le nouveau serveur garde folder nullable et l'ancien payload pour zéro/un dossier ; plusieurs liens avec vieux payload → 409 sans perte. Les commandes locales sont idempotentes et préservent tags/recettes/autres liens. Verrou de workspace partagé et versions avant mutation. Contrats, limites1000/100/20 et erreurs dans [folder-management.md](../maintenance/folder-management.md).
+folders[] et organizationVersion sont la référence du nouveau frontend. Le nouveau serveur garde folder nullable et l'ancien payload pour zéro/un dossier ; plusieurs liens avec vieux payload →409 sans perte. Commandes locales idempotentes, tags/recettes/autres liens préservés. Verrou de workspace partagé et versions avant mutation. [Contrats et bornes](../maintenance/folder-management.md)1000 dossiers/100 recettes/20 tags.
 
-L'EXPAND historique et la nouvelle migration20261019073922_folder_organization_versions ajoutent seulement liens/versions ; aucune ancienne migration modifiée et aucune colonne retirée. Ambiguïtés legacy refusées sans effacement, à réconcilier sur décision des données concernées avant une migration réelle autorisée. Tous les anciens binaires incompatibles doivent cesser d'écrire avant une bascule multi réelle. Récupération Prisma après échec, rollback de backend ancien, images, staging et sauvegarde/restauration restent non qualifiés.
+L'EXPAND historique et20261019073922_folder_organization_versions ajoutent liens/versions, sans modifier les anciennes migrations ou retirer de colonne. Ambiguïtés refusées sans effacement : inventaire/réconciliation explicite avant migration réelle autorisée. Retirer tous les anciens binaires écrivains incompatibles avant bascule multi réelle. Récupération Prisma après échec, rollback d'ancien backend, images, staging et sauvegarde/restauration non qualifiés.
 
-Git : publication API avec parent attendu, aucun force ; relecture ref/message/fichiers/blobs et comparaison de l'arbre entier à l'index avant publication. Un clone ordinaire sert aux tests/diffs ; ne jamais pousser le miroir bare. VM/SQL/OPS : aucune intervention propriétaire, aucun seed/reset ou déploiement ; services CI jetables uniquement. Ruleset public 22294305 lu : PR et deux Quality requis, strict ; inchangé. Lecture administrative branch-protection 403 avec cette intégration, écritures de contenu prouvées ; nouveaux checks requis à décider séparément.
+Git : publication API avec parent attendu, aucun force ; arbre entier comparé à l'index avant commit, ref/message/fichiers/blobs après publication. Clone ordinaire pour lecture/diff ; ne jamais pousser un miroir bare. VM/SQL/OPS : aucune intervention propriétaire, seed/reset ou déploiement ; services CI jetables uniquement. Ruleset public22294305 lu pendant la qualification : PR/deux Quality requis/strict, inchangé. Lecture administrative branch-protection403 avec l'intégration ; nouveaux checks requis à décider séparément, pas de blocage du transport de contenu.
 
 ## Reprise et arrêt
 
-Lire les cinq sources normatives privées du projet ChatGPT, puis le dépôt, main, la branche, PR/checks et ce checkpoint ; elles ne sont pas recopiées publiquement. Le catalogue garde 66 fiches et D1–D8 ouvertes. [Review Gate](reviews/l3-review-gate.md) favorable à une PR après relecture entière ; la vraie PR reste à contrôler.
+Lire les sources normatives privées du projet puis ce checkpoint et les faits GitHub. Les quatre pièces disponibles à cette reprise ont été relues ; le dernier transfert de `Barbook_Prompt_Reprise_Work_v2.md` a échoué et cette version ne peut pas être vérifiée. Le propriétaire doit la joindre à nouveau. Le protocole du prompt maître §15 bis reste applicable ; aucune prétention de lecture de la pièce manquante. Les documents privés ne sont pas recopiés publiquement. Catalogue66 et D1–D8 conservés.
 
-Le prochain acte reste dans le périmètre L3 : finir la publication documentaire, ouvrir/relire la PR et publier son état. Aucun merge L3 n'est autorisé. Après décision explicite de merge, vérifier head/base/discussions/checks, actualiser sans réécriture si nécessaire et reprendre tout le gate/CI ; vérifier main après merge. L4 nécessite son propre cadrage D1/D2 et son autorisation. CONTRACT/production demandent leurs accords distincts.
+Le [Review Gate](reviews/l3-review-gate.md) est favorable, avec contrôle de la vraie PR. **Aucun merge L3 autorisé.** Attendre Alex. Après accord : relire head/base/discussions/checks, actualiser sans réécriture si nécessaire, reprendre toute la revue/CI si la base ou le code change, merger avec SHA attendu et vérifier main. Ne pas supprimer la branche sans merge confirmé et décision conforme à sa préservation. L4 nécessite cadrage D1/D2 et autorisation ; CONTRACT et production ont leurs accords distincts.
 
-Un seul écrivain. Work écrit encore ce checkpoint ; aucun relais n'est annoncé à cet instant. À l'arrêt, publier PRET_A_PASSER et confirmer l'absence de tâche d'écriture. Chat classique peut inspecter, mais doit obtenir confirmation de l'arrêt de Work et de la transition avant de modifier cette branche. Au retour, Work reçoit la confirmation d'arrêt de Chat classique et vérifie les refs/PR/CI avant reprise ; ne jamais forcer une divergence. Tous les éléments inconnus restent décrits comme tels, GitHub fait foi.
+Ce checkpoint clôt les écritures de Work ; seuls les contrôles de publication/CI et la mise à jour de leur preuve dans la description de PR restent à terminer. Aucun développement ne continue hors session. État de passation prévu : PRET_A_PASSER, aucun écrivain actif après ces contrôles. Chat classique peut inspecter, mais doit recevoir confirmation du propriétaire que Work est arrêté et que la transition est autorisée avant toute écriture. Au retour, Work reçoit confirmation de l'arrêt de Chat classique et vérifie refs/PR/CI. Aucune divergence ne doit être forcée.

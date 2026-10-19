@@ -7,7 +7,7 @@ Phase A validée comme base. L0–L2 autorisés le 16 octobre ; merges #20–#23
 | L0 — Reprise durable | MERGE #20 | pilotage et relais versionnés, accès en écriture prouvé |
 | L1 — Socle | MERGE #21/#22 | New/null corrigés, dépendances corrigées et audits zéro, combinaison qualifiée |
 | L2 — Intégration | MERGE #23 | PostgreSQL/HTTP/Chromium et six checks sur main ; rien déployé |
-| L3 — Dossiers B3a–B3c | A_REVOIR | développé/qualifié sur branche existante ; Review Gate complet puis PR ; merge à valider |
+| L3 — Dossiers B3a–B3c | PR_OUVERTE #24 | développé/qualifié ; Review Gate et vrai diff contrôlés, six checks PR verts ; merge à valider |
 | B3d — CONTRACT | NON_APPROUVE | retrait legacy seulement après inventaire des usages, bascule compatible, backup/restore et accord destructif distinct |
 | L4 — Sessions et saisie sûre | PROPOSE_NON_APPROUVE | cadrer D1/D2 avant session durable, expiration/reprise et isolation des brouillons |
 | L5 — Cycle recette | PROPOSE_NON_APPROUVE | édition/version, suppression/restauration selon D5, quantités/ABV |

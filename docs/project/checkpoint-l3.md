@@ -1,6 +1,6 @@
 # Checkpoint L3 — 19 octobre 2026
 
-L0–L2 sont intégrés. L3 B3a–B3c est développé et qualifié sur la branche dossiers préservée. **Merge L3, CONTRACT, base propriétaire et production non autorisés.** Le numéro/état de la PR et la ref documentaire finale sont dans [agent-handoff.md](agent-handoff.md).
+L0–L2 sont intégrés. L3 B3a–B3c est développé et qualifié sur la branche dossiers préservée ; [PR #24](https://github.com/Alexdmt0110/Barbook/pull/24) ouverte, vrai diff contrôlé et six checks PR verts sur cbe399d. **Merge L3, CONTRACT, base propriétaire et production non autorisés.** La ref documentaire finale est à résoudre depuis GitHub et [agent-handoff.md](agent-handoff.md).
 
 ## Intégration autorisée du socle
 
