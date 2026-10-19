@@ -5,16 +5,13 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { isPrismaKnownRequestError } from '../../common/prisma-errors';
 import { toSlug } from '../../common/slug';
 import { lockOrganizationWorkspace } from '../../database/lock-organization-workspace';
 import { PrismaService } from '../../database/prisma.service';
 import {
-  CocktailOrganizationFolder,
   CocktailOrganizationResult,
   CocktailOrganizationTag,
 } from './cocktail-organization.types';
-import { CreateFolderDto } from './dto/create-folder.dto';
 import { UpdateCocktailOrganizationDto } from './dto/update-cocktail-organization.dto';
 
 interface NormalizedTag {
@@ -24,83 +21,10 @@ interface NormalizedTag {
 
 const MAX_TAGS_PER_COCKTAIL = 20;
 const MAX_TAG_NAME_LENGTH = 40;
-const MAX_FOLDER_NAME_LENGTH = 80;
 
 @Injectable()
 export class CocktailOrganizationService {
   constructor(private readonly prisma: PrismaService) {}
-
-  async listPersonalFolders(
-    userId: string,
-  ): Promise<CocktailOrganizationFolder[]> {
-    const workspaceId = await this.requirePersonalWorkspaceId(userId);
-
-    return this.prisma.folder.findMany({
-      where: {
-        workspaceId,
-      },
-      orderBy: [
-        {
-          name: 'asc',
-        },
-        {
-          id: 'asc',
-        },
-      ],
-      select: {
-        id: true,
-        name: true,
-      },
-    });
-  }
-
-  async createPersonalFolder(
-    userId: string,
-    dto: CreateFolderDto,
-  ): Promise<CocktailOrganizationFolder> {
-    const workspaceId = await this.requirePersonalWorkspaceId(userId);
-
-    const name = dto.name.trim();
-
-    if (name.length === 0 || name.length > MAX_FOLDER_NAME_LENGTH) {
-      throw new BadRequestException('Folder name is invalid.');
-    }
-
-    const existingFolder = await this.prisma.folder.findUnique({
-      where: {
-        workspaceId_name: {
-          workspaceId,
-          name,
-        },
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    if (existingFolder) {
-      throw new ConflictException('A folder with this name already exists.');
-    }
-
-    try {
-      return await this.prisma.folder.create({
-        data: {
-          workspaceId,
-          name,
-        },
-        select: {
-          id: true,
-          name: true,
-        },
-      });
-    } catch (error: unknown) {
-      if (isPrismaKnownRequestError(error, 'P2002')) {
-        throw new ConflictException('A folder with this name already exists.');
-      }
-
-      throw error;
-    }
-  }
 
   async listPersonalTags(userId: string): Promise<CocktailOrganizationTag[]> {
     const workspaceId = await this.requirePersonalWorkspaceId(userId);
