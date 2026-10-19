@@ -1,6 +1,6 @@
 # Pilotage Barbook
 
-La phase A est validée comme base de travail. **L0–L2 sont intégrés ; L3 B3a–B3c est autorisé depuis le 19 octobre 2026.** Le catalogue ne vaut pas autorisation générale. Les merges, migrations destructives, décisions métier structurantes et opérations de production restent à valider par Alex.
+La phase A est validée comme base de travail. **L0–L3 B3a–B3c sont intégrés ; main est qualifié après le merge autorisé de #24 le 19 octobre 2026.** Le catalogue ne vaut pas autorisation générale. Les merges, migrations destructives, décisions métier structurantes et opérations de production restent à valider par Alex.
 
 - [Checkpoint courant L3, résultats, limites et décisions](checkpoint-l3.md)
 - [Review Gate complet L3](reviews/l3-review-gate.md)
@@ -14,7 +14,7 @@ La phase A est validée comme base de travail. **L0–L2 sont intégrés ; L3 B3
 - [Handoff canonique : lire ici à chaque reprise](agent-handoff.md)
 - [Revues préventives et Review Gates](review-log.md)
 
-La PR de pilotage #20 est mergée : ces documents font partie de main. Pendant L3, le checkpoint le plus récent est sur la branche active `feature/cocktail-folder-management`, au même chemin canonique. Un seul écrivain actualise ce journal ; confronter toujours le checkpoint de main et celui de la branche active aux références GitHub, sans créer un autre chemin de journal.
+Les PR #20–#24 sont mergées. Le checkpoint après #24 est proposé sur `docs/l3-merge-checkpoint`, au même chemin canonique ; consulter sa PR avant de supposer son intégration dans main. La branche `feature/cocktail-folder-management` est conservée à son head fusionné 95e21bc, sans réécriture. Un seul écrivain actualise ce journal ; confronter toujours le checkpoint de main et celui de la branche active aux références GitHub, sans créer un autre chemin de journal.
 
 ## Méthode
 

@@ -9,7 +9,7 @@
       "L2",
       "L3_B3a_B3c"
     ],
-    "merges": "PR_20_21_22_23_UNIQUEMENT",
+    "merges": "PR_20_21_22_23_24_UNIQUEMENT",
     "production": false,
     "decisions_D1_D8": "OUVERTES_SAUF_AUTORISATIONS_EXPLICITES"
   },
@@ -653,14 +653,14 @@
       "id": "BB-F-023",
       "titre": "Appartenances multiples aux dossiers",
       "statut_observe": "partielle — branche active, S13.",
-      "statut_execution": "PR_OUVERTE",
+      "statut_execution": "MERGE_PARTIEL_B3A_B3C",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
       "branche_actuelle": "feature/cocktail-folder-management",
       "branche_proposee": null,
       "pr_actuelle": "#24",
-      "commit_preuve": "b0bb7574e373a2876b93cf67abf22f671ae7fca3",
+      "commit_preuve": "d7ea95f7827a5b96b5ad4b17ef73fa4982c2ad22",
       "valeur_parcours": "depuis une fiche, cocher plusieurs collections puis retrouver la même recette dans chacune.",
       "regles_cas_limites": "0..n dossiers plats ; déduplication des IDs ; relation unique, FK composites ; remplacer l'ensemble depuis la fiche atomiquement avec version attendue ; filtre folderId inchangé mais lecture via CocktailFolder. Liste vide retire seulement les appartenances, pas les tags/recette.",
       "donnees_api_droits": "reprendre la branche existante ; PUT `{folderIds: UUID[], tagNames: string[], expectedVersion}` et réponses `folders[]` ; compatibilité de `folder`/`folderId` explicitement temporisée ; aucun vieux client ne doit écraser un ensemble multiple.",
@@ -673,9 +673,9 @@
       ],
       "decisions": [],
       "documentation": "docs/maintenance/folder-management.md ; docs/project/checkpoint-l3.md ; docs/project/reviews/l3-review-gate.md",
-      "prochain_bloc": "Attendre l’accord explicite de merge #24 ; puis relire head/base/discussions/checks courants et qualifier main. CONTRACT, L4 et production exclus.",
+      "prochain_bloc": "L3 B3a–B3c mergé/qualifié dans main. Examiner le checkpoint documentaire par PR distincte ; aucun nouveau code L4/CONTRACT/production autorisé.",
       "autorisation": "LOT_L3_B3A_B3C_SANS_CONTRACT",
-      "perimetre_execute": "L3 B3a–B3c, qualifié en CI ; merge encore à valider.",
+      "perimetre_execute": "L3 B3a–B3c intégré par #24 après accord explicite ; main qualifié en CI, aucune production ; CONTRACT non approuvé.",
       "preuves_execution": [
         {
           "sha": "b0bb7574e373a2876b93cf67abf22f671ae7fca3",
@@ -697,6 +697,18 @@
             39225651014
           ],
           "resultat": "Vrai diff : 76 fichiers/blobs et 13 commits vérifiés, aucun commentaire/revue, mergeable/clean ; six checks PR success, logs 61 natifs et 4 Chromium relus ; merge non autorisé."
+        },
+        {
+          "pr": 24,
+          "sha": "d7ea95f7827a5b96b5ad4b17ef73fa4982c2ad22",
+          "date": "2026-10-19",
+          "merged_at": "2026-10-19T14:08:14Z",
+          "runs": [
+            39266232823,
+            39266232851,
+            39266232835
+          ],
+          "resultat": "Merge autorisé/exécuté ; deux parents/arbre identique au head approuvé, branche/3 commits préservés ; six checks main success,151 backend+NYC/131 frontend/10 garde-fous/61 natifs/4 Chromium, audits zéro ; aucune production."
         }
       ]
     },
@@ -704,14 +716,14 @@
       "id": "BB-F-024",
       "titre": "Navigation et gestion complète des dossiers",
       "statut_observe": "partielle — création dans la fiche, pas de page dédiée.",
-      "statut_execution": "PR_OUVERTE",
+      "statut_execution": "MERGE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
       "branche_actuelle": "feature/cocktail-folder-management",
       "branche_proposee": null,
       "pr_actuelle": "#24",
-      "commit_preuve": "b0bb7574e373a2876b93cf67abf22f671ae7fca3",
+      "commit_preuve": "d7ea95f7827a5b96b5ad4b17ef73fa4982c2ad22",
       "valeur_parcours": "onglet Dossiers dans le header, liste et création visibles, ouverture, recherche des cocktails, ajout multiple, retrait local, renommage et suppression sûrs.",
       "regles_cas_limites": "nom trim 1–80, unicité exacte par workspace selon ADR actuel, case policy explicite ; 0 recette = vrai état vide ; ajout en lot borné (proposition 100 IDs), validé entièrement ou rollback ; retirer ne modifie ni tags ni autres dossiers. Suppression confirmée détache les liens, jamais les recettes.",
       "donnees_api_droits": "GET/PATCH/DELETE folder par ID, GET cocktails paginés du dossier ; PUT `/folders/:id/cocktails/:cocktailId` et DELETE idempotents, endpoint lot additive ; 409 doublon, 404 hors scope ; verrouillage/version cohérent avec F023.",
@@ -724,9 +736,9 @@
       ],
       "decisions": [],
       "documentation": "docs/maintenance/folder-management.md ; docs/project/checkpoint-l3.md ; docs/project/reviews/l3-review-gate.md",
-      "prochain_bloc": "Attendre l’accord explicite de merge #24 ; puis relire head/base/discussions/checks courants et qualifier main. CONTRACT, L4 et production exclus.",
+      "prochain_bloc": "L3 B3a–B3c mergé/qualifié dans main. Examiner le checkpoint documentaire par PR distincte ; aucun nouveau code L4/CONTRACT/production autorisé.",
       "autorisation": "LOT_L3_B3A_B3C_SANS_CONTRACT",
-      "perimetre_execute": "L3 B3a–B3c, qualifié en CI ; merge encore à valider.",
+      "perimetre_execute": "L3 B3a–B3c intégré par #24 après accord explicite ; main qualifié en CI, aucune production ; CONTRACT non approuvé.",
       "preuves_execution": [
         {
           "sha": "b0bb7574e373a2876b93cf67abf22f671ae7fca3",
@@ -748,6 +760,18 @@
             39225651014
           ],
           "resultat": "Vrai diff : 76 fichiers/blobs et 13 commits vérifiés, aucun commentaire/revue, mergeable/clean ; six checks PR success, logs 61 natifs et 4 Chromium relus ; merge non autorisé."
+        },
+        {
+          "pr": 24,
+          "sha": "d7ea95f7827a5b96b5ad4b17ef73fa4982c2ad22",
+          "date": "2026-10-19",
+          "merged_at": "2026-10-19T14:08:14Z",
+          "runs": [
+            39266232823,
+            39266232851,
+            39266232835
+          ],
+          "resultat": "Merge autorisé/exécuté ; deux parents/arbre identique au head approuvé, branche/3 commits préservés ; six checks main success,151 backend+NYC/131 frontend/10 garde-fous/61 natifs/4 Chromium, audits zéro ; aucune production."
         }
       ]
     },

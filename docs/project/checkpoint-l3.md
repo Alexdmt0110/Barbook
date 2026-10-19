@@ -1,6 +1,6 @@
 # Checkpoint L3 — 19 octobre 2026
 
-L0–L2 sont intégrés. L3 B3a–B3c est développé et qualifié sur la branche dossiers préservée ; [PR #24](https://github.com/Alexdmt0110/Barbook/pull/24) ouverte, vrai diff contrôlé et six checks PR verts sur cbe399d. **Merge L3, CONTRACT, base propriétaire et production non autorisés.** La ref documentaire finale est à résoudre depuis GitHub et [agent-handoff.md](agent-handoff.md).
+L0–L3 B3a–B3c sont intégrés. [PR #24](https://github.com/Alexdmt0110/Barbook/pull/24) mergée après accord explicite d'Alex le 19 octobre 2026 à 14:08:14 UTC ; main d7ea95f qualifié par six checks verts. Branche dossiers conservée. **CONTRACT, L4, base propriétaire et production non autorisés.** Le checkpoint documentaire est sur `docs/l3-merge-checkpoint`, à intégrer par une PR distincte après validation ; voir [agent-handoff.md](agent-handoff.md).
 
 ## Intégration autorisée du socle
 
@@ -58,8 +58,16 @@ Captures de succès [artefact 12172691949](https://github.com/Alexdmt0110/Barboo
 
 ## Décisions et prochaine étape
 
-Recommandation : examiner puis autoriser séparément le merge de la PR L3, après contrôle de son head et de ses six checks. Alternative : demander des corrections ciblées sur cette même branche, sans dupliquer les commits historiques.
+L’accord « je l’autorise » du 19 octobre porte sur #24 : merge effectué avec expected_head_sha=95e21bc et stratégie merge commit, puis état merged/merged_at/main/parents/arbre/checks vérifiés. Le checkpoint documentaire suit sa propre PR ; cet accord ne préautorise pas son merge ni les suivants.
 
 L'activation des quatre checks supplémentaires comme requis est une décision séparée ; seuls les deux Quality restent actuellement requis par protection. Ne pas l'inclure implicitement dans un accord de merge.
 
 L4 n'est pas autorisé. Avant son code, présenter D1 (bêta privée recommandée ou ouverture publique et ses exigences d'abus/récupération) et D2 (session opaque HttpOnly/Secure recommandée ou JWT mémoire+refresh rotatif), durées et reprise sur appareil partagé. D3–D8 restent ouvertes selon leurs phases ; aucune décision de production ou CONTRACT ne découle d'une validation de ce checkpoint.
+
+## Merge L3 et qualification de main
+
+Merge commit `d7ea95f7827a5b96b5ad4b17ef73fa4982c2ad22`, parents `c0fc5fd3facd42c112673bbfc47285ba4547259b` et `95e21bc0fd1ce1f289bc0a2ba07f7200ad5f0312`. Arbre `fd27da5d07cac729b13971bc976847aea51b27e9`, identique au head approuvé ; 76 fichiers/blobs,14 commits, zéro revue/commentaire et six checks PR/push contrôlés juste avant merge. Les trois commits originaux sont ancêtres de main, l'EXPAND est inchangé ; feature/cocktail-folder-management reste à 95e21bc.
+
+Six contrôles push-on-main success : [Integration39266232823](https://github.com/Alexdmt0110/Barbook/actions/runs/39266232823), [CI39266232851](https://github.com/Alexdmt0110/Barbook/actions/runs/39266232851), [Security39266232835](https://github.com/Alexdmt0110/Barbook/actions/runs/39266232835). Logs lus : 151 backend/18 suites +1 NYC, 131 frontend/21 fichiers, 10 garde-fous, 61 natifs/5 suites,4 Chromium ; drift nul/redeploy sans pending/smoke compilé et audits complets/runtime zéro. Ces résultats sont ceux de main, pas seulement du head avant merge. Aucun test ignoré ou contrôle désactivé.
+
+Reprise : prompt Reprise V2 maintenant disponible et lu ; autres sources inchangées. Checkpoint sur branche docs dédiée publiée depuis main ; seuls huit documents de pilotage changent. Aucun code, test, dépendance, SQL ou workflow modifié ; pas de nouvelle exécution applicative locale pour la documentation. VM/SQL/infra : aucune intervention propriétaire, bases CI jetables uniquement.

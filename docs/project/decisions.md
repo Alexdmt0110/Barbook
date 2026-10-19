@@ -63,12 +63,12 @@ Les recommandations ci-dessous sont **des propositions**, aucune n'est considér
 
 **Recommandation initiale :** autoriser les branches/commits/push des lots approuvés et les décisions techniques courantes ; garder le merge et la production à validation explicite tant que le pipeline n'a pas été éprouvé. Option ultérieure : préautoriser les merges non destructifs après Review Gate complet et CI verte, en merge commit, avec vérification mergedAt et main post-merge.
 
-**À décider :** autorisation des lots après L3 et politique de merge des phases suivantes. Branches/commits/push/PR de L0–L3 sont autorisés ; seuls les merges #20–#23 ont reçu un accord et ont été exécutés. Tout merge suivant reste à valider. Phase B n'autorise jamais implicitement production, CONTRACT, suppression de données, réécriture d'historique ni coûts externes. L'accès en écriture a été prouvé après autorisation de phase B, puis recontrôlé le 19 octobre.
+**À décider :** autorisation des lots après L3 et politique de merge des phases suivantes. Branches/commits/push/PR de L0–L3 sont autorisés ; les merges #20–#24 ont reçu un accord et ont été exécutés. Le merge du checkpoint documentaire et tout merge suivant restent à valider. Phase B n'autorise jamais implicitement production, CONTRACT, suppression de données, réécriture d'historique ni coûts externes. L'accès en écriture a été prouvé après autorisation de phase B, puis recontrôlé le 19 octobre.
 
 
 ## Livraison courante et validations encore ouvertes
 
-#20–#23 ont été mergées avec accord le 19 octobre et main qualifié ; [checkpoint-l3.md](checkpoint-l3.md) conserve les SHA/preuves. L3 B3a–B3c est développé et qualifié, Review Gate favorable à une PR. Son merge nécessite un accord distinct ; aucune décision D1–D8 n'est close par la CI.
+#20–#24 ont été mergées avec accord le 19 octobre et main d7ea95f est qualifié ; [checkpoint-l3.md](checkpoint-l3.md) conserve SHA/preuves. L3 B3a–B3c est intégré. Le checkpoint documentaire proposé sur docs/l3-merge-checkpoint a son merge distinct à valider ; aucune décision D1–D8 n'est close par la CI.
 
 Recommandation séparée : rendre requis PostgreSQL Integration, Browser Integration et Dependency Audit (backend/frontend), en gardant Backend Quality et Frontend Quality. Alternative : conserver les quatre supplémentaires informatifs ; ils ne bloquent alors pas un merge par le ruleset. Aucun changement de protection effectué. Un accord de merge L3 ne devra pas être interprété comme validation de ce ruleset.
 
@@ -79,3 +79,7 @@ Après L3, cadrer D1/D2 pour L4. D3/D4 concernent la collaboration, D5 le cycle 
 Réponse « je valide » à la demande explicite de validation des quatre merges et de la reprise L3 : intégration #20 → #21 → #22 → #23, mises à jour de branches sans réécriture, Review Gates/CI et reprise de la branche dossiers existante selon B3a–B3c autorisées. WORK reprend seul ; aucune autre session d'écriture annoncée. Le périmètre inclut les migrations additives de test et les choix techniques courants nécessaires aux dossiers.
 
 Cette validation n'active pas les nouveaux checks requis, ne ferme pas D1–D8, n'autorise ni CONTRACT, ni migration destructive, ni application de migration/déploiement sur une instance propriétaire/VPS. La PR L3 sera proposée après Review Gate ; son merge reste à validation distincte.
+
+## Validation du propriétaire — merge #24
+
+Après la demande explicite de validation de la PR #24, Alex répond « je l’autorise » le 19 octobre 2026. Accord exécuté pour cette PR uniquement, en merge commit avec SHA attendu 95e21bc ; merged_at=14:08:14 UTC et main d7ea95f/six checks verts vérifiés. Aucune extension implicite aux merges documentaires suivants, L4, D1–D8, règles de protection, CONTRACT ou production. La branche dossiers reste conservée. La présente mise à jour est proposée par branche/PR ; aucune écriture directe de documentation dans main.
