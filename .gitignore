@@ -1,5 +1,5 @@
 # Dependencies
-**/node_modules/
+**/node_modules
 
 # Build outputs
 **/dist/
@@ -39,3 +39,7 @@ Thumbs.db
 
 # Local database data
 postgres-data/
+
+# Browser test output
+e2e/test-results/
+e2e/playwright-report/
