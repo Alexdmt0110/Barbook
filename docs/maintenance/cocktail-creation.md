@@ -82,6 +82,18 @@ toSlug()
 
 Le slug est unique au sein du workspace.
 
+Le slug `new` est réservé par le routeur frontend au formulaire de création.
+Pour un nom dont le slug canonique serait `new` (par exemple `New` ou `NÉW !!!`),
+l'API génère `new-cocktail`. Le nom affiché reste celui saisi. Le frontend utilise
+le slug renvoyé par l'API et ne le recalcule pas. La règle ne concerne pas les
+slugs d'ingrédients. Une collision avec un cocktail déjà nommé `New Cocktail`
+reste un conflit `409`, comme les autres collisions de slugs canoniques.
+
+Ce correctif ne réécrit aucune donnée existante. Avant toute reprise sur une
+base déjà utilisée, rechercher les éventuels cocktails historiques de slug `new`
+et préparer leur traitement séparément ; aucune migration de données n'est
+incluse dans ce bloc.
+
 Une tentative de création avec un slug déjà utilisé retourne un conflit HTTP `409`.
 
 ## Catalogue d'ingrédients
@@ -227,6 +239,10 @@ vide → degré inconnu
 ## Alcool principal
 
 L'alcool principal est facultatif.
+
+Dans le contrat API, `mainAlcoholName` peut être omis ou valoir `null` : ces deux
+formes signifient qu'aucun alcool principal n'est sélectionné. Une chaîne vide
+est normalisée en absence. Les autres types sont rejetés par le DTO (`400`).
 
 Dans le formulaire, les choix sont dérivés des ingrédients de la recette dont le degré saisi est strictement supérieur à `0`.
 

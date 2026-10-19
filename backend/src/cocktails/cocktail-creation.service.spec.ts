@@ -486,6 +486,45 @@ describe('CocktailCreationService', () => {
     });
   });
 
+  it.each([undefined, null])(
+    'creates a cocktail without a main alcohol when the optional value is %s',
+    async (mainAlcoholName) => {
+      await service.createPersonalCocktail(
+        'user-123',
+        buildCreateDto({ mainAlcoholName }),
+      );
+
+      expect(cocktailCreate.mock.calls[0]?.[0]['data']).toMatchObject({
+        mainAlcoholId: null,
+      });
+    },
+  );
+
+  it.each(['New', '  NÉW !!!  '])(
+    'keeps a cocktail named %s reachable outside the creation route',
+    async (name) => {
+      await service.createPersonalCocktail(
+        'user-123',
+        buildCreateDto({ name }),
+      );
+
+      expect(cocktailFindUnique).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            workspaceId_slug: {
+              workspaceId: 'workspace-123',
+              slug: 'new-cocktail',
+            },
+          },
+        }),
+      );
+      expect(cocktailCreate.mock.calls[0]?.[0]['data']).toMatchObject({
+        name,
+        slug: 'new-cocktail',
+      });
+    },
+  );
+
   it('maps an invalid cocktail name to a bad request before persistence', async () => {
     await expect(
       service.createPersonalCocktail(

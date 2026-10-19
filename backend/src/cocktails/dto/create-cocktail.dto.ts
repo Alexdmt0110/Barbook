@@ -173,7 +173,7 @@ export class CreateCocktailDto {
   @Transform(({ value }: TransformValue) => trimOptionalString(value))
   @IsString()
   @MaxLength(120)
-  mainAlcoholName?: string;
+  mainAlcoholName?: string | null;
 
   @IsArray()
   @ArrayMinSize(1)

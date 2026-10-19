@@ -2,6 +2,7 @@ import { MeasurementUnit } from '../generated/prisma/client';
 import {
   CocktailCreationInvariantError,
   CocktailCreationValidationError,
+  createCocktailSlug,
   requireCocktailCreationSlug,
   resolveMainAlcoholId,
   resolveRecipeAbvOverride,
@@ -10,6 +11,20 @@ import {
 } from './cocktail-creation.rules';
 
 describe('Cocktail creation rules', () => {
+  describe('createCocktailSlug', () => {
+    it.each(['New', '  NÉW !!!  '])(
+      'avoids the reserved route for %s',
+      (name) => {
+        expect(createCocktailSlug(name)).toBe('new-cocktail');
+      },
+    );
+
+    it('keeps ordinary cocktail and ingredient slugs unchanged', () => {
+      expect(createCocktailSlug('New Fashioned')).toBe('new-fashioned');
+      expect(requireCocktailCreationSlug('New', 'Ingredient name')).toBe('new');
+    });
+  });
+
   describe('requireCocktailCreationSlug', () => {
     it('normalizes a valid value into its canonical slug', () => {
       expect(

@@ -23,9 +23,11 @@
     "prebuild": "prisma generate",
     "lint:fix": "eslint {src,apps,libs,test}/**/*.ts --fix",
     "preverify": "prisma generate",
-    "verify": "npm run lint && npm run build && npm test && prisma validate",
+    "verify": "npm run lint && npm run build && npm test && prisma validate && npm run test:dependency-compatibility",
     "verify:db": "npm run verify && prisma migrate status",
-    "db:seed": "prisma db seed --"
+    "db:seed": "prisma db seed --",
+    "audit:security": "npm audit --package-lock-only --audit-level=moderate && npm audit --package-lock-only --omit=dev --audit-level=moderate",
+    "test:dependency-compatibility": "node --test test/dependency-compatibility.cjs"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -51,7 +53,7 @@
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
     "@types/express": "^5.0.0",
-    "@types/jest": "^29.5.14",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.10.7",
     "@types/pg": "^8.23.1",
     "@types/supertest": "^6.0.2",
@@ -59,12 +61,12 @@
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
     "globals": "^15.14.0",
-    "jest": "^29.7.0",
+    "jest": "^30.5.2",
     "prettier": "^3.4.2",
     "prisma": "^7.10.0",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
-    "ts-jest": "^29.2.5",
+    "ts-jest": "^29.4.15",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
@@ -78,6 +80,9 @@
     },
     "prisma": {
       "mysql2": "3.24.3"
+    },
+    "@istanbuljs/load-nyc-config": {
+      "js-yaml": "4.3.2"
     }
   },
   "jest": {

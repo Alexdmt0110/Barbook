@@ -369,7 +369,9 @@ describe('CocktailCreate', () => {
     expect(component.steps.length).toBe(component.maxPreparationSteps);
   });
 
-  it('navigates to the created cocktail detail page', () => {
+  it.each(['tom-collins', 'new-cocktail'])('navigates to the returned detail slug %s', (slug) => {
+    cocktailsService.response = of({ id: 'cocktail-created', slug });
+
     const component = createComponent();
 
     fillRequiredFields(component);
@@ -384,7 +386,7 @@ describe('CocktailCreate', () => {
 
     component.submit();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/cocktails', 'tom-collins']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/cocktails', slug]);
   });
 
   it('shows a useful conflict message for an existing cocktail name', () => {
