@@ -94,3 +94,8 @@ Autorisation explicite des quatre merges et de L3 reçue après le checkpoint. A
 ## Intégration #21 — Review Gate sur base actualisée
 
 #20 mergée en 75fea4888cd2644fb633832c6393d631b6290b93, ses deux Quality checks sur main verts. #21 actualisée sans conflit en 85e23e471445abd2f595bd1bbea233527f7b2650, deux parents vérifiés, arbre distant identique au merge calculé, 13 blobs de pilotage contrôlés. Comparaison binaire du diff complet : 3f9dfdb...e925cbb identique à main...85e23e4 pour les neuf fichiers applicatifs ; le Review Gate fonctionnel/validation/DB/erreurs/sécurité/tests/maintenabilité/dépendances/frontend/performance/OPS précédent est donc réévalué sur le même changement, sans risque supplémentaire identifié. Le présent ajout est le checkpoint documentaire, sans modification applicative ni migration ; git diff --check passé. Aucun BLOCKER/P1 du diff identifié ; attendre la nouvelle CI et relire base/head/fichiers avant le merge autorisé #21.
+
+
+## Intégration #22 — Review Gate sur base actualisée
+
+Main eaeeac8b9dc76b4b4af239e1b9d3063d424a30c8 après #21, Quality verts. Merge de main dans #22 sans conflit, deux parents et arbre/blobs distants vérifiés. Comparaison du diff entier : huit fichiers identiques à 3f9dfdb...ab756e6, les axes du Review Gate sécurité sont réévalués avec les mêmes modifications. Risque combiné principal : Jest 30 et Angular corrigé doivent exécuter les nouvelles régressions de #21 ; verify locaux et CI obligatoires avant le merge autorisé. Schéma/migrations/OPS inchangés. Ce checkpoint n'ajoute que du pilotage. Aucun BLOCKER/P1 de code identifié à la revue ; verdict conditionné aux checks réels.
