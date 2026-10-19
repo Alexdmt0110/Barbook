@@ -41,6 +41,9 @@ function buildListRecord() {
       id: 'ingredient-gin',
       name: 'Gin',
     },
+    folderMemberships: [
+      { folder: { id: 'folder-classics', name: 'Classiques' } },
+    ],
     folder: {
       id: 'folder-classics',
       name: 'Classiques',
@@ -86,6 +89,8 @@ function buildDetailRecord(
       name: 'Rhum blanc',
     },
     folder: null,
+    folderMemberships: [],
+    organizationVersion: 0,
     tags: [
       {
         tag: {
@@ -211,6 +216,7 @@ describe('CocktailsService', () => {
               id: 'ingredient-gin',
               name: 'Gin',
             },
+            folders: [{ id: 'folder-classics', name: 'Classiques' }],
             folder: {
               id: 'folder-classics',
               name: 'Classiques',

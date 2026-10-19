@@ -31,6 +31,7 @@ export interface CocktailSummary {
   imageUrl: string | null;
   mainAlcohol: CocktailSummaryIngredient | null;
   folder: CocktailSummaryFolder | null;
+  folders: CocktailSummaryFolder[];
   tags: CocktailSummaryTag[];
   updatedAt: Date;
 }
@@ -84,6 +85,7 @@ export interface CocktailDetailStep {
 }
 
 export interface CocktailDetail extends CocktailSummary {
+  organizationVersion: number;
   ice: string | null;
   notes: string | null;
   ingredients: CocktailDetailIngredient[];

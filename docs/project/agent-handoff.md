@@ -1,26 +1,26 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-19T07:33:57.966632+00:00"
+checkpoint_utc: "2026-10-19T07:49:46.337291+00:00"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
 handoff_status: "EN_COURS"
-feature: "L3 B3a — migration additive de prévalidation, réconciliation sûre et versions"
+feature: "L3 B3a — contrat de classement multiple et concurrence"
 branch: "feature/cocktail-folder-management"
 base_branch: "main"
-remote_head_sha: "ba84b0f0d3b850a687f15924663ea9927731a6e1"
-local_head_sha: "ba84b0f0d3b850a687f15924663ea9927731a6e1"
-worktree: "schéma/migration et tests de données préparés et vérifiés localement, à publier"
+remote_head_sha: "e5852e89fe6699de9d9fa3558ad0e2764d78aefc"
+local_head_sha: "e5852e89fe6699de9d9fa3558ad0e2764d78aefc"
+worktree: "bloc organisation testé localement, contenu du présent commit ; résoudre le head distant à la reprise"
 pr: "#20–#23 mergées ; aucune PR L3 avant Review Gate complet"
-tests: "main combiné six checks verts ; baseline dossiers local 141 unitaires+NYC, 110 frontend, 10 garde-fous/lint/build/Prisma/tsc ; baseline dossiers six checks verts ; nouveau bloc natif 43 tests attendus, non exécuté localement"
-migrations: "baseline 5 migrations CI vertes ; nouvelle sixième migration publiée à qualifier ; aucune base propriétaire/VPS"
-changes_pushed: "quatre merges main et merge 69e54dc dans dossiers ; trois commits initiaux conservés"
-unpushed_changes: "ce checkpoint/plan/backlog et déclencheurs CI avant publication ; aucun changement applicatif L3 nouveau"
-decisions_validated: "merges #20–#23 et L3 B3a–B3c ; WORK seul ; décisions techniques ordinaires du Design Review"
-decisions_pending: "merge de la future PR L3 ; nouveaux checks requis ; D1–D8 ; CONTRACT/production non autorisés"
-next_atomic_step: "lire la nouvelle CI migrations/43 natifs/drift/navigateur ; si verte poursuivre contrats folders[] et expectedVersion, sans toucher une base réelle"
-risks_and_blockers: "fenêtre legacy entre EXPAND et dual-write ; prévalidation refuse les liens ambigus au lieu d’en effacer ; contrats/UI multi-dossiers restent à réaliser"
+tests: "e5852e8 six checks success :151 à qualifier après ce bloc, baseline141 unitaires+NYC,110 frontend,43 natifs,4 Chromium ; nouveau bloc local151+NYC/lint/build/Prisma/tsc verts"
+migrations: "6 migrations fraîches/redeploy/status/drift CI verts ; aucune base propriétaire"
+changes_pushed: "socle et données e5852e8 vérifiés ; contrats/tests dans le présent commit"
+unpushed_changes: "aucun après publication vérifiée ; ne pas déduire un SHA à partir de cette phrase"
+decisions_validated: "merges #20–#23 et L3 B3a–B3c ; WORK seul"
+decisions_pending: "merge future PR L3 ; nouveaux checks requis ; D1–D8 ; CONTRACT/production"
+next_atomic_step: "contrôler CI organisation (48 natifs attendus), puis gestion locale dossiers et frontend selon design"
+risks_and_blockers: "contrats multiples en cours de qualification ; gestion dossiers et UI à réaliser ; anciens écrivains incompatibles lors future bascule"
 production_effect: "aucun"
 ```
 
@@ -49,3 +49,7 @@ Git : branche dossiers actualisée et pilotage/configuration à publier. VM : au
 ## Checkpoint données L3
 
 Baseline ba84b0f0d3b850a687f15924663ea9927731a6e1 : six checks success, runs39217043698/39217043827/39217043832 ; EXPAND partagé et parcours legacy requalifiés. Nouveau bloc : migration 20261019073922_folder_organization_versions, deux champs Prisma, quatre cas d'upgrade et deux cas de contraintes ajoutés. Pas d'ancienne migration modifiée. Local :141 unitaires+NYC,10 garde-fous/lint/build/Prisma/tsc passés. Six migrations fraîches et43 natifs attendus dans la prochaine CI, pas annoncés réussis avant lecture. Le nouveau contrat/app UI n'est pas encore implémenté.
+
+## Checkpoint contrats L3
+
+Données e5852e89fe6699de9d9fa3558ad0e2764d78aefc : six checks success, runs39217611527/39217611428/39217611427.43 natifs et quatre Chromium, six migrations fresh/redeploy/status/drift confirmés. Nouveau bloc : lectures folders[], filtre relationnel, version de détail et résultat, DTO/compatibilité legacy, verrou de workspace avant versions et mutation, transactions conservées.151 unitaires+NYC/lint/build/Prisma/tsc locaux ; cinq nouveaux tests natifs à exercer en CI (48 attendus). Pas de changement UI ou migration dans ce bloc. Gestion dossiers encore dans l'ancien service à déplacer au prochain bloc cohérent.

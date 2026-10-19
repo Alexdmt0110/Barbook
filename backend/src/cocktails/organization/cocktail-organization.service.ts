@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { isPrismaKnownRequestError } from '../../common/prisma-errors';
 import { toSlug } from '../../common/slug';
+import { lockOrganizationWorkspace } from '../../database/lock-organization-workspace';
 import { PrismaService } from '../../database/prisma.service';
 import {
   CocktailOrganizationFolder,
@@ -131,9 +132,27 @@ export class CocktailOrganizationService {
   ): Promise<CocktailOrganizationResult> {
     const workspaceId = await this.requirePersonalWorkspaceId(userId);
 
+    const isMultiple = dto.folderIds !== undefined;
+    if (
+      (isMultiple && dto.folderId !== undefined) ||
+      (!isMultiple && dto.folderId === undefined) ||
+      (isMultiple && dto.expectedVersion === undefined)
+    ) {
+      throw new BadRequestException(
+        'Provide folderIds with expectedVersion, or a legacy folderId.',
+      );
+    }
+    const folderIds = [
+      ...new Set(
+        (isMultiple ? dto.folderIds! : dto.folderId ? [dto.folderId] : []).map(
+          (id) => id.toLowerCase(),
+        ),
+      ),
+    ];
     const normalizedTags = this.normalizeTagNames(dto.tagNames);
 
     return this.prisma.$transaction(async (transaction) => {
+      await lockOrganizationWorkspace(transaction, workspaceId);
       const cocktail = await transaction.cocktail.findUnique({
         where: {
           workspaceId_slug: {
@@ -143,6 +162,9 @@ export class CocktailOrganizationService {
         },
         select: {
           id: true,
+          folderId: true,
+          organizationVersion: true,
+          _count: { select: { folderMemberships: true } },
         },
       });
 
@@ -150,26 +172,31 @@ export class CocktailOrganizationService {
         throw new NotFoundException('Cocktail not found.');
       }
 
-      let folder: CocktailOrganizationFolder | null = null;
-
-      if (dto.folderId !== null) {
-        folder = await transaction.folder.findUnique({
-          where: {
-            workspaceId_id: {
-              workspaceId,
-              id: dto.folderId,
-            },
-          },
-          select: {
-            id: true,
-            name: true,
-          },
-        });
-
-        if (!folder) {
-          throw new BadRequestException('Folder is unavailable.');
-        }
+      if (
+        (dto.expectedVersion !== undefined &&
+          dto.expectedVersion !== cocktail.organizationVersion) ||
+        (!isMultiple && cocktail._count.folderMemberships > 1)
+      ) {
+        throw new ConflictException(
+          'Organization has changed. Reload it before saving.',
+        );
       }
+
+      const folders =
+        folderIds.length === 0
+          ? []
+          : await transaction.folder.findMany({
+              where: { workspaceId, id: { in: folderIds } },
+              orderBy: { id: 'asc' },
+              select: { id: true, name: true },
+            });
+      if (folders.length !== folderIds.length) {
+        throw new BadRequestException('Folder is unavailable.');
+      }
+      const folder =
+        folders.find((item) => item.id === cocktail.folderId) ??
+        folders[0] ??
+        null;
 
       let tags: CocktailOrganizationTag[] = [];
 
@@ -206,16 +233,8 @@ export class CocktailOrganizationService {
         }
       }
 
-      /*
-       * L'UPDATE verrouille la ligne du cocktail avant le remplacement
-       * de ses relations d'organisation.
-       *
-       * Pendant la phase de transition expand/contract, folderId reste
-       * écrit en parallèle de CocktailFolder afin que l'ancien contrat
-       * frontend reste fonctionnel sans permettre aux deux modèles de
-       * diverger.
-       */
-      await transaction.cocktail.update({
+      // The workspace lock serializes link mutations; the version protects stale drafts.
+      const updated = await transaction.cocktail.update({
         where: {
           workspaceId_id: {
             workspaceId,
@@ -224,7 +243,9 @@ export class CocktailOrganizationService {
         },
         data: {
           folderId: folder?.id ?? null,
+          organizationVersion: { increment: 1 },
         },
+        select: { organizationVersion: true },
       });
 
       await transaction.cocktailFolder.deleteMany({
@@ -234,15 +255,13 @@ export class CocktailOrganizationService {
         },
       });
 
-      if (folder) {
+      if (folders.length > 0) {
         await transaction.cocktailFolder.createMany({
-          data: [
-            {
-              workspaceId,
-              cocktailId: cocktail.id,
-              folderId: folder.id,
-            },
-          ],
+          data: folders.map((item) => ({
+            workspaceId,
+            cocktailId: cocktail.id,
+            folderId: item.id,
+          })),
         });
       }
 
@@ -275,6 +294,8 @@ export class CocktailOrganizationService {
 
       return {
         folder,
+        folders,
+        organizationVersion: updated.organizationVersion,
         tags,
       };
     });
