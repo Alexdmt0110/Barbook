@@ -20,6 +20,7 @@ const garnishUnitMigration = '20261016141503_garnish_unit_integrity';
 const folderExpandMigration =
   '20260908095150_multiple_folder_membership_expand';
 const folderVersionMigration = '20261019073922_folder_organization_versions';
+const sessionMigration = '20261020095600_web_sessions';
 
 async function withLegacySchema(
   run: (client: Client, schema: string) => Promise<void>,
@@ -79,6 +80,51 @@ async function legacyRows(
 }
 
 describe('Real migration history and upgrade', () => {
+  it('adds the session store after all six migrations without changing existing accounts or recipes', async () => {
+    await withLegacySchema(async (client, schema) => {
+      await legacyRows(client, false);
+      for (const migration of [
+        workspaceIntegrityMigration,
+        folderExpandMigration,
+        garnishUnitMigration,
+        folderVersionMigration,
+      ])
+        await client.query(sql(migration));
+      await client.query(
+        `INSERT INTO "User" ("id","email","passwordHash","displayName","updatedAt") VALUES ('session-upgrade-user','upgrade@example.test','synthetic-unusable-hash','Upgrade',now())`,
+      );
+      const snapshot = async () => {
+        const result = await client.query<{
+          users: unknown;
+          workspaces: unknown;
+          cocktails: unknown;
+          links: unknown;
+        }>(`SELECT
+          (SELECT jsonb_agg(to_jsonb(u) ORDER BY "id") FROM "User" u) AS users,
+          (SELECT jsonb_agg(to_jsonb(w) ORDER BY "id") FROM "Workspace" w) AS workspaces,
+          (SELECT jsonb_agg(to_jsonb(c) ORDER BY "id") FROM "Cocktail" c) AS cocktails,
+          (SELECT jsonb_agg(to_jsonb(f) ORDER BY "cocktailId","folderId") FROM "CocktailFolder" f) AS links`);
+        return result.rows;
+      };
+      const before = await snapshot();
+      await client.query(sql(sessionMigration));
+      expect(await snapshot()).toEqual(before);
+      const empty = await client.query('SELECT * FROM "Session"');
+      expect(empty.rows).toEqual([]);
+      const indexes = await client.query<{ indexname: string }>(
+        "SELECT indexname FROM pg_indexes WHERE schemaname=$1 AND tablename='Session' ORDER BY indexname",
+        [schema],
+      );
+      expect(indexes.rows.map((row) => row.indexname)).toEqual([
+        'Session_expiresAt_idx',
+        'Session_idleExpiresAt_idx',
+        'Session_pkey',
+        'Session_tokenHash_key',
+        'Session_userId_idx',
+      ]);
+    });
+  });
+
   it('has every versioned migration recorded successfully by Prisma deploy', async () => {
     const client = new Client({ connectionString: requireTestDatabase() });
     await client.connect();

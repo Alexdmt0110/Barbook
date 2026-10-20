@@ -63,3 +63,7 @@ Tous sont à qualifier ; un plan ou le store B4a ne constitue pas la preuve d'un
 | L4-18 | migration fraîche/upgrade/hostiles/purge | FK/CHECK/index ; historique immuable ; sessions actives préservées |
 
 Preuves B4a ciblées : tests unitaires des primitives/politiques ; tests réels création/stockage haché/redémarrage du service, expirations et plafond, replay après révocation, isolation user, transaction rollback, ordres lock/création/logout-all/activité, contraintes et purge. CI existante doit aussi requalifier les 151 backend,131 frontend,61 natifs,4 Chromium et10 garde-fous de référence. Les futurs résultats sont consignés au checkpoint, sans déclarer aujourd'hui ces critères passés.
+
+## Précisions issues de la revue B4a avant publication
+
+Authentification : un CTE matérialisé prend le verrou de ligne avant de contrôler les échéances avec clock_timestamp ; une requête expirée pendant son attente ne peut pas prolonger la session. Création/global : le store exige ReadCommitted et refuse un snapshot répétable, qui pourrait manquer un login committé pendant l'attente. Timestamps timestamptz(3), index hash varchar64 vérifié par CHECK. Les tests observent les verrous PostgreSQL et les échéances DB, sans temporisation fixe déterminant l'ordre. La purge borne les suppressions à500, pas la totalité du scan. Aucun job ajouté.
