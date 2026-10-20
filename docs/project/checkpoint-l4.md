@@ -1,0 +1,57 @@
+# Checkpoint L4 — B4a qualifié, suite non réalisée
+
+20 octobre 2026. Alex a validé D1a/D1b/D2a/D2b/D2c et autorisé les six blocs L4. **Seul B4a est développé et qualifié à ce checkpoint ; aucune PR L4 n'est encore mergée.** [Design et18critères](l4-design.md), [décisions](decisions.md), [Review Gate B4a](reviews/l4-b4a-review-gate.md), [handoff canonique](agent-handoff.md).
+
+## Git et périmètre
+
+| Référence vérifiée | État |
+| --- | --- |
+| main | `c99b08052e2e1494f621c7de8a7fb0831516bd1e`, inchangé ; #25 mergée le20octobre08:53:33UTC, six checks verts |
+| branche active | `feature/secure-web-sessions`, depuis ce main ; aucun historique réécrit |
+| conception | `51d4b675e0f30487edbc55887996a1f1a2939437`, décisions/design publiés avant code, six checks de baseline success |
+| préparation initiale | `47b479d534effd8383aa3ab426b5c7d3436c3128`, store/migration/tests ; CI native rouge sur CASE sans cast |
+| code corrigé et qualifié | `6ffc67b7b2c5f69437d3209ee335e4e0e1a1219e`, casts integer explicites ; six checks success |
+| branche dossiers | `95e21bc0fd1ce1f289bc0a2ba07f7200ad5f0312`, conservée, ses trois commits initiaux ancêtres de main |
+| checkpoint L3 | docs/l3-merge-checkpoint `39fd7303f20a15f81422cc20fe68b7473d505330`, conservée ; #24/#25 déjà intégrées |
+
+Ce document précède sa propre publication. Son commit documentaire sera le successeur de6ffc67b, sans changement applicatif ; vérifier la ref exacte et la PR de cette branche sur GitHub. La description PR consigne le HEAD final et ses checks effectivement terminés. Aucun SHA auto-référentiel inventé, aucun second checkpoint/PR à créer à la reprise si déjà présent.
+
+## Résultat B4a
+
+- Modèle Session additif : hash unique du credential opaque, CSRF aléatoire indépendant, propriétaire User/FK cascade, échéances et révocation timestamptz/CHECK/index.
+- Store transactionnel : création, validation/activité plafonnée à l'absolue, révocation individuelle/globale et purge500. ReadCommitted explicite, verrou User partagé ; contrôle d'expiration après verrou Session pour éviter une prolongation après attente.
+- Politiques exactes décidées :2h inactive/12h absolue standard ; option7j/30j, sans activation implicite. Aucune horloge client utilisée par le store.
+- Durabilité du code/pilotage : commits atomiques immédiatement publiés par API avec parent attendu, arbre entier comparé à l'index avant commit ; SHA/message/fichiers/blobs distants vérifiés puis clone fast-forward propre.
+
+Le store est enregistré dans AuthModule mais **n'est pas appelé par les routes actuelles**. Login/register/me, JwtAuthGuard, les réponses accessToken et Angular/sessionStorage JWT restent identiques. La table seule ne fournit pas de cookie, CSRF HTTP, admission privée ni restauration de brouillon. Pas de fallback JWT à maintenir après la future bascule ; son retrait coordonné relève de B4b.
+
+## Vérifications réellement exécutées
+
+| Environnement | Exécution et résultat |
+| --- | --- |
+| local Node24.19/npm11.9 | backend verify : lint zéro warning, build,168tests/19suites, Prisma generate/validate et1test NYC ; tscnoEmit incluant tests,10garde-fous ; diffcheck et typage E2E |
+| frontend local inchangé | verify : lint/build,131tests/21fichiers à la baseline ; code frontend non modifié ensuite |
+| CI Quality | [run39406606827](https://github.com/Alexdmt0110/Barbook/actions/runs/39406606827), Backend Quality118573951607 et Frontend Quality118573951185 success ;168/131 confirmés dans les logs |
+| CI PostgreSQL16 réel | [run39406606891/job118573952324](https://github.com/Alexdmt0110/Barbook/actions/runs/39406606891/job/118573952324) success ;10garde-fous,88tests/6suites,7migrations fresh/redeploy/status/drift sans différence et smoke compilé |
+| CI Chromium réel | [même run/job118573952504](https://github.com/Alexdmt0110/Barbook/actions/runs/39406606891/job/118573952504) success ;4parcours existants desktop1365/mobile390 contre API/PG, sept migrations ; aucun mock API |
+| CI sécurité dépendances | [run39406606861](https://github.com/Alexdmt0110/Barbook/actions/runs/39406606861), jobs118573951893/118573951667 success ; audits complets/runtime backend/frontend zéro, audit E2E zéro dans Browser |
+| inspection statique |24fichiers contre main avant checkpoint ; DDL Session conforme à la référence Prisma hors CHECK additionnels ; six anciennes migrations et migration_lock inchangés ;66IDs et seules4fiches de suivi L4 changées ; liens/YAML/diff vérifiés |
+
+Les26tests du store exercent PostgreSQL réel : deux modes/durées et renouvellement, plafond absolu, expirations/replay, expiration pendant attente de verrou sans modification de ligne, autre instance Nest, rollbacks, user disparu/isolation refusée, deux ordres création/global, activité/révocation, CHECK/FK/unicité/cascade et purge préservant les actives. Le test d'upgrade supplémentaire conserve comptes/workspaces/recettes/liens. Aucun test nouveau désactivé ou remplacé par un mock.
+
+Première CI native47b479d :19échecs/69succès, erreur42883 text*interval dans le CASE ; corrigée par6ffc67b, même suite ensuite88succès. Review Gate repris sur toute la branche après correction : aucun BLOCKER/P1 restant identifié dans B4a. La CI rouge reste traçable. Aucun PostgreSQL/Chromium local exécuté ; les preuves natives/navigateur viennent uniquement d'Actions. Les suites existantes ne constituent pas des tests de la future UI cookie.
+
+## Suite L4 et limites
+
+| Bloc | Statut et prochaine preuve |
+| --- | --- |
+| B4a | qualifié sur branche, Review Gate terminé ; vraie PR/diff/checks à finaliser après publication documentaire ; merge à valider |
+| B4b | autorisé, non commencé : contrats/cookie/CSRF, inscription transactionnelle avec Session, guard/endpoints, identité attendue et bootstrap Angular, retrait Bearer coordonné ; fixation/replay/CSRF/401 et tests web réels |
+| B4c | autorisé, non commencé : admission serveur fermée/liste et getters/méthodes storage tolérants ; pas de bypass test |
+| B4d | autorisé, non commencé : mémoire + sessionStorage24h, restauration explicite utilisateur/workspace/recette/version, purge volontaire/changement de compte et résultat inconnu sans replay |
+| B4e | autorisé, non commencé : logout global après réauthentification, onglets/changement A→B/activité/réseau/requêtes en vol et tests UI/HTTP supplémentaires |
+| B4f | non réalisé pour L4 complet : Review Gate global,18critères complets, parcours de sécurité/navigateurs, contrats/docs et checkpoint final |
+
+Le store prouve des sous-cas de L4-05/06/07/18 ; aucun critère HTTP/UI entier n'est fermé par anticipation. L4-01/02/03/04/08–17 attendent leurs vrais parcours, même si des briques ou invariants internes sont déjà testés. Autre instance Nest ne vaut pas qualification du redémarrage d'un processus de production. Cookie Secure/TLS/cookies refusés, CSRF serveur et appareils partagés restent non qualifiés. La purge n'est pas planifiée et son scan n'est pas garanti borné à500 ; mesurer avant échelle supérieure.
+
+D1b inclut édition/corbeille dans la V1, mais L5 et D5/rétention restent exclus du développement L4. D3/D4/D6/D7/D8 et CONTRACT non clos. Pas d'application sur base propriétaire, recovery Prisma/backup/restore/rollback de bascule, VPS ou production. Branches historiques préservées, ruleset inchangé (deux Quality requis ; quatre autres checks observés). Git : commits/push/PR seulement. VM : aucune. SQL : sept migrations uniquement en bases CI jetables. Infra : aucun changement.

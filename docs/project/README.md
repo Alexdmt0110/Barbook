@@ -2,6 +2,8 @@
 
 La phase A est validée comme base de travail. **L0–L3 B3a–B3c sont intégrés ; main c99b080 est qualifié après #25 le 20 octobre 2026. L4 est autorisé, D1/D2 validées ; B4a commence sur feature/secure-web-sessions.** Le catalogue ne vaut pas autorisation générale. Les merges, migrations destructives, décisions métier structurantes et opérations de production restent à valider par Alex.
 
+- [Checkpoint L4 — B4a qualifié et limites](checkpoint-l4.md)
+- [Review Gate B4a](reviews/l4-b4a-review-gate.md)
 - [Design Review, six blocs et critères L4](l4-design.md)
 - [ADR sessions PostgreSQL](../adr/0005-revocable-web-sessions.md)
 - [Checkpoint L3, résultats, limites et décisions](checkpoint-l3.md)

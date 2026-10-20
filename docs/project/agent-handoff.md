@@ -1,45 +1,55 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-20T09:53:03.672243Z"
+checkpoint_utc: "2026-10-20T10:21:22.525926Z"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
-work_owner: "WORK"
-handoff_status: "EN_COURS"
-feature: "L4 autorisé ; B4a contrats et préparation du store Session"
+work_owner: "AUCUN"
+handoff_status: "PRET_A_PASSER"
+feature: "L4 B4a store/contrats qualifiés sur branche ; B4b–B4f non réalisés ; PR du premier bloc à valider"
 branch: "feature/secure-web-sessions"
 base_branch: "main"
-remote_head_sha: "c99b08052e2e1494f621c7de8a7fb0831516bd1e"
-local_head_sha: "c99b08052e2e1494f621c7de8a7fb0831516bd1e"
-worktree: "pilotage L4 et trois déclencheurs push exacts de branche avant publication ; aucun code applicatif"
-pr: "aucune ouverte ; #25 mergée le 20 octobre à 08:53:33 UTC"
-tests: "main c99b080 six checks success ; nouvelle branche : vérifications documentaires, CI à observer après publication"
-migrations: "aucune créée/appliquée L4 ; six historiques CI seulement ; aucune DB propriétaire"
-changes_pushed: "branche L4 publiée depuis main c99b080 ; #20–#25 intégrées"
-unpushed_changes: "ce bloc de conception/pilotage uniquement avant son commit/push"
-decisions_validated: "D1a/D1b/D2a/D2b/D2c et six blocs L4 le 20 octobre ; merges #20–#25 seulement"
-decisions_pending: "chaque merge L4 ; D3–D8 sauf garde-fous existants ; L5/CONTRACT/production non autorisés"
-next_atomic_step: "vérifier publication/CI du design puis B4a : schéma et store Session additifs avec tests unitaires/PostgreSQL réels"
-risks_and_blockers: "JWT encore actif avant B4b ; aucun parcours cookie/CSRF/draft prétendu opérationnel ; pas de PostgreSQL/Chromium local détecté"
+remote_head_sha: "6ffc67b7b2c5f69437d3209ee335e4e0e1a1219e"
+local_head_sha: "6ffc67b7b2c5f69437d3209ee335e4e0e1a1219e"
+worktree: "neuf documents de checkpoint/Gate/pilotage avant publication ; aucun code/test/SQL modifié depuis6ffc67b"
+pr: "aucune à cette photographie ; créer puis vérifier la vraie PR de cette branche après publication et Gate documentaire"
+tests: "six checks6ffc67b success ;168backend+NYC,131frontend,10garde-fous,88natifs dont26store,4Chromium ;7migrations et audits zéro ; logs relus"
+migrations: "20261020095600_web_sessions additive ; sept migrations en CI jetable seulement ; historique inchangé ; aucune DB propriétaire"
+changes_pushed: "51d4b675 design ;47b479d préparation ;6ffc67b correction SQL, parent/arbre/message/fichiers/blobs vérifiés"
+unpushed_changes: "ce checkpoint documentaire uniquement avant son commit/push ; aucun code applicatif non poussé"
+decisions_validated: "D1a/D1b/D2a/D2b/D2c et six blocs L4 le20octobre ; merges #20–#25 uniquement"
+decisions_pending: "chaque merge L4 ; D3–D8 sauf garde-fous ; L5/CONTRACT/production non autorisés"
+next_atomic_step: "vérifier PR/HEAD/checks et validation de merge du premier bloc ; suite autorisée B4b : Design Review puis bascule API/Angular cookie/CSRF/contexte"
+risks_and_blockers: "aucun BLOCKER/P1 restant du diff B4a ; JWT encore actif ; cookie/CSRF HTTP/admission/drafts non livrés ; aucune qualification de production"
 production_effect: "aucun"
 ```
 
-Cette photographie précède sa publication et ne peut porter son propre SHA. Lire la ref de la branche puis l'historique : le prochain commit documentaire décrit ce bloc ; ne pas le reproduire. Contrôler parent/arbre/message/fichiers/blobs et CI réellement terminée avant code. Le handoff ne constitue pas un verrou technique.
+Cette photographie précède son propre commit. Il doit être l'unique successeur documentaire de6ffc67b sur cette branche à ce jalon, sans changement des blobs applicatifs/tests/SQL. La ref, l'historique et la description de la vraie PR consigneront le HEAD final et ses CI. Comparer aux faits distants ; ne pas reproduire un checkpoint ou ouvrir une seconde PR s'ils existent déjà. Ce document n'est pas un verrou technique.
 
-## Reprise vérifiée et périmètre
+## Dernier checkpoint sûr
 
-Alex autorise L4 uniquement et WORK reprend cette tranche dans cette conversation ; aucun autre écrivain annoncé. D1 : bêta privée à admission serveur ; édition et corbeille en V1 mais L5 exclu et D5/rétention non tranchée. D2 : sessions opaques PostgreSQL, cookie HttpOnly/Secure production, CSRF/expiration/révocation/fixation ; standard2h inactive/12h absolues et option non précochée7j/30j ; brouillons mémoire + sessionStorage24h, restauration explicite isolée, purge volontaire/changement de compte, pas de secret/replay/écrasement récent. [Design L4](l4-design.md), [décisions](decisions.md), [ADR0005](../adr/0005-revocable-web-sessions.md).
+Main `c99b08052e2e1494f621c7de8a7fb0831516bd1e` inchangé, #24/#25 réellement mergées et main vert. Branche L4 publiée depuis ce main ; GitHub pull/push=true. Branches dossiers95e21bc et docs/l3-merge-checkpoint39fd730 conservées ; trois commits originaux dossiers ancêtres de main et migrations historiques inchangées. Aucun travail concurrent annoncé ; WORK a repris avec l'autorisation explicite d'Alex dans cette conversation.
 
-GitHub interrogé directement le20octobre : main c99b080, PR#25 documentaire bien mergée/huit fichiers, six checks success, aucune PR ouverte. Branches dossiers95e21bc et docs/l3-merge-checkpoint39fd730 conservées ; aucune réécriture. Le snapshot de main indiquant encore #25 en attente a été reconnu obsolète ; pas de duplication. Accès réel pull/push=true. Publication via API Git avec parent attendu et comparaison de l'arbre entier à l'index, puis vérification distante et fast-forward du clone. Pas de CLI Git authentifiée ni push forcé.
+[Checkpoint L4](checkpoint-l4.md) : B4a schéma/store additifs et politiques approuvées, sans modification des routes JWT/Angular. [Design L4](l4-design.md) et [ADR0005](../adr/0005-revocable-web-sessions.md) publiés avant code. SessionService163lignes, CSPRNG32octets/hash unique, CSRF indépendant, timestamps DB et CHECK/FK/index, ReadCommitted exigé/verrou User partagé, verrou Session avant contrôle d'expiration, purge500sans scheduler. D1/D2 sont versionnées,66fiches préservées ; F003 partielle, nouvelles parties F001/F002/F051 non commencées.
 
-## Prochain travail et tests
+## Tests et correction tracée
 
-B4a prépare SessionService et migration additive ; pas encore de changement de login/guard/frontend. Tests natifs de stockage haché, bornes/activité, révocation/rejeu/global, ordre transactionnel, FK/CHECK/purge et upgrade. Les six contrôles de branche sont activés par déclencheurs exacts sans modifier les jobs. Node24.19/npm11.9 présents, backend npm ci passé (853paquets ; warnings de dépréciation glob/ESLint existants, pas de mise à jour aveugle). PostgreSQL/Docker/Chromium non détectés ; preuves natives/navigateur attendues en CI jetable. Ne pas annoncer ces futurs tests verts par anticipation.
+Local : backend verify168tests/19suites+1NYC, lint/build/Prisma, tscnoEmit incluant tests,10garde-fous et typage E2E passés. Frontend inchangé, verify131tests/21fichiers passé à la baseline de branche. Pas de PostgreSQL/Docker/Chromium local détecté/exécuté ; preuves natives/navigateur exclusivement Actions.
 
-La suite autorisée est B4b→B4c→B4d→B4e→B4f selon le design, avec micro-commits verts et push immédiat. Chaque PR est soumise à Alex avant merge. Arrêt sur divergence distante, secret, migration destructive/personnelle ou décision métier hors périmètre ; aucune désactivation de check. Pas de L5, CONTRACT, nouvelle infrastructure, déploiement ni coût tiers. Les sources privées restent hors Git public, hashes identiques à leur lecture antérieure ; prompt Reprise et handoff relus.
+Code6ffc67b, six contrôles success : [CI39406606827](https://github.com/Alexdmt0110/Barbook/actions/runs/39406606827), [Integration39406606891](https://github.com/Alexdmt0110/Barbook/actions/runs/39406606891), [Security39406606861](https://github.com/Alexdmt0110/Barbook/actions/runs/39406606861). Logs relus :168backend+NYC,131frontend,10garde-fous,88natifs/6suites dont26store,4Chromium desktop/mobile,7migrations fresh/redeploy/status/drift sans différence et smoke dist/main.js ; audits complets/runtime backend/frontend et E2E zéro.
+
+La première CI47b479d a réellement échoué19tests (69succès) sur CASE text*interval ; casts integer corrigés dans6ffc67b, mêmes88tests ensuite verts. Aucun contrôle désactivé, aucune assertion assouplie. Le [Review Gate](reviews/l4-b4a-review-gate.md) a été repris intégralement depuis main après correction, pas seulement du patch ; aucun BLOCKER/P1 restant identifié dans B4a. La vraie PR et ses propres contrôles restent à relire après publication de ces documents ; ils ne sont pas présumés verts par ce snapshot.
+
+## Périmètre et prochain travail
+
+Alex a validé la bêta privée avec admission serveur, édition/corbeille V1 sans autoriser L5/D5, session opaque PostgreSQL/cookie HttpOnly/Secure/CSRF/révocation/fixation, standard2h/12h et option non précochée7j/30j. Brouillons mémoire + sessionStorage24h, restauration explicite liée utilisateur/workspace/recette/version, purge volontaire/changement de compte, aucun secret ou replay/écrasement récent. Les recommandations anciennes30min/mémoire seule sont remplacées. D3–D8 restent ouverts sauf garde-fous déjà explicites.
+
+Seul B4a est qualifié et proposé en PR au terme de cette session. B4b–B4f sont autorisés mais non réalisés : bascule coordonnée API/Angular, suppression Bearer, admission fermée/liste côté serveur, tolérance au storage bloqué, brouillons et protections multi-onglets/réseau. Aucune nouvelle autorisation de développement L4 n'est requise pour ces blocs ; chaque PR reste soumise à Alex avant son merge. Ne pas modifier une PR présentée comme prête sans actualiser scope, Gate et preuves. À la reprise, vérifier d'abord l'état de cette PR et l'éventuel accord/merge, puis la prochaine micro-tâche B4b ; ne pas réimplémenter le store.
+
+Le store testé ne prouve pas un parcours web cookie/CSRF, un redémarrage de processus, des cookies refusés/TLS production ou des drafts opérationnels. Les18critères complets, tests de sécurité HTTP/navigateurs et limitations restent à produire en B4f. Purge non planifiée et scan potentiellement supérieur à500 ; charge/backup/restore/recovery Prisma/rollback de bascule/production non qualifiés. Aucun L5, CONTRACT, autre lot, base personnelle/production, infrastructure ou déploiement autorisé.
 
 ## Git / VM / SQL / Infra et passation
 
-Git : branche dédiée publiée ; conception en cours de publication, aucune PR/merge L4. VM : aucune. SQL : aucun L4 ; migrations historiques uniquement en CI jetable. Infra : aucun changement ; ruleset inchangé (seulement Backend/Frontend Quality requis, quatre contrôles supplémentaires observés).
+Git : trois commits publiés, arbre complet comparé à l'index avant création puis ref/message/fichiers/blobs distants vérifiés ; clone fast-forward propre avant ce bloc documentaire. API Git avec parent attendu, aucun force-push/écriture directe main/merge/suppression de branche. VM : aucune. SQL : nouvelle migration additive testée seulement sur bases CI jetables identifiées, six historiques inchangées. Infra : aucun changement ; règles/permissions/actions/jobs inchangés, seulement triggers push exacts de branche. Deux Quality requis, quatre autres checks observés, ruleset non modifié.
 
-Un seul responsable actif par branche. À toute reprise : lire les sources et ce journal, comparer main/branche/commits/PR/checks/travail local ; ne pas refaire l'audit ou les commits déjà poussés. Work↔Chat classique exige l'arrêt de l'écrivain précédent et transfert explicite du propriétaire. Avant fin de session : état testé/commité/poussé, checkpoint et PRET_A_PASSER ; aucun travail ne continue hors session. En cas d'interruption brutale, GitHub fait foi, reconstruire sans force-push ni reset destructif.
+Ce checkpoint clôt les écritures de fichiers WORK de cette session ; restent sa publication, lecture de la vraie PR/CI et consignation des preuves finales dans sa description. Aucun travail ne continue hors session. Work↔Chat classique : transfert explicite du propriétaire et arrêt de l'écrivain précédent avant toute écriture ; lecture/diagnostic possible en parallèle. Toujours comparer main/branche/SHA/PR/checks/travail local au handoff ; GitHub fait foi. Arrêt sur divergence, secret, opération propriétaire/destructive ou décision hors périmètre ; préserver l'historique, pas de reset destructif. Sources normatives privées identiques aux copies déjà lues ; Reprise/handoff relus, aucune source privée copiée dans Git public.

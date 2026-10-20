@@ -20,7 +20,7 @@
       "id": "BB-F-001",
       "titre": "Inscription et création atomique du carnet personnel",
       "statut_observe": "implémentée sans test suffisant — S06, transaction mockée, CI historique.",
-      "statut_execution": "EN_COURS_L4_B4a",
+      "statut_execution": "APPROUVE_L4_NON_COMMENCE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "S.",
@@ -40,15 +40,15 @@
       "decisions": [
         "D1"
       ],
-      "documentation": "l4-design.md ; decisions.md ; ADR 0005 ; preuves à qualifier dans le checkpoint L4.",
-      "prochain_bloc": "B4a : store et schéma Session additifs, tests ; auth JWT courante inchangée avant B4b.",
+      "documentation": "l4-design.md ; checkpoint-l4.md ; decisions.md ; ADR 0005 ; Review Gate B4a.",
+      "prochain_bloc": "B4b : bascule API/Angular cookie/CSRF/contexte après revue ; B4c admission/stockage ; B4d brouillons ; aucune bascule web déjà livrée.",
       "autorisation": "L4_APPROUVE_2026_10_20"
     },
     {
       "id": "BB-F-002",
       "titre": "Connexion, déconnexion et retours de navigation",
       "statut_observe": "implémentée sans test suffisant — S06 et auth Angular.",
-      "statut_execution": "EN_COURS_L4_B4a",
+      "statut_execution": "APPROUVE_L4_NON_COMMENCE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "S.",
@@ -67,22 +67,22 @@
         "BB-F-003"
       ],
       "decisions": [],
-      "documentation": "l4-design.md ; decisions.md ; ADR 0005 ; preuves à qualifier dans le checkpoint L4.",
-      "prochain_bloc": "B4a : store et schéma Session additifs, tests ; auth JWT courante inchangée avant B4b.",
+      "documentation": "l4-design.md ; checkpoint-l4.md ; decisions.md ; ADR 0005 ; Review Gate B4a.",
+      "prochain_bloc": "B4b : bascule API/Angular cookie/CSRF/contexte après revue ; B4c admission/stockage ; B4d brouillons ; aucune bascule web déjà livrée.",
       "autorisation": "L4_APPROUVE_2026_10_20"
     },
     {
       "id": "BB-F-003",
       "titre": "Sessions durables, expiration et révocation",
       "statut_observe": "partielle — JWT 15 min/sessionStorage ; refresh et révocation absents.",
-      "statut_execution": "EN_COURS_L4_B4a",
+      "statut_execution": "QUALIFIE_PARTIEL_B4a_NON_MERGE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
       "branche_actuelle": "feature/secure-web-sessions",
       "branche_proposee": null,
       "pr_actuelle": null,
-      "commit_preuve": "3f9dfdbd3115380960296db3c7025715d48db55c",
+      "commit_preuve": "6ffc67b7b2c5f69437d3209ee335e4e0e1a1219e",
       "valeur_parcours": "une saisie ou un service ne doit pas obliger à perdre son travail toutes les quinze minutes.",
       "regles_cas_limites": "D2 validée : session opaque PostgreSQL, standard 2 h inactive/12 h absolue ; Rester connecté non précoché 7 j/30 j. Cookie HttpOnly/Secure production, CSRF serveur, fixation, logout/révocation et onglets ; aucun fallback Bearer après bascule B4b.",
       "donnees_api_droits": "Session user-owned avec expiration/révocation et secret stocké haché ; endpoints état/logout, éventuellement refresh ; cookies Secure/HttpOnly/SameSite, contrôle origine/CSRF sur mutations. Définir aussi l'auth des médias.",
@@ -96,8 +96,8 @@
       "decisions": [
         "D2"
       ],
-      "documentation": "l4-design.md ; decisions.md ; ADR 0005 ; preuves à qualifier dans le checkpoint L4.",
-      "prochain_bloc": "B4a : store et schéma Session additifs, tests ; auth JWT courante inchangée avant B4b.",
+      "documentation": "l4-design.md ; checkpoint-l4.md ; decisions.md ; ADR 0005 ; Review Gate B4a.",
+      "prochain_bloc": "B4b : bascule API/Angular cookie/CSRF/contexte après revue ; B4c admission/stockage ; B4d brouillons ; aucune bascule web déjà livrée.",
       "autorisation": "L4_APPROUVE_2026_10_20"
     },
     {
@@ -1506,7 +1506,7 @@
       "id": "BB-F-051",
       "titre": "Saisie protégée, erreurs et récupération",
       "statut_observe": "partielle — erreurs/retry présents, pas de protection de brouillon.",
-      "statut_execution": "EN_COURS_L4_B4a",
+      "statut_execution": "APPROUVE_L4_NON_COMMENCE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
@@ -1526,8 +1526,8 @@
         "BB-F-015"
       ],
       "decisions": [],
-      "documentation": "l4-design.md ; decisions.md ; ADR 0005 ; preuves à qualifier dans le checkpoint L4.",
-      "prochain_bloc": "B4a : store et schéma Session additifs, tests ; auth JWT courante inchangée avant B4b.",
+      "documentation": "l4-design.md ; checkpoint-l4.md ; decisions.md ; ADR 0005 ; Review Gate B4a.",
+      "prochain_bloc": "B4b : bascule API/Angular cookie/CSRF/contexte après revue ; B4c admission/stockage ; B4d brouillons ; aucune bascule web déjà livrée.",
       "autorisation": "L4_APPROUVE_2026_10_20"
     },
     {

@@ -63,7 +63,7 @@ Le 20 octobre 2026, Alex valide explicitement D1a/D1b/D2a/D2b/D2c et autorise L4
 
 **Recommandation initiale :** autoriser les branches/commits/push des lots approuvés et les décisions techniques courantes ; garder le merge et la production à validation explicite tant que le pipeline n'a pas été éprouvé. Option ultérieure : préautoriser les merges non destructifs après Review Gate complet et CI verte, en merge commit, avec vérification mergedAt et main post-merge.
 
-**À décider :** autorisation des lots après L3 et politique de merge des phases suivantes. Branches/commits/push/PR de L0–L3 sont autorisés ; les merges #20–#24 ont reçu un accord et ont été exécutés. Le merge #25 a été autorisé et exécuté le 20 octobre ; chaque merge L4 ou suivant exige encore un accord distinct. Phase B n'autorise jamais implicitement production, CONTRACT, suppression de données, réécriture d'historique ni coûts externes. L'accès en écriture a été prouvé après autorisation de phase B, puis recontrôlé le 19 octobre.
+**À décider :** autorisation des lots après L4 et politique future de merge. Branches/commits/push/PR de L0–L4 sont autorisés ; les merges #20–#24 ont reçu un accord et ont été exécutés. Le merge #25 a été autorisé et exécuté le 20 octobre ; chaque merge L4 ou suivant exige encore un accord distinct. Phase B n'autorise jamais implicitement production, CONTRACT, suppression de données, réécriture d'historique ni coûts externes. L'accès en écriture a été prouvé après autorisation de phase B, puis recontrôlé le 19 octobre.
 
 
 ## Livraison courante et validations encore ouvertes
