@@ -66,8 +66,8 @@ export class SessionService {
         ${randomUUID()}, ${userId}, ${hashSessionCredential(credential)},
         ${generateOpaqueToken()}, ${persistent}, statement_timestamp(),
         statement_timestamp(),
-        statement_timestamp() + ${policy.idleSeconds} * interval '1 second',
-        statement_timestamp() + ${policy.absoluteSeconds} * interval '1 second'
+        statement_timestamp() + ${policy.idleSeconds}::integer * interval '1 second',
+        statement_timestamp() + ${policy.absoluteSeconds}::integer * interval '1 second'
       ) RETURNING ${sessionFields}
     `;
 
@@ -89,8 +89,8 @@ export class SessionService {
         "lastSeenAt" = LEAST("expiresAt", GREATEST("lastSeenAt", clock_timestamp())),
         "idleExpiresAt" = LEAST("expiresAt", GREATEST(
           "idleExpiresAt", clock_timestamp() + (
-            CASE WHEN "persistent" THEN ${PERSISTENT_SESSION.idleSeconds}
-            ELSE ${STANDARD_SESSION.idleSeconds} END
+            CASE WHEN "persistent" THEN ${PERSISTENT_SESSION.idleSeconds}::integer
+            ELSE ${STANDARD_SESSION.idleSeconds}::integer END
           ) * interval '1 second'
         ))
       FROM candidate
