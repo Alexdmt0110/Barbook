@@ -1,55 +1,45 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-19T14:12:10.597Z"
+checkpoint_utc: "2026-10-20T09:53:03.672243Z"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
-work_owner: "AUCUN"
-handoff_status: "PRET_A_PASSER"
-feature: "L3 B3a–B3c mergé par #24 ; main qualifié ; checkpoint documentaire à proposer"
-branch: "docs/l3-merge-checkpoint"
+work_owner: "WORK"
+handoff_status: "EN_COURS"
+feature: "L4 autorisé ; B4a contrats et préparation du store Session"
+branch: "feature/secure-web-sessions"
 base_branch: "main"
-remote_head_sha: "d7ea95f7827a5b96b5ad4b17ef73fa4982c2ad22"
-local_head_sha: "d7ea95f7827a5b96b5ad4b17ef73fa4982c2ad22"
-worktree: "propre avant ce checkpoint ; huit documents de pilotage uniquement en cours de publication"
-pr: "#24 mergée le 2026-10-19T14:08:14Z ; aucune PR documentaire encore créée à cette photographie"
-tests: "main d7ea95f : six checks success ; 151 backend+NYC, 131 frontend, 10 garde-fous, 61 PostgreSQL/HTTP et 4 Chromium ; audits complets/runtime zéro"
-migrations: "6 migrations sur bases CI jetables seulement ; aucune application propriétaire/VPS ; CONTRACT absent"
-changes_pushed: "#24 head 95e21bc fusionné dans main par d7ea95f ; branche documentaire publiée à cette base ; branche dossiers conservée"
-unpushed_changes: "ce checkpoint documentaire uniquement avant sa publication ; aucun code applicatif non poussé"
-decisions_validated: "merges #20–#24 ; développement L0–L3 B3a–B3c ; accord explicite de merge #24 dans ce chat le 19 octobre"
-decisions_pending: "merge du checkpoint documentaire ; L4 et D1–D8 ; checks supplémentaires requis ; CONTRACT et toute production"
-next_atomic_step: "après publication/revue/CI de la PR documentaire, attendre son accord de merge distinct ; cadrer ensuite D1/D2 avant toute autorisation L4"
-risks_and_blockers: "aucun BLOCKER/P1 identifié ; bascule réelle/recovery Prisma/backup/restore non qualifiés ; limites legacy et A015/A016 ouvertes"
+remote_head_sha: "c99b08052e2e1494f621c7de8a7fb0831516bd1e"
+local_head_sha: "c99b08052e2e1494f621c7de8a7fb0831516bd1e"
+worktree: "pilotage L4 et trois déclencheurs push exacts de branche avant publication ; aucun code applicatif"
+pr: "aucune ouverte ; #25 mergée le 20 octobre à 08:53:33 UTC"
+tests: "main c99b080 six checks success ; nouvelle branche : vérifications documentaires, CI à observer après publication"
+migrations: "aucune créée/appliquée L4 ; six historiques CI seulement ; aucune DB propriétaire"
+changes_pushed: "branche L4 publiée depuis main c99b080 ; #20–#25 intégrées"
+unpushed_changes: "ce bloc de conception/pilotage uniquement avant son commit/push"
+decisions_validated: "D1a/D1b/D2a/D2b/D2c et six blocs L4 le 20 octobre ; merges #20–#25 seulement"
+decisions_pending: "chaque merge L4 ; D3–D8 sauf garde-fous existants ; L5/CONTRACT/production non autorisés"
+next_atomic_step: "vérifier publication/CI du design puis B4a : schéma et store Session additifs avec tests unitaires/PostgreSQL réels"
+risks_and_blockers: "JWT encore actif avant B4b ; aucun parcours cookie/CSRF/draft prétendu opérationnel ; pas de PostgreSQL/Chromium local détecté"
 production_effect: "aucun"
 ```
 
-Les SHA décrivent l'état vérifié avant publication : le présent document ne peut contenir son propre hash. Le commit documentaire doit être l'unique successeur sur cette branche à cette photographie ; vérifier ref, arbre, fichiers et CI de sa PR. Sa description GitHub consigne son SHA et les résultats connus après publication. Après fast-forward confirmé du clone, aucun changement non poussé ne doit subsister. Le handoff n'est pas un verrou technique.
+Cette photographie précède sa publication et ne peut porter son propre SHA. Lire la ref de la branche puis l'historique : le prochain commit documentaire décrit ce bloc ; ne pas le reproduire. Contrôler parent/arbre/message/fichiers/blobs et CI réellement terminée avant code. Le handoff ne constitue pas un verrou technique.
 
-## Checkpoint sûr et preuves
+## Reprise vérifiée et périmètre
 
-[PR #24](https://github.com/Alexdmt0110/Barbook/pull/24) effectivement mergée avec autorisation explicite d'Alex, le 19 octobre 2026 à 14:08:14 UTC. Head revu `95e21bc0fd1ce1f289bc0a2ba07f7200ad5f0312`, base `c0fc5fd3facd42c112673bbfc47285ba4547259b`. Juste avant merge : 76 fichiers/blobs et14 commits conformes, aucune revue/commentaire, mergeable/clean et six contrôles PR/push verts. Aucun code ni base modifié depuis le Review Gate.
+Alex autorise L4 uniquement et WORK reprend cette tranche dans cette conversation ; aucun autre écrivain annoncé. D1 : bêta privée à admission serveur ; édition et corbeille en V1 mais L5 exclu et D5/rétention non tranchée. D2 : sessions opaques PostgreSQL, cookie HttpOnly/Secure production, CSRF/expiration/révocation/fixation ; standard2h inactive/12h absolues et option non précochée7j/30j ; brouillons mémoire + sessionStorage24h, restauration explicite isolée, purge volontaire/changement de compte, pas de secret/replay/écrasement récent. [Design L4](l4-design.md), [décisions](decisions.md), [ADR0005](../adr/0005-revocable-web-sessions.md).
 
-Main vérifié : `d7ea95f7827a5b96b5ad4b17ef73fa4982c2ad22`, parents c0fc5fd3facd42c112673bbfc47285ba4547259b et 95e21bc0fd1ce1f289bc0a2ba07f7200ad5f0312. Arbre `fd27da5d07cac729b13971bc976847aea51b27e9`, identique au head revu. Six checks push-on-main success : [Integration39266232823](https://github.com/Alexdmt0110/Barbook/actions/runs/39266232823), [CI39266232851](https://github.com/Alexdmt0110/Barbook/actions/runs/39266232851), [Security39266232835](https://github.com/Alexdmt0110/Barbook/actions/runs/39266232835). Logs relus : 151 unitaires/18 suites +1 compatibilité NYC, 131 frontend/21 fichiers, 10 garde-fous, 61 natifs/5 suites,4 Chromium ; 6 migrations fresh/redeploy/status/drift et smoke compilé verts ; audits complets/runtime backend/frontend zéro. [Checkpoint détaillé L3](checkpoint-l3.md).
+GitHub interrogé directement le20octobre : main c99b080, PR#25 documentaire bien mergée/huit fichiers, six checks success, aucune PR ouverte. Branches dossiers95e21bc et docs/l3-merge-checkpoint39fd730 conservées ; aucune réécriture. Le snapshot de main indiquant encore #25 en attente a été reconnu obsolète ; pas de duplication. Accès réel pull/push=true. Publication via API Git avec parent attendu et comparaison de l'arbre entier à l'index, puis vérification distante et fast-forward du clone. Pas de CLI Git authentifiée ni push forcé.
 
-La branche `feature/cocktail-folder-management` reste distante à 95e21bc, sans suppression ni réécriture. Ses trois commits420357d2b0f7375c2121f9d62551607ef0cb561e, c5a87663cb3cd38815a661dcb89073034235ae55 et46321485d1d28351da7e0b555411199f40fa801a sont désormais ancêtres de main ; EXPAND historique inchangé. Le code/tests qualifié b0bb7574e373a2876b93cf67abf22f671ae7fca3 est identique dans main. Aucun cherry-pick ou nouvelle implémentation nécessaire.
+## Prochain travail et tests
 
-Le checkpoint après merge est sur `docs/l3-merge-checkpoint`, créée et publiée depuis d7ea95f ; consulter la PR ouverte de cette branche pour son état courant. Les huit fichiers modifiés sont README.md, agent-handoff.md, backlog.json, backlog.md, checkpoint-l3.md, decisions.md, review-log.md et roadmap.md sous docs/project/. Aucun fichier applicatif, test, workflow, dépendance ou SQL modifié. L'accord pour #24 ne vaut pas accord de merge pour cette nouvelle PR. Le handoff de main peut rester une photographie avant merge jusqu'à intégration du checkpoint : confronter les refs et PR.
+B4a prépare SessionService et migration additive ; pas encore de changement de login/guard/frontend. Tests natifs de stockage haché, bornes/activité, révocation/rejeu/global, ordre transactionnel, FK/CHECK/purge et upgrade. Les six contrôles de branche sont activés par déclencheurs exacts sans modifier les jobs. Node24.19/npm11.9 présents, backend npm ci passé (853paquets ; warnings de dépréciation glob/ESLint existants, pas de mise à jour aveugle). PostgreSQL/Docker/Chromium non détectés ; preuves natives/navigateur attendues en CI jetable. Ne pas annoncer ces futurs tests verts par anticipation.
 
-## Exécutions et limites
+La suite autorisée est B4b→B4c→B4d→B4e→B4f selon le design, avec micro-commits verts et push immédiat. Chaque PR est soumise à Alex avant merge. Arrêt sur divergence distante, secret, migration destructive/personnelle ou décision métier hors périmètre ; aucune désactivation de check. Pas de L5, CONTRACT, nouvelle infrastructure, déploiement ni coût tiers. Les sources privées restent hors Git public, hashes identiques à leur lecture antérieure ; prompt Reprise et handoff relus.
 
-Dans la session de développement : `npm --prefix backend run verify`, `npm --prefix frontend run verify`, lint/tsc backend, typage e2e, Prisma generate/validate et diff check réellement exécutés. Dans cette reprise : Git/diff/ascendance/blobs, JSON/YAML/fences/liens locaux pour les documents ; pas de réexécution applicative locale pour ce seul checkpoint. Les nouvelles exécutions applicatives viennent des jobs CI observés, avec PostgreSQL 16 et Chromium réels ; aucun résultat local DB/navigateur ou de propriétaire prétendu.
+## Git / VM / SQL / Infra et passation
 
-Captures b0bb757, artefact 12172691949/run39223198122, récupérées et inspectées dans la session précédente : index/vide, multi-classement, détail, desktop/mobile 390px et trois thèmes. Rétention 7 jours ; les copies locales ont disparu lors de la réinitialisation. Safari/appareil physique/lecteur d'écran/zoom 200 %/charge non qualifiés.
+Git : branche dédiée publiée ; conception en cours de publication, aucune PR/merge L4. VM : aucune. SQL : aucun L4 ; migrations historiques uniquement en CI jetable. Infra : aucun changement ; ruleset inchangé (seulement Backend/Frontend Quality requis, quatre contrôles supplémentaires observés).
 
-folders[] et organizationVersion sont la référence du nouveau frontend. Nouveau serveur : ancien payload compatible pour zéro/un lien,409 devant plusieurs, sans perte. Verrou workspace avant versions, commandes locales idempotentes, recettes/tags/autres appartenances conservés ; [contrats et limites](../maintenance/folder-management.md). Les migrations EXPAND et20261019073922 ajoutent liens/versions ; ambiguïtés refusées sans effacement. Inventorier/réconcilier explicitement toute base réelle concernée et retirer les anciens binaires écrivains incompatibles avant une bascule autorisée. Recovery Prisma après échec, rollback d'ancien backend, staging, sauvegarde/restauration et production restent non qualifiés.
-
-Git : publication API avec parent attendu, comparaison de l'arbre entier à l'index avant commit et relecture ref/message/fichiers/blobs après publication. Main modifié uniquement par le merge autorisé ; checkpoint par branche/PR. Aucun force-push. VM/SQL/infra : aucune intervention propriétaire, seed/reset ou déploiement ; bases CI jetables seulement. Ruleset public 22294305 inchangé, PR/deux Quality requis/strict ; les quatre autres checks ne sont pas devenus requis. Lecture administrative branch-protection403 avec l'intégration, règles publiques lisibles.
-
-## Reprise et arrêt
-
-Le prompt Reprise V2 est désormais reçu et lu intégralement ; les autres sources fournies ont les mêmes hashes que lors de leur lecture précédente. Le relais Work↔Chat du prompt maître §15 bis reste obligatoire ; ne pas recopier les documents privés dans GitHub. Catalogue 66 et D1–D8 conservés. Le présent accord porte sur #24 uniquement, pas L4/CONTRACT/protection/production.
-
-À la reprise : lire les sources privées et le handoff de la branche documentaire, interroger main/branches/PR/checks puis comparer. Si la PR documentaire est déjà mergée, ne pas la recréer. Si elle est ouverte, attendre sa validation distincte ou les corrections demandées ; ne pas pousser directement main. Ensuite présenter D1 audience privée/publique et D2 session/durée/appareil partagé avant tout code L4. Aucun autre lot n'a reçu d'autorisation.
-
-Ce checkpoint clôt les écritures de fichiers de Work ; restent seulement publication, vraie PR/CI et consignation de leur preuve dans sa description avant l'annonce PRET_A_PASSER. Aucun travail ne continue hors session. Un seul écrivain : Chat classique peut inspecter, mais attend confirmation du propriétaire que Work est arrêté et que le transfert est autorisé avant d'écrire ; Work confirme l'arrêt de Chat classique avant retour. En cas de divergence, conserver les états et ne rien forcer.
+Un seul responsable actif par branche. À toute reprise : lire les sources et ce journal, comparer main/branche/commits/PR/checks/travail local ; ne pas refaire l'audit ou les commits déjà poussés. Work↔Chat classique exige l'arrêt de l'écrivain précédent et transfert explicite du propriétaire. Avant fin de session : état testé/commité/poussé, checkpoint et PRET_A_PASSER ; aucun travail ne continue hors session. En cas d'interruption brutale, GitHub fait foi, reconstruire sans force-push ni reset destructif.

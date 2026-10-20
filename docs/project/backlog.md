@@ -45,4 +45,17 @@ Statut MERGE dans le périmètre B3a–B3c, [PR #24](https://github.com/Alexdmt0
 
 Preuves et limites : [checkpoint-l3.md](checkpoint-l3.md), [Review Gate](reviews/l3-review-gate.md), [contrats](../maintenance/folder-management.md). F023 garde le CONTRACT futur ; A006 garde la bascule réelle à qualifier, A015 est partiel et A016 reste ouvert. Les autres fiches/décisions ne sont pas autorisées par ces résultats.
 
-Prochaine étape : examiner la PR de checkpoint documentaire issue de `docs/l3-merge-checkpoint` et valider son merge séparément. #24 est mergée et main qualifié ; ne pas refaire ce travail. L4 doit être cadré avec D1/D2 avant autorisation ; aucun code de session, photo, suppression de recette ou production ajouté ici.
+## L4 — autorisé le 20 octobre 2026
+
+D1a/D1b/D2a/D2b/D2c validées, [design et critères](l4-design.md). #25 documentaire est mergée dans main c99b080 et qualifiée ; ne pas la recréer. Branche dédiée `feature/secure-web-sessions`, B4a en cours. Les fiches F001/F002/F003/F051 sont partiellement autorisées dans ce périmètre, pas toutes leurs évolutions futures.
+
+| Bloc | Résultat attendu | État |
+| --- | --- | --- |
+| BB-L4-01 / B4a | contrats/ADR et préparation Session additive testée, auth actuelle préservée | EN_COURS |
+| BB-L4-02 / B4b | API/UI cookie/CSRF et contexte coordonnés, retrait Bearer | APPROUVE |
+| BB-L4-03 / B4c | admission serveur fermée/liste, storage refusé toléré | APPROUVE |
+| BB-L4-04 / B4d / A010 / A012 | brouillons mémoire/sessionStorage 24 h, restauration isolée explicite, versions | APPROUVE |
+| BB-L4-05 / B4e | révocation globale, activité/onglets/réseau et courses | APPROUVE |
+| BB-L4-06 / B4f | Review Gate complet, six checks, vraie PR et handoff | APPROUVE ; merge à valider |
+
+Les critères L4-01 à L4-18 ne sont pas encore déclarés passés. B4a ne sécurise pas à lui seul les parcours JWT. L5, D5/rétention, CONTRACT, infrastructure et production restent exclus ; les branches historiques sont conservées.
