@@ -21,3 +21,7 @@ Les cinq timestamps sont timestamptz(3), décidés par PostgreSQL. CHECK pour ha
 Exécuter `npm --prefix backend run verify`, `npm --prefix backend run test:integration:safety`, puis prepare/test:e2e exclusivement selon les [garde-fous](integration-tests.md) sur loopback `barbook_test_*` explicitement optée. Pas de connexion DB mockée. Unitaires : encodage/durées ; natifs : stockage haché, autre instance Nest, expiration/plafond/attente, replay, transactions, verrous réellement observés, FK/CHECK/unicité/cascade et purge. Les résultats réellement passés se lisent au checkpoint/CI.
 
 Aucune base propriétaire inventoriée/migrée. Backup/restore, recovery Prisma, rollback de bascule et TLS/cookies réels restent à qualifier avant livraison autorisée. B4a n'active ni cookie, ni CSRF HTTP, ni admission privée, ni UI/brouillons ; aucun L5 ou CONTRACT.
+
+## Préparation web B4b (inactive avant bascule)
+
+Les primitives web-session-security préparent origine/cookie/CSRF/contexte ;44cas de test les exécutent sur un contrôleur HTTP de test exclu du build. Elles ne sont pas encore raccordées à configure-application, AuthController ou aux guards métier. inspect lit sans renouveler ; le futur guard devra ensuite appeler authenticate après les contrôles, et refuser si la session a expiré/été révoquée entre-temps. Une prélecture n'autorise jamais une opération. La bascule API/Angular reste à réaliser sur feature/web-session-cutover ; consulter le handoff courant.

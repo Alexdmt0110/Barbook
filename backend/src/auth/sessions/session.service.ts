@@ -74,6 +74,19 @@ export class SessionService {
     return { credential, session };
   }
 
+  /** Read-only web preflight; final authorization still requires authenticate. */
+  async inspect(credential: unknown): Promise<SessionState | null> {
+    if (!isOpaqueToken(credential)) return null;
+    const [session] = await this.prisma.$queryRaw<SessionState[]>`
+      SELECT ${sessionFields} FROM "Session"
+      WHERE "tokenHash" = ${hashSessionCredential(credential)}
+        AND "revokedAt" IS NULL
+        AND "idleExpiresAt" > clock_timestamp()
+        AND "expiresAt" > clock_timestamp()
+    `;
+    return session ?? null;
+  }
+
   /** Lock before checking deadlines: waiting must never renew an expired row. */
   async authenticate(credential: unknown): Promise<SessionState | null> {
     if (!isOpaqueToken(credential)) return null;

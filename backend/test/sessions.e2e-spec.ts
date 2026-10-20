@@ -137,6 +137,40 @@ describe('PostgreSQL opaque session store (not yet the web auth boundary)', () =
     },
   );
 
+  it('inspects without renewing and cannot authorize a session revoked after preflight', async () => {
+    const issued = await issue();
+    const before = await prisma.session.findUniqueOrThrow({
+      where: { id: issued.session.id },
+    });
+    expect(await service.inspect(issued.credential)).toEqual(issued.session);
+    expect(await service.inspect(issued.credential)).toEqual(issued.session);
+    expect(
+      await prisma.session.findUnique({ where: { id: before.id } }),
+    ).toEqual(before);
+    await service.revoke(issued.credential);
+    expect(await service.inspect(issued.credential)).toBeNull();
+    expect(await service.authenticate(issued.credential)).toBeNull();
+    expect(await service.inspect(undefined)).toBeNull();
+    expect(await service.inspect(generateOpaqueToken())).toBeNull();
+  });
+
+  it('refuses expiration between read-only preflight and final authorization without activity changes', async () => {
+    const issued = await issue();
+    expect(await service.inspect(issued.credential)).not.toBeNull();
+    await pool.query(
+      `UPDATE "Session" SET "createdAt"=statement_timestamp()-interval '3 hours', "lastSeenAt"=statement_timestamp()-interval '2 hours', "idleExpiresAt"=date_trunc('milliseconds', statement_timestamp()) WHERE "id"=$1`,
+      [issued.session.id],
+    );
+    const expired = await prisma.session.findUniqueOrThrow({
+      where: { id: issued.session.id },
+    });
+    expect(await service.inspect(issued.credential)).toBeNull();
+    expect(await service.authenticate(issued.credential)).toBeNull();
+    expect(
+      await prisma.session.findUnique({ where: { id: expired.id } }),
+    ).toEqual(expired);
+  });
+
   it('issues independent sessions and another Nest instance reads the same store', async () => {
     const first = await issue();
     const second = await issue();
