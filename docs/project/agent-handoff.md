@@ -1,26 +1,32 @@
 # Handoff canonique Barbook
 
+## État courant B4b
+
+#26 est intégrée après accord explicite, main76f742b qualifié et toutes branches historiques préservées. WORK reprend seul sur feature/web-session-cutover. [Design B4b](l4-b4b-design.md) avant code ; ce bloc est documentaire, sa publication est le prochain commit sur la base vérifiée. Les photographies B4a ci-dessous sont historiques ; ne pas recréer #26 ni réimplémenter le store. Relire GitHub et le dernier handoff de branche pour continuer. Aucun nouveau merge, déploiement, migration propriétaire, L5 ou CONTRACT.
+
+
+
 ```yaml
-checkpoint_utc: "2026-10-20T10:21:22.525926Z"
+checkpoint_utc: "2026-10-20T11:15:10.337753+00:00"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
-work_owner: "AUCUN"
-handoff_status: "PRET_A_PASSER"
-feature: "L4 B4a store/contrats qualifiés sur branche ; B4b–B4f non réalisés ; PR du premier bloc à valider"
-branch: "feature/secure-web-sessions"
+work_owner: "WORK"
+handoff_status: "EN_COURS"
+feature: "#26 mergée/main qualifié ; B4b Design Review et préparation des contrôles web"
+branch: "feature/web-session-cutover"
 base_branch: "main"
-remote_head_sha: "6ffc67b7b2c5f69437d3209ee335e4e0e1a1219e"
-local_head_sha: "6ffc67b7b2c5f69437d3209ee335e4e0e1a1219e"
-worktree: "neuf documents de checkpoint/Gate/pilotage avant publication ; aucun code/test/SQL modifié depuis6ffc67b"
-pr: "aucune à cette photographie ; créer puis vérifier la vraie PR de cette branche après publication et Gate documentaire"
-tests: "six checks6ffc67b success ;168backend+NYC,131frontend,10garde-fous,88natifs dont26store,4Chromium ;7migrations et audits zéro ; logs relus"
-migrations: "20261020095600_web_sessions additive ; sept migrations en CI jetable seulement ; historique inchangé ; aucune DB propriétaire"
-changes_pushed: "51d4b675 design ;47b479d préparation ;6ffc67b correction SQL, parent/arbre/message/fichiers/blobs vérifiés"
-unpushed_changes: "ce checkpoint documentaire uniquement avant son commit/push ; aucun code applicatif non poussé"
-decisions_validated: "D1a/D1b/D2a/D2b/D2c et six blocs L4 le20octobre ; merges #20–#25 uniquement"
-decisions_pending: "chaque merge L4 ; D3–D8 sauf garde-fous ; L5/CONTRACT/production non autorisés"
-next_atomic_step: "vérifier PR/HEAD/checks et validation de merge du premier bloc ; suite autorisée B4b : Design Review puis bascule API/Angular cookie/CSRF/contexte"
-risks_and_blockers: "aucun BLOCKER/P1 restant du diff B4a ; JWT encore actif ; cookie/CSRF HTTP/admission/drafts non livrés ; aucune qualification de production"
+remote_head_sha: "76f742bc7de437fe7ed1d6528344be208d54159d"
+local_head_sha: "76f742bc7de437fe7ed1d6528344be208d54159d"
+worktree: "bloc de conception/pilotage et triggers de branche avant publication ; aucun code B4b"
+pr: "#26 mergée le20octobre11:06:17UTC ; aucune PR B4b"
+tests: "main76f742b : six checks success ;168backend+NYC,131frontend,88natifs,4Chromium,7migrations et audits zéro ; logs relus"
+migrations: "sept migrations CI jetables seulement ; aucune nouvelle B4b ni base propriétaire"
+changes_pushed: "#26 intégrée par76f742b ; nouvelle branche B4b publiée depuis ce main"
+unpushed_changes: "ce bloc documentaire uniquement avant publication"
+decisions_validated: "merge #26 ; poursuite des blocs L4 et D1/D2 déjà autorisés"
+decisions_pending: "chaque nouveau merge ; D3–D8 sauf garde-fous ; L5/CONTRACT/production exclus"
+next_atomic_step: "publier le design B4b puis préparer/tester les primitives web sans modifier encore les contrats actifs"
+risks_and_blockers: "JWT encore actif ; cookie/CSRF web et drafts non livrés ; bascule API/UI devra être coordonnée"
 production_effect: "aucun"
 ```
 
@@ -52,4 +58,4 @@ Le store testé ne prouve pas un parcours web cookie/CSRF, un redémarrage de pr
 
 Git : trois commits publiés, arbre complet comparé à l'index avant création puis ref/message/fichiers/blobs distants vérifiés ; clone fast-forward propre avant ce bloc documentaire. API Git avec parent attendu, aucun force-push/écriture directe main/merge/suppression de branche. VM : aucune. SQL : nouvelle migration additive testée seulement sur bases CI jetables identifiées, six historiques inchangées. Infra : aucun changement ; règles/permissions/actions/jobs inchangés, seulement triggers push exacts de branche. Deux Quality requis, quatre autres checks observés, ruleset non modifié.
 
-Ce checkpoint clôt les écritures de fichiers WORK de cette session ; restent sa publication, lecture de la vraie PR/CI et consignation des preuves finales dans sa description. Aucun travail ne continue hors session. Work↔Chat classique : transfert explicite du propriétaire et arrêt de l'écrivain précédent avant toute écriture ; lecture/diagnostic possible en parallèle. Toujours comparer main/branche/SHA/PR/checks/travail local au handoff ; GitHub fait foi. Arrêt sur divergence, secret, opération propriétaire/destructive ou décision hors périmètre ; préserver l'historique, pas de reset destructif. Sources normatives privées identiques aux copies déjà lues ; Reprise/handoff relus, aucune source privée copiée dans Git public.
+La photographie de clôture B4a ci-dessous précède la reprise explicite B4b : WORK est désormais EN_COURS selon le YAML courant. Aucun travail ne continue hors session. Work↔Chat classique : transfert explicite du propriétaire et arrêt de l'écrivain précédent avant toute écriture ; lecture/diagnostic possible en parallèle. Toujours comparer main/branche/SHA/PR/checks/travail local au handoff ; GitHub fait foi. Arrêt sur divergence, secret, opération propriétaire/destructive ou décision hors périmètre ; préserver l'historique, pas de reset destructif. Sources normatives privées identiques aux copies déjà lues ; Reprise/handoff relus, aucune source privée copiée dans Git public.

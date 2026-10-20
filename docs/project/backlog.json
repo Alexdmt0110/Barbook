@@ -10,7 +10,7 @@
       "L3_B3a_B3c",
       "L4"
     ],
-    "merges": "PR_20_21_22_23_24_25_UNIQUEMENT",
+    "merges": "PR_20_21_22_23_24_25_26_UNIQUEMENT",
     "production": false,
     "decisions_D1_D8": "D1a_D1b_D2a_D2b_D2c_VALIDEES ; D3_D8_OUVERTES_SAUF_GARDE_FOUS_EXPLICITES"
   },
@@ -24,7 +24,7 @@
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "S.",
-      "branche_actuelle": "feature/secure-web-sessions",
+      "branche_actuelle": "feature/web-session-cutover",
       "branche_proposee": null,
       "pr_actuelle": null,
       "commit_preuve": "3f9dfdbd3115380960296db3c7025715d48db55c",
@@ -41,7 +41,7 @@
         "D1"
       ],
       "documentation": "l4-design.md ; checkpoint-l4.md ; decisions.md ; ADR 0005 ; Review Gate B4a.",
-      "prochain_bloc": "B4b : bascule API/Angular cookie/CSRF/contexte après revue ; B4c admission/stockage ; B4d brouillons ; aucune bascule web déjà livrée.",
+      "prochain_bloc": "B4b : contrôles web testés puis bascule API/Angular coordonnée ; B4c admission/stockage et B4d brouillons à venir.",
       "autorisation": "L4_APPROUVE_2026_10_20"
     },
     {
@@ -52,7 +52,7 @@
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "S.",
-      "branche_actuelle": "feature/secure-web-sessions",
+      "branche_actuelle": "feature/web-session-cutover",
       "branche_proposee": null,
       "pr_actuelle": null,
       "commit_preuve": "3f9dfdbd3115380960296db3c7025715d48db55c",
@@ -68,21 +68,21 @@
       ],
       "decisions": [],
       "documentation": "l4-design.md ; checkpoint-l4.md ; decisions.md ; ADR 0005 ; Review Gate B4a.",
-      "prochain_bloc": "B4b : bascule API/Angular cookie/CSRF/contexte après revue ; B4c admission/stockage ; B4d brouillons ; aucune bascule web déjà livrée.",
+      "prochain_bloc": "B4b : contrôles web testés puis bascule API/Angular coordonnée ; B4c admission/stockage et B4d brouillons à venir.",
       "autorisation": "L4_APPROUVE_2026_10_20"
     },
     {
       "id": "BB-F-003",
       "titre": "Sessions durables, expiration et révocation",
       "statut_observe": "partielle — JWT 15 min/sessionStorage ; refresh et révocation absents.",
-      "statut_execution": "QUALIFIE_PARTIEL_B4a_NON_MERGE",
+      "statut_execution": "MERGE_PARTIEL_B4a_B4b_EN_COURS",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
-      "branche_actuelle": "feature/secure-web-sessions",
+      "branche_actuelle": "feature/web-session-cutover",
       "branche_proposee": null,
-      "pr_actuelle": null,
-      "commit_preuve": "6ffc67b7b2c5f69437d3209ee335e4e0e1a1219e",
+      "pr_actuelle": "#26 MERGEE_B4a",
+      "commit_preuve": "76f742bc7de437fe7ed1d6528344be208d54159d",
       "valeur_parcours": "une saisie ou un service ne doit pas obliger à perdre son travail toutes les quinze minutes.",
       "regles_cas_limites": "D2 validée : session opaque PostgreSQL, standard 2 h inactive/12 h absolue ; Rester connecté non précoché 7 j/30 j. Cookie HttpOnly/Secure production, CSRF serveur, fixation, logout/révocation et onglets ; aucun fallback Bearer après bascule B4b.",
       "donnees_api_droits": "Session user-owned avec expiration/révocation et secret stocké haché ; endpoints état/logout, éventuellement refresh ; cookies Secure/HttpOnly/SameSite, contrôle origine/CSRF sur mutations. Définir aussi l'auth des médias.",
@@ -97,7 +97,7 @@
         "D2"
       ],
       "documentation": "l4-design.md ; checkpoint-l4.md ; decisions.md ; ADR 0005 ; Review Gate B4a.",
-      "prochain_bloc": "B4b : bascule API/Angular cookie/CSRF/contexte après revue ; B4c admission/stockage ; B4d brouillons ; aucune bascule web déjà livrée.",
+      "prochain_bloc": "B4b : contrôles web testés puis bascule API/Angular coordonnée ; B4c admission/stockage et B4d brouillons à venir.",
       "autorisation": "L4_APPROUVE_2026_10_20"
     },
     {
@@ -1510,7 +1510,7 @@
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
-      "branche_actuelle": "feature/secure-web-sessions",
+      "branche_actuelle": "feature/web-session-cutover",
       "branche_proposee": null,
       "pr_actuelle": null,
       "commit_preuve": "3f9dfdbd3115380960296db3c7025715d48db55c",
@@ -1527,7 +1527,7 @@
       ],
       "decisions": [],
       "documentation": "l4-design.md ; checkpoint-l4.md ; decisions.md ; ADR 0005 ; Review Gate B4a.",
-      "prochain_bloc": "B4b : bascule API/Angular cookie/CSRF/contexte après revue ; B4c admission/stockage ; B4d brouillons ; aucune bascule web déjà livrée.",
+      "prochain_bloc": "B4b : contrôles web testés puis bascule API/Angular coordonnée ; B4c admission/stockage et B4d brouillons à venir.",
       "autorisation": "L4_APPROUVE_2026_10_20"
     },
     {

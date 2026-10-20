@@ -9,6 +9,7 @@ on:
       - main
       - feature/cocktail-folder-management
       - feature/secure-web-sessions
+      - feature/web-session-cutover
 
 permissions:
   contents: read

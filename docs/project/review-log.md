@@ -213,3 +213,9 @@ Correction ciblée : casts integer explicites des constantes de durée, dans cr�
 6ffc67b : six checks success réellement lus ; logs168backend+NYC,131frontend,10garde-fous,88natifs/6suites dont26store et4Chromium. Sept migrations fresh/redeploy/status/drift et smoke vert ; audits complets/runtime backend/frontend zéro. Le P1 text*interval de47b479d est fermé par ces exécutions ; aucun test retiré ou affaibli.
 
 Revue complète main...branche après correction,24fichiers avant ce checkpoint, tous axes dans reviews/l4-b4a-review-gate.md ; aucun BLOCKER/P1 restant identifié dans le périmètre préparatoire. Sources/primitives/transactions/SQL/tests/docs/workflows relus, absence de changement frontend/dépendance/infra/ancienne migration vérifiée. B4a inactif côté routes reste explicite, pas de clôture globale L4. Checkpoint/handoff/catalogue mis à jour dans un bloc documentaire seul ; relire la vraie PR et les checks de son HEAD après publication. Merge distinct à valider par Alex ; aucune production.
+
+## #26 mergée ; Design Review B4b avant code
+
+Accord explicite Alex20octobre ; HEAD/base/diff26fichiers/quatre commits/12checks/discussions/mergeabilité revérifiés sans changement. Merge commit76f742b, mergedAt11:06:17UTC et arbre/parents/main/six checks post-merge vérifiés, logs168/131/88/4/sept migrations/audits zéro relus. Aucune branche historique supprimée/réécrite.
+
+B4b : nouvelle branche feature/web-session-cutover. Revue l4-b4b-design.md avant code : origine/cookie/CSRF/contexte côté web ; store réutilisé ; transactions d'inscription complètes ; pas de fallback Bearer ; génération client et interdiction d'installer B dans écran A ; expiration distincte du logout ; fixtures et vrais tests à adapter sans suppression d'assertion. Commits bornés de préparation inactive puis bascule coordonnée. Le présent commit ne change que pilotage/design et les trois triggers push exacts, sans actions/jobs/permissions/protection.

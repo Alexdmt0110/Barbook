@@ -2,7 +2,8 @@
 
 La phase A est validée comme base de travail. **L0–L3 B3a–B3c sont intégrés ; main c99b080 est qualifié après #25 le 20 octobre 2026. L4 est autorisé, D1/D2 validées ; B4a commence sur feature/secure-web-sessions.** Le catalogue ne vaut pas autorisation générale. Les merges, migrations destructives, décisions métier structurantes et opérations de production restent à valider par Alex.
 
-- [Checkpoint L4 — B4a qualifié et limites](checkpoint-l4.md)
+- [Design Review B4b — bascule web](l4-b4b-design.md)
+- [Checkpoint L4 — B4a intégré et limites](checkpoint-l4.md)
 - [Review Gate B4a](reviews/l4-b4a-review-gate.md)
 - [Design Review, six blocs et critères L4](l4-design.md)
 - [ADR sessions PostgreSQL](../adr/0005-revocable-web-sessions.md)
@@ -27,3 +28,5 @@ Lire le prompt maître V2, le PDF de workflow, les règles de travail et les pro
 Un seul responsable actif par tranche et branche. Vérifier GitHub et le travail local avant d'écrire. Design Review → changement limité → tests réels → commit Conventional Commit atomique → push immédiat → lecture du SHA, du message et des fichiers distants → Checkpoint Barbook. Revue complète de la branche contre sa base avant PR ; après correction BLOCKER/P1, recommencer cette revue entière. Ne pas désactiver les contrôles en échec.
 
 Les tests, PR, merges, migrations et déploiements ont des états distincts. Une CI verte ne prouve pas la production. Un document de handoff ne remplace jamais les références distantes. Ne jamais forcer un push, réécrire ou supprimer la branche dossiers pour simplifier la reprise.
+
+État courant20octobre : #26 intégrée à76f742b, six checks main success ; B4b reprend sur feature/web-session-cutover. L'auth courante reste JWT jusqu'à la bascule coordonnée testée ; aucun déploiement.

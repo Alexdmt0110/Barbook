@@ -87,3 +87,9 @@ Après la demande explicite de validation de la PR #24, Alex répond « je l’a
 ## Validation du propriétaire — 20 octobre 2026, L4
 
 Après vérification indépendante de #24/#25, Alex valide les choix détaillés D1/D2 ci-dessus et autorise L4 seulement, ses six blocs, les décisions techniques ordinaires, branches/commits/push/checkpoints/tests/Review Gates/PR et migrations sur bases de développement jetables. WORK reprend cette tranche ; aucun travail Chat classique concurrent n'est annoncé. Chaque PR reste à valider avant merge. Ni l'édition/corbeille L5, ni le CONTRACT, ni base personnelle/production, infrastructure ou déploiement ne sont autorisés.
+
+## Autorisation et vérification du merge #26 — 20 octobre 2026
+
+Alex autorise explicitement #26 et la poursuite des blocs L4 déjà approuvés, en commençant par B4b ; chaque nouvelle PR reste à validation distincte. Merge commit76f742bc7de437fe7ed1d6528344be208d54159d confirmé, mergedAt11:06:17UTC (13:06Paris), parentsc99b080/4c97d89 et arbre identique au head revu. Avant merge :26blobs/diff/quatre commits et douze checks push+PR success, aucune discussion, mergeable/clean. Après : six checks main success, logs168/131/88/4/sept migrations/audits zéro relus. Toutes les branches historiques conservées.
+
+B4b sur feature/web-session-cutover depuis ce main ; Design Review dédiée. Aucun autre merge, L5, CONTRACT, migration personnelle/production, changement d'infrastructure ou déploiement autorisé.

@@ -1,6 +1,6 @@
 # Checkpoint L4 — B4a qualifié, suite non réalisée
 
-20 octobre 2026. Alex a validé D1a/D1b/D2a/D2b/D2c et autorisé les six blocs L4. **Seul B4a est développé et qualifié à ce checkpoint ; aucune PR L4 n'est encore mergée.** [Design et18critères](l4-design.md), [décisions](decisions.md), [Review Gate B4a](reviews/l4-b4a-review-gate.md), [handoff canonique](agent-handoff.md).
+20 octobre 2026. Alex a validé D1a/D1b/D2a/D2b/D2c et autorisé les six blocs L4. **B4a est intégré par #26 après accord explicite ; B4b commence sur une nouvelle branche.** [Design et18critères](l4-design.md), [décisions](decisions.md), [Review Gate B4a](reviews/l4-b4a-review-gate.md), [handoff canonique](agent-handoff.md).
 
 ## Git et périmètre
 
@@ -55,3 +55,9 @@ Première CI native47b479d :19échecs/69succès, erreur42883 text*interval dans 
 Le store prouve des sous-cas de L4-05/06/07/18 ; aucun critère HTTP/UI entier n'est fermé par anticipation. L4-01/02/03/04/08–17 attendent leurs vrais parcours, même si des briques ou invariants internes sont déjà testés. Autre instance Nest ne vaut pas qualification du redémarrage d'un processus de production. Cookie Secure/TLS/cookies refusés, CSRF serveur et appareils partagés restent non qualifiés. La purge n'est pas planifiée et son scan n'est pas garanti borné à500 ; mesurer avant échelle supérieure.
 
 D1b inclut édition/corbeille dans la V1, mais L5 et D5/rétention restent exclus du développement L4. D3/D4/D6/D7/D8 et CONTRACT non clos. Pas d'application sur base propriétaire, recovery Prisma/backup/restore/rollback de bascule, VPS ou production. Branches historiques préservées, ruleset inchangé (deux Quality requis ; quatre autres checks observés). Git : commits/push/PR seulement. VM : aucune. SQL : sept migrations uniquement en bases CI jetables. Infra : aucun changement.
+
+## Intégration vérifiée de B4a et reprise B4b
+
+#26 effectivement mergée le20octobre2026 à11:06:17UTC par76f742bc7de437fe7ed1d6528344be208d54159d, parentsc99b080/4c97d89, arbre4be600b0c3957131a0d021ed8a21655e080b36d3 identique au head revu. Main à ce SHA, six checks post-merge success : [Quality39412588451](https://github.com/Alexdmt0110/Barbook/actions/runs/39412588451), [Integration39412588433](https://github.com/Alexdmt0110/Barbook/actions/runs/39412588433), [Security39412588400](https://github.com/Alexdmt0110/Barbook/actions/runs/39412588400). Logs relus168backend,131frontend,88natifs,4Chromium, sept migrations et audits zéro. Branches historiques toutes conservées à leurs refs antérieures.
+
+Nouvelle branche feature/web-session-cutover depuis76f742b ; [revue B4b](l4-b4b-design.md). Les photographies pré-merge ci-dessus sont conservées comme preuves historiques, pas comme état courant de la PR. B4b reste à réaliser ; aucune bascule cookie/CSRF ni protection de draft déjà livrée. Les autorisations/exclusions L4 restent inchangées.

@@ -9,7 +9,7 @@ Phase A validée comme base. L0–L2 autorisés le 16 octobre ; merges #20–#24
 | L2 — Intégration | MERGE #23 | PostgreSQL/HTTP/Chromium et six checks sur main ; rien déployé |
 | L3 — Dossiers B3a–B3c | MERGE #24 ; main vert | merge commit d7ea95f autorisé/exécuté, six checks main success ; checkpoint documentaire #25 également intégré |
 | B3d — CONTRACT | NON_APPROUVE | retrait legacy seulement après inventaire des usages, bascule compatible, backup/restore et accord destructif distinct |
-| L4 — Sessions et saisie sûre | APPROUVE ; B4a QUALIFIE_NON_MERGE | D1/D2 validées, six blocs du design L4 ; session PostgreSQL et brouillons sessionStorage24h ; PR/merge distincts |
+| L4 — Sessions et saisie sûre | APPROUVE ; B4a MERGE #26 ; B4b EN_COURS | D1/D2 validées, six blocs du design L4 ; session PostgreSQL et brouillons sessionStorage24h ; PR/merge distincts |
 | L5 — Cycle recette | PROPOSE_NON_APPROUVE | édition/version, suppression/restauration selon D5, quantités/ABV |
 | L6 — Photos privées | PROPOSE_NON_APPROUVE | D2/D6 ; contrôles fichier, accès privé, stockage/cleanup et sauvegardes |
 | L7 — Qualification V1 | PROPOSE_NON_APPROUVE | parcours, navigateurs/appareils, zoom/clavier, performances et docs exactes |
@@ -27,3 +27,5 @@ Le [design L3](l3-design.md), le [checkpoint](checkpoint-l3.md) et le [Review Ga
 D1a bêta privée, D1b édition/corbeille V1 et D2 sessions/durées/brouillons sont validées. L5 reste non autorisé ; D5 fixera la rétention avant tout développement de corbeille. D3/D4, D6, D7/D8 restent à trancher au moment utile. Aucun accès VPS, déploiement, migration propriétaire, coût tiers ou changement de ruleset ici. Aucun CONTRACT. Le catalogue de 66 fiches est préservé, sans autorisation générale.
 
 B4a (store additif) est qualifié sur branche au code6ffc67b :168backend,131frontend,88natifs,4Chromium, sept migrations et audits zéro, six checks success. Le [checkpoint L4](checkpoint-l4.md) et le [Review Gate B4a](reviews/l4-b4a-review-gate.md) définissent exactement les preuves et limites. Les autres blocs restent à réaliser ; aucun merge L4 autorisé.
+
+#26 a été mergée après accord le20octobre à11:06:17UTC, main76f742b/six checks post-merge verts. B4a est intégré, feature/secure-web-sessions conservée. B4b reprend sur feature/web-session-cutover ; design l4-b4b-design.md. Aucune nouvelle phase ni aucun merge suivant n'est implicitement autorisé.
