@@ -41,7 +41,7 @@
         "D1"
       ],
       "documentation": "l4-design.md ; checkpoint-l4.md ; decisions.md ; ADR 0005 ; Review Gate B4a.",
-      "prochain_bloc": "B4b : contrôles web testés puis bascule API/Angular coordonnée ; B4c admission/stockage et B4d brouillons à venir.",
+      "prochain_bloc": "B4b : activer de façon coordonnée API/Angular cookie/CSRF/contexte, sans fallback Bearer ; primitives6500544 déjà qualifiées mais inactives ; préserver toutes les assertions de régression.",
       "autorisation": "L4_APPROUVE_2026_10_20"
     },
     {
@@ -68,14 +68,14 @@
       ],
       "decisions": [],
       "documentation": "l4-design.md ; checkpoint-l4.md ; decisions.md ; ADR 0005 ; Review Gate B4a.",
-      "prochain_bloc": "B4b : contrôles web testés puis bascule API/Angular coordonnée ; B4c admission/stockage et B4d brouillons à venir.",
+      "prochain_bloc": "B4b : activer de façon coordonnée API/Angular cookie/CSRF/contexte, sans fallback Bearer ; primitives6500544 déjà qualifiées mais inactives ; préserver toutes les assertions de régression.",
       "autorisation": "L4_APPROUVE_2026_10_20"
     },
     {
       "id": "BB-F-003",
       "titre": "Sessions durables, expiration et révocation",
       "statut_observe": "partielle — JWT 15 min/sessionStorage ; refresh et révocation absents.",
-      "statut_execution": "MERGE_PARTIEL_B4a_B4b_EN_COURS",
+      "statut_execution": "MERGE_PARTIEL_B4a_B4b_PREPARATION_QUALIFIEE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
@@ -97,7 +97,7 @@
         "D2"
       ],
       "documentation": "l4-design.md ; checkpoint-l4.md ; decisions.md ; ADR 0005 ; Review Gate B4a.",
-      "prochain_bloc": "B4b : contrôles web testés puis bascule API/Angular coordonnée ; B4c admission/stockage et B4d brouillons à venir.",
+      "prochain_bloc": "B4b : activer de façon coordonnée API/Angular cookie/CSRF/contexte, sans fallback Bearer ; primitives6500544 déjà qualifiées mais inactives ; préserver toutes les assertions de régression.",
       "autorisation": "L4_APPROUVE_2026_10_20"
     },
     {
@@ -1527,7 +1527,7 @@
       ],
       "decisions": [],
       "documentation": "l4-design.md ; checkpoint-l4.md ; decisions.md ; ADR 0005 ; Review Gate B4a.",
-      "prochain_bloc": "B4b : contrôles web testés puis bascule API/Angular coordonnée ; B4c admission/stockage et B4d brouillons à venir.",
+      "prochain_bloc": "B4b : activer de façon coordonnée API/Angular cookie/CSRF/contexte, sans fallback Bearer ; primitives6500544 déjà qualifiées mais inactives ; préserver toutes les assertions de régression.",
       "autorisation": "L4_APPROUVE_2026_10_20"
     },
     {

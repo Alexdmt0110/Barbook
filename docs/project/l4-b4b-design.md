@@ -47,3 +47,9 @@ Actualiser les contrats de maintenance, variables .env/CI et ADR historique apr�
 ## Préparation : vérification sans prolongation
 
 Le guard lira d'abord les métadonnées par inspect, sans écriture, pour vérifier CSRF et contexte ; puis authenticate revérifiera expiration/révocation sous verrou et actualisera l'activité. Inspect seul ne donne jamais l'autorisation finale. Une révocation/expiration entre les deux fait échouer authenticate. Cela évite de prolonger une session lors d'un refus CSRF/contexte ; coût explicite d'une lecture indexée supplémentaire, sans cache d'autorisation. Les droits métier restent revalidés par les services existants. Tests natifs supplémentaires : inspection sans effet, révocation/expiration et refus final après prélecture.
+
+## Points de protocole à fermer avant activation
+
+Une réponse logout ancienne peut arriver après un login d'un autre onglet : un Set-Cookie de suppression inconditionnel pourrait alors effacer le nouveau cookie. Le helper clearSessionCookie ne garantit pas à lui seul l'ordre des transitions. Définir/tester ce protocole avant son raccordement (coordination des transitions avec fallback sûr, ou révocation sans suppression globale inconditionnelle), sans demander une nouvelle décision produit. Le contrôle serveur du contexte reste obligatoire indépendamment des notifications.
+
+Si le POST register a réussi mais que le navigateur refuse le cookie, le compte existe réellement : la vérification /me doit produire un message honnête de connexion non établie, pas prétendre que l'inscription a été annulée ou rejouer automatiquement le POST. Même exigence de distinction entre résultat certain et inconnu pour les erreurs réseau. Ces cas ne sont pas encore qualifiés par les44tests de primitives.

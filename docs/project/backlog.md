@@ -63,3 +63,5 @@ Les critères L4-01 à L4-18 ne sont pas encore déclarés passés. B4a ne sécu
 Preuves B4a et limites : [checkpoint-l4.md](checkpoint-l4.md), [Review Gate](reviews/l4-b4a-review-gate.md). F003 demeure partielle ; F001/F002/F051 sont approuvées mais leur nouvelle implémentation web n'a pas commencé. Aucune inscription privée/cookie/CSRF HTTP/restauration de brouillon prétendue livrée par le store seul.
 
 Reprise B4b : [design préventif](l4-b4b-design.md). Préparation des contrôles web puis bascule coordonnée API/UI ; transport des fixtures actualisé sans retirer leurs assertions. Aucun cookie/CSRF HTTP/draft encore opérationnel à ce jalon documentaire.
+
+B4b première préparation qualifiée au code6500544 :44tests HTTP de primitives et2PG d'inspection supplémentaires, total212backend/90natifs. Les routes JWT et Angular restent inchangés ; bascule coordonnée non réalisée. Pas de PR B4b avant qualification complète. Handoff et checkpoint-l4.md contiennent la prochaine micro-tâche sans nouveau besoin d'autorisation L4.

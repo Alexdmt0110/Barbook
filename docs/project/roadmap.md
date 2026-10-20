@@ -29,3 +29,5 @@ D1a bêta privée, D1b édition/corbeille V1 et D2 sessions/durées/brouillons s
 B4a (store additif) est qualifié sur branche au code6ffc67b :168backend,131frontend,88natifs,4Chromium, sept migrations et audits zéro, six checks success. Le [checkpoint L4](checkpoint-l4.md) et le [Review Gate B4a](reviews/l4-b4a-review-gate.md) définissent exactement les preuves et limites. Les autres blocs restent à réaliser ; aucun merge L4 autorisé.
 
 #26 a été mergée après accord le20octobre à11:06:17UTC, main76f742b/six checks post-merge verts. B4a est intégré, feature/secure-web-sessions conservée. B4b reprend sur feature/web-session-cutover ; design l4-b4b-design.md. Aucune nouvelle phase ni aucun merge suivant n'est implicitement autorisé.
+
+B4b est EN_COURS_PREPARATION : premier micro-bloc6500544 qualifié, contrôles web encore inactifs côté application ;212backend/90natifs et six checks verts. La bascule API/Angular, admission, brouillons et qualification globale restent à réaliser dans L4. Aucune nouvelle PR ouverte ni nouveau merge autorisé.
