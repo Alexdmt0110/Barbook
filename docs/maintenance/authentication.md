@@ -1,5 +1,7 @@
 # Authentification Barbook
 
+Préparation L4 B4a : le [store PostgreSQL](web-sessions.md) est ajouté sans activer les nouveaux contrats web. Ce document décrit encore l'authentification JWT en cours ; la cible validée est l'[ADR 0005](../adr/0005-revocable-web-sessions.md), à raccorder en B4b.
+
 ## Architecture
 
 L'authentification Barbook couvre actuellement le flux complet :

@@ -187,3 +187,29 @@ But : enregistrer l'accord, le merge et sa preuve après exécution, sans écrit
 Gate de toute la branche documentaire contre main : états fonctionnels/autorisation confrontés aux API GitHub ; validation JSON/YAML/liens/fences/diff ; pas de nouveau modèle DB, erreur HTTP, autorisation, dépendance, UI ou coût/performance ; cohérence des responsabilités des documents et références historiques ; aucune donnée privée/secrète ajoutée ; commandes/tests CI distingués des vérifications locales. Production readiness reste limitée au périmètre déjà qualifié. Aucun BLOCKER/P1 ni nouveau P2 identifié. Réexécutions applicatives locales inutiles pour ces seuls documents ; six checks main observés, puis CI PR obligatoire sur le nouveau head.
 
 Publier un commit atomique, comparer l'arbre entier avant commit, mettre à jour la ref sans force avec parent attendu et relire SHA/message/parents/fichiers/blobs. Après ouverture, relire le vrai diff de la PR et ses checks/discussions/mergeabilité ; consigner la preuve finale dans sa description. Ne pas merger sans accord. Git : checkpoint versionné par branche/PR ; VM : aucun ; SQL propriétaire : aucune action ; infra : aucun changement.
+
+## L4 — Design Review préventive B4a, 20 octobre 2026
+
+D1/D2 et L4 validées explicitement ; main c99b080, #25 mergée/six checks success, push=true et branche dédiée publiée vérifiés. Sources normatives identiques aux copies déjà lues ; Reprise et handoff relus, snapshot documentaire obsolète confronté à GitHub sans le recréer. WORK reprend la nouvelle tranche, aucun autre écrivain annoncé.
+
+Design avant code dans l4-design.md/ADR0005 : SessionService cohésif et client transactionnel explicite, crypto Node/PG existants, pas de repository/framework/service externe. Migration additive et invariants temporels/hash/FK ; horloge DB, activité conditionnelle et verrou User partagé création/révocation globale. JWT actuel conservé en B4a ; B4b basculera ensemble API/Angular, CSRF et contexte utilisateur attendu pour éviter les écritures A sous B. Brouillons décidés mémoire/sessionStorage24h, pas mémoire seule. Durée standard décidée2h/12h, pas30min/12h.
+
+Le présent bloc versionne les décisions, le pilotage et uniquement les trois déclencheurs push de branche des workflows existants. Aucune permission/action/contrôle/protection ni code/SQL/dépendance modifié. Vérification documentaire JSON,66IDs,liens, YAML et diff avant publication ; résultats applicatifs de cette nouvelle branche à attendre en CI. Ni merge, L5, CONTRACT, migration propriétaire, infrastructure ou production.
+
+## L4 B4a — préparation du store, revue avant publication
+
+Schéma Session/additif20261020095600, hash unique/CSRF indépendant/FK User/CHECK temporels/timestamptz, SessionService dans AuthModule sans appel HTTP. Revue préventive publiée dans51d4b675 et précisions l4-design : ReadCommitted obligatoire, verrou User commun, CTE matérialisé verrouillant avant contrôle d'expiration, activité plafonnée sans résurrection, purge500/SKIP LOCKED. Aucune dépendance ou route/guard/UI modifiée. Les dates de création sont prises après attente du verrou User.
+
+Local réellement passé : backend verify19suites/168tests +1NYC, lint zéro warning, build, Prisma validate/generate, tscnoEmit incluant tests ; dix garde-fous, typage E2E et diffcheck. Frontend inchangé : verify21fichiers/131tests passé à la baseline de cette branche. DDL Session comparé à la référence Prisma et six migrations historiques/lockfile inchangés octet pour octet. Contrats internes et limites dans maintenance/web-sessions.md. Les tests PostgreSQL nouveaux sont compilés mais non exécutables localement ; CI jetable à observer après ce push, sans présumer du résultat. Aucun cookie/CSRF HTTP/admission privée/draft encore qualifié. Le Review Gate complet et la PR attendent ces preuves, pas de merge/production autorisé.
+
+## L4 B4a — correction après première CI native
+
+Run39406195894, PostgreSQL Integration118572604269 : sept migrations/fresh/redeploy/statut/drift passés, cinq suites historiques passées, nouvelle suite19échecs/7succès (88tests au total,69succès). Cause : PostgreSQL infère les deux paramètres du CASE sans type numérique comme text, puis refuse text*interval (42883). Les tests de concurrence signalent aussi l'absence de verrou attendu puisque cette requête échoue avant son exécution. Le store n'est pas activé par les routes actuelles ; aucune bascule ni migration propriétaire.
+
+Correction ciblée : casts integer explicites des constantes de durée, dans création et branches du CASE d'activité. Aucun test retiré, aucune attente/validation/contrainte ou permission assouplie. Vérification locale168tests/lint/build/Prisma/tsc à refaire, puis push immédiat et nouvelle CI native complète. P1 ouvert tant que ces preuves ne passent pas ; Review Gate complet de toute la branche à reprendre depuis main après correction.
+
+## L4 B4a — clôture P1 et Review Gate complet repris depuis main
+
+6ffc67b : six checks success réellement lus ; logs168backend+NYC,131frontend,10garde-fous,88natifs/6suites dont26store et4Chromium. Sept migrations fresh/redeploy/status/drift et smoke vert ; audits complets/runtime backend/frontend zéro. Le P1 text*interval de47b479d est fermé par ces exécutions ; aucun test retiré ou affaibli.
+
+Revue complète main...branche après correction,24fichiers avant ce checkpoint, tous axes dans reviews/l4-b4a-review-gate.md ; aucun BLOCKER/P1 restant identifié dans le périmètre préparatoire. Sources/primitives/transactions/SQL/tests/docs/workflows relus, absence de changement frontend/dépendance/infra/ancienne migration vérifiée. B4a inactif côté routes reste explicite, pas de clôture globale L4. Checkpoint/handoff/catalogue mis à jour dans un bloc documentaire seul ; relire la vraie PR et les checks de son HEAD après publication. Merge distinct à valider par Alex ; aucune production.

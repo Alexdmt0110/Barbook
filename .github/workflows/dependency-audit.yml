@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, hardening/dependency-security, feature/cocktail-folder-management]
+    branches: [main, hardening/dependency-security, feature/cocktail-folder-management, feature/secure-web-sessions]
 
 permissions:
   contents: read

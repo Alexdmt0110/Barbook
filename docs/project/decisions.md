@@ -11,23 +11,23 @@
 
 Le pilotage canonique est docs/project/ ; les cinq chapitres d'audit sont archivés sans les documents normatifs privés ni secrets. Le catalogue conserve 66 fiches, avec autorisation partielle explicite pour la qualité et le pilotage. Les mises à jour de branche passent par les API Git GitHub avec parent vérifié, publication non forcée et contrôle de la ref ; un clone ordinaire sert aux diffs et tests. Ce mécanisme remplace le transport CLI non authentifié, sans contourner les protections GitHub.
 
-## D1 à D8 — toujours ouvertes
+## D1/D2 validées pour L4 ; D3 à D8 ouvertes dans leurs limites
 
-Ces recommandations restent à soumettre au moment où elles deviennent nécessaires. Les garde-fous de merge et de production ci-dessus sont déjà imposés pour L0–L2 ; ils ne ferment pas la discussion D8 pour les phases suivantes.
+Le 20 octobre 2026, Alex valide explicitement D1a/D1b/D2a/D2b/D2c et autorise L4, six blocs du [design L4](l4-design.md). Les recommandations D3–D8 restent à soumettre au moment utile ; les garde-fous déjà imposés restent applicables. L'accord de phase A n'approuve pas tout le catalogue.
 
-Les recommandations ci-dessous sont **des propositions**, aucune n'est considérée acceptée par absence de réponse. Le reste des choix techniques ordinaires peut être tranché dans le cadre approuvé.
+### D1 — Audience et périmètre du premier lancement — VALIDÉ
 
-### D1 — Audience et périmètre du premier lancement
+**D1a : bêta privée.** Admission contrôlée côté serveur, fermée par défaut, liste explicite d'emails autorisés hors Git. Le frontend ne peut pas ouvrir les inscriptions. Pas de suppression implicite des comptes existants. Avant ouverture publique : réexaminer inscription publique, vérification email, récupération d'accès et protections d'abus.
 
-**Recommandation :** V1 bêta privée pour Alex et un petit groupe de comptes autorisés, sans publication publique de recettes ni inscription anonyme ouverte. Valider l'ajout de l'édition et de la récupération à la V1 historique. Alternative : ouverture publique autonome, qui impose dès le départ récupération d'accès/email, politique d'abus et davantage d'exploitation.
+**D1b : édition et récupération incluses en V1.** La suppression de recette sera une corbeille récupérable ; durée et règles restent à valider en D5. Cette décision produit n'autorise ni L5 ni son code dans L4.
 
-**À décider :** bêta privée ou public dès V1 ; édition/suppression récupérable incluses ou livrées juste après dans une V1.1 explicitement limitée.
+### D2 — Sessions et brouillons — VALIDÉ
 
-### D2 — Stratégie de session web
+**D2a : session opaque PostgreSQL**, révocable ; cookie HttpOnly et Secure en production ; CSRF serveur effectif, expiration, révocation et protection contre fixation. L'ADR 0005 remplace la cible JWT/refresh de l'ADR 0002. B4a prépare sans activer ; l'auth JWT actuelle ne sera retirée qu'avec la bascule API/Angular B4b.
 
-**Recommandation :** cookie de session opaque HttpOnly/Secure pour Angular+API même origine, sessions serveur révocables ; définir durée inactive/absolue et comportement appareil partagé. Alternative cohérente avec la piste ADR : JWT en mémoire + refresh rotatif HttpOnly, avec davantage de gestion client et un accès média spécifique.
+**D2b :** standard = **2 heures d'inactivité / 12 heures absolues** ; option « Rester connecté » non précochée = **7 jours / 30 jours**. Déconnexion volontaire = révocation serveur réelle. Tests requis appareil partagé, onglets, replay, expiration et concurrence. Ces durées remplacent la recommandation initiale standard 30 minutes.
 
-**À décider :** option de session ; connexion persistante souhaitée ou fin de session navigateur ; récupération de saisie après expiration. L'actuel JWT sessionStorage reste un état historique, pas une cible durable approuvée.
+**D2c :** mémoire + **sessionStorage, 24 heures maximum**, liés strictement utilisateur/workspace/recette, restauration explicite après refresh ou reconnexion du même compte. Aucune restauration croisée ; purge appropriée au logout volontaire et changement de compte ; aucun secret ; pas de resoumission automatique ; version serveur plus récente protégée. Stockage bloqué = repli mémoire honnête. Sauvegarde serveur future non incluse. Ce choix remplace la recommandation initiale mémoire seule du cadrage.
 
 ### D3 — Propriété et copie entre espaces
 
@@ -63,16 +63,16 @@ Les recommandations ci-dessous sont **des propositions**, aucune n'est considér
 
 **Recommandation initiale :** autoriser les branches/commits/push des lots approuvés et les décisions techniques courantes ; garder le merge et la production à validation explicite tant que le pipeline n'a pas été éprouvé. Option ultérieure : préautoriser les merges non destructifs après Review Gate complet et CI verte, en merge commit, avec vérification mergedAt et main post-merge.
 
-**À décider :** autorisation des lots après L3 et politique de merge des phases suivantes. Branches/commits/push/PR de L0–L3 sont autorisés ; les merges #20–#24 ont reçu un accord et ont été exécutés. Le merge du checkpoint documentaire et tout merge suivant restent à valider. Phase B n'autorise jamais implicitement production, CONTRACT, suppression de données, réécriture d'historique ni coûts externes. L'accès en écriture a été prouvé après autorisation de phase B, puis recontrôlé le 19 octobre.
+**À décider :** autorisation des lots après L4 et politique future de merge. Branches/commits/push/PR de L0–L4 sont autorisés ; les merges #20–#24 ont reçu un accord et ont été exécutés. Le merge #25 a été autorisé et exécuté le 20 octobre ; chaque merge L4 ou suivant exige encore un accord distinct. Phase B n'autorise jamais implicitement production, CONTRACT, suppression de données, réécriture d'historique ni coûts externes. L'accès en écriture a été prouvé après autorisation de phase B, puis recontrôlé le 19 octobre.
 
 
 ## Livraison courante et validations encore ouvertes
 
-#20–#24 ont été mergées avec accord le 19 octobre et main d7ea95f est qualifié ; [checkpoint-l3.md](checkpoint-l3.md) conserve SHA/preuves. L3 B3a–B3c est intégré. Le checkpoint documentaire proposé sur docs/l3-merge-checkpoint a son merge distinct à valider ; aucune décision D1–D8 n'est close par la CI.
+#20–#25 sont mergées après accords explicites. Main vérifié le 20 octobre : `c99b08052e2e1494f621c7de8a7fb0831516bd1e`, six checks success. #25 est documentaire (huit fichiers), fusionnée à 08:53:33 UTC. L3 B3a–B3c est intégré, pas CONTRACT ; branche dossiers conservée à 95e21bc. L4 est autorisé sur `feature/secure-web-sessions` depuis ce main, avec migrations uniquement en environnements jetables de test. Aucun merge L4 autorisé.
 
-Recommandation séparée : rendre requis PostgreSQL Integration, Browser Integration et Dependency Audit (backend/frontend), en gardant Backend Quality et Frontend Quality. Alternative : conserver les quatre supplémentaires informatifs ; ils ne bloquent alors pas un merge par le ruleset. Aucun changement de protection effectué. Un accord de merge L3 ne devra pas être interprété comme validation de ce ruleset.
+Recommandation séparée toujours ouverte : rendre requis PostgreSQL Integration, Browser Integration et Dependency Audit backend/frontend, en gardant les deux Quality. Le ruleset actuel reste inchangé ; aucune modification de protection n'est approuvée.
 
-Après L3, cadrer D1/D2 pour L4. D3/D4 concernent la collaboration, D5 le cycle de recette/rétention, D6 les médias et D7/D8 l'exploitation/livraison. Ni CONTRACT ni accès/migration/déploiement de propriétaire/VPS autorisés. Les choix techniques ordinaires des dossiers sont documentés dans l3-design.md ; ils ne décident pas de ces politiques métier.
+D3/D4 concernent la collaboration, D5 la corbeille/rétention, D6 les médias, D7/D8 l'exploitation/livraison. Aucun L5/CONTRACT, accès/migration propriétaire, changement d'infrastructure, coût tiers ou déploiement n'est autorisé. Le protocole Work↔Chat reste obligatoire, un seul écrivain, source de vérité GitHub.
 
 ## Validation du propriétaire — 19 octobre 2026, après checkpoint L0–L2
 
@@ -83,3 +83,7 @@ Cette validation n'active pas les nouveaux checks requis, ne ferme pas D1–D8, 
 ## Validation du propriétaire — merge #24
 
 Après la demande explicite de validation de la PR #24, Alex répond « je l’autorise » le 19 octobre 2026. Accord exécuté pour cette PR uniquement, en merge commit avec SHA attendu 95e21bc ; merged_at=14:08:14 UTC et main d7ea95f/six checks verts vérifiés. Aucune extension implicite aux merges documentaires suivants, L4, D1–D8, règles de protection, CONTRACT ou production. La branche dossiers reste conservée. La présente mise à jour est proposée par branche/PR ; aucune écriture directe de documentation dans main.
+
+## Validation du propriétaire — 20 octobre 2026, L4
+
+Après vérification indépendante de #24/#25, Alex valide les choix détaillés D1/D2 ci-dessus et autorise L4 seulement, ses six blocs, les décisions techniques ordinaires, branches/commits/push/checkpoints/tests/Review Gates/PR et migrations sur bases de développement jetables. WORK reprend cette tranche ; aucun travail Chat classique concurrent n'est annoncé. Chaque PR reste à valider avant merge. Ni l'édition/corbeille L5, ni le CONTRACT, ni base personnelle/production, infrastructure ou déploiement ne sont autorisés.

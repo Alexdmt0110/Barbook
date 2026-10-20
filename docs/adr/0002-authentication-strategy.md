@@ -2,7 +2,7 @@
 
 ## Statut
 
-Accepté.
+Historique accepté pour l'implémentation JWT actuelle. La cible est remplacée par l'[ADR 0005 — sessions web révocables](0005-revocable-web-sessions.md), approuvée par Alex le 20 octobre 2026. B4a prépare le store sans modifier les routes ; B4b effectuera la bascule API/Angular. Les limites ci-dessous sont une photographie historique et non la cible V1 approuvée.
 
 ## Contexte
 

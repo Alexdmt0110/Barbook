@@ -55,9 +55,30 @@ model User {
 
   personalWorkspace Workspace?        @relation("PersonalWorkspaceOwner")
   memberships       WorkspaceMember[]
+  sessions          Session[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Session {
+  id        String @id @default(uuid())
+  userId    String
+  tokenHash String @unique @db.VarChar(64)
+  csrfToken String @db.VarChar(43)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  persistent    Boolean   @default(false)
+  createdAt     DateTime  @default(now()) @db.Timestamptz(3)
+  lastSeenAt    DateTime  @db.Timestamptz(3)
+  idleExpiresAt DateTime  @db.Timestamptz(3)
+  expiresAt     DateTime  @db.Timestamptz(3)
+  revokedAt     DateTime? @db.Timestamptz(3)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([idleExpiresAt])
 }
 
 model Workspace {

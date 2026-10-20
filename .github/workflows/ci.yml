@@ -8,6 +8,7 @@ on:
     branches:
       - main
       - feature/cocktail-folder-management
+      - feature/secure-web-sessions
 
 permissions:
   contents: read

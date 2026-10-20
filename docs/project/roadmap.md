@@ -1,15 +1,15 @@
 # Roadmap autorisée
 
-Phase A validée comme base. L0–L2 autorisés le 16 octobre ; merges #20–#24 et L3 B3a–B3c autorisés le 19 octobre. Le merge du checkpoint documentaire et L4 restent à valider séparément. Les recommandations et D1–D8 ne sont pas automatiquement acceptées.
+Phase A validée comme base. L0–L2 autorisés le 16 octobre ; merges #20–#24 et L3 B3a–B3c autorisés le 19 octobre. Le merge documentaire #25 est autorisé/exécuté le 20 octobre ; D1/D2 et L4 seuls sont désormais approuvés. Chaque merge L4 reste à valider. Les recommandations et D1–D8 ne sont pas automatiquement acceptées.
 
-| Lot | État au 19 octobre 2026 | Résultat / prochaine validation |
+| Lot | État au 20 octobre 2026 | Résultat / prochaine validation |
 | --- | --- | --- |
 | L0 — Reprise durable | MERGE #20 | pilotage et relais versionnés, accès en écriture prouvé |
 | L1 — Socle | MERGE #21/#22 | New/null corrigés, dépendances corrigées et audits zéro, combinaison qualifiée |
 | L2 — Intégration | MERGE #23 | PostgreSQL/HTTP/Chromium et six checks sur main ; rien déployé |
-| L3 — Dossiers B3a–B3c | MERGE #24 ; main vert | merge commit d7ea95f autorisé/exécuté, six checks main success ; checkpoint documentaire proposé séparément |
+| L3 — Dossiers B3a–B3c | MERGE #24 ; main vert | merge commit d7ea95f autorisé/exécuté, six checks main success ; checkpoint documentaire #25 également intégré |
 | B3d — CONTRACT | NON_APPROUVE | retrait legacy seulement après inventaire des usages, bascule compatible, backup/restore et accord destructif distinct |
-| L4 — Sessions et saisie sûre | PROPOSE_NON_APPROUVE | cadrer D1/D2 avant session durable, expiration/reprise et isolation des brouillons |
+| L4 — Sessions et saisie sûre | APPROUVE ; B4a QUALIFIE_NON_MERGE | D1/D2 validées, six blocs du design L4 ; session PostgreSQL et brouillons sessionStorage24h ; PR/merge distincts |
 | L5 — Cycle recette | PROPOSE_NON_APPROUVE | édition/version, suppression/restauration selon D5, quantités/ABV |
 | L6 — Photos privées | PROPOSE_NON_APPROUVE | D2/D6 ; contrôles fichier, accès privé, stockage/cleanup et sauvegardes |
 | L7 — Qualification V1 | PROPOSE_NON_APPROUVE | parcours, navigateurs/appareils, zoom/clavier, performances et docs exactes |
@@ -18,10 +18,12 @@ Phase A validée comme base. L0–L2 autorisés le 16 octobre ; merges #20–#24
 | L10 — Collaboration | PROPOSE_NON_APPROUVE | D3/D4 ; droits, révocations, copies et dernier propriétaire |
 | L11 — Exploitation métier | PROPOSE_NON_APPROUVE | produits/coûts/stock/préparation, règles approuvées par domaine |
 
-Main courant : `d7ea95f7827a5b96b5ad4b17ef73fa4982c2ad22`, six checks verts après #24. Les cinq merges ont été qualifiés dans l'ordre ; SHA et runs dans [checkpoint-l3.md](checkpoint-l3.md). Aucune PR n'est fusionnée par simple ouverture ou CI verte.
+Main courant : `c99b08052e2e1494f621c7de8a7fb0831516bd1e`, six checks verts après #25 (huit documents seulement). Les six PR #20–#25 ont été intégrées dans l'ordre ; preuves historiques dans [checkpoint-l3.md](checkpoint-l3.md) et [checkpoint-l4.md](checkpoint-l4.md). Aucune PR n'est fusionnée par simple ouverture ou CI verte.
 
 L3 utilise toujours `feature/cocktail-folder-management`, actualisée par merge `69e54dc614a7c7241f58fe55370c5f877eab560e`. Les trois commits 420357d2/c5a87663/46321485 restent ancêtres, l'EXPAND est inchangé. Ne pas supprimer/rebaser/recréer/cherry-pick leurs changements pour la reprise. Le code qualifié courant est `b0bb7574e373a2876b93cf67abf22f671ae7fca3` ; la ref documentaire/PR actuelle se lit dans le handoff.
 
-Le [design L3](l3-design.md), le [checkpoint](checkpoint-l3.md), le [Review Gate](reviews/l3-review-gate.md) et le [handoff canonique](agent-handoff.md) documentent les critères et preuves. Le merge L3 a été effectué après ces contrôles, avec le SHA attendu et qualification de main. Le checkpoint documentaire suit sa propre PR, dont le merge reste à autoriser. Aucun autre lot n'est autorisé par #24.
+Le [design L3](l3-design.md), le [checkpoint](checkpoint-l3.md) et le [Review Gate](reviews/l3-review-gate.md) conservent les preuves historiques. #24/#25 sont intégrées et leurs branches conservées. La reprise L4 est sur `feature/secure-web-sessions` depuis c99b080 ; [design L4](l4-design.md), [décisions](decisions.md) et [handoff](agent-handoff.md) font foi pour le périmètre actuel.
 
-Prochaine décision produit utile après L3 : D1 audience bêta privée/publique et D2 session/durée/reprise, nécessaires à L4. Recommandations et alternatives dans [decisions.md](decisions.md), sans les considérer acceptées. Aucun accès VPS, déploiement, migration propriétaire, coût tiers ou nouveau ruleset n'est activé ici. Les 66 fiches et le chemin critique détaillé restent dans l'archive de phase A.
+D1a bêta privée, D1b édition/corbeille V1 et D2 sessions/durées/brouillons sont validées. L5 reste non autorisé ; D5 fixera la rétention avant tout développement de corbeille. D3/D4, D6, D7/D8 restent à trancher au moment utile. Aucun accès VPS, déploiement, migration propriétaire, coût tiers ou changement de ruleset ici. Aucun CONTRACT. Le catalogue de 66 fiches est préservé, sans autorisation générale.
+
+B4a (store additif) est qualifié sur branche au code6ffc67b :168backend,131frontend,88natifs,4Chromium, sept migrations et audits zéro, six checks success. Le [checkpoint L4](checkpoint-l4.md) et le [Review Gate B4a](reviews/l4-b4a-review-gate.md) définissent exactement les preuves et limites. Les autres blocs restent à réaliser ; aucun merge L4 autorisé.

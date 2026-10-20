@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PasswordService } from './password.service';
+import { SessionService } from './sessions/session.service';
 
 const JWT_ISSUER = 'barbook-api';
 const JWT_AUDIENCE = 'barbook-web';
@@ -40,7 +41,7 @@ const JWT_AUDIENCE = 'barbook-web';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PasswordService, JwtAuthGuard],
+  providers: [AuthService, PasswordService, JwtAuthGuard, SessionService],
   exports: [JwtModule, JwtAuthGuard],
 })
 export class AuthModule {}
