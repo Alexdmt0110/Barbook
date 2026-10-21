@@ -1,4 +1,4 @@
-import { acceptDraftNavigation, loseCreationResponse, restoreConflictedOrganization, restoreCreationAfterRefresh } from '../fixtures/draft-journeys';
+import { exerciseDraftQuota, acceptDraftNavigation, loseCreationResponse, restoreConflictedOrganization, restoreCreationAfterRefresh } from '../fixtures/draft-journeys';
 import { expect, Page, test } from '@playwright/test';
 import { browserFixtureEmail } from '../fixtures/registration-emails';
 import { randomUUID } from 'node:crypto';
@@ -506,6 +506,7 @@ test('register, create, classify, manage folders and log back in', async ({ page
     await secondTab.close();
   }
   await loseCreationResponse(page, `${prefix} lost response`, fillRecipeForm, await browserHeaders(page));
+  await exerciseDraftQuota(page);
 });
 
 test('expired PostgreSQL session is rejected and returns to login without storing credentials', async ({

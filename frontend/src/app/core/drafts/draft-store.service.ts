@@ -163,7 +163,9 @@ export class DraftStore {
   }
   private prune(): void {
     const now = Date.now();
+    const previous = this.entries.length;
     this.entries = this.entries.filter((entry) => this.isRecord(entry, now));
+    if (this.entries.length !== previous) this.persist();
   }
   private persist(): boolean {
     if (!this.owner) return false;
@@ -199,6 +201,10 @@ export class DraftStore {
       );
       if (new Set(entries.map((entry) => entry.key)).size !== entries.length)
         throw new Error('duplicates');
+      if (entries.length !== parsed['entries'].length) {
+        const cleaned: Envelope = { schema: 1, owner, entries };
+        this.memoryOnly.set(!this.storage.write('session', DRAFT_KEY, JSON.stringify(cleaned)));
+      }
       return entries;
     } catch {
       this.eraseStorage();

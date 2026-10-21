@@ -93,3 +93,36 @@ export async function loseCreationResponse(
     await page.unroute(pattern);
   }
 }
+
+/** Real browser quota exceptions at the storage boundary, without replacing any API. */
+export async function exerciseDraftQuota(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key: string, value: string) {
+      if (key === 'barbook.drafts.v1')
+        throw new DOMException('Fixture quota exhausted', 'QuotaExceededError');
+      return original.call(this, key, value);
+    };
+    (window as unknown as { restoreDraftStorage: () => void }).restoreDraftStorage = () => {
+      Storage.prototype.setItem = original;
+    };
+  });
+  try {
+    await page.getByRole('textbox', { name: /^Nom \*/ }).fill('Quota draft');
+    await expect(
+      page.getByText('Stockage navigateur indisponible ou saturé.', { exact: false }),
+    ).toBeVisible();
+    await page
+      .getByRole('navigation', { name: 'Navigation principale' })
+      .getByRole('link', { name: 'Mes cocktails', exact: true })
+      .click();
+    await page.getByRole('link', { name: /Nouveau cocktail/ }).click();
+    await page.getByRole('button', { name: 'Restaurer le brouillon', exact: true }).click();
+    await expect(page.getByRole('textbox', { name: /^Nom \*/ })).toHaveValue('Quota draft');
+    await page.getByRole('button', { name: 'Abandonner le brouillon', exact: true }).click();
+  } finally {
+    await page.evaluate(() =>
+      (window as unknown as { restoreDraftStorage: () => void }).restoreDraftStorage(),
+    );
+  }
+}

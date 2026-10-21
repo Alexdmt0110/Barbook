@@ -44,6 +44,7 @@ describe('DraftStore identity and lifetime', () => {
     expect(sessionStorage.getItem(DRAFT_KEY)).toBe(saved);
     vi.setSystemTime(Date.now() + DRAFT_TTL);
     expect(store.find(store.lease(), 'create:new')).toBeNull();
+    expect(JSON.parse(sessionStorage.getItem(DRAFT_KEY)!).entries).toEqual([]);
   });
   it.each([
     { userId: 'B', workspaceId: 'WA' },
@@ -155,5 +156,21 @@ describe('DraftStore identity and lifetime', () => {
     store.confirmIdentity(a);
     expect(store.save(lease, 'create:new', 1, 'late')).toBe(false);
     expect(store.find(store.lease(), 'create:new')?.value).toBe('saved');
+  });
+  it('removes expired payloads on import while preserving other recipes and their original expiry', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-21T12:00:00Z'));
+    const lease = bind();
+    store.save(lease, 'create:new', 1, 'expired private');
+    vi.setSystemTime(Date.now() + 1000);
+    store.save(lease, 'organization:other', 4, 'retained');
+    const expiry = store.find(lease, 'organization:other')!.expiresAt;
+    vi.setSystemTime(Date.now() + DRAFT_TTL - 1000);
+    TestBed.resetTestingModule();
+    store = TestBed.inject(DraftStore);
+    store.confirmIdentity(a);
+    const raw = sessionStorage.getItem(DRAFT_KEY)!;
+    expect(raw).not.toContain('expired private');
+    expect(store.find(store.lease(), 'organization:other')!.expiresAt).toBe(expiry);
   });
 });
