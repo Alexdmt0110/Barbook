@@ -109,3 +109,7 @@ Six checks success : [Quality39414957581](https://github.com/Alexdmt0110/Barbook
 Prochain bloc : guard/cookies/CSRF/login/register/me/logout et Angular coordonnés, adaptation des fixtures en conservant leurs assertions, qualification native et navigateur puis Review Gate complet avant une PR B4b. Aucune PR B4b ouverte pour cette préparation partielle. Risques de protocole avant activation : logout tardif vs login récent, réponse A tardive après B, absence de replay, cookies refusés après compte réellement créé. Journal de reprise courant obligatoire ; aucune nouvelle autorisation de développement L4 nécessaire, chaque merge futur reste distinct.
 
 PR B4b : [#27](https://github.com/Alexdmt0110/Barbook/pull/27) ouverte, non mergée ; diff réel70fichiers/9commits vérifié au checkpoint479a4b8, aucun commentaire/revue/conflit. Ce complément est documentaire seulement ; vérifier les six checks du dernier HEAD puis attendre Alex pour le merge.
+
+## B4d — premier micro-bloc mémoire/identité
+
+Store borné versionné, TTL24h, lease après identité /me, suspension conservatrice, purge volontaire avant HTTP et invalidation des callbacks. Messages logout/identité inter-onglets sans secret. Mémoire de repli et signal explicite de purge impossible. Local frontend verify : lint/build,157tests/23fichiers, compatibilité CLI passés. Les formulaires ne l'utilisent pas encore ; B4d reste incomplet. Prochain bloc : intégration création/organisation/restauration/version et tests réels. CI de ce commit à observer, aucune PR ni merge.
