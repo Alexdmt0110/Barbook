@@ -1,4 +1,5 @@
 import { expect, Page, test } from '@playwright/test';
+import { browserFixtureEmail } from '../fixtures/registration-emails';
 import { randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
@@ -36,7 +37,7 @@ async function fillRecipeForm(page: Page, name: string): Promise<void> {
 
 test('register, create, classify, manage folders and log back in', async ({ page }, testInfo) => {
   const suffix = randomUUID().slice(0, 8);
-  const email = `browser-${randomUUID()}@example.test`;
+  const email = browserFixtureEmail(testInfo.project.name, 'browser');
   const prefix = `QA e2e ${suffix}`;
   const name = `${prefix} <b>Citron</b>`;
   const tagName = `E2E-${suffix}`;
@@ -501,11 +502,11 @@ test('register, create, classify, manage folders and log back in', async ({ page
 
 test('expired PostgreSQL session is rejected and returns to login without storing credentials', async ({
   page,
-}) => {
+}, testInfo) => {
   const registration = await page.request.post('http://127.0.0.1:3000/api/auth/register', {
     headers: { Origin: 'http://127.0.0.1:4200', 'X-Barbook-Request': '1' },
     data: {
-      email: `expired-${randomUUID()}@example.test`,
+      email: browserFixtureEmail(testInfo.project.name, 'expired'),
       displayName: 'Expiry fixture',
       password,
     },

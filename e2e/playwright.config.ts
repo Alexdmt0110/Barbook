@@ -1,8 +1,14 @@
 import { defineConfig } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
+import { browserFixtureEmail } from './fixtures/registration-emails';
 import { join } from 'node:path';
 import { requireTestDatabase } from '../backend/test/helpers/test-database';
 
 requireTestDatabase();
+process.env.BARBOOK_BROWSER_RUN_ID ??= randomUUID();
+const registrationEmails = ['desktop', 'mobile'].flatMap((project) =>
+  [browserFixtureEmail(project, 'browser'), browserFixtureEmail(project, 'expired')],
+);
 
 export default defineConfig({
   testDir: './tests',
@@ -36,6 +42,7 @@ export default defineConfig({
   webServer: [
     {
       name: 'API',
+      env: { REGISTRATION_ALLOWED_EMAILS: registrationEmails.join(',') },
       command: 'npm run start:prod',
       cwd: join(__dirname, '../backend'),
       url: 'http://127.0.0.1:3000/api',

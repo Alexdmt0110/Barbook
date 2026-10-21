@@ -10,6 +10,7 @@ import {
   WorkspaceKind,
   WorkspaceRole,
 } from '../generated/prisma/client';
+import { RegistrationAdmissionPolicy } from './admission/registration-admission.policy';
 import { AuthResponse, AuthenticatedUser } from './auth.types';
 import { IssuedSession, SessionService } from './sessions/session.service';
 import { LoginDto } from './dto/login.dto';
@@ -26,12 +27,14 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly passwordService: PasswordService,
     private readonly sessions: SessionService,
+    private readonly admission: RegistrationAdmissionPolicy,
   ) {}
 
   async register(
     dto: RegisterDto,
     previousCredential?: string,
   ): Promise<IssuedAuthentication> {
+    this.admission.assertAllowed(dto.email);
     const existingUser = await this.prisma.user.findUnique({
       where: {
         email: dto.email,

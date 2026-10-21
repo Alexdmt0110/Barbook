@@ -1,3 +1,5 @@
+import { ConfigService } from '@nestjs/config';
+import { RegistrationAdmissionPolicy } from './admission/registration-admission.policy';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { Prisma } from '../generated/prisma/client';
@@ -50,7 +52,21 @@ describe('AuthService session transactions', () => {
       } as unknown as PrismaService,
       { hash, verify },
       { create: createSession, revoke } as unknown as SessionService,
+      new RegistrationAdmissionPolicy(
+        new ConfigService({ REGISTRATION_ALLOWED_EMAILS: dto.email }),
+      ),
     );
+  });
+  it('rejects a non-admitted email before lookup, hash or transaction', async () => {
+    await expect(
+      service.register({ ...dto, email: 'unlisted@example.test' }),
+    ).rejects.toMatchObject({
+      response: { code: 'REGISTRATION_NOT_ALLOWED' },
+    });
+    expect(findUser).not.toHaveBeenCalled();
+    expect(hash).not.toHaveBeenCalled();
+    expect(transaction).not.toHaveBeenCalled();
+    expect(revoke).not.toHaveBeenCalled();
   });
   it('creates account, workspace, OWNER and session in the same ReadCommitted transaction', async () => {
     const result = await service.register(dto, 'old');

@@ -56,3 +56,9 @@ La description de #27 sera actualisée après les contrôles finaux avec leurs l
 ## Reprise B4c après merge autorisé de #27
 
 État courant : #27 mergée à07:39:25UTC par90d9356, parents/arbre/main et six checks post-merge confirmés. Les sections B4b précédentes sont historiques et leur attente de merge levée par le nouvel accord explicite d’Alex. Branche feature/private-beta-admission publiée depuis ce main, clone propre avant design. Voir [Design Review B4c](l4-b4c-design.md). Aucune migration nouvelle/propriétaire, VM/Infra aucune action ; B4d/B4e/L4f restent à réaliser, L5/CONTRACT/production exclus.
+
+## B4c — admission implémentée, qualification native à observer
+
+Prochain commit : politique serveur dans AuthService avant DB/hash, fermé/liste exacte sans bypass ; configuration invalidée au startup, message403 contrôlé et UI bêta privée. Fixtures HTTP natives et quatre parcours browser adaptés par réservations exactes avant bootstrap, anciennes assertions/quotas conservés. Sept cas PostgreSQL/HTTP nouveaux ; total118 natifs attendu, pas encore exécuté localement. Unitaire232backend et138frontend, lint/build/Prisma/compatibilité, tsc backend/E2E et10garde-fous passés localement ; CI du code à attendre avant Review Gate. Premier test unitaire a révélé que le validateur email accepte le caractère étoile dans une adresse RFC : refus explicite ajouté et suite verte, aucun test retiré.
+
+Stockage tolérant pas encore implémenté ; B4d/brouillons24h et B4e/logout global restent à faire. Aucune nouvelle migration, base propriétaire, VM ou infrastructure. Publier ce bloc puis qualifier PostgreSQL/Chromium ; poursuivre storage dans un commit distinct. Ne pas ouvrir de PR avant Review Gate de tout B4c.
