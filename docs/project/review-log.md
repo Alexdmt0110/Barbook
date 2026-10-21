@@ -253,3 +253,7 @@ Les quatre parcours réels incluent désormais deux onglets partageant le cookie
 [Review Gate B4b](reviews/l4-b4b-review-gate.md) repris sur toute la branche depuis main après les corrections Nest et dépendances : aucun BLOCKER/P1 restant identifié dans ce périmètre. Publication documentaire seule, puis vraie PR/diff/checks à contrôler ; **merge soumis à Alex**. Toutes les branches historiques conservées.
 
 B4c admission privée/storage, B4d brouillons24h/restauration/purge/version et B4e logout global/courses approfondies restent à réaliser. La préservation de sessionStorage à expiration ne constitue pas une sauvegarde des formulaires. Aucun compte partagé/workspace sélectionnable n'est livré ; mismatch couvert par clients HTTP hostiles, pas par un sélecteur inexistant. TLS/Secure réel, proxy, Safari/iOS, backup/restore/rollback propriétaire et déploiement non qualifiés. L4 n'est pas terminé ; L5/CONTRACT/production restent exclus.
+
+## B4c — revue préventive
+
+#27 autorisée puis intégrée90d9356, mergedAt/parents/arbre/main et six checks qualifiés ; branche dédiée publiée depuis main propre. Design l4-b4c-design.md avant code : admission dans AuthService avant DB/hash, fermé/liste exacte sans bypass test ; fixtures par vraies listes synthétiques réservées avant bootstrap ; BrowserStorageService englobe getter et méthodes, repli mémoire chez consommateurs. Aucun nouveau SQL/dépendance/infra. Publication documentaire et triggers push exacts seulement avant implémentation.

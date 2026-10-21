@@ -45,3 +45,5 @@ Les quatre parcours réels incluent désormais deux onglets partageant le cookie
 B4c admission privée/storage, B4d brouillons24h/restauration/purge/version et B4e logout global/courses approfondies restent à réaliser. La préservation de sessionStorage à expiration ne constitue pas une sauvegarde des formulaires. Aucun compte partagé/workspace sélectionnable n'est livré ; mismatch couvert par clients HTTP hostiles, pas par un sélecteur inexistant. TLS/Secure réel, proxy, Safari/iOS, backup/restore/rollback propriétaire et déploiement non qualifiés. L4 n'est pas terminé ; L5/CONTRACT/production restent exclus.
 
 PR B4b : [#27](https://github.com/Alexdmt0110/Barbook/pull/27) ouverte, non mergée ; diff réel70fichiers/9commits vérifié au checkpoint479a4b8, aucun commentaire/revue/conflit. Ce complément est documentaire seulement ; vérifier les six checks du dernier HEAD puis attendre Alex pour le merge.
+
+État21octobre après accord : B4b intégré par#27, main90d9356/six checks post-merge verts ; B4c EN_COURS sur feature/private-beta-admission, [design](l4-b4c-design.md). B4d/B4e et qualification globale restent à réaliser ; aucun nouveau merge autorisé.

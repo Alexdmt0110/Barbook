@@ -1,25 +1,25 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-21T07:13:35Z"
+checkpoint_utc: "2026-10-21T07:44:04Z"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
-handoff_status: "PRET_A_PASSER"
-feature: "L4 B4b : bascule qualifiée ; PR #27 ouverte, merge soumis à Alex"
-branch: "feature/web-session-cutover"
+handoff_status: "EN_COURS"
+feature: "L4 B4c : Design Review publiée avant code, B4b intégré et main qualifié"
+branch: "feature/private-beta-admission"
 base_branch: "main"
-remote_head_sha: "479a4b83084649c7daa735116a1676df832f98eb"
-local_head_sha: "479a4b83084649c7daa735116a1676df832f98eb"
+remote_head_sha: "90d9356bae7a80ee3d0fa01ad1ce3e26b905d005"
+local_head_sha: "90d9356bae7a80ee3d0fa01ad1ce3e26b905d005"
 worktree: "checkpoint documentaire en publication finale ; aucune modification applicative non poussée"
-pr: "https://github.com/Alexdmt0110/Barbook/pull/27 ; OPEN, non mergée ; base main76f742b ; vérifier checks du dernier HEAD"
+pr: "#27 MERGEE ; aucune PR B4c"
 tests: "213 backend/138 frontend/111 PostgreSQL-HTTP/4 Chromium ; six checks code success ; voir checkpoint-l4.md"
 migrations: "sept migrations historiques inchangées ; seulement CI jetables, aucune base propriétaire"
 changes_pushed: "bascule2b7b924 ; correctif Nest4807e5d ; deps7d90508 ; qualification8ff31b7"
 unpushed_changes: "documents de ce checkpoint avant leur propre publication"
 decisions_validated: "D1/D2 et L4 seuls ; reprendre branche existante"
 decisions_pending: "tout nouveau merge ; L5/CONTRACT/production non autorisés"
-next_atomic_step: "vérifier les six checks du dernier HEAD de #27, attendre accord explicite de merge ; après merge/main vert reprendre B4c"
+next_atomic_step: "implémenter admission serveur/fixtures selon l4-b4c-design.md, puis stockage tolérant ; chaque nouveau merge à valider"
 risks_and_blockers: "aucun BLOCKER/P1 identifié B4b ; B4c/B4d/B4e restent nécessaires avant clôture L4"
 production_effect: "aucun"
 ```
@@ -52,3 +52,7 @@ Branches historiques conservées : dossiers95e21bc, secure-web-sessions4c97d89 e
 Ouverte le21octobre2026 à07:16:29UTC ; base76f742b/head479a4b8 vérifiés,70fichiers et9commits. Toutes les lignes ajoutées/retirées et les blobs des fichiers présents correspondent au diff local main...HEAD ; les deux suppressions JWT sont conformes. Aucun commentaire/revue/thread, mergeable=true ; aucun merge effectué. Le présent commit final ajoute seulement les références de PR dans six documents, sans modifier le code8ff31b7 ni son Review Gate. Les six checks code sont verts ; les contrôles push/PR du checkpoint documentaire sont encore à observer jusqu'à leur fin. Vérifier les runs du dernier HEAD sur GitHub plutôt qu'une ancienne photographie.
 
 La description de #27 sera actualisée après les contrôles finaux avec leurs liens. Aucun commentaire ou message n'est envoyé à un tiers. PRET_A_PASSER signifie code/pilotage disponibles pour reprise ; il ne vaut ni accord merge ni clôture de L4.
+
+## Reprise B4c après merge autorisé de #27
+
+État courant : #27 mergée à07:39:25UTC par90d9356, parents/arbre/main et six checks post-merge confirmés. Les sections B4b précédentes sont historiques et leur attente de merge levée par le nouvel accord explicite d’Alex. Branche feature/private-beta-admission publiée depuis ce main, clone propre avant design. Voir [Design Review B4c](l4-b4c-design.md). Aucune migration nouvelle/propriétaire, VM/Infra aucune action ; B4d/B4e/L4f restent à réaliser, L5/CONTRACT/production exclus.
