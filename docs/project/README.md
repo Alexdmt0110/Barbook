@@ -29,3 +29,5 @@ Lire le prompt maître V2, le PDF de workflow, les règles de travail et les pro
 Un seul responsable actif par tranche et branche. Vérifier GitHub et le travail local avant d'écrire. Design Review → changement limité → tests réels → commit Conventional Commit atomique → push immédiat → lecture du SHA, du message et des fichiers distants → Checkpoint Barbook. Revue complète de la branche contre sa base avant PR ; après correction BLOCKER/P1, recommencer cette revue entière. Ne pas désactiver les contrôles en échec.
 
 Les tests, PR, merges, migrations et déploiements ont des états distincts. Une CI verte ne prouve pas la production. Un document de handoff ne remplace jamais les références distantes. Ne jamais forcer un push, réécrire ou supprimer la branche dossiers pour simplifier la reprise.
+
+PR B4b : [#27](https://github.com/Alexdmt0110/Barbook/pull/27) ouverte, non mergée ; diff réel70fichiers/9commits vérifié au checkpoint479a4b8, aucun commentaire/revue/conflit. Ce complément est documentaire seulement ; vérifier les six checks du dernier HEAD puis attendre Alex pour le merge.

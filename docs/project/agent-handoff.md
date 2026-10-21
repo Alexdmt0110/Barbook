@@ -5,21 +5,21 @@ checkpoint_utc: "2026-10-21T07:13:35Z"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
-handoff_status: "EN_ATTENTE_VALIDATION"
-feature: "L4 B4b : bascule qualifiée ; PR à ouvrir puis merge soumis à Alex"
+handoff_status: "PRET_A_PASSER"
+feature: "L4 B4b : bascule qualifiée ; PR #27 ouverte, merge soumis à Alex"
 branch: "feature/web-session-cutover"
 base_branch: "main"
-remote_head_sha: "8ff31b74b8643f21228fcfbf64fe1cc24e2ad1d8"
-local_head_sha: "8ff31b74b8643f21228fcfbf64fe1cc24e2ad1d8"
-worktree: "checkpoint documentaire en préparation ; aucune modification applicative non poussée"
-pr: "aucune à cette photographie ; ouvrir PR B4b après publication, vérifier GitHub avant reprise"
+remote_head_sha: "479a4b83084649c7daa735116a1676df832f98eb"
+local_head_sha: "479a4b83084649c7daa735116a1676df832f98eb"
+worktree: "checkpoint documentaire en publication finale ; aucune modification applicative non poussée"
+pr: "https://github.com/Alexdmt0110/Barbook/pull/27 ; OPEN, non mergée ; base main76f742b ; vérifier checks du dernier HEAD"
 tests: "213 backend/138 frontend/111 PostgreSQL-HTTP/4 Chromium ; six checks code success ; voir checkpoint-l4.md"
 migrations: "sept migrations historiques inchangées ; seulement CI jetables, aucune base propriétaire"
 changes_pushed: "bascule2b7b924 ; correctif Nest4807e5d ; deps7d90508 ; qualification8ff31b7"
 unpushed_changes: "documents de ce checkpoint avant leur propre publication"
 decisions_validated: "D1/D2 et L4 seuls ; reprendre branche existante"
 decisions_pending: "tout nouveau merge ; L5/CONTRACT/production non autorisés"
-next_atomic_step: "publier ce checkpoint ; ouvrir et relire la vraie PR B4b ; vérifier les six checks de son HEAD ; attendre accord merge"
+next_atomic_step: "vérifier les six checks du dernier HEAD de #27, attendre accord explicite de merge ; après merge/main vert reprendre B4c"
 risks_and_blockers: "aucun BLOCKER/P1 identifié B4b ; B4c/B4d/B4e restent nécessaires avant clôture L4"
 production_effect: "aucun"
 ```
@@ -46,3 +46,9 @@ Ne pas refaire la bascule. Lire la PR existante avant toute création, son HEAD/
 Store/guards : inspect sans activité, contexte/CSRF puis authenticate final sous verrou ; droits métier conservés. Login/register créent une session dans la transaction ; seul son hash est en DB, credential exclusivement en Set-Cookie. Logout révoque sans Set-Cookie, empêchant une réponse ancienne d'effacer une nouvelle connexion. Les requêtes déjà autorisées peuvent finir ; pas d'annulation rétroactive. Angular garde identité/CSRF en mémoire, vérifie/me et rejette les réponses anciennes sans retry de mutation. Une panne logout masque le privé et propose un retry explicite. Les notifications invalident les autres onglets ; elles ne donnent aucun droit.
 
 Branches historiques conservées : dossiers95e21bc, secure-web-sessions4c97d89 et docs/l3-merge-checkpoint39fd730, ainsi que les archives. Git : commits/push/PR uniquement, aucun merge B4b autorisé. VM : aucun déploiement. SQL : aucune migration nouvelle/personnelle/production, tests CI jetables seuls. Infra : aucun changement, jobs/actions/permissions/ruleset conservés.
+
+## PR #27 réellement ouverte et relue
+
+Ouverte le21octobre2026 à07:16:29UTC ; base76f742b/head479a4b8 vérifiés,70fichiers et9commits. Toutes les lignes ajoutées/retirées et les blobs des fichiers présents correspondent au diff local main...HEAD ; les deux suppressions JWT sont conformes. Aucun commentaire/revue/thread, mergeable=true ; aucun merge effectué. Le présent commit final ajoute seulement les références de PR dans six documents, sans modifier le code8ff31b7 ni son Review Gate. Les six checks code sont verts ; les contrôles push/PR du checkpoint documentaire sont encore à observer jusqu'à leur fin. Vérifier les runs du dernier HEAD sur GitHub plutôt qu'une ancienne photographie.
+
+La description de #27 sera actualisée après les contrôles finaux avec leurs liens. Aucun commentaire ou message n'est envoyé à un tiers. PRET_A_PASSER signifie code/pilotage disponibles pour reprise ; il ne vaut ni accord merge ni clôture de L4.
