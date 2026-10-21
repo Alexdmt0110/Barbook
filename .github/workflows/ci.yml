@@ -11,6 +11,7 @@ on:
       - feature/secure-web-sessions
       - feature/web-session-cutover
       - feature/private-beta-admission
+      - feature/session-drafts
 
 permissions:
   contents: read

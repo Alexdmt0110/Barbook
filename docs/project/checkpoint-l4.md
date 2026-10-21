@@ -1,3 +1,11 @@
+# Checkpoint L4 — B4c intégré ; conception B4d
+
+## Intégration vérifiée de #28 — 21 octobre 2026
+
+Autorisation explicite exécutée. HEAD revu f44306a42ae232f725c5cabba123ea1fc44153e0, base90d9356 ; zéro commentaire/revue/thread, mergeable clean, six checks du dernier HEAD success (push et PR). Merge commit0c4a5580f3fe7d8e71c83c0434aadc3ce46d1e73, mergedAt2026-10-21T11:05:03Z ; parents90d9356/f44306a, arbre42fe8ccac17771d1e8367f276bf622ecfd63c557 identique au HEAD revu ; main confirmé à ce merge. Branches historiques conservées. Six checks post-merge success, logs relus :232backend/147frontend/118PG-HTTP/4Chromium, sept migrations jetables, audits zéro. Jobs119185986301/119185986485/119185986067/119185986403/119185986198/119185986930.
+
+Branche feature/session-drafts créée depuis ce main qualifié ; [Design Review B4d](l4-b4d-design.md) avant code. B4d reste à implémenter. Aucun déploiement, migration propriétaire, changement infra, CONTRACT ni L5. Chaque nouvelle PR attend son propre accord de merge. Les états ci-dessous sont historiques.
+
 # Checkpoint L4 — B4a/B4b intégrés, B4c qualifié sur branche
 
 ## État courant B4c — 21 octobre 2026

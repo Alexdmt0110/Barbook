@@ -1,3 +1,7 @@
+# Reprise courante — L4 B4d
+
+21 octobre 2026 : #28 intégrée avec autorisation explicite, main0c4a5580f3fe7d8e71c83c0434aadc3ce46d1e73 qualifié, six checks success ; preuves dans [checkpoint](checkpoint-l4.md). Branche feature/session-drafts publiée depuis ce main. [Design Review préventive](l4-b4d-design.md) préparée avant code. Prochain commit : store de brouillons borné et cycle identité/expiration/purge, tests de sécurité ; puis formulaires et Chromium, Review Gate et nouvelle PR sans merge. B4e/B4f restent autorisés dans L4 mais distincts ; aucune production/L5/CONTRACT. WORK seul. Photographies ci-dessous historiques, lire les refs GitHub réelles à la reprise.
+
 # Handoff canonique Barbook
 
 ```yaml
