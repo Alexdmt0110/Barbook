@@ -1,9 +1,10 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { AUTH_SNAPSHOT } from './auth.models';
+import { authInterceptor } from './auth.interceptor';
 
 describe('AuthService cookie session', () => {
   let service: AuthService;
@@ -16,7 +17,7 @@ describe('AuthService cookie session', () => {
   beforeEach(() => {
     sessionStorage.clear();
     TestBed.configureTestingModule({
-      providers: [{ provide: Router, useValue: { url: '/cocktails', navigate: vi.fn().mockResolvedValue(true) } }, provideHttpClient(), provideHttpClientTesting()],
+      providers: [{ provide: Router, useValue: { url: '/cocktails', navigate: vi.fn().mockResolvedValue(true) } }, provideHttpClient(withInterceptors([authInterceptor])), provideHttpClientTesting()],
     });
     service = TestBed.inject(AuthService);
     http = TestBed.inject(HttpTestingController);
@@ -89,6 +90,21 @@ describe('AuthService cookie session', () => {
     retry.flush(null);
     expect(service.logoutUncertain()).toBe(false);
   });
+  it('discards a late logout response after a new cookie session has been confirmed', () => {
+    establish();
+    const error = vi.fn();
+    service.logout().subscribe({ error });
+    const oldLogout = http.expectOne('/api/auth/logout');
+    const renewed = { ...auth, csrfToken: 'renewed-csrf' };
+    service.login({ email: auth.user.email, password: 'password' }).subscribe();
+    http.expectOne('/api/auth/login').flush(renewed);
+    http.expectOne('/api/auth/me').flush(renewed);
+    oldLogout.flush(null);
+    expect(error).toHaveBeenCalledOnce();
+    expect(service.snapshot()).toEqual(renewed);
+    expect(service.logoutUncertain()).toBe(false);
+    http.expectNone('/api/auth/logout');
+  });
   it('preserves drafts after involuntary expiry without sending logout', () => {
     establish();
     sessionStorage.setItem('draft-fixture', 'kept');
@@ -100,7 +116,7 @@ describe('AuthService cookie session', () => {
     TestBed.resetTestingModule();
     sessionStorage.setItem('barbook.accessToken', 'old-jwt');
     TestBed.configureTestingModule({
-      providers: [{ provide: Router, useValue: { url: '/cocktails', navigate: vi.fn().mockResolvedValue(true) } }, provideHttpClient(), provideHttpClientTesting()],
+      providers: [{ provide: Router, useValue: { url: '/cocktails', navigate: vi.fn().mockResolvedValue(true) } }, provideHttpClient(withInterceptors([authInterceptor])), provideHttpClientTesting()],
     });
     service = TestBed.inject(AuthService);
     http = TestBed.inject(HttpTestingController);

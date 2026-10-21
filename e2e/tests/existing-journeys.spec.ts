@@ -454,6 +454,49 @@ test('register, create, classify, manage folders and log back in', async ({ page
   await expect(
     page.getByRole('heading', { name: 'Dossier introuvable', exact: true }),
   ).toBeVisible();
+
+  // Exercise real cookies, server CSRF and BroadcastChannel in two live tabs.
+  const rejectedName = `CSRF rejected ${suffix}`;
+  const hostile = await page.request.post('http://127.0.0.1:3000/api/folders', {
+    headers: { ...headers, 'X-Barbook-CSRF': 'A'.repeat(43) },
+    data: { name: rejectedName },
+  });
+  expect(hostile.status()).toBe(403);
+  const missing = await page.request.get('http://127.0.0.1:3000/api/folders/browse', {
+    headers,
+    params: { search: rejectedName },
+  });
+  expect(missing.status()).toBe(200);
+  expect(((await missing.json()) as { total: number }).total).toBe(0);
+  const oldCookie = (await page.context().cookies()).find(
+    (entry) => entry.name === 'barbook-session-dev',
+  );
+  expect(oldCookie?.httpOnly).toBe(true);
+  expect(oldCookie).toBeDefined();
+  const secondTab = await page.context().newPage();
+  try {
+    await secondTab.goto('/cocktails');
+    await expect(secondTab.getByRole('heading', { name, exact: true })).toBeVisible();
+    await secondTab.getByRole('button', { name: 'Déconnexion', exact: true }).click();
+    await expect(secondTab).toHaveURL(/\/login$/);
+    await expect(page).toHaveURL(/\/login\?returnUrl=/);
+    await expect(page.getByRole('heading', { name: 'Dossier introuvable', exact: true })).toHaveCount(0);
+    // Explicit Cookie replays the credential even if the browser ever discards it.
+    const replay = await page.request.get('http://127.0.0.1:3000/api/auth/me', {
+      headers: { Cookie: `barbook-session-dev=${oldCookie!.value}` },
+    });
+    expect(replay.status()).toBe(401);
+    await secondTab.getByLabel('Adresse email', { exact: true }).fill(email);
+    await secondTab.getByLabel('Mot de passe', { exact: true }).fill(password);
+    await expect(secondTab.getByLabel('Rester connecté', { exact: false })).not.toBeChecked();
+    await secondTab.getByRole('button', { name: 'Se connecter', exact: true }).click();
+    await expect(secondTab).toHaveURL('http://127.0.0.1:4200/');
+    await page.goto(`/cocktails/${created.slug}`);
+    await expect(page.getByRole('heading', { name, exact: true, level: 1 })).toBeVisible();
+    expect(await page.evaluate(() => sessionStorage.getItem('barbook.accessToken'))).toBeNull();
+  } finally {
+    await secondTab.close();
+  }
 });
 
 test('expired PostgreSQL session is rejected and returns to login without storing credentials', async ({
