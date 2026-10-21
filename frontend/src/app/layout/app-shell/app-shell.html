@@ -51,6 +51,7 @@
           type="button"
           class="logout-button"
           (click)="logout()"
+          [disabled]="authService.logoutPending() || authService.globalLogoutUncertain()"
         >
           Déconnexion
         </button>
@@ -61,9 +62,12 @@
   </header>
 
   <main class="app-content">
+    <app-global-logout />
     @if (authService.logoutUncertain()) {
       <p role="alert">Déconnexion non confirmée. Si le réseau est indisponible, réessaie avant de quitter cet appareil.</p>
-      <button type="button" (click)="logout()">Réessayer la déconnexion</button>
+      @if (!authService.globalLogoutUncertain()) {
+        <button type="button" [disabled]="authService.logoutPending()" (click)="logout()">Réessayer la déconnexion</button>
+      }
     } @else if (authService.isAuthenticated()) {
       <router-outlet />
     }

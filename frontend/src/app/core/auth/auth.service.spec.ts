@@ -33,6 +33,7 @@ describe('AuthService cookie session', () => {
   afterEach(() => {
     http.verify();
     sessionStorage.clear();
+    vi.unstubAllGlobals();
   });
   function establish(): void {
     service.login({ email: auth.user.email, password: 'password' }).subscribe();
@@ -148,6 +149,153 @@ describe('AuthService cookie session', () => {
     http.expectOne('/api/auth/me').flush(b);
     expect(drafts.find(drafts.lease(), 'create:new')).toBeNull();
     expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
+  });
+  it('requires explicit global confirmation on every retry and never downgrades it to local logout', () => {
+    establish();
+    const drafts = TestBed.inject(DraftStore);
+    drafts.save(drafts.lease(), 'create:new', 1, 'private');
+    service.logoutAll('password').subscribe({ error: () => undefined });
+    const first = http.expectOne('/api/auth/logout-all');
+    expect(first.request.body).toEqual({ password: 'password' });
+    expect(first.request.headers.get('X-Barbook-CSRF')).toBe(auth.csrfToken);
+    expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
+    expect(service.globalLogoutUncertain()).toBe(true);
+    first.error(new ProgressEvent('error'));
+    const refused = vi.fn();
+    service.logout().subscribe({ error: refused });
+    service.loadCurrentUser().subscribe({ error: refused });
+    expect(refused).toHaveBeenCalledTimes(2);
+    http.expectNone('/api/auth/logout');
+    http.expectNone('/api/auth/me');
+    service.logoutAll('reentered').subscribe();
+    const retry = http.expectOne('/api/auth/logout-all');
+    expect(retry.request.body).toEqual({ password: 'reentered' });
+    expect(retry.request.context.get(AUTH_SNAPSHOT)).toEqual(auth);
+    retry.flush(null);
+    expect(service.logoutUncertain()).toBe(false);
+    expect(service.globalLogoutUncertain()).toBe(false);
+  });
+  it('does not claim global logout on wrong password or replay an uncertain operation', () => {
+    establish();
+    const error = vi.fn();
+    service.logoutAll('wrong').subscribe({ error });
+    http
+      .expectOne('/api/auth/logout-all')
+      .flush({ code: 'REAUTHENTICATION_FAILED' }, { status: 401, statusText: 'Unauthorized' });
+    expect(error).toHaveBeenCalledOnce();
+    expect(service.logoutUncertain()).toBe(true);
+    expect(service.globalLogoutUncertain()).toBe(true);
+    expect(service.logoutPending()).toBe(false);
+    http.expectNone('/api/auth/logout-all');
+  });
+  it('ignores a late global response after identity B is confirmed, preserving B drafts', () => {
+    establish();
+    service.logoutAll('password').subscribe({ error: () => undefined });
+    const pending = http.expectOne('/api/auth/logout-all');
+    const b = { ...auth, user: { ...auth.user, id: 'B' }, workspaceId: 'WB', csrfToken: 'csrf-B' };
+    service.login({ email: 'b@example.test', password: 'password' }).subscribe();
+    http.expectOne('/api/auth/login').flush(b);
+    http.expectOne('/api/auth/me').flush(b);
+    const drafts = TestBed.inject(DraftStore);
+    drafts.save(drafts.lease(), 'create:new', 1, 'B private');
+    pending.flush(null);
+    expect(service.snapshot()).toEqual(b);
+    expect(service.logoutUncertain()).toBe(false);
+    expect(drafts.find(drafts.lease(), 'create:new')?.value).toBe('B private');
+  });
+  it('purges a retained draft on voluntary server revocation but preserves expiry', () => {
+    establish();
+    const drafts = TestBed.inject(DraftStore);
+    drafts.save(drafts.lease(), 'create:new', 1, 'private');
+    service.expire(true);
+    expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
+    expect(drafts.lease()).toBeNull();
+  });
+  it('ignores delayed logout notifications for an older session of the same owner', async () => {
+    TestBed.resetTestingModule();
+    const messages: unknown[] = [];
+    const channels: { onmessage: ((event: MessageEvent) => void) | null }[] = [];
+    vi.stubGlobal(
+      'BroadcastChannel',
+      class {
+        onmessage = null;
+        constructor() {
+          channels.push(this);
+        }
+        postMessage(message: unknown): void {
+          messages.push(message);
+        }
+        close(): void {
+          /* fixture */
+        }
+      },
+    );
+    vi.stubGlobal('crypto', {
+      subtle: { digest: async (_: string, data: Uint8Array) => data.buffer },
+    });
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: Router,
+          useValue: { url: '/cocktails', navigate: vi.fn().mockResolvedValue(true) },
+        },
+        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClientTesting(),
+      ],
+    });
+    service = TestBed.inject(AuthService);
+    http = TestBed.inject(HttpTestingController);
+    establish();
+    service.logout().subscribe();
+    http.expectOne('/api/auth/logout').flush(null);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const oldMessage = messages[0];
+    expect(JSON.stringify(oldMessage)).not.toContain('csrf');
+    const renewed = { ...auth, csrfToken: 'new-session' };
+    service.login({ email: auth.user.email, password: 'password' }).subscribe();
+    http.expectOne('/api/auth/login').flush(renewed);
+    http.expectOne('/api/auth/me').flush(renewed);
+    const drafts = TestBed.inject(DraftStore);
+    drafts.save(drafts.lease(), 'create:new', 1, 'new private');
+    channels[0].onmessage?.({ data: oldMessage } as MessageEvent);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(service.snapshot()).toEqual(renewed);
+    expect(drafts.find(drafts.lease(), 'create:new')?.value).toBe('new private');
+    // A matching notification still applies, including after involuntary expiry.
+    const tag = Array.from(new TextEncoder().encode(renewed.csrfToken), (value) =>
+      value.toString(16).padStart(2, '0'),
+    ).join('');
+    service.expire();
+    channels[0].onmessage?.({
+      data: { kind: 'logout', owner: { userId: 'A', workspaceId: 'WA' }, tag },
+    } as MessageEvent);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
+  });
+  it('continues without crashing if BroadcastChannel construction is denied', () => {
+    TestBed.resetTestingModule();
+    vi.stubGlobal(
+      'BroadcastChannel',
+      class {
+        constructor() {
+          throw new DOMException('denied', 'SecurityError');
+        }
+      },
+    );
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: Router,
+          useValue: { url: '/cocktails', navigate: vi.fn().mockResolvedValue(true) },
+        },
+        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClientTesting(),
+      ],
+    });
+    service = TestBed.inject(AuthService);
+    http = TestBed.inject(HttpTestingController);
+    establish();
+    expect(service.currentUser()).toEqual(auth.user);
   });
   it('removes the retired JWT at initialization without reading it as authority', () => {
     TestBed.resetTestingModule();

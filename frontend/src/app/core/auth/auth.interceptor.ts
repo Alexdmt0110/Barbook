@@ -31,11 +31,12 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
         epoch === auth.epoch() &&
         !publicAuth &&
         path !== '/api/auth/logout' &&
+        path !== '/api/auth/logout-all' &&
         error instanceof HttpErrorResponse &&
         (error.status === 401 ||
           (error.status === 409 && error.error?.code === 'AUTH_CONTEXT_CHANGED'))
       ) {
-        auth.expire();
+        auth.expire(error.error?.code === 'SESSION_REVOKED');
       }
       return throwError(() => error);
     }),

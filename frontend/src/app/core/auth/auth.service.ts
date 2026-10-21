@@ -11,6 +11,7 @@ import {
   switchMap,
   tap,
   throwError,
+  timeout,
 } from 'rxjs';
 import { DraftOwner, DraftStore } from '../drafts/draft-store.service';
 import { BrowserStorageService } from '../storage/browser-storage.service';
@@ -26,25 +27,20 @@ export class AuthService {
   private generation = 0;
   private bootstrap?: Observable<AuthResponse>;
   private pendingLogout: AuthResponse | null = null;
-  private readonly channel =
-    typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel('barbook.auth');
+  private lastConfirmed: AuthResponse | null = null;
+  private readonly channel = this.openChannel();
   readonly currentUser = computed(() => this.session()?.user ?? null);
   readonly isAuthenticated = computed(() => this.session() !== null);
   readonly logoutUncertain = signal(false);
+  readonly globalLogoutUncertain = signal(false);
+  readonly logoutPending = signal(false);
 
   constructor() {
     // Remove the retired credential; never read it or purge unrelated drafts.
     this.storage.remove('session', 'barbook.accessToken');
     if (this.channel)
       this.channel.onmessage = (event: MessageEvent<unknown>) => {
-        const message = event.data as { kind?: unknown; owner?: DraftOwner } | null;
-        if (message?.kind === 'logout' && message.owner && this.drafts.belongsTo(message.owner)) {
-          this.drafts.purge();
-          this.expire();
-        } else if (message?.kind === 'identity') {
-          if (message.owner && !this.drafts.belongsTo(message.owner)) this.drafts.purge();
-          this.expire();
-        } else if (event.data === 'changed') this.expire();
+        void this.receiveNotification(event.data);
       };
     inject(DestroyRef).onDestroy(() => this.channel?.close());
   }
@@ -65,6 +61,10 @@ export class AuthService {
   }
 
   loadCurrentUser(): Observable<AuthResponse> {
+    if (this.logoutUncertain())
+      return throwError(
+        () => new Error('Déconnexion non confirmée. Reconnecte-toi explicitement.'),
+      );
     if (!this.bootstrap) {
       const epoch = this.generation;
       this.bootstrap = this.http.get<AuthResponse>('/api/auth/me').pipe(
@@ -76,6 +76,7 @@ export class AuthService {
             throw new Error('Le compte ou l’espace a changé. Reconnecte-toi.');
           }
           this.drafts.confirmIdentity(this.draftOwner(auth));
+          this.lastConfirmed = auth;
           this.session.set(auth);
         }),
         finalize(() => {
@@ -88,7 +89,8 @@ export class AuthService {
   }
 
   /** Involuntary expiry never revokes remotely or removes draft storage. */
-  expire(): void {
+  expire(revoked = false): void {
+    if (revoked) this.drafts.purge();
     const wasAuthenticated = this.session() !== null;
     this.drafts.suspend();
     this.generation++;
@@ -100,9 +102,24 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
+    return this.requestLogout(false);
+  }
+
+  logoutAll(password: string): Observable<void> {
+    return this.requestLogout(true, password);
+  }
+
+  private requestLogout(global: boolean, password?: string): Observable<void> {
     return defer(() => {
+      if (!global && this.globalLogoutUncertain())
+        throw new Error('La déconnexion globale demande une nouvelle confirmation.');
+      if (this.logoutPending()) throw new Error('Une déconnexion est déjà en cours.');
       this.pendingLogout ??= this.session();
       const snapshot = this.pendingLogout;
+      if (global && !snapshot)
+        throw new Error('Reconnecte-toi avant de confirmer une déconnexion globale.');
+      this.logoutPending.set(true);
+      this.globalLogoutUncertain.set(global);
       this.drafts.purge();
       if (snapshot) this.notify('logout', snapshot);
       this.drafts.suspend();
@@ -112,29 +129,34 @@ export class AuthService {
       this.logoutUncertain.set(true);
       return this.http
         .post<void>(
-          '/api/auth/logout',
-          {},
+          global ? '/api/auth/logout-all' : '/api/auth/logout',
+          global ? { password } : {},
           {
             context: new HttpContext().set(AUTH_SNAPSHOT, snapshot),
           },
         )
         .pipe(
+          timeout(15000),
           tap(() => {
             this.pendingLogout = null;
             this.logoutUncertain.set(false);
+            this.globalLogoutUncertain.set(false);
           }),
+          finalize(() => this.logoutPending.set(false)),
         );
     });
   }
 
   private signIn(url: string, request: LoginRequest | RegisterRequest): Observable<AuthResponse> {
     return defer(() => {
+      const previous = this.session() ?? this.lastConfirmed;
       this.drafts.suspend();
       this.generation++;
       this.session.set(null);
       this.bootstrap = undefined;
       this.pendingLogout = null;
       this.logoutUncertain.set(false);
+      this.globalLogoutUncertain.set(false);
       const epoch = this.generation;
       return this.http.post<AuthResponse>(url, request).pipe(
         switchMap((issued) =>
@@ -165,18 +187,82 @@ export class AuthService {
         ),
         tap((auth) => {
           this.drafts.confirmIdentity(this.draftOwner(auth));
+          this.lastConfirmed = auth;
           this.session.set(auth);
-          this.notify('identity', auth);
+          if (previous) this.notify('identity', previous, auth);
         }),
       );
     });
   }
 
-  private notify(kind: 'logout' | 'identity', auth: AuthResponse): void {
+  private openChannel(): BroadcastChannel | null {
     try {
-      this.channel?.postMessage({ kind, owner: this.draftOwner(auth) });
+      return typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel('barbook.auth');
     } catch {
-      /* Local intent remains applied if broadcasting is unavailable. */
+      return null;
+    }
+  }
+
+  private notify(kind: 'logout' | 'identity', previous: AuthResponse, next?: AuthResponse): void {
+    void this.sessionTag(previous).then((tag) => {
+      if (!tag) return;
+      try {
+        this.channel?.postMessage({
+          kind,
+          owner: this.draftOwner(previous),
+          tag,
+          nextOwner: next ? this.draftOwner(next) : undefined,
+        });
+      } catch {
+        /* Server context checks remain authoritative. */
+      }
+    });
+  }
+
+  private async receiveNotification(data: unknown): Promise<void> {
+    const message = data as {
+      kind?: unknown;
+      owner?: DraftOwner;
+      tag?: unknown;
+      nextOwner?: DraftOwner;
+    } | null;
+    const current = this.session() ?? this.lastConfirmed;
+    if (
+      !current ||
+      !message ||
+      !['logout', 'identity'].includes(String(message.kind)) ||
+      typeof message.tag !== 'string' ||
+      !message.owner
+    )
+      return;
+    const epoch = this.generation;
+    const tag = await this.sessionTag(current);
+    if (
+      epoch !== this.generation ||
+      !tag ||
+      tag !== message.tag ||
+      !this.drafts.belongsTo(message.owner)
+    )
+      return;
+    if (
+      message.kind === 'logout' ||
+      (message.nextOwner && !this.drafts.belongsTo(message.nextOwner))
+    )
+      this.drafts.purge();
+    this.expire();
+  }
+
+  private async sessionTag(auth: AuthResponse): Promise<string | null> {
+    try {
+      const digest = await crypto.subtle.digest(
+        'SHA-256',
+        new TextEncoder().encode(auth.csrfToken),
+      );
+      return Array.from(new Uint8Array(digest), (value) =>
+        value.toString(16).padStart(2, '0'),
+      ).join('');
+    } catch {
+      return null;
     }
   }
 
