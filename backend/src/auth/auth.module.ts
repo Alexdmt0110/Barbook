@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../database/prisma.module';
+import { RegistrationAdmissionPolicy } from './admission/registration-admission.policy';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SessionGuard } from './guards/session.guard';
@@ -12,6 +13,7 @@ import { WebSessionService } from './sessions/web-session.service';
   controllers: [AuthController],
   providers: [
     AuthService,
+    RegistrationAdmissionPolicy,
     PasswordService,
     SessionGuard,
     SessionService,

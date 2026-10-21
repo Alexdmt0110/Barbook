@@ -1,4 +1,5 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { randomUUID } from 'node:crypto';
 import { Server } from 'node:http';
@@ -35,24 +36,44 @@ export function originHeaders(): Record<string, string> {
   return { Origin: process.env.FRONTEND_ORIGIN!, 'X-Barbook-Request': '1' };
 }
 
-export async function createApplicationFixture(): Promise<
-  NestExpressApplication<Server>
-> {
+const actorEmails = new WeakMap<NestExpressApplication, string[]>();
+
+export async function createApplicationFixture(
+  registrationEmails: readonly string[] = [],
+  actorSlots = 20,
+): Promise<NestExpressApplication<Server>> {
   requireTestDatabase();
+  const reserved = Array.from(
+    { length: actorSlots },
+    () => `qa-${randomUUID()}@example.test`,
+  );
   const module = await Test.createTestingModule({
     imports: [AppModule],
-  }).compile();
+  })
+    .overrideProvider(ConfigService)
+    .useValue(
+      new ConfigService({
+        ...process.env,
+        REGISTRATION_ALLOWED_EMAILS: [...reserved, ...registrationEmails].join(
+          ',',
+        ),
+      }),
+    )
+    .compile();
   const app = module.createNestApplication<NestExpressApplication<Server>>({
     logger: false,
   });
   configureApplication(app);
   await app.init();
+  actorEmails.set(app, reserved);
   return app;
 }
 
 export async function createActor(app: NestExpressApplication): Promise<Actor> {
+  const email = actorEmails.get(app)?.shift();
+  if (!email) throw new Error('No reserved admitted fixture email remains.');
   const result = await app.get(AuthService).register({
-    email: `qa-${randomUUID()}@example.test`,
+    email,
     password: FIXTURE_PASSWORD,
     displayName: 'Fixture QA',
   });

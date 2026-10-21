@@ -71,6 +71,10 @@ export class Register {
       return error instanceof Error ? error.message : 'Une erreur inattendue est survenue.';
     }
 
+    if (error.status === 403 && error.error?.code === 'REGISTRATION_NOT_ALLOWED') {
+      return 'Les inscriptions sont réservées aux participants de la bêta privée.';
+    }
+
     if (error.status === 0) {
       return 'Impossible de joindre le serveur. Réessaie dans quelques instants.';
     }

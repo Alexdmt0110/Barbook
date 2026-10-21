@@ -93,3 +93,7 @@ Après vérification indépendante de #24/#25, Alex valide les choix détaillés
 Alex autorise explicitement #26 et la poursuite des blocs L4 déjà approuvés, en commençant par B4b ; chaque nouvelle PR reste à validation distincte. Merge commit76f742bc7de437fe7ed1d6528344be208d54159d confirmé, mergedAt11:06:17UTC (13:06Paris), parentsc99b080/4c97d89 et arbre identique au head revu. Avant merge :26blobs/diff/quatre commits et douze checks push+PR success, aucune discussion, mergeable/clean. Après : six checks main success, logs168/131/88/4/sept migrations/audits zéro relus. Toutes les branches historiques conservées.
 
 B4b sur feature/web-session-cutover depuis ce main ; Design Review dédiée. Aucun autre merge, L5, CONTRACT, migration personnelle/production, changement d'infrastructure ou déploiement autorisé.
+
+## Autorisation et merge #27 — 21 octobre 2026
+
+Alex autorise explicitement #27 uniquement et la suite des blocs L4, à commencer par B4c. Merge90d9356 confirmé à07:39:25UTC ; parents76f742b/1e52381 et arbre conformes, six checks main success et logs213/138/111/4 relus. Branches historiques conservées. B4c démarre sur feature/private-beta-admission ; [design](l4-b4c-design.md). Chaque nouveau merge reste distinct ; aucun L5/CONTRACT/base propriétaire/infrastructure/production.

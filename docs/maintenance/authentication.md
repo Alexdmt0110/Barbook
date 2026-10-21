@@ -25,6 +25,14 @@ Codes : 400 DTO invalide ; 401 session absente/expirée/révoquée ou mauvais id
 
 Le cookie révoqué peut rester présent mais n'accorde aucun accès ; la prochaine connexion le remplace. Ne pas l'effacer depuis une réponse asynchrone ancienne. Les requêtes déjà autorisées avant révocation peuvent terminer : pas d'annulation rétroactive d'un commit.
 
-B4c doit encore fermer l'admission serveur et traiter les stockages ; B4d les vrais brouillons 24h et leurs purges ; B4e logout global et approfondissement des courses. Aucun logout-all public livré ici. TLS/proxy/Safari/iOS, inventaire des consommateurs réels et rollback demandent leur qualification avant production. Les clients JWT doivent se reconnecter ; déployer ultérieurement API/UI ensemble, avec table Session préalable et procédure autorisée.
+B4c ferme l’admission serveur sur sa branche ; la qualification courante figure au handoff. Le stockage tolérant est le sous-bloc suivant ; B4d les vrais brouillons 24h et leurs purges ; B4e logout global et approfondissement des courses. Aucun logout-all public livré ici. TLS/proxy/Safari/iOS, inventaire des consommateurs réels et rollback demandent leur qualification avant production. Les clients JWT doivent se reconnecter ; déployer ultérieurement API/UI ensemble, avec table Session préalable et procédure autorisée.
 
 Commandes : npm --prefix backend run verify ; npm --prefix frontend run verify ; intégrations réelles selon [integration-tests.md](integration-tests.md). Les résultats/limites ne sont pas déduits de la présence des tests.
+
+## Admission privée B4c
+
+REGISTRATION_ALLOWED_EMAILS est une liste serveur d'adresses exactes séparées par virgules. Absente/vide/espaces : aucune inscription. Adresses normalisées trim/minuscules comme le DTO ; doublons dédupliqués, aucune équivalence implicite des alias/domaines. Liste invalide/joker/entrée vide entre séparateurs : échec au démarrage avec message sans les adresses. Aucun mode public, header ou exception test. Configurer hors Git et redémarrer uniquement dans une opération autorisée ultérieurement ; pas de liste réelle publiée ici.
+
+RegistrationAdmissionPolicy est appelée par AuthService.register avant lookup/hash/transaction. Refus403 REGISTRATION_NOT_ALLOWED identique pour compte existant et inconnu, sans création partielle, cookie ou révocation. Login et sessions existantes ne dépendent pas de l'admission ; retirer une adresse ne supprime ni son compte ni ses droits. Cette liste n'est pas une vérification de possession de l'email : D1 reporte celle-ci avant ouverture publique. Le contrôle d'ownership des recettes/workspaces reste distinct.
+
+Les tests PG/HTTP configurent de vraies listes exactes avant bootstrap, avec adresses synthétiques réservées pour les acteurs. Les cas fermés ont zéro réservation/liste vide. Playwright configure quatre adresses de fixtures exactes dans l'API avant démarrage ; ni wildcard ni bypass d'environnement. Les quotas existants restent actifs. Résultats effectivement exécutés au handoff, pas déduits de la présence des tests.

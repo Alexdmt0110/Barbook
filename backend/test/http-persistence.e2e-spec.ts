@@ -24,6 +24,11 @@ import {
 import { requireTestDatabase } from './helpers/test-database';
 
 describe('PostgreSQL HTTP contracts and transactions', () => {
+  const registrationEmail = `Register-${randomUUID()}@Example.Test`;
+  const raceEmail = `race-${randomUUID()}@example.test`;
+  const rollbackSuffix = randomUUID().replaceAll('-', '');
+  const rollbackEmail = `rollback-${rollbackSuffix}@example.test`;
+
   let app: NestExpressApplication<Server>;
   let prisma: PrismaService;
   let pool: Pool;
@@ -60,7 +65,11 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
 
   beforeAll(async () => {
     pool = new Pool({ connectionString: requireTestDatabase() });
-    app = await createApplicationFixture();
+    app = await createApplicationFixture([
+      registrationEmail,
+      raceEmail,
+      rollbackEmail,
+    ]);
     prisma = app.get(PrismaService);
     alice = await createActor(app);
     bob = await createActor(app);
@@ -94,7 +103,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
   });
 
   it('registers the normalized account, sole personal workspace and OWNER atomically', async () => {
-    const email = `Register-${randomUUID()}@Example.Test`;
+    const email = registrationEmail;
     const response = await api()
       .post('/api/auth/register')
       .set(originHeaders())
@@ -130,7 +139,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
   });
 
   it('allows only one concurrent registration for the same email', async () => {
-    const email = `race-${randomUUID()}@example.test`;
+    const email = raceEmail;
     const payload = {
       email,
       password: FIXTURE_PASSWORD,
@@ -153,8 +162,8 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
   });
 
   it('rolls registration back when the database refuses OWNER membership', async () => {
-    const suffix = randomUUID().replaceAll('-', '');
-    const email = `rollback-${suffix}@example.test`;
+    const suffix = rollbackSuffix;
+    const email = rollbackEmail;
     const name = `bb_member_${suffix}`;
     await pool.query(
       `CREATE FUNCTION "${name}"() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF EXISTS (SELECT 1 FROM "User" WHERE "id"=NEW."userId" AND "email"='${email}') THEN RAISE EXCEPTION 'synthetic membership failure'; END IF; RETURN NEW; END $$`,

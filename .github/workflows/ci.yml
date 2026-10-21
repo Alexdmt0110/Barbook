@@ -10,6 +10,7 @@ on:
       - feature/cocktail-folder-management
       - feature/secure-web-sessions
       - feature/web-session-cutover
+      - feature/private-beta-admission
 
 permissions:
   contents: read

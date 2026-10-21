@@ -12,12 +12,14 @@ import {
   tap,
   throwError,
 } from 'rxjs';
+import { BrowserStorageService } from '../storage/browser-storage.service';
 import { AUTH_SNAPSHOT, AuthResponse, LoginRequest, RegisterRequest } from './auth.models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly storage = inject(BrowserStorageService);
   private readonly session = signal<AuthResponse | null>(null);
   private generation = 0;
   private bootstrap?: Observable<AuthResponse>;
@@ -30,11 +32,7 @@ export class AuthService {
 
   constructor() {
     // Remove the retired credential; never read it or purge unrelated drafts.
-    try {
-      sessionStorage.removeItem('barbook.accessToken');
-    } catch {
-      /* Storage may be disabled. */
-    }
+    this.storage.remove('session', 'barbook.accessToken');
     if (this.channel) this.channel.onmessage = () => this.expire();
     inject(DestroyRef).onDestroy(() => this.channel?.close());
   }

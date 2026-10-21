@@ -13,3 +13,5 @@ BroadcastChannel invalide les autres onglets lors d'une connexion/déconnexion, 
 Les routes privées sont sous AppShell avec authGuard ; AppShell ne rend son outlet que pour une identité confirmée. La navigation conserve un returnUrl interne. Le proxy de développement et le futur reverse proxy utilisent /api, sans URL de backend dans l'application.
 
 Vérification : npm --prefix frontend run verify ; tests réels desktop/mobile selon [integration-tests.md](integration-tests.md). Les limites B4c–B4e et les résultats exacts figurent dans le [handoff](../project/agent-handoff.md).
+
+B4c remplace l’accès direct à l’ancienne clé JWT par BrowserStorageService.remove(session,…), qui protège le getter de stockage autant que la méthode. Le thème conserve son signal mémoire en cas de stockage refusé. Le parcours Chromium bloque les deux getters avant reconnexion/rechargement ; les résultats réellement observés restent au handoff. Aucun vrai brouillon24h livré par cette seule tolérance.

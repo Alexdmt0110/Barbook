@@ -16,6 +16,8 @@ import {
 import { requireTestDatabase } from './helpers/test-database';
 
 describe('Real web cookie sessions and server CSRF', () => {
+  const rollbackSuffix = randomUUID().replaceAll('-', '');
+  const rollbackEmail = `${rollbackSuffix}@example.test`;
   let app: NestExpressApplication<Server>;
   let prisma: PrismaService;
   let pool: Pool;
@@ -24,7 +26,7 @@ describe('Real web cookie sessions and server CSRF', () => {
   const api = () => request(app.getHttpServer());
   beforeAll(async () => {
     pool = new Pool({ connectionString: requireTestDatabase() });
-    app = await createApplicationFixture();
+    app = await createApplicationFixture([rollbackEmail]);
     prisma = app.get(PrismaService);
     alice = await createActor(app);
     bob = await createActor(app);
@@ -218,9 +220,9 @@ describe('Real web cookie sessions and server CSRF', () => {
     },
   );
   it('rolls all registration rows back if session insertion fails', async () => {
-    const suffix = randomUUID().replaceAll('-', '');
+    const suffix = rollbackSuffix;
     const name = `bb_session_${suffix}`;
-    const email = `${suffix}@example.test`;
+    const email = rollbackEmail;
     await pool.query(
       `CREATE FUNCTION "${name}"() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF EXISTS (SELECT 1 FROM "User" WHERE "id"=NEW."userId" AND "email"='${email}') THEN RAISE EXCEPTION 'synthetic session failure'; END IF; RETURN NEW; END $$`,
     );

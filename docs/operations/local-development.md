@@ -38,6 +38,7 @@ Variables actuelles :
 - `DATABASE_PORT` : port PostgreSQL utilisé par le backend ;
 - `PORT` : port HTTP de l'API ;
 - `FRONTEND_ORIGIN` : origine autorisée par CORS ;
+- `REGISTRATION_ALLOWED_EMAILS` : liste privée serveur d’emails exacts séparés par virgules ; vide par défaut = inscriptions fermées ;
 - variables d'authentification documentées dans `.env.example`.
 
 ## PostgreSQL
@@ -202,3 +203,5 @@ docs(cocktails): document cocktail creation
 Le développement local ne nécessite pas de déploiement sur le VPS.
 
 Les évolutions de l'infrastructure distante doivent être traitées comme des opérations distinctes et documentées avant leur exécution.
+
+L’admission est relue au démarrage. Une liste vide ne bloque pas le login des comptes existants ; une liste mal formée fait échouer le démarrage. Ne jamais versionner la liste réelle. Les tests configurent uniquement des adresses synthétiques exactes, sans ouvrir l’application par un flag test.
