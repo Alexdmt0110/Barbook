@@ -1,70 +1,51 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-21T07:44:04Z"
+checkpoint_utc: "2026-10-21T08:13:22Z"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
-handoff_status: "EN_COURS"
-feature: "L4 B4c : Design Review publiée avant code, B4b intégré et main qualifié"
+handoff_status: "EN_ATTENTE_VALIDATION"
+feature: "L4 B4c : admission privée et stockage tolérant qualifiés ; PR à ouvrir"
 branch: "feature/private-beta-admission"
 base_branch: "main"
-remote_head_sha: "90d9356bae7a80ee3d0fa01ad1ce3e26b905d005"
-local_head_sha: "90d9356bae7a80ee3d0fa01ad1ce3e26b905d005"
-worktree: "checkpoint documentaire en publication finale ; aucune modification applicative non poussée"
-pr: "#27 MERGEE ; aucune PR B4c"
-tests: "213 backend/138 frontend/111 PostgreSQL-HTTP/4 Chromium ; six checks code success ; voir checkpoint-l4.md"
-migrations: "sept migrations historiques inchangées ; seulement CI jetables, aucune base propriétaire"
-changes_pushed: "bascule2b7b924 ; correctif Nest4807e5d ; deps7d90508 ; qualification8ff31b7"
+remote_head_sha: "167d20b933523bd64cc33fb6c99c775ad543b956"
+local_head_sha: "167d20b933523bd64cc33fb6c99c775ad543b956"
+worktree: "checkpoint documentaire seul en préparation ; code qualifié poussé et propre avant ces documents"
+pr: "aucune PR B4c à cette photographie ; #27 MERGEE ; vérifier GitHub avant création"
+tests: "232backend/147frontend/118PG-HTTP/4Chromium ; six checks code success ; PG/navigateur seulement CI"
+migrations: "sept historiques inchangées ; aucune nouvelle, personnelle ou production"
+changes_pushed: "design70212e2 ; admissionbca7b34 ; stockage167d20b"
 unpushed_changes: "documents de ce checkpoint avant leur propre publication"
-decisions_validated: "D1/D2 et L4 seuls ; reprendre branche existante"
+decisions_validated: "merge #27 et suite L4 seuls ; D1/D2 inchangées ; WORK seul"
 decisions_pending: "tout nouveau merge ; L5/CONTRACT/production non autorisés"
-next_atomic_step: "implémenter admission serveur/fixtures selon l4-b4c-design.md, puis stockage tolérant ; chaque nouveau merge à valider"
-risks_and_blockers: "aucun BLOCKER/P1 identifié B4b ; B4c/B4d/B4e restent nécessaires avant clôture L4"
+next_atomic_step: "publier ce checkpoint, ouvrir/relire vraie PR B4c et ses six checks puis attendre accord merge"
+risks_and_blockers: "aucun BLOCKER/P1 B4c identifié ; B4d/B4e/B4f restent à réaliser"
 production_effect: "aucun"
 ```
 
-Cette photographie précède sa propre publication. Lire les refs GitHub, les PR et les derniers commits : le SHA ci-dessus est le code qualifié, pas le futur commit documentaire. Clone propre à8ff31b7 avant ces seuls documents ; sources privées prompt maître/règles/PDF/reprise relues. WORK reprend seul selon l'autorisation du propriétaire ; aucune branche recréée/réécrite/supprimée.
+Cette photographie précède sa propre publication. Lire les refs/PR/CI réelles, ne pas réécrire l'historique ni refaire le code poussé. Sources privées déjà relues, pas recopiées dans Git public. Clone propre au code167d20b avant ces seuls documents. Le numéro de PR doit être consigné après ouverture et relecture, sans présumer de sa CI.
 
-## État courant — 21 octobre 2026, B4b qualifié sur branche
+## État courant B4c — 21 octobre 2026
 
-Main reste `76f742bc7de437fe7ed1d6528344be208d54159d` (#26 intégrée). La branche `feature/web-session-cutover` au code `8ff31b74b8643f21228fcfbf64fe1cc24e2ad1d8` active les sessions PostgreSQL, cookies HttpOnly, CSRF serveur, contexte attendu et bootstrap Angular ; Bearer/JWT et sa dépendance sont retirés. Aucun merge B4b ni déploiement. Les sections antérieures datées ci-dessous sont des preuves historiques, pas l'état actuel.
+B4b intégré par #27 après accord explicite d'Alex ; main90d9356bae7a80ee3d0fa01ad1ce3e26b905d005, mergedAt07:39:25UTC, parents76f742b/1e52381 et arbre f817f3b identiques au head revu. Six checks post-merge main success, logs213backend/138frontend/111PG-HTTP/4Chromium relus. Branches historiques conservées ; aucune production.
 
-Six checks de ce code success : [Quality39559982719](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982719), [Integration39559982657](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982657), [Audits39559982741](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982741). Logs relus : **213 backend,138 frontend,111 PostgreSQL/HTTP,4 Chromium desktop/mobile** ; dix garde-fous, sept migrations fresh/redeploy/status/drift et smoke, audits complets/runtime zéro. Local : verify backend/frontend, compatibilité NYC/CLI, tsc backend et E2E, safety et diffcheck passés ; pas de PostgreSQL/Chromium local prétendu.
+B4c est développé et qualifié sur feature/private-beta-admission, code167d20b933523bd64cc33fb6c99c775ad543b956 après design70212e2 et admissionbca7b34. Admission dans AuthService avant lookup/hash/transaction ; REGISTRATION_ALLOWED_EMAILS vide/absente ferme les inscriptions, liste exacte normalisée côté serveur, aucune ouverture depuis UI/headers ni bypass d'environnement. Configuration invalide échoue sans exposer les valeurs. Refus403 générique, aucune ligne/Set-Cookie/révocation. Les comptes/sessions existants restent utilisables après retrait de la liste ; droits workspace inchangés.
 
-Les quatre parcours réels incluent désormais deux onglets partageant le cookie, logout dans le second et invalidation du premier, rejeu401 du credential révoqué, reconnexion explicite, CSRF invalide403 sans dossier créé, expiration DB, cookie HttpOnly inaccessible à document.cookie et absence d'accessToken. Les unités avec le vrai AuthService/interceptor ordonnent un logout tardif après reconnexion et vérifient que la nouvelle session reste installée. HTTP/PG : compte A/contexte ancien avec cookie B refusé avant lecture/écriture/logout ; origine/CSRF manquants ou hostiles ne prolongent pas l'activité ; fixation/rotation, échéances et rollback testés. Aucune simulation d'API dans Chromium, aucune inscription ou retry supplémentaire ni quota assoupli.
+BrowserStorageService protège getters ET méthodes local/session ; read→string|null, write/remove→booléen. Aucun clear global ni cache privé ; ThemeService conserve le signal mémoire et AuthService retire seulement l'ancienne clé JWT. La persistance de formulaires24h n'est pas encore implémentée.
 
-[Review Gate B4b](reviews/l4-b4b-review-gate.md) repris sur toute la branche depuis main après les corrections Nest et dépendances : aucun BLOCKER/P1 restant identifié dans ce périmètre. Publication documentaire seule, puis vraie PR/diff/checks à contrôler ; **merge soumis à Alex**. Toutes les branches historiques conservées.
+Six checks code success : [Quality39567144917](https://github.com/Alexdmt0110/Barbook/actions/runs/39567144917), [Integration39567144688](https://github.com/Alexdmt0110/Barbook/actions/runs/39567144688), [Audits39567144907](https://github.com/Alexdmt0110/Barbook/actions/runs/39567144907). Logs relus : **232backend/22suites,147frontend/22fichiers,118PG-HTTP/8suites et4Chromium**. Sept migrations historiques fresh/redeploy/status/drift/smoke,10garde-fous, audits complets/runtime zéro. Local verify backend/frontend/Prisma/compatibilité NYC+CLI, tsc backend/E2E, safety et diffcheck passés ; PG/Chromium seulement en CI.
 
-B4c admission privée/storage, B4d brouillons24h/restauration/purge/version et B4e logout global/courses approfondies restent à réaliser. La préservation de sessionStorage à expiration ne constitue pas une sauvegarde des formulaires. Aucun compte partagé/workspace sélectionnable n'est livré ; mismatch couvert par clients HTTP hostiles, pas par un sélecteur inexistant. TLS/Secure réel, proxy, Safari/iOS, backup/restore/rollback propriétaire et déploiement non qualifiés. L4 n'est pas terminé ; L5/CONTRACT/production restent exclus.
+Sept nouveaux tests natifs admission : fermé/non admis, aucune création partielle/cookie/activité, exact/casse, aliases/suffixes refusés, champs/headers hostiles, comptes existants avec admission retirée et session préservée. Les historiques concurrence/rollback/isolation/CSRF/rejeu restent actifs. Fixtures : vraies listes exactes réservées avant bootstrap, zéro réservation pour fermeture, quatre inscriptions browser/quotas/retries conservés. Chromium étend le parcours d'expiration avec deux getters SecurityError, reconnexion cookie, thème mémoire puis reload/me sans persistance ni erreur JS ; aucune API simulée.
 
+[Review Gate B4c](reviews/l4-b4c-review-gate.md) de toute la branche depuis main : aucun BLOCKER/P1 restant identifié. Code/migrations/locks/workflows/contrats/tests relus, pas de nouvelle dépendance ni modification de schéma/permission/ruleset. Publication documentaire seule puis vraie PR/diff/CI à vérifier, **merge soumis à Alex**.
 
-## Reprise sûre et autorisations
+B4d brouillons24h/restauration/purge/identité/workspace/version, B4e logout global/réauthentification et B4f qualification globale restent à réaliser. L4-01 et volet stockage de L4-14 exercés ; pas de clôture anticipée des critères brouillons/onglets/réseau complets. La liste privée n'est pas une vérification de possession d'email (D1 reporte celle-ci avant ouverture publique). Changer la liste demande un redémarrage ultérieur autorisé ; aucune liste réelle ni infra configurée ici. TLS/proxy/Safari/iOS/backup/restore/rollback propriétaire non qualifiés ; aucun L5/CONTRACT/déploiement.
 
-Ne pas refaire la bascule. Lire la PR existante avant toute création, son HEAD/base/main, discussions, diff et six checks. Le merge de #26 était autorisé et exécuté le20octobre11:06:17UTC ; main76f742b, parentsc99b080/4c97d89 et six checks post-merge vérifiés. L'autorisation ne s'étend pas au merge B4b. Après accord distinct et merge contrôlé, poursuivre B4c depuis main vert, avec revue préventive et sans migration propriétaire.
+## Reprise et autorisations
 
-Store/guards : inspect sans activité, contexte/CSRF puis authenticate final sous verrou ; droits métier conservés. Login/register créent une session dans la transaction ; seul son hash est en DB, credential exclusivement en Set-Cookie. Logout révoque sans Set-Cookie, empêchant une réponse ancienne d'effacer une nouvelle connexion. Les requêtes déjà autorisées peuvent finir ; pas d'annulation rétroactive. Angular garde identité/CSRF en mémoire, vérifie/me et rejette les réponses anciennes sans retry de mutation. Une panne logout masque le privé et propose un retry explicite. Les notifications invalident les autres onglets ; elles ne donnent aucun droit.
+Après vraie PR : attendre Alex pour le merge. Son accord sur #27 a été exécuté et ne vaut pas accord pour B4c. Après merge distinct/main vert, reprendre B4d avec revue préventive : création/organisation existantes, mémoire+sessionStorage24h, restauration explicite compte/workspace/recette/version et purge volontaire/changement de compte, sans replay. Utiliser BrowserStorageService pour getter/méthodes refusés et conserver repli mémoire honnête. Ne pas commencer édition/corbeille L5 ni D5 non décidé.
 
-Branches historiques conservées : dossiers95e21bc, secure-web-sessions4c97d89 et docs/l3-merge-checkpoint39fd730, ainsi que les archives. Git : commits/push/PR uniquement, aucun merge B4b autorisé. VM : aucun déploiement. SQL : aucune migration nouvelle/personnelle/production, tests CI jetables seuls. Infra : aucun changement, jobs/actions/permissions/ruleset conservés.
+B4e doit encore exposer et tester logout global après réauthentification ; ne pas prétendre cette route livrée parce que le store interne sait révoquer. Une requête déjà autorisée peut finir ; pas d'annulation rétroactive. Les réponses anciennes et le contexte A/B restent couverts par B4b et ses régressions, sans inventer un sélecteur partagé.
 
-## PR #27 réellement ouverte et relue
-
-Ouverte le21octobre2026 à07:16:29UTC ; base76f742b/head479a4b8 vérifiés,70fichiers et9commits. Toutes les lignes ajoutées/retirées et les blobs des fichiers présents correspondent au diff local main...HEAD ; les deux suppressions JWT sont conformes. Aucun commentaire/revue/thread, mergeable=true ; aucun merge effectué. Le présent commit final ajoute seulement les références de PR dans six documents, sans modifier le code8ff31b7 ni son Review Gate. Les six checks code sont verts ; les contrôles push/PR du checkpoint documentaire sont encore à observer jusqu'à leur fin. Vérifier les runs du dernier HEAD sur GitHub plutôt qu'une ancienne photographie.
-
-La description de #27 sera actualisée après les contrôles finaux avec leurs liens. Aucun commentaire ou message n'est envoyé à un tiers. PRET_A_PASSER signifie code/pilotage disponibles pour reprise ; il ne vaut ni accord merge ni clôture de L4.
-
-## Reprise B4c après merge autorisé de #27
-
-État courant : #27 mergée à07:39:25UTC par90d9356, parents/arbre/main et six checks post-merge confirmés. Les sections B4b précédentes sont historiques et leur attente de merge levée par le nouvel accord explicite d’Alex. Branche feature/private-beta-admission publiée depuis ce main, clone propre avant design. Voir [Design Review B4c](l4-b4c-design.md). Aucune migration nouvelle/propriétaire, VM/Infra aucune action ; B4d/B4e/L4f restent à réaliser, L5/CONTRACT/production exclus.
-
-## B4c — admission implémentée, qualification native à observer
-
-Prochain commit : politique serveur dans AuthService avant DB/hash, fermé/liste exacte sans bypass ; configuration invalidée au startup, message403 contrôlé et UI bêta privée. Fixtures HTTP natives et quatre parcours browser adaptés par réservations exactes avant bootstrap, anciennes assertions/quotas conservés. Sept cas PostgreSQL/HTTP nouveaux ; total118 natifs attendu, pas encore exécuté localement. Unitaire232backend et138frontend, lint/build/Prisma/compatibilité, tsc backend/E2E et10garde-fous passés localement ; CI du code à attendre avant Review Gate. Premier test unitaire a révélé que le validateur email accepte le caractère étoile dans une adresse RFC : refus explicite ajouté et suite verte, aucun test retiré.
-
-Stockage tolérant pas encore implémenté ; B4d/brouillons24h et B4e/logout global restent à faire. Aucune nouvelle migration, base propriétaire, VM ou infrastructure. Publier ce bloc puis qualifier PostgreSQL/Chromium ; poursuivre storage dans un commit distinct. Ne pas ouvrir de PR avant Review Gate de tout B4c.
-
-## B4c — stockage tolérant prêt pour qualification navigateur
-
-Admissionbca7b34 : sept nouveaux cas natifs et tous les historiques sont passés,118PG/HTTP/8suites, sept migrations/drift/smoke verts ;232backend et138frontend en CI. Stockage : BrowserStorageService.read/write/remove protège getters et méthodes sans clear global ; ThemeService garde son signal et AuthService retire seulement l’ancienne clé JWT. Ne pas confondre ce repli avec les brouillons B4d. Local147frontend/22fichiers, lint/build/compatibilité CLI et typage E2E passés ; backend inchangé depuis sa qualification. Nouveau cas Chromium au sein du parcours d’expiration : deux getters SecurityError, login cookie, thème mémoire et refresh avec/me sans persistance. Sa preuve réelle attend la CI du prochain commit.
-
-Aucun SQL/modèle/migration/dépendance/infra changé par ce sous-bloc. Publier, attendre les six checks et lire les logs avant la revue de toute la branche/PR. Les anciens instantanés ci-dessus ne remplacent pas la ref GitHub courante.
+Branches historiques conservées, notamment feature/web-session-cutover1e52381, secure-web-sessions4c97d89, dossiers95e21bc, docs/l3-merge-checkpoint39fd730 et archives. Git : commits/push/PR uniquement, aucun nouveau merge. VM : aucun déploiement. SQL : aucune migration nouvelle/propriétaire, seulement CI jetables. Infra : aucun changement ; seuls triggers push exacts ajoutés aux trois workflows, sans modification d'actions/jobs/permissions/ruleset.

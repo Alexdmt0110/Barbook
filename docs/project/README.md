@@ -1,6 +1,9 @@
 # Pilotage Barbook
 
-La phase A est validée. **L0–L3 et B4a sont intégrés ; main76f742b. B4b est qualifié sur feature/web-session-cutover, code8ff31b7 ; ouverture de PR et merge distinct à vérifier dans le handoff. B4c–B4e restent à développer.** Aucun déploiement ; L5 et CONTRACT exclus.
+La phase A est validée. **L0–L3 et B4a/B4b sont intégrés ; main90d9356, six checks post-merge #27 verts. B4c est qualifié sur feature/private-beta-admission, code167d20b ; PR et merge distinct à vérifier au handoff. B4d/B4e restent à réaliser.** Aucun déploiement ; L5 et CONTRACT exclus.
+
+- [Design Review B4c](l4-b4c-design.md)
+- [Review Gate B4c](reviews/l4-b4c-review-gate.md)
 
 - [Design Review B4b — bascule web](l4-b4b-design.md)
 - [Checkpoint L4 — B4a intégré et limites](checkpoint-l4.md)
