@@ -25,7 +25,7 @@ Codes : 400 DTO invalide ; 401 session absente/expirée/révoquée ou mauvais id
 
 Le cookie révoqué peut rester présent mais n'accorde aucun accès ; la prochaine connexion le remplace. Ne pas l'effacer depuis une réponse asynchrone ancienne. Les requêtes déjà autorisées avant révocation peuvent terminer : pas d'annulation rétroactive d'un commit.
 
-B4c ferme l’admission serveur sur sa branche ; la qualification courante figure au handoff. Le stockage tolérant est le sous-bloc suivant ; B4d les vrais brouillons 24h et leurs purges ; B4e logout global et approfondissement des courses. Aucun logout-all public livré ici. TLS/proxy/Safari/iOS, inventaire des consommateurs réels et rollback demandent leur qualification avant production. Les clients JWT doivent se reconnecter ; déployer ultérieurement API/UI ensemble, avec table Session préalable et procédure autorisée.
+B4c (admission serveur et stockage tolérant) est intégré par #28. B4d ajoute les brouillons temporaires sur sa branche ; voir temporary-drafts.md et le handoff pour la qualification courante. B4e reste nécessaire pour logout global et approfondissement des courses. Aucun logout-all public livré ici. TLS/proxy/Safari/iOS, inventaire des consommateurs réels et rollback demandent leur qualification avant production. Les clients JWT doivent se reconnecter ; déployer ultérieurement API/UI ensemble, avec table Session préalable et procédure autorisée.
 
 Commandes : npm --prefix backend run verify ; npm --prefix frontend run verify ; intégrations réelles selon [integration-tests.md](integration-tests.md). Les résultats/limites ne sont pas déduits de la présence des tests.
 

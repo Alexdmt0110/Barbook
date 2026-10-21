@@ -275,3 +275,14 @@ Sept nouveaux tests natifs admission : fermé/non admis, aucune création partie
 [Review Gate B4c](reviews/l4-b4c-review-gate.md) de toute la branche depuis main : aucun BLOCKER/P1 restant identifié. Code/migrations/locks/workflows/contrats/tests relus, pas de nouvelle dépendance ni modification de schéma/permission/ruleset. Publication documentaire seule puis vraie PR/diff/CI à vérifier, **merge soumis à Alex**.
 
 B4d brouillons24h/restauration/purge/identité/workspace/version, B4e logout global/réauthentification et B4f qualification globale restent à réaliser. L4-01 et volet stockage de L4-14 exercés ; pas de clôture anticipée des critères brouillons/onglets/réseau complets. La liste privée n'est pas une vérification de possession d'email (D1 reporte celle-ci avant ouverture publique). Changer la liste demande un redémarrage ultérieur autorisé ; aucune liste réelle ni infra configurée ici. TLS/proxy/Safari/iOS/backup/restore/rollback propriétaire non qualifiés ; aucun L5/CONTRACT/déploiement.
+
+
+## L4 B4d — Review Gate complet après corrections
+
+## B4d qualifié sur branche — 21 octobre 2026
+
+Code2062903e3a4175d3c37474a1f3e3f1a202d74e2b, après design6231cb5, store8debc7b, formulairesdde1083, correctifs5a93256/60252ea/2062903. Six checks success, logs232backend/175frontend/118PG-HTTP/4Chromium relus ; sept migrations CI historiques,10garde-fous, audits zéro. [Quality39601079419](https://github.com/Alexdmt0110/Barbook/actions/runs/39601079419), [Integration39601079425](https://github.com/Alexdmt0110/Barbook/actions/runs/39601079425), [Audits39601079398](https://github.com/Alexdmt0110/Barbook/actions/runs/39601079398).
+
+[Review Gate complet](reviews/l4-b4d-review-gate.md) repris de zéro contre main après corrections : aucun BLOCKER/P1 restant identifié dans B4d. Restauration explicite/identité/workspace/ID/version/TTL, expiration involontaire, purge volontaire, réponse perdue et quota réel exercés. Les deux CI navigateur rouges restent expliquées ci-dessous et dans la revue ; aucune assertion, retry ou limite assouplie. Local lint/build/175tests frontend (deux workers après timeout historique isolé,5/5 puis175/175), compatibilité CLI ; backend verify232/Prisma/NYC,10garde-fous/tsc et typecheck E2E passés. PG/Chromium seulement en Actions.
+
+Seuls documents de qualification en préparation avant vraie PR. Lire HEAD réel/CI et diff de cette PR ; chaque merge doit encore être autorisé explicitement. Main0c4a558 (#28) inchangé et qualifié,16branches distantes présentes et cinq refs historiques vérifiées inchangées. B4e logout global/réauthentification et B4f restent à réaliser ; pas de clôture anticipée des18critères complets. Aucun déploiement, migration nouvelle/personnelle/production, infra, CONTRACT ou L5.

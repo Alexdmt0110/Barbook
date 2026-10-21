@@ -9,7 +9,7 @@ Phase A validée comme base. L0–L2 autorisés le 16 octobre ; merges #20–#24
 | L2 — Intégration | MERGE #23 | PostgreSQL/HTTP/Chromium et six checks sur main ; rien déployé |
 | L3 — Dossiers B3a–B3c | MERGE #24 ; main vert | merge commit d7ea95f autorisé/exécuté, six checks main success ; checkpoint documentaire #25 également intégré |
 | B3d — CONTRACT | NON_APPROUVE | retrait legacy seulement après inventaire des usages, bascule compatible, backup/restore et accord destructif distinct |
-| L4 — Sessions et saisie sûre | APPROUVE ; B4a MERGE #26 ; B4b QUALIFIE_SUR_BRANCHE | D1/D2 validées, six blocs du design L4 ; session PostgreSQL et brouillons sessionStorage24h ; PR/merge distincts |
+| L4 — Sessions et saisie sûre | APPROUVE ; B4a/B4b/B4c MERGE #26/#27/#28 ; B4d QUALIFIE_SUR_BRANCHE | D1/D2 validées, six blocs du design L4 ; session PostgreSQL et brouillons sessionStorage24h ; PR/merge distincts |
 | L5 — Cycle recette | PROPOSE_NON_APPROUVE | édition/version, suppression/restauration selon D5, quantités/ABV |
 | L6 — Photos privées | PROPOSE_NON_APPROUVE | D2/D6 ; contrôles fichier, accès privé, stockage/cleanup et sauvegardes |
 | L7 — Qualification V1 | PROPOSE_NON_APPROUVE | parcours, navigateurs/appareils, zoom/clavier, performances et docs exactes |
@@ -63,3 +63,8 @@ Sept nouveaux tests natifs admission : fermé/non admis, aucune création partie
 [Review Gate B4c](reviews/l4-b4c-review-gate.md) de toute la branche depuis main : aucun BLOCKER/P1 restant identifié. Code/migrations/locks/workflows/contrats/tests relus, pas de nouvelle dépendance ni modification de schéma/permission/ruleset. Publication documentaire seule puis vraie PR/diff/CI à vérifier, **merge soumis à Alex**.
 
 B4d brouillons24h/restauration/purge/identité/workspace/version, B4e logout global/réauthentification et B4f qualification globale restent à réaliser. L4-01 et volet stockage de L4-14 exercés ; pas de clôture anticipée des critères brouillons/onglets/réseau complets. La liste privée n'est pas une vérification de possession d'email (D1 reporte celle-ci avant ouverture publique). Changer la liste demande un redémarrage ultérieur autorisé ; aucune liste réelle ni infra configurée ici. TLS/proxy/Safari/iOS/backup/restore/rollback propriétaire non qualifiés ; aucun L5/CONTRACT/déploiement.
+
+
+## Reprise courante — B4d,21octobre2026
+
+#28 intégrée par0c4a558 après accord explicite ; six checks post-merge qualifiés, branches historiques conservées. B4d développé sur feature/session-drafts au code2062903, tests locaux175frontend/232backend ; six checks success et [Review Gate](reviews/l4-b4d-review-gate.md) complet favorables à la nouvelle PR, sans accord de merge. Mémoire/sessionStorage24h, restauration explicite liée à identité/workspace/recette/version, purge et absence de replay ; [contrat](../maintenance/temporary-drafts.md). B4e global/réauthentification et B4f restent distincts. Aucun nouveau merge autorisé, aucune production/infra/L5/CONTRACT. Les états B4c antérieurs ci-dessus sont historiques.

@@ -228,3 +228,8 @@ historique
 L'ABV estimé ne prend pas en compte la dilution liée à la glace ou à la technique de préparation.
 
 Les unités liquides non exprimées en `ML` ne sont pas encore converties pour le calcul ABV.
+
+
+## Brouillons L4 B4d
+
+Voir le [contrat des brouillons temporaires](temporary-drafts.md) : mémoire/sessionStorage24h, identité confirmée, restauration et abandon explicites, versions et résultats incertains, stockage refusé et purge volontaire. Aucun envoi automatique ni clôture de L4 global.

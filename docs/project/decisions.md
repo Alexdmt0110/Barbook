@@ -97,3 +97,9 @@ B4b sur feature/web-session-cutover depuis ce main ; Design Review dédiée. Auc
 ## Autorisation et merge #27 — 21 octobre 2026
 
 Alex autorise explicitement #27 uniquement et la suite des blocs L4, à commencer par B4c. Merge90d9356 confirmé à07:39:25UTC ; parents76f742b/1e52381 et arbre conformes, six checks main success et logs213/138/111/4 relus. Branches historiques conservées. B4c démarre sur feature/private-beta-admission ; [design](l4-b4c-design.md). Chaque nouveau merge reste distinct ; aucun L5/CONTRACT/base propriétaire/infrastructure/production.
+
+## Autorisation et merge #28 — 21 octobre 2026
+
+Alex autorise explicitement #28 uniquement, puis B4d dans L4 déjà validé. Merge commit0c4a5580f3fe7d8e71c83c0434aadc3ce46d1e73 confirmé, mergedAt2026-10-21T11:05:03Z (13:05:03Paris), parents90d9356/f44306a et arbre42fe8ccac17771d1e8367f276bf622ecfd63c557 conforme au HEAD revu. Main à ce merge, six checks post-merge success et logs232backend/147frontend/118PG-HTTP/4Chromium relus. Toutes les branches historiques conservées.
+
+B4d développé sur feature/session-drafts ; [conception préventive](l4-b4d-design.md). Pas de nouvelle décision produit ni de merge implicite. B4e/B4f restent distincts ; logout global après réauthentification reste à livrer. Aucune base personnelle/production, infrastructure, migration nouvelle, déploiement, CONTRACT ou L5.

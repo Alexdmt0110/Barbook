@@ -1,4 +1,12 @@
-# Checkpoint L4 — B4c intégré ; conception B4d
+# Checkpoint L4 — B4c intégré ; B4d qualifié sur branche
+
+## B4d qualifié sur branche — 21 octobre 2026
+
+Code2062903e3a4175d3c37474a1f3e3f1a202d74e2b, après design6231cb5, store8debc7b, formulairesdde1083, correctifs5a93256/60252ea/2062903. Six checks success, logs232backend/175frontend/118PG-HTTP/4Chromium relus ; sept migrations CI historiques,10garde-fous, audits zéro. [Quality39601079419](https://github.com/Alexdmt0110/Barbook/actions/runs/39601079419), [Integration39601079425](https://github.com/Alexdmt0110/Barbook/actions/runs/39601079425), [Audits39601079398](https://github.com/Alexdmt0110/Barbook/actions/runs/39601079398).
+
+[Review Gate complet](reviews/l4-b4d-review-gate.md) repris de zéro contre main après corrections : aucun BLOCKER/P1 restant identifié dans B4d. Restauration explicite/identité/workspace/ID/version/TTL, expiration involontaire, purge volontaire, réponse perdue et quota réel exercés. Les deux CI navigateur rouges restent expliquées ci-dessous et dans la revue ; aucune assertion, retry ou limite assouplie. Local lint/build/175tests frontend (deux workers après timeout historique isolé,5/5 puis175/175), compatibilité CLI ; backend verify232/Prisma/NYC,10garde-fous/tsc et typecheck E2E passés. PG/Chromium seulement en Actions.
+
+Seuls documents de qualification en préparation avant vraie PR. Lire HEAD réel/CI et diff de cette PR ; chaque merge doit encore être autorisé explicitement. Main0c4a558 (#28) inchangé et qualifié,16branches distantes présentes et cinq refs historiques vérifiées inchangées. B4e logout global/réauthentification et B4f restent à réaliser ; pas de clôture anticipée des18critères complets. Aucun déploiement, migration nouvelle/personnelle/production, infra, CONTRACT ou L5.
 
 ## Intégration vérifiée de #28 — 21 octobre 2026
 
