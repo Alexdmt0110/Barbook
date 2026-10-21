@@ -12,6 +12,7 @@ on:
       - feature/web-session-cutover
       - feature/private-beta-admission
       - feature/session-drafts
+      - feature/global-session-revocation
 
 permissions:
   contents: read

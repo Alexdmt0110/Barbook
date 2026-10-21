@@ -154,3 +154,12 @@ Relances lues :5/5 ciblés puis175/175 dans25fichiers avec deux workers ; compat
 ## PR B4d ouverte — dernier complément documentaire
 
 #29 créée après Review Gate, base0c4a558/heada80c160,42fichiers/7commits ; tous les blobs, toutes les lignes ajoutées/retirées et les refs du vrai diff correspondent au clone. Aucun commentaire/revue/inline, mergeable=true sans conflit ; douze checks push+PR success lus. Complément de pilotage seulement pour numéro de PR et reprise ; code2062903 inchangé. Vérifier le dernier HEAD documentaire/ses six checks avant tout merge, qui doit recevoir l’accord distinct d’Alex. Branches historiques conservées, aucune production/L5/CONTRACT.
+
+
+## 21 octobre 2026 — #29 intégrée, main qualifié, ouverture B4e
+
+Autorisation explicite Alex limitée à #29 : HEAD7d795003b24e8360d8a70620961a6c215885b96a/base0c4a5580f3fe7d8e71c83c0434aadc3ce46d1e73 revérifiés,42fichiers/8commits, tous blobs et toutes lignes +/- identiques ; zéro commentaire/revue/inline, mergeable=true/clean,12checks push+PR success. Merge commit non destructif de86dd0e11c938e202c038e9049876af651a0ccb, mergedAt2026-10-21T13:15:45Z ; parents0c4a558/7d79500 et arbre6db7ad7e7e473068f501a4e1d03f802f621d069d confirmés ; main pointe réellement dessus.
+
+Les six checks main sont success : Backend119243778657, Frontend119243777935, PostgreSQL119243776141, Chromium119243776318, audits119243775690/119243775136. Logs relus232backend/175frontend/118PG-HTTP/4Chromium ; sept migrations historiques, fraîche/redeploy/status/drift/smoke, audits zéro. Le téléchargement Chromium a rencontré deux DNS transitoires puis réussi ; les quatre parcours ont réellement passé49.8s. Les16branches sont conservées, tous les anciens HEAD hors main sont inchangés.
+
+Autorisation de développement B4e puis B4f donnée ; aucune autorisation de merge futur. Branche feature/global-session-revocation publiée immédiatement depuis main de86dd0, tracking local établi ; design préventif dans l4-b4e-design.md avant code. Les trois workflows ne reçoivent que le trigger push exact de cette branche, sans changement de jobs/actions/permissions. Git : merge29 confirmé + nouvelle branche ; VM aucun ; SQL aucune migration nouvelle/propriétaire ; Infra aucun changement.

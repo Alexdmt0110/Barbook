@@ -1,56 +1,36 @@
-# Handoff canonique Barbook — L4 B4d
+# Handoff canonique Barbook — L4 B4e
 
 ```yaml
-checkpoint_utc: "2026-10-21T12:47:20+00:00"
+checkpoint_utc: "2026-10-21T13:19:04Z"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
-handoff_status: "PRET_A_PASSER"
-feature: "L4 B4d : PR #29 ouverte et diff vérifié ; merge à valider"
-branch: "feature/session-drafts"
+handoff_status: "EN_COURS"
+feature: "L4 B4e — conception préventive, puis révocation globale et courses"
+branch: "feature/global-session-revocation"
 base_branch: "main"
-base_sha: "0c4a5580f3fe7d8e71c83c0434aadc3ce46d1e73"
-remote_head_sha: "a80c16001fbe210bd9bbaf357bf2b936a33eb93c"
-local_head_sha: "a80c16001fbe210bd9bbaf357bf2b936a33eb93c"
-worktree: "documents de qualification seuls en préparation ; code poussé et qualifié"
-pr: "https://github.com/Alexdmt0110/Barbook/pull/29 ; OPEN, non mergée ; base main0c4a558"
-tests: "232backend/175frontend/118PG-HTTP/4Chromium ; douze checks push+PR a80c160 success ; dernier checkpoint à observer"
-migrations: "sept historiques uniquement en CI jetables ; aucune nouvelle/personnelle/production"
-changes_pushed: "6231cb5/8debc7b/dde1083/5a93256/60252ea/2062903/a80c160"
-unpushed_changes: "documents de ce checkpoint avant leur propre publication"
-decisions_validated: "#28 intégrée ; développement L4 seul ; D1/D2 inchangées ; WORK seul"
-decisions_pending: "chaque nouveau merge ; aucun L5/CONTRACT/production"
-next_atomic_step: "vérifier refs/HEAD et six checks du dernier checkpoint documentaire ; attendre accord explicite Alex pour #29, aucun merge implicite"
-risks_and_blockers: "aucun BLOCKER/P1 B4d restant identifié ; limites stockage/navigateurs et B4e/B4f documentées"
+base_sha: "de86dd0e11c938e202c038e9049876af651a0ccb"
+remote_head_sha: "de86dd0e11c938e202c038e9049876af651a0ccb"
+local_head_sha: "de86dd0e11c938e202c038e9049876af651a0ccb"
+worktree: "checkpoint merge29/design B4e et triggers push seuls en préparation"
+pr: "#29 MERGED ; aucune PR B4e encore"
+tests: "six checks main de86dd0 success ; logs232backend/175frontend/118PG-HTTP/4Chromium relus"
+migrations: "sept historiques sur CI jetables ; aucune nouvelle/personnelle/production"
+changes_pushed: "#29 mergée de86dd0 ; branche B4e publiée au même commit"
+unpushed_changes: "documents de ce checkpoint et trois triggers exacts avant publication atomique"
+decisions_validated: "développement B4e puis B4f ; D1/D2 inchangées ; WORK seul"
+decisions_pending: "tout nouveau merge exige Alex ; aucun L5/CONTRACT/déploiement/infra"
+next_atomic_step: "implémenter endpoint global réauthentifié et tests verrouillés selon l4-b4e-design.md"
+risks_and_blockers: "B4e/B4f non encore implémentés/qualifiés ; limites offline, in-flight et stockage documentées"
 production_effect: "aucun"
 ```
 
-Cette photographie précède sa propre publication. Les refs/PR/CI GitHub réelles restent autoritaires ; le commit documentaire sera un successeur du checkpointa80c160 sans changement applicatif. Ne pas inventer de SHA auto-référentiel ni recréer une branche/PR déjà présente.
+Photographie précédant sa propre publication ; relire refs/HEAD/checks GitHub. Aucun SHA auto-référentiel inventé.
 
-## B4d qualifié sur branche — 21 octobre 2026
+#29 : autorisation limitée appliquée, HEAD7d79500/base0c4a558 vérifiés,42fichiers/8commits et vrai diff identiques à la qualification, zéro discussion/revue,12checks verts. mergedAt2026-10-21T13:15:45Z ; merge de86dd0 parents0c4a558/7d79500, arbre6db7ad7 identique. Main réellement lu au merge et ses six checks success, logs232/175/118/4. Tous les16anciens refs hors main conservés à leur SHA. Détails et IDs dans checkpoint-l4.md.
 
-Code2062903e3a4175d3c37474a1f3e3f1a202d74e2b, après design6231cb5, store8debc7b, formulairesdde1083, correctifs5a93256/60252ea/2062903. Six checks success, logs232backend/175frontend/118PG-HTTP/4Chromium relus ; sept migrations CI historiques,10garde-fous, audits zéro. [Quality39601079419](https://github.com/Alexdmt0110/Barbook/actions/runs/39601079419), [Integration39601079425](https://github.com/Alexdmt0110/Barbook/actions/runs/39601079425), [Audits39601079398](https://github.com/Alexdmt0110/Barbook/actions/runs/39601079398).
+B4a/b/c/d intégrés ; récupération temporaire24h, isolation user/workspace/recette, confirmation /me et restauration explicite, versions et réponse perdue qualifiées sur #29. Aucun replay automatique. Les limites browser/stockage/effacement physique restent dans docs/maintenance/temporary-drafts.md. Le store interne revokeAll ne constitue pas encore un logout global public.
 
-[Review Gate complet](reviews/l4-b4d-review-gate.md) repris de zéro contre main après corrections : aucun BLOCKER/P1 restant identifié dans B4d. Restauration explicite/identité/workspace/ID/version/TTL, expiration involontaire, purge volontaire, réponse perdue et quota réel exercés. Les deux CI navigateur rouges restent expliquées ci-dessous et dans la revue ; aucune assertion, retry ou limite assouplie. Local lint/build/175tests frontend (deux workers après timeout historique isolé,5/5 puis175/175), compatibilité CLI ; backend verify232/Prisma/NYC,10garde-fous/tsc et typecheck E2E passés. PG/Chromium seulement en Actions.
+Reprendre B4e sur cette branche, design l4-b4e-design.md avant code : endpoint/UI après mot de passe, sérialisation User→Session, révocation pendant attente, courses identité/connexion/logout et erreurs réseau ; puis B4f avec18critères et Review Gate complet. Chaque commit testé/poussé immédiatement et six contrôles ; pas de nouvelle PR avant zéroBLOCKER/P1. Tout merge futur demande Alex. Conserver toutes les branches.
 
-Seuls documents de qualification en préparation avant vraie PR. Lire HEAD réel/CI et diff de cette PR ; chaque merge doit encore être autorisé explicitement. Main0c4a558 (#28) inchangé et qualifié,16branches distantes présentes et cinq refs historiques vérifiées inchangées. B4e logout global/réauthentification et B4f restent à réaliser ; pas de clôture anticipée des18critères complets. Aucun déploiement, migration nouvelle/personnelle/production, infra, CONTRACT ou L5.
-
-## Intégration #28 et historique
-
-#28 a été autorisée explicitement puis intégrée le21octobre2026 à11:05:03UTC (13:05:03Paris) par merge commit0c4a558, parents90d9356/f44306a, arbre42fe8ccac17771d1e8367f276bf622ecfd63c557 identique au HEAD revu. Main et six checks post-merge ont été réellement lus, logs232/147/118/4. Les preuves et checkpoints intermédiaires sont conservés dans checkpoint-l4.md ; ne pas reprendre les anciens états B4c comme état actuel.
-
-Branches historiques conservées : private-beta-admissionf44306a, web-session-cutover1e52381, secure-web-sessions4c97d89, dossiers95e21bc et docs/l3-merge-checkpoint39fd730 ;16refs présentes au contrôle final. Aucun rebase/force-push/suppression. Sources privées normatives déjà lues et non copiées dans Git public.
-
-## Périmètre livré et prochain bloc
-
-Création et organisation existantes, mémoire/sessionStorage24h, restauration/abandon explicites après /me et contrôle de schéma/versions ; aucune resoumission automatique. Expiration conserve la saisie, logout/changement d'identité purgent avant accès. Les handlers précédents sont invalidés. Quota/getters refusés : avertissement mémoire, abandon disponible ; si marqueur incertain et effacement impossibles, envoi bloqué avant HTTP. L'effacement physique refusé n'est pas promis. Contrat : docs/maintenance/temporary-drafts.md.
-
-Après PR vérifiée : attendre accord explicite d'Alex pour son merge ; conserver toutes les branches. Après merge distinct et main requalifié seulement, reprendre B4e sur une nouvelle branche avec Design Review : endpoint/UI de déconnexion globale après réauthentification et courses multi-onglets/réseau/requêtes en vol, puis B4f et18critères globaux. Le store interne revokeAll ne constitue pas encore cette fonctionnalité publique. Aucun sélecteur partagé ni édition/corbeille L5/D5 livré.
-
-Git : commits/push/PR seulement pour ce checkpoint, aucun nouveau merge. VM : aucun déploiement. SQL : aucune migration nouvelle/propriétaire ; sept historiques sur CI jetables seulement. Infra : aucun changement ; seuls trois triggers push exacts de la branche ajoutés aux workflows existants, sans changement de jobs/actions/permissions/ruleset. TLS/Secure réel/proxy/Safari/iOS/backup/restore/rollback et base propriétaire ne sont pas qualifiés.
-
-## PR #29 réellement ouverte et relue
-
-[PR #29](https://github.com/Alexdmt0110/Barbook/pull/29), base0c4a558/heada80c160 :42fichiers,7commits avant ce dernier complément documentaire. Tous les blobs et toutes les lignes ajoutées/retirées du vrai diff GitHub correspondent au diff local ; aucun patch manquant. Zéro commentaire/revue/inline ; mergeable=true, aucun conflit. Les douze contrôles push+PR de ce HEAD sont maintenant success ; code2062903 et ses preuves ne changent pas. Ce complément enregistre seulement le numéro/état de PR dans le pilotage. Observer le dernier HEAD de ces seuls documents avant tout merge.
-
-PRET_A_PASSER signifie une reprise durable, pas une fin de L4 ni une autorisation de merge. Attendre Alex pour #29. Aucun démarrage de B4e sur cette branche.
+Git : merge29 et branche B4e ; VM aucun ; SQL aucune nouvelle/personnelle/production ; Infra aucun changement, triggers de branche seuls. Sources privées normatives déjà lues ; pas de copie au dépôt. Pas de déploiement, CONTRACT, L5. PG/Chromium qualifiés sur Actions uniquement ; pas de TLS réel/proxy/Safari/iOS/backup/restore/rollback qualifiés.
