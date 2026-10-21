@@ -25,3 +25,10 @@ Unitaires : mot de passe faux/vrai/changé, rollback, contexte capturé, retries
 Chromium desktop/mobile : formulaire clavier, mauvaise réauthentification sans révocation serveur, vrais appareils isolés, purge/401 sur l'ancien appareil, réponse204 perdue sans faux succès ni replay, nouvelle identité protégée. Étendre les parcours existants sans nouvelles inscriptions ni relaxation des quotas/assertions/timeouts/retries.
 
 Chaque bloc cohérent : vérifications locales adaptées, commit atomique immédiatement publié, contrôle parent/arbre/message/fichiers/blobs et six checks. B4f : matrice des18critères L4 avec preuves et limites, relecture de toute la branche contre main sur tous axes du prompt maître ; corriger BLOCKER/P1 puis refaire toute la revue. Vraie PR seulement ensuite ; pas de merge sans autorisation distincte.
+
+
+## Complément préventif — notifications retardées
+
+La notification doit cibler la session précédente, pas seulement user/workspace : sinon un logoutA retardé pourrait purger une nouvelle sessionA. Empreinte SHA256 du CSRF en mémoire (ni credential ni CSRF brut diffusé), vérification de génération après digest asynchrone, puis comparaison de l'empreinte et du propriétaire. Identity annonce le propriétaire suivant seulement avec l'empreinte de la session précédente connue. Une nouvelle session déjà confirmée ignore la notification ancienne, même du même utilisateur. Si aucune session précédente n'est connue ou WebCrypto/BroadcastChannel indisponible, les contrôles serveur garantissent le refus, sans promettre une notification immédiate. Bloquer aussi le bootstrap implicite pendant une déconnexion non confirmée ; seule une reconnexion explicite rétablit le contexte.
+
+Checkpoint backend7a10fb4 publié et parent/arbre/fichiers/blobs vérifiés. Les collections GitHub check-runs et actions/runs sont toujours vides pour1667810 puis7a10fb4 ; six contrôles B4e NON qualifiés. Ce complément utilise l'API Contents pour publier un vrai checkpoint documentaire et vérifier si l'événement est traité ; aucune configuration d'infrastructure ou protection n'est modifiée. Aucune PR ne sera ouverte sans preuves natives/browser et Review Gate.
