@@ -2,6 +2,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { DRAFT_KEY, DraftStore } from '../drafts/draft-store.service';
 import { AuthService } from './auth.service';
 import { AUTH_SNAPSHOT } from './auth.models';
 import { authInterceptor } from './auth.interceptor';
@@ -17,7 +18,14 @@ describe('AuthService cookie session', () => {
   beforeEach(() => {
     sessionStorage.clear();
     TestBed.configureTestingModule({
-      providers: [{ provide: Router, useValue: { url: '/cocktails', navigate: vi.fn().mockResolvedValue(true) } }, provideHttpClient(withInterceptors([authInterceptor])), provideHttpClientTesting()],
+      providers: [
+        {
+          provide: Router,
+          useValue: { url: '/cocktails', navigate: vi.fn().mockResolvedValue(true) },
+        },
+        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClientTesting(),
+      ],
     });
     service = TestBed.inject(AuthService);
     http = TestBed.inject(HttpTestingController);
@@ -112,11 +120,47 @@ describe('AuthService cookie session', () => {
     expect(sessionStorage.getItem('draft-fixture')).toBe('kept');
     http.expectNone('/api/auth/logout');
   });
+  it('binds drafts only after /me, preserves on expiry, purges before failed logout', () => {
+    const drafts = TestBed.inject(DraftStore);
+    service.login({ email: auth.user.email, password: 'password' }).subscribe();
+    http.expectOne('/api/auth/login').flush(auth);
+    expect(drafts.lease()).toBeNull();
+    http.expectOne('/api/auth/me').flush(auth);
+    const lease = drafts.lease();
+    drafts.save(lease, 'create:new', 1, 'saisie');
+    service.expire();
+    expect(drafts.lease()).toBeNull();
+    establish();
+    expect(drafts.find(drafts.lease(), 'create:new')?.value).toBe('saisie');
+    service.logout().subscribe({ error: () => undefined });
+    expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
+    http.expectOne('/api/auth/logout').error(new ProgressEvent('error'));
+    expect(drafts.save(lease, 'create:new', 1, 'late')).toBe(false);
+  });
+  it('purges account A when account B is confirmed, including after involuntary expiry', () => {
+    establish();
+    const drafts = TestBed.inject(DraftStore);
+    drafts.save(drafts.lease(), 'create:new', 1, 'private A');
+    service.expire();
+    const b = { ...auth, user: { ...auth.user, id: 'B' }, workspaceId: 'WB' };
+    service.login({ email: 'b@example.test', password: 'password' }).subscribe();
+    http.expectOne('/api/auth/login').flush(b);
+    http.expectOne('/api/auth/me').flush(b);
+    expect(drafts.find(drafts.lease(), 'create:new')).toBeNull();
+    expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
+  });
   it('removes the retired JWT at initialization without reading it as authority', () => {
     TestBed.resetTestingModule();
     sessionStorage.setItem('barbook.accessToken', 'old-jwt');
     TestBed.configureTestingModule({
-      providers: [{ provide: Router, useValue: { url: '/cocktails', navigate: vi.fn().mockResolvedValue(true) } }, provideHttpClient(withInterceptors([authInterceptor])), provideHttpClientTesting()],
+      providers: [
+        {
+          provide: Router,
+          useValue: { url: '/cocktails', navigate: vi.fn().mockResolvedValue(true) },
+        },
+        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClientTesting(),
+      ],
     });
     service = TestBed.inject(AuthService);
     http = TestBed.inject(HttpTestingController);

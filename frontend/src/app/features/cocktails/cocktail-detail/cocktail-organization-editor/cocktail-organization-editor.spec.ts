@@ -1,3 +1,5 @@
+import { provideRouter } from '@angular/router';
+import { DraftStore } from '../../../../core/drafts/draft-store.service';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -11,9 +13,10 @@ const tag = { id: 'tag', name: 'Classique', slug: 'classique' };
 describe('CocktailOrganizationEditor', () => {
   let http: HttpTestingController;
   beforeEach(() => {
+    sessionStorage.clear();
     TestBed.configureTestingModule({
       imports: [CocktailOrganizationEditor],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     });
     http = TestBed.inject(HttpTestingController);
   });
@@ -24,10 +27,15 @@ describe('CocktailOrganizationEditor', () => {
       .expectOne((req) => req.url === '/api/folders/browse')
       .flush({ items, total: items.length, page: 1, pageSize: 25, totalPages: pages });
   }
-  function setup() {
+  function setup(version = 4, recipeId = 'recipe-a') {
+    TestBed.inject(DraftStore).confirmIdentity({
+      userId: 'test-user',
+      workspaceId: 'test-workspace',
+    });
     const fixture = TestBed.createComponent(CocktailOrganizationEditor);
+    fixture.componentRef.setInput('cocktailId', recipeId);
     fixture.componentRef.setInput('slug', 'daiquiri');
-    fixture.componentRef.setInput('organizationVersion', 4);
+    fixture.componentRef.setInput('organizationVersion', version);
     fixture.componentRef.setInput('folders', [a]);
     fixture.componentRef.setInput('tags', [tag]);
     fixture.detectChanges();
@@ -127,7 +135,7 @@ describe('CocktailOrganizationEditor', () => {
     fixture.componentInstance.reloadOrganization();
     http
       .expectOne('/api/cocktails/daiquiri')
-      .flush({ folder: b, folders: [b], tags: [], organizationVersion: 8 });
+      .flush({ id: 'recipe-a', folder: b, folders: [b], tags: [], organizationVersion: 8 });
     expect(fixture.componentInstance.selectedFolderIds()).toEqual(['b']);
     expect(fixture.componentInstance.selectedTagNames()).toEqual([]);
     fixture.componentInstance.saveOrganization();
@@ -161,5 +169,60 @@ describe('CocktailOrganizationEditor', () => {
     checkbox(fixture.nativeElement, 'Classique').click();
     expect(fixture.componentInstance.newTagName()).toBe('Unfinished');
     expect(fixture.componentInstance.selectedTagNames()).toEqual(['Classique']);
+  });
+  it('restores only this recipe and retains its original version against a newer server state', () => {
+    const first = setup();
+    first.componentInstance.newTagName.set('unfinished');
+    first.componentInstance.removeFolder('a');
+    first.destroy();
+    const other = setup(4, 'recipe-b');
+    expect(other.componentInstance.draft.candidate()).toBeNull();
+    other.destroy();
+    const restored = setup(8);
+    expect(restored.componentInstance.draft.candidate()).not.toBeNull();
+    restored.componentInstance.saveOrganization();
+    http.expectNone('/api/cocktails/daiquiri/organization');
+    restored.componentInstance.restoreDraft();
+    expect(restored.componentInstance.newTagName()).toBe('unfinished');
+    expect(restored.componentInstance.selectedFolderIds()).toEqual([]);
+    expect(restored.componentInstance.hasConflict()).toBe(true);
+    restored.componentInstance.saveOrganization();
+    http.expectNone('/api/cocktails/daiquiri/organization');
+    restored.componentInstance.reloadOrganization();
+    http
+      .expectOne('/api/cocktails/daiquiri')
+      .flush({ id: 'recipe-a', folder: b, folders: [b], tags: [], organizationVersion: 8 });
+    restored.componentInstance.saveOrganization();
+    const request = http.expectOne('/api/cocktails/daiquiri/organization');
+    expect(request.request.body.expectedVersion).toBe(8);
+    request.flush({ folder: b, folders: [b], tags: [], organizationVersion: 9 });
+  });
+  it('preserves the restored version when a second client wins after restore and keeps the draft on 409', () => {
+    const first = setup();
+    first.componentInstance.removeTag('Classique');
+    first.destroy();
+    const restored = setup();
+    restored.componentInstance.restoreDraft();
+    restored.componentInstance.saveOrganization();
+    const request = http.expectOne('/api/cocktails/daiquiri/organization');
+    expect(request.request.body.expectedVersion).toBe(4);
+    request.flush({}, { status: 409, statusText: 'Conflict' });
+    expect(restored.componentInstance.selectedTagNames()).toEqual([]);
+    expect(restored.componentInstance.draft.dirty()).toBe(true);
+    expect(restored.componentInstance.hasConflict()).toBe(true);
+  });
+  it('keeps folder creation uncertainty distinct from successful organization and rejects a replacement recipe', () => {
+    const fixture = setup();
+    fixture.componentInstance.newFolderName.set('new');
+    fixture.componentInstance.createFolder();
+    http.expectOne('/api/folders').error(new ProgressEvent('error'));
+    expect(fixture.componentInstance.draft.uncertain()).toBe(true);
+    fixture.componentInstance.saveOrganization();
+    http.expectNone('/api/cocktails/daiquiri/organization');
+    fixture.componentInstance.reloadOrganization();
+    http
+      .expectOne('/api/cocktails/daiquiri')
+      .flush({ id: 'different', folders: [], tags: [], organizationVersion: 1 });
+    expect(fixture.componentInstance.draft.uncertain()).toBe(true);
   });
 });

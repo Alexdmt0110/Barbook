@@ -2,7 +2,7 @@
 
 Le [catalogue détaillé](audit/03-Vision-et-catalogue.md) et [backlog.json](backlog.json) conservent les 66 identifiants. Le [registre des 24 constats](audit/02-Audit-qualite-securite-UX.md) est une photographie d'audit ; les preuves d'exécution ci-dessous et le handoff font foi pour la phase B. Une autorisation partielle ne valide pas toute la fiche associée.
 
-| ID | Priorité / lot | État au 19 octobre 2026 | Résultat attendu et critères | Preuve / dépendances |
+| ID | Priorité / lot | État vérifié | Résultat attendu et critères | Preuve / dépendances |
 | --- | --- | --- | --- | --- |
 | BB-L0-01 / F060 | MUST / L0 | MERGE #20 ; main vert | Créer une branche, publier un commit atomique et relire ses fichiers sur GitHub ; versions du pilotage et single writer | branche docs/project-pilotage ; handoff et revue L0 |
 | BB-L1-01 / A001 | MUST / L1 | MERGE #21 ; main vert | Nom produisant new rejeté ou rendu routable de façon cohérente ; cas normal et route de création inchangés ; pas de 500 | règles métier + DTO/service + frontend ; contrat documenté |
@@ -53,8 +53,8 @@ D1a/D1b/D2a/D2b/D2c validées, [design et critères](l4-design.md). #25 document
 | --- | --- | --- |
 | BB-L4-01 / B4a | contrats/ADR et store Session additif qualifiés ;88natifs dont26store, sept migrations ; auth actuelle préservée | MERGE #26 ; main76f742b qualifié |
 | BB-L4-02 / B4b | API/UI cookie/CSRF et contexte coordonnés, retrait Bearer | MERGE #27 ; main90d9356 qualifié |
-| BB-L4-03 / B4c | admission serveur fermée/liste, storage refusé toléré | QUALIFIE_SUR_BRANCHE167d20b ; PR/merge à vérifier |
-| BB-L4-04 / B4d / A010 / A012 | brouillons mémoire/sessionStorage 24 h, restauration isolée explicite, versions | APPROUVE |
+| BB-L4-03 / B4c | admission serveur fermée/liste, storage refusé toléré | MERGE #28 ; main0c4a558 qualifié |
+| BB-L4-04 / B4d / A010 / A012 | brouillons mémoire/sessionStorage 24 h, restauration isolée explicite, versions | PR #29 OUVERTE ; code2062903 qualifié ; merge à valider |
 | BB-L4-05 / B4e | révocation globale, activité/onglets/réseau et courses | APPROUVE |
 | BB-L4-06 / B4f | Review Gate complet, six checks, vraie PR et handoff | APPROUVE ; merge à valider |
 
@@ -95,3 +95,8 @@ Sept nouveaux tests natifs admission : fermé/non admis, aucune création partie
 [Review Gate B4c](reviews/l4-b4c-review-gate.md) de toute la branche depuis main : aucun BLOCKER/P1 restant identifié. Code/migrations/locks/workflows/contrats/tests relus, pas de nouvelle dépendance ni modification de schéma/permission/ruleset. Publication documentaire seule puis vraie PR/diff/CI à vérifier, **merge soumis à Alex**.
 
 B4d brouillons24h/restauration/purge/identité/workspace/version, B4e logout global/réauthentification et B4f qualification globale restent à réaliser. L4-01 et volet stockage de L4-14 exercés ; pas de clôture anticipée des critères brouillons/onglets/réseau complets. La liste privée n'est pas une vérification de possession d'email (D1 reporte celle-ci avant ouverture publique). Changer la liste demande un redémarrage ultérieur autorisé ; aucune liste réelle ni infra configurée ici. TLS/proxy/Safari/iOS/backup/restore/rollback propriétaire non qualifiés ; aucun L5/CONTRACT/déploiement.
+
+
+État courant21octobre : #28 intégrée après autorisation explicite, main0c4a558/six checks post-merge success. B4d sur feature/session-drafts, code2062903 ;175frontend/232backend/118PG-HTTP/4Chromium requalifiés, six checks success. [Design](l4-b4d-design.md), [Review Gate](reviews/l4-b4d-review-gate.md), [contrat brouillons](../maintenance/temporary-drafts.md). Chaque nouvelle PR reste soumise à un accord de merge distinct ; B4e/B4f ne sont pas clôturés.
+
+PR #29 ouverte,42fichiers/7commits au checkpointa80c160, vrai diff/blobs relus et douze checks push+PR success. Ce complément de pilotage est documentaire ; observer ses propres checks puis attendre Alex.

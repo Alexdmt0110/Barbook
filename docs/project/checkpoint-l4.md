@@ -1,3 +1,19 @@
+# Checkpoint L4 — B4c intégré ; B4d qualifié sur branche
+
+## B4d qualifié sur branche — 21 octobre 2026
+
+Code2062903e3a4175d3c37474a1f3e3f1a202d74e2b, après design6231cb5, store8debc7b, formulairesdde1083, correctifs5a93256/60252ea/2062903. Six checks success, logs232backend/175frontend/118PG-HTTP/4Chromium relus ; sept migrations CI historiques,10garde-fous, audits zéro. [Quality39601079419](https://github.com/Alexdmt0110/Barbook/actions/runs/39601079419), [Integration39601079425](https://github.com/Alexdmt0110/Barbook/actions/runs/39601079425), [Audits39601079398](https://github.com/Alexdmt0110/Barbook/actions/runs/39601079398).
+
+[Review Gate complet](reviews/l4-b4d-review-gate.md) repris de zéro contre main après corrections : aucun BLOCKER/P1 restant identifié dans B4d. Restauration explicite/identité/workspace/ID/version/TTL, expiration involontaire, purge volontaire, réponse perdue et quota réel exercés. Les deux CI navigateur rouges restent expliquées ci-dessous et dans la revue ; aucune assertion, retry ou limite assouplie. Local lint/build/175tests frontend (deux workers après timeout historique isolé,5/5 puis175/175), compatibilité CLI ; backend verify232/Prisma/NYC,10garde-fous/tsc et typecheck E2E passés. PG/Chromium seulement en Actions.
+
+Seuls documents de qualification en préparation avant vraie PR. Lire HEAD réel/CI et diff de cette PR ; chaque merge doit encore être autorisé explicitement. Main0c4a558 (#28) inchangé et qualifié,16branches distantes présentes et cinq refs historiques vérifiées inchangées. B4e logout global/réauthentification et B4f restent à réaliser ; pas de clôture anticipée des18critères complets. Aucun déploiement, migration nouvelle/personnelle/production, infra, CONTRACT ou L5.
+
+## Intégration vérifiée de #28 — 21 octobre 2026
+
+Autorisation explicite exécutée. HEAD revu f44306a42ae232f725c5cabba123ea1fc44153e0, base90d9356 ; zéro commentaire/revue/thread, mergeable clean, six checks du dernier HEAD success (push et PR). Merge commit0c4a5580f3fe7d8e71c83c0434aadc3ce46d1e73, mergedAt2026-10-21T11:05:03Z ; parents90d9356/f44306a, arbre42fe8ccac17771d1e8367f276bf622ecfd63c557 identique au HEAD revu ; main confirmé à ce merge. Branches historiques conservées. Six checks post-merge success, logs relus :232backend/147frontend/118PG-HTTP/4Chromium, sept migrations jetables, audits zéro. Jobs119185986301/119185986485/119185986067/119185986403/119185986198/119185986930.
+
+Branche feature/session-drafts créée depuis ce main qualifié ; [Design Review B4d](l4-b4d-design.md) avant code. B4d reste à implémenter. Aucun déploiement, migration propriétaire, changement infra, CONTRACT ni L5. Chaque nouvelle PR attend son propre accord de merge. Les états ci-dessous sont historiques.
+
 # Checkpoint L4 — B4a/B4b intégrés, B4c qualifié sur branche
 
 ## État courant B4c — 21 octobre 2026
@@ -101,3 +117,40 @@ Six checks success : [Quality39414957581](https://github.com/Alexdmt0110/Barbook
 Prochain bloc : guard/cookies/CSRF/login/register/me/logout et Angular coordonnés, adaptation des fixtures en conservant leurs assertions, qualification native et navigateur puis Review Gate complet avant une PR B4b. Aucune PR B4b ouverte pour cette préparation partielle. Risques de protocole avant activation : logout tardif vs login récent, réponse A tardive après B, absence de replay, cookies refusés après compte réellement créé. Journal de reprise courant obligatoire ; aucune nouvelle autorisation de développement L4 nécessaire, chaque merge futur reste distinct.
 
 PR B4b : [#27](https://github.com/Alexdmt0110/Barbook/pull/27) ouverte, non mergée ; diff réel70fichiers/9commits vérifié au checkpoint479a4b8, aucun commentaire/revue/conflit. Ce complément est documentaire seulement ; vérifier les six checks du dernier HEAD puis attendre Alex pour le merge.
+
+## B4d — premier micro-bloc mémoire/identité
+
+Store borné versionné, TTL24h, lease après identité /me, suspension conservatrice, purge volontaire avant HTTP et invalidation des callbacks. Messages logout/identité inter-onglets sans secret. Mémoire de repli et signal explicite de purge impossible. Local frontend verify : lint/build,157tests/23fichiers, compatibilité CLI passés. Les formulaires ne l'utilisent pas encore ; B4d reste incomplet. Prochain bloc : intégration création/organisation/restauration/version et tests réels. CI de ce commit à observer, aucune PR ni merge.
+
+## B4d — intégration des formulaires et des décisions explicites
+
+Après store8debc7b (six checks success), création et organisation utilisent un brouillon brut borné, par identité/workspace/ID stable, avec TTL24h et restauration/abandon explicites. Version d’origine, refus des écritures anciennes et expectedVersion serveur conservés. Guard de sortie, avertissement mémoire et purge impossible, résultat inconnu avant envoi et absence de replay. Deux corrections préventives : purge mémoire lors de changements successifs sous storage bloqué ; anciens handles invalidés à toute suspension. Si marqueur incertain ET effacement refusés, mutation bloquée avant HTTP pour empêcher la résurrection d’un snapshot non marqué.
+
+Local frontend verify :170tests/24fichiers, lint/build/compatibilité CLI success ; typage E2E success. Les quatre parcours Chromium existants sont étendus sans inscription/retry/quota ajouté : refresh création, restauration version obsolète après409, logout inter-onglets avec saisie, expiration/reconnexion même compte, mémoire/purge sous getters refusés, et POST réellement committé dont seule la réponse est coupée. Ces ajouts navigateur restent à exécuter en CI ; aucune preuve PG/Chromium locale prétendue. Prochaine étape : six checks, correction éventuelle, Review Gate complet depuis main et documentation avant nouvelle PR. Aucun merge/déploiement/SQL propriétaire/infra/L5/CONTRACT.
+
+## B4d — correction avant Review Gate
+
+Checkpointdde10833e7d5da20910414b540e7b6a733495b78 publié, arbreaad78750fc0e0522650791739366b9ccd43a4b3c et26blobs vérifiés, clone propre. CI : cinq checks success ; Browser Integration119212258119 échoue sur les quatre essais pour deux causes. La lecture de vérification directe omettait les headers de contexte (409 attendu par la protection serveur). Le logout détruit le router-outlet privé avant le guard : les traces Chromium desktop/mobile confirment « Cannot read properties of null (reading canLeave) ». Corriger le client de test sans desserrer le serveur ; guard tolérant au composant déjà détruit avec test de régression.
+
+Revue supplémentaire : whitelist exacte des contrôles et version de création avant FormGroup.setValue (évite crash sur champ inconnu), validation répétée au moment de restaurer ; formulaire inerte pendant mutation pour éviter de perdre une saisie modifiée en vol.172tests frontend/25fichiers locaux passés après ces corrections, typecheck E2E passé. Requalifier six checks et reprendre toute la revue main...branche après publication ; aucune PR encore ouverte, aucun merge.
+
+## B4d — rétention lors de l'accès
+
+Le TTL refuse déjà toute restauration à24h ; la dernière passe retire également les payloads expirés du stockage lors de lecture/import, en conservant les autres recettes et leurs échéances. Pas de minuterie de suppression prétendue dans un onglet fermé : purge au prochain accès. Avertissement d'effacement refusé sans promettre le blocage des nouvelles saisies mémoire. Backend local verify effectivement terminé :232tests/22suites, lint/build/Prisma/NYC passés ;10garde-fous et tsc passés. Les preuves CI et la revue finale restent à consigner après publication.
+
+Six checks5a93256 success, logs232backend/172frontend/118PG-HTTP/4Chromium relus (jobs Quality119215540428/119215539570, intégration119215541155/119215540790, audits119215541927/119215541142). Le dernier micro-bloc ajoute un vrai QuotaExceededError navigateur sur la clé des brouillons et prouve la reprise mémoire après navigation, sans modifier l’API ni les quotas serveur. Requalification finale sur son propre HEAD requise.
+
+## B4d — abandon sous quota, correction issue du vrai navigateur
+
+60252ea : cinq checks success,232backend/173frontend/118PG-HTTP ; Browser119218866861 : deux parcours expiration passent, deux parcours principaux timeout. Les traces montrent que QuotaExceededError est traité, la navigation et la restauration mémoire passent ; attente bloquée sur le bouton Abandonner, masqué par la condition du texte de persistance. Séparer l'action d'abandon du message24h pour qu'elle reste disponible même sans stockage. Ajouter test DOM de cette action et assertion d'absence de promesse24h.
+
+Revue du même chemin : après abandon, si l'écriture du namespace réduit échoue, tenter la suppression de la clé pour qu'un ancien payload ne réapparaisse pas. Les autres recettes restent en mémoire, avec avertissement de persistance. Test de régression ajouté. Aucun timeout/retry/quota augmenté, aucune assertion retirée ; cleanup du test n'écrase plus l'erreur originale lors de teardown. Requalification complète puis Review Gate entier depuis main toujours requis avant PR.
+
+Local après correctif quota : lint/build passés,174tests passent et un test historique inchangé de FolderCocktailPicker dépasse5s sous charge. Relance ciblée puis suite complète avec VITEST_MAX_WORKERS=2 (option réellement supportée par la version installée), sans changer timeout, assertions ni configuration CI. Les résultats de ces relances doivent être lus avant publication ; ne pas considérer une sortie partielle comme verte.
+
+Relances lues :5/5 ciblés puis175/175 dans25fichiers avec deux workers ; compatibilité CLI passée. Lint et build passés sur ce code. Typecheck E2E et diffcheck passés. Publication du correctif quota seule ; les documents maintenance/décisions et le brouillon de Review Gate restent en préparation hors de ce commit, sans PR ouverte. Six checks du nouveau HEAD à observer avant de conclure la revue.
+
+
+## PR B4d ouverte — dernier complément documentaire
+
+#29 créée après Review Gate, base0c4a558/heada80c160,42fichiers/7commits ; tous les blobs, toutes les lignes ajoutées/retirées et les refs du vrai diff correspondent au clone. Aucun commentaire/revue/inline, mergeable=true sans conflit ; douze checks push+PR success lus. Complément de pilotage seulement pour numéro de PR et reprise ; code2062903 inchangé. Vérifier le dernier HEAD documentaire/ses six checks avant tout merge, qui doit recevoir l’accord distinct d’Alex. Branches historiques conservées, aucune production/L5/CONTRACT.

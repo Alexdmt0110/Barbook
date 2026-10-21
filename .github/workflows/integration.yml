@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, test/critical-integration-flows, feature/cocktail-folder-management, feature/secure-web-sessions, feature/web-session-cutover, feature/private-beta-admission]
+    branches: [main, test/critical-integration-flows, feature/cocktail-folder-management, feature/secure-web-sessions, feature/web-session-cutover, feature/private-beta-admission, feature/session-drafts]
 
 permissions:
   contents: read

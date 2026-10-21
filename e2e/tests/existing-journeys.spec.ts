@@ -1,3 +1,4 @@
+import { exerciseDraftQuota, acceptDraftNavigation, loseCreationResponse, restoreConflictedOrganization, restoreCreationAfterRefresh } from '../fixtures/draft-journeys';
 import { expect, Page, test } from '@playwright/test';
 import { browserFixtureEmail } from '../fixtures/registration-emails';
 import { randomUUID } from 'node:crypto';
@@ -36,6 +37,7 @@ async function fillRecipeForm(page: Page, name: string): Promise<void> {
 }
 
 test('register, create, classify, manage folders and log back in', async ({ page }, testInfo) => {
+  acceptDraftNavigation(page);
   const suffix = randomUUID().slice(0, 8);
   const email = browserFixtureEmail(testInfo.project.name, 'browser');
   const prefix = `QA e2e ${suffix}`;
@@ -89,6 +91,7 @@ test('register, create, classify, manage folders and log back in', async ({ page
   await expect(page).toHaveURL(/\/cocktails\/new$/);
 
   await fillRecipeForm(page, name);
+  await restoreCreationAfterRefresh(page, name);
   const createdResponse = page.waitForResponse(
     (response) =>
       response.request().method() === 'POST' &&
@@ -176,6 +179,7 @@ test('register, create, classify, manage folders and log back in', async ({ page
   ).toBeVisible();
   for (const folderName of folderNames)
     await expect(page.getByRole('checkbox', { name: folderName, exact: true })).toBeChecked();
+  await restoreConflictedOrganization(page);
   await page
     .getByRole('button', { name: 'Recharger et remplacer le brouillon', exact: true })
     .click();
@@ -474,6 +478,8 @@ test('register, create, classify, manage folders and log back in', async ({ page
   );
   expect(oldCookie?.httpOnly).toBe(true);
   expect(oldCookie).toBeDefined();
+  await page.goto('/cocktails/new');
+  await fillRecipeForm(page, 'Draft before cross-tab logout');
   const secondTab = await page.context().newPage();
   try {
     await secondTab.goto('/cocktails');
@@ -481,7 +487,8 @@ test('register, create, classify, manage folders and log back in', async ({ page
     await secondTab.getByRole('button', { name: 'Déconnexion', exact: true }).click();
     await expect(secondTab).toHaveURL(/\/login$/);
     await expect(page).toHaveURL(/\/login\?returnUrl=/);
-    await expect(page.getByRole('heading', { name: 'Dossier introuvable', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Créer un cocktail', exact: true })).toHaveCount(0);
+    expect(await page.evaluate(() => sessionStorage.getItem('barbook.drafts.v1'))).toBeNull();
     // Explicit Cookie replays the credential even if the browser ever discards it.
     const replay = await page.request.get('http://127.0.0.1:3000/api/auth/me', {
       headers: { Cookie: `barbook-session-dev=${oldCookie!.value}` },
@@ -498,11 +505,14 @@ test('register, create, classify, manage folders and log back in', async ({ page
   } finally {
     await secondTab.close();
   }
+  await loseCreationResponse(page, `${prefix} lost response`, fillRecipeForm, await browserHeaders(page));
+  await exerciseDraftQuota(page);
 });
 
 test('expired PostgreSQL session is rejected and returns to login without storing credentials', async ({
   page,
 }, testInfo) => {
+  acceptDraftNavigation(page);
   const registration = await page.request.post('http://127.0.0.1:3000/api/auth/register', {
     headers: { Origin: 'http://127.0.0.1:4200', 'X-Barbook-Request': '1' },
     data: {
@@ -518,6 +528,9 @@ test('expired PostgreSQL session is rejected and returns to login without storin
   expect(cookie?.httpOnly).toBe(true);
   expect(cookie?.sameSite).toBe('Lax');
   expect(cookie?.expires).toBe(-1);
+  await page.goto('/cocktails/new');
+  const draftName = `Expiry draft ${testInfo.project.name}`;
+  await fillRecipeForm(page, draftName);
   execFileSync(
     process.execPath,
     ['--import', 'tsx', 'test/expire-browser-session.ts', auth.user.id],
@@ -535,6 +548,20 @@ test('expired PostgreSQL session is rejected and returns to login without storin
   expect(await page.evaluate(() => sessionStorage.getItem('barbook.accessToken'))).toBeNull();
   expect(await page.evaluate(() => document.cookie.includes('barbook-session-dev'))).toBe(false);
   await expect(page.getByRole('button', { name: 'Se connecter', exact: true })).toBeVisible();
+
+  // Reconnect the same verified identity: recover explicitly without a recipe POST.
+  await page.getByLabel('Adresse email', { exact: true }).fill(browserFixtureEmail(testInfo.project.name, 'expired'));
+  await page.getByLabel('Mot de passe', { exact: true }).fill(password);
+  await page.getByRole('button', { name: 'Se connecter', exact: true }).click();
+  await expect(page).toHaveURL('http://127.0.0.1:4200/cocktails');
+  await page.getByRole('link', { name: /Nouveau cocktail/ }).click();
+  await page.getByRole('button', { name: 'Restaurer le brouillon', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: /^Nom \*/ })).toHaveValue(draftName);
+  await expect(page.getByRole('spinbutton', { name: /^Quantité/ })).toHaveValue('5');
+  await page.getByRole('button', { name: 'Déconnexion', exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  expect(await page.evaluate(() => sessionStorage.getItem('barbook.drafts.v1'))).toBeNull();
+  await page.goto('/login?returnUrl=%2Fcocktails');
 
   // Cookies remain available while both Web Storage getters are forbidden.
   const errors: string[] = [];
@@ -563,5 +590,11 @@ test('expired PostgreSQL session is rejected and returns to login without storin
   await expect(page.getByRole('button', { name: 'Déconnexion', exact: true })).toBeVisible();
   // A fresh bootstrap uses the HttpOnly cookie, without restoring a persisted theme.
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.getByRole('link', { name: /Nouveau cocktail/ }).click();
+  await page.getByRole('textbox', { name: /^Nom \*/ }).fill('Memory only');
+  await expect(page.getByText('Stockage navigateur indisponible ou saturé.', { exact: false })).toBeVisible();
+  await page.getByRole('button', { name: 'Déconnexion', exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByText('Le navigateur refuse l’effacement des brouillons enregistrés.', { exact: false })).toBeVisible();
   expect(errors).toEqual([]);
 });

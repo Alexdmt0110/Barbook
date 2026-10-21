@@ -1,3 +1,5 @@
+import { BrowserStorageService } from '../../../core/storage/browser-storage.service';
+import { DraftStore } from '../../../core/drafts/draft-store.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
@@ -44,6 +46,7 @@ describe('CocktailCreate', () => {
   let navigateSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(async () => {
+    sessionStorage.clear();
     await TestBed.configureTestingModule({
       imports: [CocktailCreate],
       providers: [
@@ -71,6 +74,10 @@ describe('CocktailCreate', () => {
   });
 
   function createComponent(): CocktailCreate {
+    TestBed.inject(DraftStore).confirmIdentity({
+      userId: 'test-user',
+      workspaceId: 'test-workspace',
+    });
     const fixture = TestBed.createComponent(CocktailCreate);
 
     return fixture.componentInstance;
@@ -427,5 +434,106 @@ describe('CocktailCreate', () => {
     expect(cocktailsService.requests).toEqual([]);
 
     expect(navigateSpy).not.toHaveBeenCalled();
+  });
+  it('restores invalid raw fields and ingredient metadata only after explicit choice, without sending', () => {
+    const first = createComponent();
+    first.form.controls.name.setValue('unfinished');
+    first.onIngredientSelected(0, { id: 'gin', slug: 'gin', name: 'Gin', defaultAbv: 40 });
+    first.ingredients.at(0).controls.amount.setValue(-5);
+    first.ingredients.at(0).controls.unit.setValue('CL');
+    first.form.controls.notes.setValue('notes privées');
+    const restored = createComponent();
+    expect(restored.draft.candidate()).not.toBeNull();
+    expect(restored.form.controls.name.value).toBe('');
+    restored.submit();
+    expect(cocktailsService.requests).toHaveLength(0);
+    restored.restoreDraft();
+    expect(restored.ingredients.at(0).getRawValue()).toMatchObject({
+      ingredientName: 'Gin',
+      amount: -5,
+      unit: 'CL',
+      ingredientDefaultAbv: 40,
+    });
+    expect(restored.form.controls.notes.value).toBe('notes privées');
+    expect(restored.form.invalid).toBe(true);
+    expect(cocktailsService.requests).toHaveLength(0);
+  });
+  it('restores selected ingredient ABV semantics and clears the draft after successful explicit submission', () => {
+    const first = createComponent();
+    fillRequiredFields(first);
+    first.onIngredientSelected(0, { id: 'gin', slug: 'gin', name: 'Gin', defaultAbv: 40 });
+    first.ingredients.at(0).controls.ingredientDefaultAbv.setValue(42);
+    first.ingredients.at(0).controls.amount.setValue(5);
+    const restored = createComponent();
+    restored.restoreDraft();
+    restored.submit();
+    expect(cocktailsService.requests[0].ingredients[0]).toMatchObject({ abvOverride: 42 });
+    expect(restored.draft.dirty()).toBe(false);
+    expect(createComponent().draft.candidate()).toBeNull();
+  });
+  it('keeps an unknown outcome across reload and never retries until explicit verification', () => {
+    const first = createComponent();
+    fillRequiredFields(first);
+    first.ingredients.at(0).controls.ingredientName.setValue('Gin');
+    first.ingredients.at(0).controls.amount.setValue(5);
+    cocktailsService.response = throwError(() => new HttpErrorResponse({ status: 0 }));
+    first.submit();
+    expect(first.draft.uncertain()).toBe(true);
+    first.submit();
+    expect(cocktailsService.requests).toHaveLength(1);
+    const restored = createComponent();
+    restored.restoreDraft();
+    restored.submit();
+    expect(cocktailsService.requests).toHaveLength(1);
+    restored.draft.verifiedAbsent();
+    restored.submit();
+    expect(cocktailsService.requests).toHaveLength(2);
+  });
+  it('abandons both persisted and visible values without a POST and cannot submit after context changes', () => {
+    const component = createComponent();
+    fillRequiredFields(component);
+    component.discardDraft();
+    expect(component.form.controls.name.value).toBe('');
+    expect(component.draft.dirty()).toBe(false);
+    fillRequiredFields(component);
+    TestBed.inject(DraftStore).confirmIdentity({ userId: 'other', workspaceId: 'other' });
+    component.submit();
+    expect(cocktailsService.requests).toHaveLength(0);
+  });
+  it('rejects extra form controls and incompatible form versions before applying untrusted storage', () => {
+    const first = createComponent();
+    first.form.controls.name.setValue('private');
+    const store = TestBed.inject(DraftStore);
+    const candidate = store.find(store.lease(), 'create:new')!;
+    const value = candidate.value as { form: Record<string, unknown> };
+    value.form['unknownControl'] = 'hostile';
+    store.save(store.lease(), 'create:new', 1, value);
+    const restored = createComponent();
+    expect(restored.draft.invalid()).toBe(true);
+    expect(() => restored.restoreDraft()).not.toThrow();
+    delete value.form['unknownControl'];
+    store.save(store.lease(), 'create:new', 0, value);
+    expect(createComponent().draft.invalid()).toBe(true);
+  });
+  it('keeps the explicit abandon action available when persistence is refused', () => {
+    TestBed.inject(DraftStore).confirmIdentity({
+      userId: 'test-user',
+      workspaceId: 'test-workspace',
+    });
+    vi.spyOn(TestBed.inject(BrowserStorageService), 'write').mockReturnValue(false);
+    const fixture = TestBed.createComponent(CocktailCreate);
+    fixture.componentInstance.form.controls.name.setValue('memory only');
+    fixture.detectChanges();
+    const notice = fixture.nativeElement.querySelector('app-draft-notice') as HTMLElement;
+    expect(notice.textContent).toContain('Stockage navigateur indisponible ou saturé.');
+    expect(notice.textContent).not.toContain(
+      'Brouillon temporaire dans cet onglet, 24 heures maximum',
+    );
+    const abandon = [...notice.querySelectorAll('button')].find((button) =>
+      button.textContent?.includes('Abandonner'),
+    );
+    expect(abandon).toBeDefined();
+    abandon!.click();
+    expect(fixture.componentInstance.form.controls.name.value).toBe('');
   });
 });

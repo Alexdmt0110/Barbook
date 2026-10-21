@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
+  HostListener,
   computed,
   DestroyRef,
   inject,
@@ -19,14 +20,22 @@ import {
   CocktailSummaryTag,
 } from '../../data-access/cocktail.models';
 import { CocktailsService } from '../../data-access/cocktails.service';
+import { DraftStore } from '../../../../core/drafts/draft-store.service';
+import { FormDraft } from '../../../../core/drafts/form-draft';
+import { DraftNotice } from '../../../../core/drafts/draft-notice';
+import { isOrganizationDraft } from './organization.draft';
 import { FoldersService } from '../../../folders/data-access/folders.service';
 
 @Component({
   selector: 'app-cocktail-organization-editor',
+  imports: [DraftNotice],
   templateUrl: './cocktail-organization-editor.html',
   styleUrl: './cocktail-organization-editor.css',
 })
 export class CocktailOrganizationEditor implements OnInit, OnChanges {
+  private readonly draftStore = inject(DraftStore);
+  draft!: FormDraft;
+  readonly cocktailId = input.required<string>();
   private readonly cocktailsService = inject(CocktailsService);
   private readonly foldersService = inject(FoldersService);
   private readonly destroyRef = inject(DestroyRef);
@@ -62,7 +71,20 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
   readonly successMessage = signal<string | null>(null);
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['cocktailId']) {
+      this.draft = new FormDraft(
+        this.draftStore,
+        'organization:' + this.cocktailId(),
+        this.organizationVersion(),
+        isOrganizationDraft,
+      );
+    }
     if (changes['slug'] || changes['organizationVersion']) {
+      if (this.draft?.dirty()) {
+        this.hasConflict.set(true);
+        this.draft.conflict.set(true);
+        return;
+      }
       this.version.set(this.organizationVersion());
       this.selectedFolderIds.set(this.folders().map((folder) => folder.id));
       this.knownFolders.set(this.mergeFolders(this.knownFolders(), this.folders()));
@@ -71,6 +93,45 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
   }
   ngOnInit(): void {
     this.loadCatalogs();
+  }
+
+  private draftValue() {
+    return {
+      folderIds: [...this.selectedFolderIds()],
+      folders: this.selectedFolders(),
+      tagNames: [...this.selectedTagNames()],
+      newFolderName: this.newFolderName(),
+      newTagName: this.newTagName(),
+    };
+  }
+  private captureDraft(): void {
+    this.draft.capture(this.draftValue());
+  }
+  restoreDraft(): void {
+    const value = this.draft.restore();
+    if (!isOrganizationDraft(value)) return;
+    this.selectedFolderIds.set(value.folderIds);
+    this.knownFolders.set(this.mergeFolders(this.knownFolders(), value.folders));
+    this.selectedTagNames.set(value.tagNames);
+    this.newFolderName.set(value.newFolderName);
+    this.newTagName.set(value.newTagName);
+    this.hasConflict.set(this.draft.conflict());
+  }
+  discardDraft(): void {
+    this.draft.succeeded(this.organizationVersion());
+    this.version.set(this.organizationVersion());
+    this.selectedFolderIds.set(this.folders().map((folder) => folder.id));
+    this.selectedTagNames.set(this.tags().map((tag) => tag.name));
+    this.newFolderName.set('');
+    this.newTagName.set('');
+    this.hasConflict.set(false);
+  }
+  canLeave(): boolean {
+    return this.draft?.canLeave() ?? true;
+  }
+  @HostListener('window:beforeunload', ['$event'])
+  beforeUnload(event: BeforeUnloadEvent): void {
+    this.draft?.beforeUnload(event);
   }
 
   loadCatalogs(page = this.folderPage()): void {
@@ -111,14 +172,17 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
         : ids.filter((value) => value !== id),
     );
     this.clearFeedback();
+    this.captureDraft();
   }
   removeFolder(id: string): void {
     this.selectedFolderIds.update((ids) => ids.filter((value) => value !== id));
     this.clearFeedback();
+    this.captureDraft();
   }
   onNewFolderNameChange(event: Event): void {
     if (event.target instanceof HTMLInputElement) this.newFolderName.set(event.target.value);
     this.clearFeedback();
+    this.captureDraft();
   }
   createFolder(): void {
     if (this.busy()) return;
@@ -132,6 +196,7 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
       this.actionErrorMessage.set('La sauvegarde complète accepte au plus 1000 dossiers.');
       return;
     }
+    if (!this.draft.begin(this.draftValue())) return;
     this.isCreatingFolder.set(true);
     this.foldersService
       .create(name)
@@ -145,16 +210,22 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
           this.knownFolders.set(this.mergeFolders(this.knownFolders(), [folder]));
           this.selectedFolderIds.update((ids) => [...ids, folder.id]);
           this.newFolderName.set('');
+          this.draft.folderSucceeded();
+          this.captureDraft();
           this.successMessage.set(
             'Dossier créé et sélectionné. Enregistre l’organisation pour l’assigner au cocktail.',
           );
         },
-        error: (error: unknown) => this.actionErrorMessage.set(this.resolveError(error, 'folder')),
+        error: (error: unknown) => {
+          this.draft.rejected(error);
+          this.actionErrorMessage.set(this.resolveError(error, 'folder'));
+        },
       });
   }
   onNewTagNameChange(event: Event): void {
     if (event.target instanceof HTMLInputElement) this.newTagName.set(event.target.value);
     this.clearFeedback();
+    this.captureDraft();
   }
   addTag(): void {
     this.clearFeedback();
@@ -165,6 +236,7 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
     }
     if (this.isTagSelected(name)) {
       this.newTagName.set('');
+      this.captureDraft();
       return;
     }
     if (this.selectedTagNames().length >= 20) {
@@ -173,6 +245,7 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
     }
     this.selectedTagNames.update((names) => [...names, name]);
     this.newTagName.set('');
+    this.captureDraft();
   }
   toggleTag(name: string, event: Event): void {
     if (!(event.target instanceof HTMLInputElement)) return;
@@ -186,12 +259,14 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
     else if (!this.isTagSelected(name))
       this.actionErrorMessage.set('Un cocktail peut avoir au maximum 20 tags.');
     event.target.checked = this.isTagSelected(name);
+    this.captureDraft();
   }
   removeTag(name: string): void {
     this.selectedTagNames.update((names) =>
       names.filter((value) => !this.sameTagName(value, name)),
     );
     this.clearFeedback();
+    this.captureDraft();
   }
   isTagSelected(name: string): boolean {
     return this.selectedTagNames().some((value) => this.sameTagName(value, name));
@@ -206,6 +281,7 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
       );
       return;
     }
+    if (!this.draft.begin(this.draftValue())) return;
     this.isSaving.set(true);
     this.cocktailsService
       .updatePersonalCocktailOrganization(this.slug(), {
@@ -219,10 +295,12 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
       )
       .subscribe({
         next: (result) => {
+          this.draft.succeeded(result.organizationVersion);
           this.applyOrganization(result);
           this.successMessage.set('Organisation enregistrée.');
         },
         error: (error: unknown) => {
+          this.draft.rejected(error);
           this.hasConflict.set(error instanceof HttpErrorResponse && error.status === 409);
           this.actionErrorMessage.set(this.resolveError(error, 'save'));
         },
@@ -239,7 +317,14 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
       )
       .subscribe({
         next: (result) => {
+          if (result.id !== this.cocktailId()) {
+            this.actionErrorMessage.set('La recette a changé. Recharge la page.');
+            return;
+          }
+          this.draft.succeeded(result.organizationVersion);
           this.applyOrganization(result);
+          this.newFolderName.set('');
+          this.newTagName.set('');
           this.clearFeedback();
           this.successMessage.set('Classement rechargé. Tu peux modifier cette version.');
         },

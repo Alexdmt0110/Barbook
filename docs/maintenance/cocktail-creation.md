@@ -418,3 +418,8 @@ Cette fonctionnalité ne gère pas encore :
 - les workspaces partagés ;
 - la gestion avancée du catalogue d'ingrédients ;
 - la recherche approximative ou fuzzy.
+
+
+## Brouillons L4 B4d
+
+Voir le [contrat des brouillons temporaires](temporary-drafts.md) : mémoire/sessionStorage24h, identité confirmée, restauration et abandon explicites, versions et résultats incertains, stockage refusé et purge volontaire. Aucun envoi automatique ni clôture de L4 global.

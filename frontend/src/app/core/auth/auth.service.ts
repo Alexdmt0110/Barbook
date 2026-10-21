@@ -12,6 +12,7 @@ import {
   tap,
   throwError,
 } from 'rxjs';
+import { DraftOwner, DraftStore } from '../drafts/draft-store.service';
 import { BrowserStorageService } from '../storage/browser-storage.service';
 import { AUTH_SNAPSHOT, AuthResponse, LoginRequest, RegisterRequest } from './auth.models';
 
@@ -20,6 +21,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly storage = inject(BrowserStorageService);
+  private readonly drafts = inject(DraftStore);
   private readonly session = signal<AuthResponse | null>(null);
   private generation = 0;
   private bootstrap?: Observable<AuthResponse>;
@@ -33,7 +35,17 @@ export class AuthService {
   constructor() {
     // Remove the retired credential; never read it or purge unrelated drafts.
     this.storage.remove('session', 'barbook.accessToken');
-    if (this.channel) this.channel.onmessage = () => this.expire();
+    if (this.channel)
+      this.channel.onmessage = (event: MessageEvent<unknown>) => {
+        const message = event.data as { kind?: unknown; owner?: DraftOwner } | null;
+        if (message?.kind === 'logout' && message.owner && this.drafts.belongsTo(message.owner)) {
+          this.drafts.purge();
+          this.expire();
+        } else if (message?.kind === 'identity') {
+          if (message.owner && !this.drafts.belongsTo(message.owner)) this.drafts.purge();
+          this.expire();
+        } else if (event.data === 'changed') this.expire();
+      };
     inject(DestroyRef).onDestroy(() => this.channel?.close());
   }
 
@@ -63,6 +75,7 @@ export class AuthService {
             this.expire();
             throw new Error('Le compte ou l’espace a changé. Reconnecte-toi.');
           }
+          this.drafts.confirmIdentity(this.draftOwner(auth));
           this.session.set(auth);
         }),
         finalize(() => {
@@ -77,6 +90,7 @@ export class AuthService {
   /** Involuntary expiry never revokes remotely or removes draft storage. */
   expire(): void {
     const wasAuthenticated = this.session() !== null;
+    this.drafts.suspend();
     this.generation++;
     this.session.set(null);
     this.bootstrap = undefined;
@@ -89,6 +103,9 @@ export class AuthService {
     return defer(() => {
       this.pendingLogout ??= this.session();
       const snapshot = this.pendingLogout;
+      this.drafts.purge();
+      if (snapshot) this.notify('logout', snapshot);
+      this.drafts.suspend();
       this.generation++;
       this.session.set(null);
       this.bootstrap = undefined;
@@ -105,7 +122,6 @@ export class AuthService {
           tap(() => {
             this.pendingLogout = null;
             this.logoutUncertain.set(false);
-            this.channel?.postMessage('changed');
           }),
         );
     });
@@ -113,6 +129,7 @@ export class AuthService {
 
   private signIn(url: string, request: LoginRequest | RegisterRequest): Observable<AuthResponse> {
     return defer(() => {
+      this.drafts.suspend();
       this.generation++;
       this.session.set(null);
       this.bootstrap = undefined;
@@ -147,11 +164,24 @@ export class AuthService {
           ),
         ),
         tap((auth) => {
+          this.drafts.confirmIdentity(this.draftOwner(auth));
           this.session.set(auth);
-          this.channel?.postMessage('changed');
+          this.notify('identity', auth);
         }),
       );
     });
+  }
+
+  private notify(kind: 'logout' | 'identity', auth: AuthResponse): void {
+    try {
+      this.channel?.postMessage({ kind, owner: this.draftOwner(auth) });
+    } catch {
+      /* Local intent remains applied if broadcasting is unavailable. */
+    }
+  }
+
+  private draftOwner(auth: AuthResponse): DraftOwner {
+    return { userId: auth.user.id, workspaceId: auth.workspaceId };
   }
 
   private sameContext(a: AuthResponse, b: AuthResponse): boolean {
