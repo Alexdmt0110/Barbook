@@ -17,6 +17,6 @@ import { WebSessionService } from './sessions/web-session.service';
     SessionService,
     WebSessionService,
   ],
-  exports: [SessionGuard],
+  exports: [SessionGuard, WebSessionService],
 })
 export class AuthModule {}
