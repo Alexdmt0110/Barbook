@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Put, UseGuards } from '@nestjs/common';
 import { CurrentUserId } from '../../auth/decorators/current-user-id.decorator';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { SessionGuard } from '../../auth/guards/session.guard';
 import { CocktailOrganizationService } from './cocktail-organization.service';
 import {
   CocktailOrganizationResult,
@@ -9,7 +9,7 @@ import {
 import { UpdateCocktailOrganizationDto } from './dto/update-cocktail-organization.dto';
 
 @Controller()
-@UseGuards(JwtAuthGuard)
+@UseGuards(SessionGuard)
 export class CocktailOrganizationController {
   constructor(
     private readonly organizationService: CocktailOrganizationService,

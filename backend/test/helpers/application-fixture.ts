@@ -18,7 +18,21 @@ import { requireTestDatabase } from './test-database';
 export const FIXTURE_PASSWORD = 'Synthetic fixture password 42!';
 
 export interface Actor extends AuthResponse {
-  workspaceId: string;
+  credential: string;
+}
+
+export function browserHeaders(actor: Actor): Record<string, string> {
+  return {
+    ...originHeaders(),
+    Cookie: `barbook-session-dev=${actor.credential}`,
+    'X-Barbook-CSRF': actor.csrfToken,
+    'X-Barbook-Expected-User': actor.user.id,
+    'X-Barbook-Expected-Workspace': actor.workspaceId,
+  };
+}
+
+export function originHeaders(): Record<string, string> {
+  return { Origin: process.env.FRONTEND_ORIGIN!, 'X-Barbook-Request': '1' };
 }
 
 export async function createApplicationFixture(): Promise<
@@ -43,9 +57,13 @@ export async function createActor(app: NestExpressApplication): Promise<Actor> {
     displayName: 'Fixture QA',
   });
   const workspace = await app.get(PrismaService).workspace.findUniqueOrThrow({
-    where: { personalOwnerId: result.user.id },
+    where: { personalOwnerId: result.response.user.id },
   });
-  return { ...result, workspaceId: workspace.id };
+  return {
+    ...result.response,
+    credential: result.credential,
+    workspaceId: workspace.id,
+  };
 }
 
 export function recipePayload(

@@ -1,5 +1,7 @@
 # Tests d'intégration PostgreSQL, HTTP et navigateur
 
+B4b adapte les transports aux cookies réels et conserve les assertions métier des dossiers/recettes. web-sessions.e2e-spec.ts ajoute les refus CSRF/origine/contexte sans écriture ni prolongation, rotation, logout/rejeu, échéances et rollback de Session. Le scénario navigateur d'expiration appelle seulement le CLI test/expire-browser-session.ts, protégé par requireTestDatabase ; aucune route de fixture n'est compilée dans l'API. Les résultats présents dans les sections L2/L3 ci-dessous sont historiques ; lire le handoff pour le code courant.
+
 Le workflow `Integration` démarre un PostgreSQL 16 jetable, sans volume persistant,
 sur chaque PR/main et sur les branches de travail L2 et dossiers. Il conserve les workflows
 Backend Quality, Frontend Quality et l'audit des dépendances de leurs branches
@@ -48,7 +50,7 @@ API compilé et Angular. Le paquet privé `e2e` contient quatre essais Chromium 
 deux scénarios sur ordinateur et sur une fenêtre mobile tactile de 390 × 844.
 Ils vérifient l'inscription, la saisie clavier, la création d'une recette avec
 conversion CL/ML, l'échappement du nom, le classement dossier/tag, les filtres,
-le rechargement, la reconnexion et le rejet réel d'un JWT expiré. Les réponses
+le rechargement, la reconnexion et le rejet réel d'une session PostgreSQL expirée. Les réponses
 HTTP et les données persistées sont contrôlées sans interception ni mock.
 
 Après préparation d'une autre base jetable et des mêmes variables de sécurité :
@@ -68,7 +70,7 @@ npm test
 
 Playwright refuse de réutiliser un serveur déjà présent sur les ports 3000/4200.
 Le garde de configuration est exécuté avant tout lancement. Les données sont
-synthétiques et le secret JWT doit être propre à cette base de test. La CI
+synthétiques ; aucun secret JWT n'est utilisé. La CI
 conserve le rapport et, en cas d'échec, traces, vidéos et captures pendant sept
 jours. Ces sorties sont ignorées par Git. Aucun retry ne masque un échec.
 
@@ -95,7 +97,7 @@ pg 9, sans conclure à une corruption à partir de cette seule dépréciation.
 
 - Migrations fraîches, historique Prisma, upgrade de données historiques et
   rollback transactionnel du DDL en présence d'une référence inter-workspace.
-- Auth réelle (Argon2/JWT), validation et préfixe `/api` partagés avec le serveur,
+- Auth réelle (Argon2/session PostgreSQL), validation et préfixe `/api` partagés avec le serveur,
   champs clients interdits, accès anonymes/forgés/expirés, isolation des ressources.
 - Persistance complète, précision Decimal, ABV inconnu avec TOP_UP,
   classement/déclassement et filtres croisés, unicité et écritures concurrentes.
@@ -183,7 +185,7 @@ par clavier avant une recette, classe dans deux dossiers, provoque un vrai 409,
 filtre chaque dossier et se reconnecte. Douze fixtures API supplémentaires du même
 compte permettent deux vraies pages de sélection ; ajout/retrait/réajout/rename
 et suppression confirmée gardent recettes/tags/autres liens. Le rejet d'un dossier
-absent et d'un JWT expiré est vérifié. Quatre inscriptions au total, limite de 5 intacte.
+absent et d'une session PostgreSQL expirée est vérifié. Quatre inscriptions au total, limite de 5 intacte.
 
 Les trois thèmes utilisent les contrôles réels. Des captures de succès sont
 conservées 7 jours ; animations finies désactivées pour ces seules captures,

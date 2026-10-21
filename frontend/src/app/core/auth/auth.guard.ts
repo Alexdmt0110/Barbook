@@ -4,29 +4,12 @@ import { catchError, map, of } from 'rxjs';
 import { AuthService } from './auth.service';
 
 export const authGuard: CanActivateFn = (_route, state) => {
-  const authService = inject(AuthService);
+  const auth = inject(AuthService);
   const router = inject(Router);
-
-  if (authService.isAuthenticated()) {
-    return true;
-  }
-
-  const loginUrl = router.createUrlTree(['/login'], {
-    queryParams: {
-      returnUrl: state.url,
-    },
-  });
-
-  if (!authService.hasStoredAccessToken()) {
-    return loginUrl;
-  }
-
-  return authService.loadCurrentUser().pipe(
+  if (auth.isAuthenticated()) return true;
+  const login = router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
+  return auth.loadCurrentUser().pipe(
     map(() => true),
-    catchError(() => {
-      authService.logout();
-
-      return of(loginUrl);
-    }),
+    catchError(() => of(login)),
   );
 };

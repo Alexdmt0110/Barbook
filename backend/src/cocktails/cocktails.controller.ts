@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CurrentUserId } from '../auth/decorators/current-user-id.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { SessionGuard } from '../auth/guards/session.guard';
 import { CocktailCreationService } from './cocktail-creation.service';
 import {
   CocktailDetail,
@@ -20,7 +20,7 @@ import { CreateCocktailDto } from './dto/create-cocktail.dto';
 import { ListCocktailsQueryDto } from './dto/list-cocktails-query.dto';
 
 @Controller('cocktails')
-@UseGuards(JwtAuthGuard)
+@UseGuards(SessionGuard)
 export class CocktailsController {
   constructor(
     private readonly cocktailsService: CocktailsService,

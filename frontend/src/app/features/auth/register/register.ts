@@ -68,7 +68,7 @@ export class Register {
 
   private resolveErrorMessage(error: unknown): string {
     if (!(error instanceof HttpErrorResponse)) {
-      return 'Une erreur inattendue est survenue.';
+      return error instanceof Error ? error.message : 'Une erreur inattendue est survenue.';
     }
 
     if (error.status === 0) {

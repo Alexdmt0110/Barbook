@@ -40,7 +40,7 @@ La création utilise :
 POST /api/cocktails
 ```
 
-L'endpoint nécessite une authentification JWT.
+L'endpoint nécessite une session cookie et les preuves CSRF/contexte.
 
 Le client ne transmet pas de `workspaceId`.
 

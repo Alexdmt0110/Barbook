@@ -1,7 +1,26 @@
 import { expect, Page, test } from '@playwright/test';
-import { createHmac, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { join } from 'node:path';
 
 const password = 'Synthetic E2E fixture password 42!';
+
+async function browserHeaders(page: Page): Promise<Record<string, string>> {
+  const result = await page.request.get('http://127.0.0.1:3000/api/auth/me');
+  expect(result.status()).toBe(200);
+  const auth = (await result.json()) as {
+    user: { id: string };
+    workspaceId: string;
+    csrfToken: string;
+  };
+  return {
+    Origin: 'http://127.0.0.1:4200',
+    'X-Barbook-Request': '1',
+    'X-Barbook-CSRF': auth.csrfToken,
+    'X-Barbook-Expected-User': auth.user.id,
+    'X-Barbook-Expected-Workspace': auth.workspaceId,
+  };
+}
 
 async function fillRecipeForm(page: Page, name: string): Promise<void> {
   await page.getByRole('textbox', { name: /^Nom \*/ }).fill(name);
@@ -135,12 +154,11 @@ test('register, create, classify, manage folders and log back in', async ({ page
   ).toBeVisible();
 
   // A second real client changes the version; the UI must preserve its stale draft.
-  const token = await page.evaluate(() => sessionStorage.getItem('barbook.accessToken'));
-  expect(token).toBeTruthy();
+  const remoteHeaders = await browserHeaders(page);
   const remoteSave = await page.request.put(
     `http://127.0.0.1:3000/api/cocktails/${created.slug}/organization`,
     {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: remoteHeaders,
       data: { folderIds: folders.map((f) => f.id), tagNames: [tagName], expectedVersion: 1 },
     },
   );
@@ -242,9 +260,7 @@ test('register, create, classify, manage folders and log back in', async ({ page
   await expect(page).toHaveURL('http://127.0.0.1:4200/cocktails/new-cocktail');
   await expect(page.getByRole('heading', { name: 'New', exact: true, level: 1 })).toBeVisible();
   // Populate two real catalogue pages without consuming another registration quota.
-  const sessionToken = await page.evaluate(() => sessionStorage.getItem('barbook.accessToken'));
-  expect(sessionToken).toBeTruthy();
-  const headers = { Authorization: `Bearer ${sessionToken}` };
+  const headers = await browserHeaders(page);
   for (let index = 0; index < 12; index++) {
     const response = await page.request.post('http://127.0.0.1:3000/api/cocktails', {
       headers,
@@ -440,11 +456,11 @@ test('register, create, classify, manage folders and log back in', async ({ page
   ).toBeVisible();
 });
 
-test('expired real JWT is rejected by the API, clears storage and returns to login', async ({
+test('expired PostgreSQL session is rejected and returns to login without storing credentials', async ({
   page,
-  request,
 }) => {
-  const registration = await request.post('http://127.0.0.1:3000/api/auth/register', {
+  const registration = await page.request.post('http://127.0.0.1:3000/api/auth/register', {
+    headers: { Origin: 'http://127.0.0.1:4200', 'X-Barbook-Request': '1' },
     data: {
       email: `expired-${randomUUID()}@example.test`,
       displayName: 'Expiry fixture',
@@ -453,24 +469,18 @@ test('expired real JWT is rejected by the API, clears storage and returns to log
   });
   expect(registration.status()).toBe(201);
   const auth = (await registration.json()) as { user: { id: string } };
-  const secret = process.env.JWT_SECRET;
-  if (!secret) throw new Error('A synthetic JWT_SECRET is required for expiry fixtures');
-  const now = Math.floor(Date.now() / 1000);
-  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
-  const payload = Buffer.from(
-    JSON.stringify({
-      sub: auth.user.id,
-      iss: 'barbook-api',
-      aud: 'barbook-web',
-      iat: now - 60,
-      exp: now - 1,
-    }),
-  ).toString('base64url');
-  const unsigned = `${header}.${payload}`;
-  const expired = `${unsigned}.${createHmac('sha256', secret).update(unsigned).digest('base64url')}`;
-  await page.addInitScript(
-    (token) => sessionStorage.setItem('barbook.accessToken', token),
-    expired,
+  const cookies = await page.context().cookies();
+  const cookie = cookies.find((entry) => entry.name === 'barbook-session-dev');
+  expect(cookie?.httpOnly).toBe(true);
+  expect(cookie?.sameSite).toBe('Lax');
+  expect(cookie?.expires).toBe(-1);
+  execFileSync(
+    process.execPath,
+    ['--import', 'tsx', 'test/expire-browser-session.ts', auth.user.id],
+    {
+      cwd: join(__dirname, '../../backend'),
+      stdio: 'pipe',
+    },
   );
   const refused = page.waitForResponse(
     (response) => new URL(response.url()).pathname === '/api/auth/me',
@@ -479,5 +489,6 @@ test('expired real JWT is rejected by the API, clears storage and returns to log
   expect((await refused).status()).toBe(401);
   await expect(page).toHaveURL('http://127.0.0.1:4200/login?returnUrl=%2Fcocktails');
   expect(await page.evaluate(() => sessionStorage.getItem('barbook.accessToken'))).toBeNull();
+  expect(await page.evaluate(() => document.cookie.includes('barbook-session-dev'))).toBe(false);
   await expect(page.getByRole('button', { name: 'Se connecter', exact: true })).toBeVisible();
 });

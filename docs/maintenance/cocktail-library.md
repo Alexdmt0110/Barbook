@@ -8,7 +8,7 @@ La bibliothèque personnelle authentifiée permet consultation, recherche par no
 
 L'édition/suppression de recette, les photos privées, les favoris et la collaboration ne sont pas ajoutés par L3. Le catalogue futur ne vaut pas autorisation.
 
-Angular appelle `/api` avec le JWT ajouté par l'interceptor. Le backend dérive le workspace via `personalOwnerId = authenticatedUserId` ; le client ne choisit ni userId ni workspaceId. Les requêtes métier et FK composites utilisent ce scope. Un workspace personnel absent est une erreur d'invariant, pas une bibliothèque vide. Les espaces partagés auront leurs propres droits et endpoints approuvés ultérieurement.
+Angular appelle `/api` avec le cookie HttpOnly et les preuves de contexte/CSRF ajoutées par l'interceptor. Le backend dérive le workspace via `personalOwnerId = authenticatedUserId` ; le client ne choisit ni userId ni workspaceId. Les requêtes métier et FK composites utilisent ce scope. Un workspace personnel absent est une erreur d'invariant, pas une bibliothèque vide. Les espaces partagés auront leurs propres droits et endpoints approuvés ultérieurement.
 
 ## Catalogue HTTP
 

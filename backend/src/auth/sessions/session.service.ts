@@ -118,10 +118,13 @@ export class SessionService {
   }
 
   /** Idempotent, including expired, unknown or already revoked credentials. */
-  async revoke(credential: unknown): Promise<void> {
+  async revoke(
+    credential: unknown,
+    transaction: Prisma.TransactionClient = this.prisma,
+  ): Promise<void> {
     if (!isOpaqueToken(credential)) return;
 
-    await this.prisma.$executeRaw`
+    await transaction.$executeRaw`
       UPDATE "Session"
       SET "revokedAt" = GREATEST("createdAt", clock_timestamp())
       WHERE "tokenHash" = ${hashSessionCredential(credential)} AND "revokedAt" IS NULL

@@ -1,278 +1,143 @@
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../database/prisma.service';
 import { Prisma } from '../generated/prisma/client';
 import { AuthService } from './auth.service';
-import { PasswordService } from './password.service';
+import { SessionService } from './sessions/session.service';
 
-function createKnownRequestError(
-  code: string,
-): Prisma.PrismaClientKnownRequestError {
-  const error = Object.create(
-    Prisma.PrismaClientKnownRequestError.prototype,
-  ) as Prisma.PrismaClientKnownRequestError;
-
-  Object.defineProperty(error, 'code', {
-    configurable: false,
-    enumerable: true,
-    value: code,
-    writable: false,
-  });
-
-  return error;
-}
-
-describe('AuthService', () => {
-  const registerDto = {
-    email: 'alex.test@barbook.local',
-    password: 'une phrase de passe suffisamment longue',
-    displayName: 'Alex',
+describe('AuthService session transactions', () => {
+  const dto = {
+    email: 'qa@example.test',
+    password: 'Synthetic password long enough',
+    displayName: 'QA',
   };
-
-  const createdUser = {
-    id: 'user-123',
-    email: 'alex.test@barbook.local',
-    displayName: 'Alex',
+  const user = { id: 'user', email: dto.email, displayName: dto.displayName };
+  const issued = {
+    credential: 'internal-credential',
+    session: { csrfToken: 'csrf', persistent: false },
   };
-
-  let userFindUnique: jest.Mock;
-  let userCreate: jest.Mock;
-  let workspaceCreate: jest.Mock;
-  let workspaceMemberCreate: jest.Mock;
-  let transaction: jest.Mock;
-
-  let hashPassword: jest.Mock;
-  let verifyPassword: jest.Mock;
-  let signToken: jest.Mock;
-
   let service: AuthService;
-
+  let findUser: jest.Mock;
+  let createUser: jest.Mock;
+  let createWorkspace: jest.Mock;
+  let createMember: jest.Mock;
+  let createSession: jest.Mock;
+  let revoke: jest.Mock;
+  let hash: jest.Mock;
+  let verify: jest.Mock;
+  let transaction: jest.Mock;
+  let tx: object;
   beforeEach(() => {
-    userFindUnique = jest.fn();
-    userCreate = jest.fn();
-    workspaceCreate = jest.fn();
-    workspaceMemberCreate = jest.fn();
-
-    const transactionClient = {
-      user: {
-        create: userCreate,
-      },
-      workspace: {
-        create: workspaceCreate,
-      },
-      workspaceMember: {
-        create: workspaceMemberCreate,
-      },
+    findUser = jest.fn().mockResolvedValue(null);
+    createUser = jest.fn().mockResolvedValue(user);
+    createWorkspace = jest.fn().mockResolvedValue({ id: 'workspace' });
+    createMember = jest.fn();
+    createSession = jest.fn().mockResolvedValue(issued);
+    revoke = jest.fn();
+    hash = jest.fn().mockResolvedValue('hash');
+    verify = jest.fn().mockResolvedValue(true);
+    tx = {
+      user: { create: createUser },
+      workspace: { create: createWorkspace, findUnique: createWorkspace },
+      workspaceMember: { create: createMember },
     };
-
-    transaction = jest.fn(
-      async (
-        callback: (client: typeof transactionClient) => Promise<unknown>,
-      ): Promise<unknown> => callback(transactionClient),
+    transaction = jest.fn(async (fn: (client: object) => Promise<unknown>) =>
+      fn(tx),
     );
-
-    const prismaService = {
-      user: {
-        findUnique: userFindUnique,
-      },
-      $transaction: transaction,
-    } as unknown as PrismaService;
-
-    hashPassword = jest.fn();
-    verifyPassword = jest.fn();
-
-    const passwordService = {
-      hash: hashPassword,
-      verify: verifyPassword,
-    } as unknown as PasswordService;
-
-    signToken = jest.fn();
-
-    const jwtService = {
-      signAsync: signToken,
-    } as unknown as JwtService;
-
-    service = new AuthService(prismaService, passwordService, jwtService);
+    service = new AuthService(
+      {
+        user: { findUnique: findUser },
+        $transaction: transaction,
+      } as unknown as PrismaService,
+      { hash, verify },
+      { create: createSession, revoke } as unknown as SessionService,
+    );
   });
-
-  it('creates a user, a personal workspace and an owner membership when registering', async () => {
-    userFindUnique.mockResolvedValue(null);
-    hashPassword.mockResolvedValue('hashed-password');
-
-    userCreate.mockResolvedValue(createdUser);
-
-    workspaceCreate.mockResolvedValue({
-      id: 'workspace-123',
-    });
-
-    workspaceMemberCreate.mockResolvedValue({
-      workspaceId: 'workspace-123',
-      userId: 'user-123',
-      role: 'OWNER',
-    });
-
-    signToken.mockResolvedValue('access-token');
-
-    const result = await service.register(registerDto);
-
-    expect(userCreate).toHaveBeenCalledWith({
+  it('creates account, workspace, OWNER and session in the same ReadCommitted transaction', async () => {
+    const result = await service.register(dto, 'old');
+    expect(createUser).toHaveBeenCalledWith({
       data: {
-        email: registerDto.email,
-        passwordHash: 'hashed-password',
-        displayName: registerDto.displayName,
+        email: dto.email,
+        passwordHash: 'hash',
+        displayName: dto.displayName,
       },
-      select: {
-        id: true,
-        email: true,
-        displayName: true,
-      },
+      select: { id: true, email: true, displayName: true },
     });
-
-    expect(workspaceCreate).toHaveBeenCalledWith({
+    expect(createWorkspace).toHaveBeenCalledWith({
       data: {
         name: 'Personal Barbook',
         kind: 'PERSONAL',
-        personalOwnerId: createdUser.id,
+        personalOwnerId: user.id,
       },
-      select: {
-        id: true,
-      },
+      select: { id: true },
     });
-
-    expect(workspaceMemberCreate).toHaveBeenCalledWith({
-      data: {
-        workspaceId: 'workspace-123',
-        userId: 'user-123',
-        role: 'OWNER',
-      },
+    expect(createMember).toHaveBeenCalledWith({
+      data: { workspaceId: 'workspace', userId: user.id, role: 'OWNER' },
     });
-
-    expect(transaction).toHaveBeenCalledTimes(1);
-
+    expect(createSession).toHaveBeenCalledWith(tx, user.id);
+    expect(revoke).toHaveBeenCalledWith('old', tx);
+    expect(transaction).toHaveBeenCalledWith(expect.any(Function), {
+      isolationLevel: 'ReadCommitted',
+    });
     expect(result).toEqual({
-      user: createdUser,
-      accessToken: 'access-token',
+      ...issued,
+      response: { user, workspaceId: 'workspace', csrfToken: 'csrf' },
     });
-
-    expect(signToken).toHaveBeenCalledWith({
-      sub: createdUser.id,
-    });
+    expect(result.response).not.toHaveProperty('credential');
+    expect(result.response).not.toHaveProperty('accessToken');
   });
-
-  it('rejects registration when the email already exists', async () => {
-    userFindUnique.mockResolvedValue({
-      id: 'existing-user',
-    });
-
-    await expect(service.register(registerDto)).rejects.toBeInstanceOf(
+  it('rejects an existing account before hashing or transaction', async () => {
+    findUser.mockResolvedValue(user);
+    await expect(service.register(dto)).rejects.toBeInstanceOf(
       ConflictException,
     );
-
-    expect(hashPassword).not.toHaveBeenCalled();
+    expect(hash).not.toHaveBeenCalled();
     expect(transaction).not.toHaveBeenCalled();
   });
-
-  it('maps a concurrent email uniqueness violation to conflict', async () => {
-    userFindUnique.mockResolvedValue(null);
-    hashPassword.mockResolvedValue('hashed-password');
-
-    transaction.mockRejectedValue(createKnownRequestError('P2002'));
-
-    await expect(service.register(registerDto)).rejects.toBeInstanceOf(
+  it('maps concurrent uniqueness failure to conflict', async () => {
+    const error = Object.create(
+      Prisma.PrismaClientKnownRequestError.prototype,
+    ) as Prisma.PrismaClientKnownRequestError;
+    Object.defineProperty(error, 'code', { value: 'P2002' });
+    transaction.mockRejectedValue(error);
+    await expect(service.register(dto)).rejects.toBeInstanceOf(
       ConflictException,
     );
-
-    expect(transaction).toHaveBeenCalledTimes(1);
-    expect(signToken).not.toHaveBeenCalled();
   });
-
-  it('logs in a user with valid credentials', async () => {
-    userFindUnique.mockResolvedValue({
-      ...createdUser,
-      passwordHash: 'stored-password-hash',
-    });
-
-    verifyPassword.mockResolvedValue(true);
-    signToken.mockResolvedValue('access-token');
-
-    const result = await service.login({
-      email: registerDto.email,
-      password: registerDto.password,
-    });
-
-    expect(verifyPassword).toHaveBeenCalledWith(
-      'stored-password-hash',
-      registerDto.password,
-    );
-
-    expect(result).toEqual({
-      user: createdUser,
-      accessToken: 'access-token',
-    });
-
-    expect(signToken).toHaveBeenCalledWith({
-      sub: createdUser.id,
-    });
+  it('propagates session failure so the caller transaction rolls back', async () => {
+    createSession.mockRejectedValue(new Error('store failed'));
+    await expect(service.register(dto)).rejects.toThrow('store failed');
+    expect(revoke).not.toHaveBeenCalled();
   });
-
-  it('performs password hashing before rejecting an unknown user', async () => {
-    userFindUnique.mockResolvedValue(null);
-    hashPassword.mockResolvedValue('discarded-password-hash');
-
-    await expect(
-      service.login({
-        email: registerDto.email,
-        password: registerDto.password,
-      }),
-    ).rejects.toBeInstanceOf(UnauthorizedException);
-
-    expect(hashPassword).toHaveBeenCalledWith(registerDto.password);
-    expect(verifyPassword).not.toHaveBeenCalled();
-    expect(signToken).not.toHaveBeenCalled();
-  });
-
-  it('rejects login when the password is incorrect', async () => {
-    userFindUnique.mockResolvedValue({
-      ...createdUser,
-      passwordHash: 'stored-password-hash',
-    });
-
-    verifyPassword.mockResolvedValue(false);
-
-    await expect(
-      service.login({
-        email: registerDto.email,
-        password: registerDto.password,
-      }),
-    ).rejects.toBeInstanceOf(UnauthorizedException);
-
-    expect(signToken).not.toHaveBeenCalled();
-  });
-
-  it('returns the authenticated user', async () => {
-    userFindUnique.mockResolvedValue(createdUser);
-
-    await expect(service.getCurrentUser(createdUser.id)).resolves.toEqual(
-      createdUser,
-    );
-
-    expect(userFindUnique).toHaveBeenCalledWith({
-      where: {
-        id: createdUser.id,
-      },
-      select: {
-        id: true,
-        email: true,
-        displayName: true,
-      },
-    });
-  });
-
-  it('rejects a token belonging to a deleted user', async () => {
-    userFindUnique.mockResolvedValue(null);
-
-    await expect(service.getCurrentUser('deleted-user')).rejects.toBeInstanceOf(
+  it.each([undefined, false, true])(
+    'logs in with explicit persistence %s and rotates the previous credential',
+    async (rememberMe) => {
+      findUser.mockResolvedValue({ ...user, passwordHash: 'hash' });
+      const result = await service.login({ ...dto, rememberMe }, 'old');
+      expect(verify).toHaveBeenCalledWith('hash', dto.password);
+      expect(createSession).toHaveBeenCalledWith(
+        tx,
+        user.id,
+        rememberMe === true,
+      );
+      expect(revoke).toHaveBeenCalledWith('old', tx);
+      expect(result.response.user).toEqual(user);
+      expect(result.response.user).not.toHaveProperty('passwordHash');
+    },
+  );
+  it('hashes the supplied password before rejecting an unknown user', async () => {
+    await expect(service.login(dto)).rejects.toBeInstanceOf(
       UnauthorizedException,
     );
+    expect(hash).toHaveBeenCalledWith(dto.password);
+    expect(verify).not.toHaveBeenCalled();
+    expect(createSession).not.toHaveBeenCalled();
+  });
+  it('rejects an incorrect password without issuing a session', async () => {
+    findUser.mockResolvedValue({ ...user, passwordHash: 'hash' });
+    verify.mockResolvedValue(false);
+    await expect(service.login(dto)).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
+    expect(createSession).not.toHaveBeenCalled();
   });
 });

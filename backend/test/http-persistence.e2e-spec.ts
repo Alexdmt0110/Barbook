@@ -1,4 +1,3 @@
-import { JwtService } from '@nestjs/jwt';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
@@ -15,6 +14,8 @@ import { PrismaService } from '../src/database/prisma.service';
 import { MeasurementUnit } from '../src/generated/prisma/client';
 import {
   Actor,
+  browserHeaders,
+  originHeaders,
   createActor,
   createApplicationFixture,
   FIXTURE_PASSWORD,
@@ -29,7 +30,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
   let alice: Actor;
   let bob: Actor;
   const api = () => request(app.getHttpServer());
-  const bearer = (actor: Actor) => `Bearer ${actor.accessToken}`;
+  const bearer = (actor: Actor) => browserHeaders(actor);
 
   async function createRecipe(
     actor: Actor,
@@ -37,7 +38,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
   ): Promise<CreateCocktailResult> {
     const response = await api()
       .post('/api/cocktails')
-      .set('Authorization', bearer(actor))
+      .set(bearer(actor))
       .send(recipePayload(changes))
       .expect(201);
     expect(response.body).toHaveProperty('id', expect.any(String));
@@ -51,7 +52,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
   ): Promise<{ id: string; name: string }> {
     const response = await api()
       .post('/api/folders')
-      .set('Authorization', bearer(actor))
+      .set(bearer(actor))
       .send({ name })
       .expect(201);
     return response.body as { id: string; name: string };
@@ -80,18 +81,15 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     expect(cors.headers['access-control-allow-origin']).toBe(
       process.env.FRONTEND_ORIGIN,
     );
-    await api()
-      .get('/api/cocktails?page=0')
-      .set('Authorization', bearer(alice))
-      .expect(400);
+    await api().get('/api/cocktails?page=0').set(bearer(alice)).expect(400);
     await api()
       .post('/api/cocktails')
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .send({ ...recipePayload(), workspaceId: bob.workspaceId })
       .expect(400);
     await api()
       .get(`/api/cocktails?workspaceId=${bob.workspaceId}`)
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .expect(400);
   });
 
@@ -99,6 +97,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     const email = `Register-${randomUUID()}@Example.Test`;
     const response = await api()
       .post('/api/auth/register')
+      .set(originHeaders())
       .send({
         email: ` ${email} `,
         password: FIXTURE_PASSWORD,
@@ -120,9 +119,14 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     expect(workspaces[0].members[0].role).toBe('OWNER');
     await api()
       .get('/api/auth/me')
-      .set('Authorization', `Bearer ${auth.accessToken}`)
+      .set(
+        'Cookie',
+        (response.headers['set-cookie'] as unknown as string[])[0].split(
+          ';',
+        )[0],
+      )
       .expect(200)
-      .expect(auth.user);
+      .expect(auth);
   });
 
   it('allows only one concurrent registration for the same email', async () => {
@@ -133,8 +137,8 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
       displayName: 'Concurrent QA',
     };
     const responses = await Promise.all([
-      api().post('/api/auth/register').send(payload),
-      api().post('/api/auth/register').send(payload),
+      api().post('/api/auth/register').set(originHeaders()).send(payload),
+      api().post('/api/auth/register').set(originHeaders()).send(payload),
     ]);
     expect(responses.map((response) => response.status).sort()).toEqual([
       201, 409,
@@ -162,6 +166,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     try {
       await api()
         .post('/api/auth/register')
+        .set(originHeaders())
         .send({ email, password: FIXTURE_PASSWORD, displayName: 'Rollback QA' })
         .expect(500);
       expect(await prisma.user.count({ where: { email } })).toBe(0);
@@ -175,23 +180,17 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
   it('uses the real password hash and rejects expired, forged or missing sessions', async () => {
     await api()
       .post('/api/auth/login')
+      .set(originHeaders())
       .send({ email: alice.user.email, password: FIXTURE_PASSWORD })
       .expect(200);
     await api()
       .post('/api/auth/login')
+      .set(originHeaders())
       .send({ email: alice.user.email, password: 'Incorrect fixture password' })
       .expect(401);
     await api().get('/api/cocktails').expect(401);
-    const jwt = app.get(JwtService);
-    const expired = await jwt.signAsync(
-      { sub: alice.user.id },
-      { expiresIn: -1 },
-    );
-    const forged = await jwt.signAsync(
-      { sub: alice.user.id },
-      { secret: 'synthetic_wrong_secret_at_least_32_characters' },
-    );
-    for (const token of [expired, forged, 'not-a-jwt']) {
+    // No legacy bearer transport, even for an otherwise valid session credential.
+    for (const token of [alice.credential, 'forged', 'not-a-jwt']) {
       await api()
         .get('/api/cocktails')
         .set('Authorization', `Bearer ${token}`)
@@ -213,7 +212,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     });
     const response = await api()
       .get(`/api/cocktails/${created.slug}`)
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .expect(200);
     const detail = response.body as CocktailDetail;
     expect(detail.ingredients).toHaveLength(1);
@@ -238,7 +237,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     });
     const toppedUp = await api()
       .get(`/api/cocktails/${unknown.slug}`)
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .expect(200);
     expect((toppedUp.body as CocktailDetail).estimatedAbv).toBeNull();
   });
@@ -251,14 +250,14 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     expect(created.slug).toBe('new-cocktail');
     const response = await api()
       .get('/api/cocktails/new-cocktail')
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .expect(200);
     const detail = response.body as CocktailDetail;
     expect(detail.name).toBe('New');
     expect(detail.mainAlcohol).toBeNull();
     await api()
       .post('/api/cocktails')
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .send(recipePayload({ name: 'New Cocktail', mainAlcoholName: null }))
       .expect(409);
     expect(
@@ -280,7 +279,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     ]) {
       await api()
         .post('/api/cocktails')
-        .set('Authorization', bearer(alice))
+        .set(bearer(alice))
         .send({ ...recipePayload(), ...extra })
         .expect(400);
     }
@@ -297,22 +296,22 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     const folder = await createFolder(alice, privateName);
     await api()
       .get(`/api/cocktails/${created.slug}`)
-      .set('Authorization', bearer(bob))
+      .set(bearer(bob))
       .expect(404);
     await api()
       .put(`/api/cocktails/${created.slug}/organization`)
-      .set('Authorization', bearer(bob))
+      .set(bearer(bob))
       .send({ folderId: null, tagNames: [] })
       .expect(404);
     const list = await api()
       .get('/api/cocktails')
       .query({ search: privateName })
-      .set('Authorization', bearer(bob))
+      .set(bearer(bob))
       .expect(200);
     expect((list.body as CocktailListResult).total).toBe(0);
     const folders = await api()
       .get('/api/folders')
-      .set('Authorization', bearer(bob))
+      .set(bearer(bob))
       .expect(200);
     expect(
       (folders.body as { id: string }[]).some(
@@ -321,13 +320,13 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     ).toBe(false);
     const suggestions = await api()
       .get('/api/ingredients?query=Gin')
-      .set('Authorization', bearer(bob))
+      .set(bearer(bob))
       .expect(200);
     expect(suggestions.body).toEqual([]);
     const own = await createRecipe(bob);
     await api()
       .put(`/api/cocktails/${own.slug}/organization`)
-      .set('Authorization', bearer(bob))
+      .set(bearer(bob))
       .send({ folderId: folder.id, tagNames: [] })
       .expect(400);
   });
@@ -339,12 +338,12 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     await createFolder(bob, folderName);
     await api()
       .post('/api/folders')
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .send({ name: folderName })
       .expect(409);
     const organized = await api()
       .put(`/api/cocktails/${created.slug}/organization`)
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .send({ folderId: folder.id, tagNames: ['Agrumes', '  agrumes  '] })
       .expect(200);
     const organization = organized.body as {
@@ -362,7 +361,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
         page: 1,
         pageSize: 1,
       })
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .expect(200);
     const list = response.body as CocktailListResult;
     expect(list.total).toBe(1);
@@ -370,12 +369,12 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     const foreign = await api()
       .get('/api/cocktails')
       .query({ folderId: folder.id, tagId: organization.tags[0].id })
-      .set('Authorization', bearer(bob))
+      .set(bearer(bob))
       .expect(200);
     expect((foreign.body as CocktailListResult).total).toBe(0);
     await api()
       .put(`/api/cocktails/${created.slug}/organization`)
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .send({ folderId: null, tagNames: [] })
       .expect(200);
     expect(
@@ -398,7 +397,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     try {
       await api()
         .post('/api/cocktails')
-        .set('Authorization', bearer(alice))
+        .set(bearer(alice))
         .send(
           recipePayload({
             name: cocktailName,
@@ -432,13 +431,13 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     const replacement = await createFolder(alice);
     await api()
       .put(`/api/cocktails/${created.slug}/organization`)
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .send({ folderId: originalFolder.id, tagNames: ['Original'] })
       .expect(200);
     const otherOriginalFolder = await createFolder(alice);
     await api()
       .put(`/api/cocktails/${created.slug}/organization`)
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .send({
         folderIds: [originalFolder.id, otherOriginalFolder.id],
         expectedVersion: 1,
@@ -458,7 +457,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     try {
       await api()
         .put(`/api/cocktails/${created.slug}/organization`)
-        .set('Authorization', bearer(alice))
+        .set(bearer(alice))
         .send({
           folderIds: [replacement.id],
           expectedVersion: 2,
@@ -467,7 +466,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
         .expect(500);
       const response = await api()
         .get(`/api/cocktails/${created.slug}`)
-        .set('Authorization', bearer(alice))
+        .set(bearer(alice))
         .expect(200);
       const detail = response.body as CocktailDetail;
       expect(detail.folder?.id).toBe(originalFolder.id);
@@ -490,14 +489,8 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
   it('creates only one recipe for concurrent duplicate requests', async () => {
     const payload = recipePayload();
     const responses = await Promise.all([
-      api()
-        .post('/api/cocktails')
-        .set('Authorization', bearer(alice))
-        .send(payload),
-      api()
-        .post('/api/cocktails')
-        .set('Authorization', bearer(alice))
-        .send(payload),
+      api().post('/api/cocktails').set(bearer(alice)).send(payload),
+      api().post('/api/cocktails').set(bearer(alice)).send(payload),
     ]);
     expect(responses.map((response) => response.status).sort()).toEqual([
       201, 409,
@@ -515,7 +508,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
       [40, 47].map((abv) =>
         api()
           .post('/api/cocktails')
-          .set('Authorization', bearer(alice))
+          .set(bearer(alice))
           .send(
             recipePayload({
               ingredients: [
@@ -536,7 +529,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
       const result = created.body as CreateCocktailResult;
       const response = await api()
         .get(`/api/cocktails/${result.slug}`)
-        .set('Authorization', bearer(alice))
+        .set(bearer(alice))
         .expect(200);
       expect((response.body as CocktailDetail).ingredients[0].abv).toBe(
         [40, 47][index],
@@ -561,14 +554,14 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
       updates.map((value) =>
         api()
           .put(`/api/cocktails/${created.slug}/organization`)
-          .set('Authorization', bearer(alice))
+          .set(bearer(alice))
           .send(value),
       ),
     );
     expect(results.map((response) => response.status)).toEqual([200, 200]);
     const response = await api()
       .get(`/api/cocktails/${created.slug}`)
-      .set('Authorization', bearer(alice))
+      .set(bearer(alice))
       .expect(200);
     const detail = response.body as CocktailDetail;
     expect(updates).toContainEqual({

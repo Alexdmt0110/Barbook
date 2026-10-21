@@ -1,7 +1,16 @@
 import { Transform } from 'class-transformer';
-import { IsEmail, IsString, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class LoginDto {
+  @IsOptional()
+  @IsBoolean()
+  rememberMe?: boolean;
   @Transform(({ value }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : undefined,
   )

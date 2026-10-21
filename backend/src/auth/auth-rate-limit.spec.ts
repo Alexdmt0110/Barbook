@@ -11,7 +11,8 @@ import {
 } from '../common/rate-limit.config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { SessionGuard } from './guards/session.guard';
+import { WebSessionService } from './sessions/web-session.service';
 
 function getHttpServer(application: INestApplication): Server {
   return application.getHttpServer() as Server;
@@ -34,13 +35,22 @@ describe('Auth rate limiting', () => {
 
   const authResponse = {
     user,
-    accessToken: 'test-access-token',
+    workspaceId: 'workspace',
+    csrfToken: 'A'.repeat(43),
   };
 
   beforeEach(async () => {
     authService = {
-      login: jest.fn().mockResolvedValue(authResponse),
-      register: jest.fn().mockResolvedValue(authResponse),
+      login: jest.fn().mockResolvedValue({
+        response: authResponse,
+        credential: 'A'.repeat(43),
+        session: { persistent: false },
+      }),
+      register: jest.fn().mockResolvedValue({
+        response: authResponse,
+        credential: 'A'.repeat(43),
+        session: { persistent: false },
+      }),
       getCurrentUser: jest.fn().mockResolvedValue(user),
     };
 
@@ -50,6 +60,13 @@ describe('Auth rate limiting', () => {
       controllers: [AuthController],
 
       providers: [
+        {
+          provide: WebSessionService,
+          useValue: {
+            config: { cookieName: 'barbook-session-dev', secure: false },
+            credential: () => undefined,
+          },
+        },
         {
           provide: AuthService,
           useValue: authService,
@@ -62,7 +79,7 @@ describe('Auth rate limiting', () => {
       ],
     });
 
-    testingModuleBuilder.overrideGuard(JwtAuthGuard).useValue({
+    testingModuleBuilder.overrideGuard(SessionGuard).useValue({
       canActivate: () => true,
     });
 

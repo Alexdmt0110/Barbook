@@ -1,6 +1,6 @@
 # Store des sessions — préparation B4a
 
-État : préparation additive de L4. Les routes actuelles utilisent encore JWT/sessionStorage ; B4b doit raccorder API et Angular ensemble. Ne pas retirer JWT_SECRET ou changer le proxy/cookie avant ce bloc et une bascule autorisée. [ADR 0005](../adr/0005-revocable-web-sessions.md), [critères L4](../project/l4-design.md), [handoff](../project/agent-handoff.md).
+État de branche B4b : store raccordé à l'API/Angular ; JWT retiré. Voir [contrat web](authentication.md), [ADR 0005](../adr/0005-revocable-web-sessions.md), [critères L4](../project/l4-design.md), [handoff](../project/agent-handoff.md). Aucun changement propriétaire/production.
 
 ## Contrats internes
 
@@ -20,8 +20,8 @@ Les cinq timestamps sont timestamptz(3), décidés par PostgreSQL. CHECK pour ha
 
 Exécuter `npm --prefix backend run verify`, `npm --prefix backend run test:integration:safety`, puis prepare/test:e2e exclusivement selon les [garde-fous](integration-tests.md) sur loopback `barbook_test_*` explicitement optée. Pas de connexion DB mockée. Unitaires : encodage/durées ; natifs : stockage haché, autre instance Nest, expiration/plafond/attente, replay, transactions, verrous réellement observés, FK/CHECK/unicité/cascade et purge. Les résultats réellement passés se lisent au checkpoint/CI.
 
-Aucune base propriétaire inventoriée/migrée. Backup/restore, recovery Prisma, rollback de bascule et TLS/cookies réels restent à qualifier avant livraison autorisée. B4a n'active ni cookie, ni CSRF HTTP, ni admission privée, ni UI/brouillons ; aucun L5 ou CONTRACT.
+Aucune base propriétaire inventoriée/migrée. Backup/restore, recovery Prisma, rollback de bascule et TLS/cookies réels restent à qualifier avant livraison autorisée. B4a était additif ; B4b raccorde maintenant cookie/CSRF/UI. L'admission privée, les brouillons complets et la révocation globale restent dans leurs blocs ; aucun L5 ou CONTRACT.
 
-## Préparation web B4b (inactive avant bascule)
+## Frontière web B4b
 
-Les primitives web-session-security préparent origine/cookie/CSRF/contexte ;44cas de test les exécutent sur un contrôleur HTTP de test exclu du build. Elles ne sont pas encore raccordées à configure-application, AuthController ou aux guards métier. inspect lit sans renouveler ; le futur guard devra ensuite appeler authenticate après les contrôles, et refuser si la session a expiré/été révoquée entre-temps. Une prélecture n'autorise jamais une opération. La bascule API/Angular reste à réaliser sur feature/web-session-cutover ; consulter le handoff courant.
+WebSessionService et SessionGuard raccordent les primitives origine/cookie/CSRF/contexte aux routes réelles. inspect lit sans renouveler ; authenticate après les contrôles doit encore réussir. Une prélecture n'autorise jamais une opération. Les44tests de primitives sont conservés et les tests HTTP/PG exercent le vrai bootstrap. revoke accepte un client transactionnel pour la rotation au login ; aucun Set-Cookie sur logout ou401. Consulter le handoff pour les résultats réellement passés.

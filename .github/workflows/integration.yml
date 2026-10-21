@@ -45,7 +45,6 @@ jobs:
       DATABASE_HOST: 127.0.0.1
       DATABASE_PORT: '5432'
       FRONTEND_ORIGIN: http://127.0.0.1:4200
-      JWT_SECRET: ci_only_jwt_secret_at_least_32_characters_long
       PORT: '3000'
       NODE_OPTIONS: --trace-deprecation
     steps:
@@ -116,7 +115,6 @@ jobs:
       DATABASE_HOST: 127.0.0.1
       DATABASE_PORT: '5432'
       FRONTEND_ORIGIN: http://127.0.0.1:4200
-      JWT_SECRET: ci_only_jwt_secret_at_least_32_characters_long
       PORT: '3000'
     steps:
       - name: Checkout repository
