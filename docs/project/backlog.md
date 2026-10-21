@@ -54,7 +54,7 @@ D1a/D1b/D2a/D2b/D2c validées, [design et critères](l4-design.md). #25 document
 | BB-L4-01 / B4a | contrats/ADR et store Session additif qualifiés ;88natifs dont26store, sept migrations ; auth actuelle préservée | MERGE #26 ; main76f742b qualifié |
 | BB-L4-02 / B4b | API/UI cookie/CSRF et contexte coordonnés, retrait Bearer | MERGE #27 ; main90d9356 qualifié |
 | BB-L4-03 / B4c | admission serveur fermée/liste, storage refusé toléré | MERGE #28 ; main0c4a558 qualifié |
-| BB-L4-04 / B4d / A010 / A012 | brouillons mémoire/sessionStorage 24 h, restauration isolée explicite, versions | QUALIFIE_SUR_BRANCHE2062903 ; PR à ouvrir |
+| BB-L4-04 / B4d / A010 / A012 | brouillons mémoire/sessionStorage 24 h, restauration isolée explicite, versions | PR #29 OUVERTE ; code2062903 qualifié ; merge à valider |
 | BB-L4-05 / B4e | révocation globale, activité/onglets/réseau et courses | APPROUVE |
 | BB-L4-06 / B4f | Review Gate complet, six checks, vraie PR et handoff | APPROUVE ; merge à valider |
 
@@ -98,3 +98,5 @@ B4d brouillons24h/restauration/purge/identité/workspace/version, B4e logout glo
 
 
 État courant21octobre : #28 intégrée après autorisation explicite, main0c4a558/six checks post-merge success. B4d sur feature/session-drafts, code2062903 ;175frontend/232backend/118PG-HTTP/4Chromium requalifiés, six checks success. [Design](l4-b4d-design.md), [Review Gate](reviews/l4-b4d-review-gate.md), [contrat brouillons](../maintenance/temporary-drafts.md). Chaque nouvelle PR reste soumise à un accord de merge distinct ; B4e/B4f ne sont pas clôturés.
+
+PR #29 ouverte,42fichiers/7commits au checkpointa80c160, vrai diff/blobs relus et douze checks push+PR success. Ce complément de pilotage est documentaire ; observer ses propres checks puis attendre Alex.

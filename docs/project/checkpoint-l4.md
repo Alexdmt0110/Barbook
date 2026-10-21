@@ -149,3 +149,8 @@ Revue du même chemin : après abandon, si l'écriture du namespace réduit éch
 Local après correctif quota : lint/build passés,174tests passent et un test historique inchangé de FolderCocktailPicker dépasse5s sous charge. Relance ciblée puis suite complète avec VITEST_MAX_WORKERS=2 (option réellement supportée par la version installée), sans changer timeout, assertions ni configuration CI. Les résultats de ces relances doivent être lus avant publication ; ne pas considérer une sortie partielle comme verte.
 
 Relances lues :5/5 ciblés puis175/175 dans25fichiers avec deux workers ; compatibilité CLI passée. Lint et build passés sur ce code. Typecheck E2E et diffcheck passés. Publication du correctif quota seule ; les documents maintenance/décisions et le brouillon de Review Gate restent en préparation hors de ce commit, sans PR ouverte. Six checks du nouveau HEAD à observer avant de conclure la revue.
+
+
+## PR B4d ouverte — dernier complément documentaire
+
+#29 créée après Review Gate, base0c4a558/heada80c160,42fichiers/7commits ; tous les blobs, toutes les lignes ajoutées/retirées et les refs du vrai diff correspondent au clone. Aucun commentaire/revue/inline, mergeable=true sans conflit ; douze checks push+PR success lus. Complément de pilotage seulement pour numéro de PR et reprise ; code2062903 inchangé. Vérifier le dernier HEAD documentaire/ses six checks avant tout merge, qui doit recevoir l’accord distinct d’Alex. Branches historiques conservées, aucune production/L5/CONTRACT.

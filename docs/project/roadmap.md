@@ -68,3 +68,5 @@ B4d brouillons24h/restauration/purge/identité/workspace/version, B4e logout glo
 ## Reprise courante — B4d,21octobre2026
 
 #28 intégrée par0c4a558 après accord explicite ; six checks post-merge qualifiés, branches historiques conservées. B4d développé sur feature/session-drafts au code2062903, tests locaux175frontend/232backend ; six checks success et [Review Gate](reviews/l4-b4d-review-gate.md) complet favorables à la nouvelle PR, sans accord de merge. Mémoire/sessionStorage24h, restauration explicite liée à identité/workspace/recette/version, purge et absence de replay ; [contrat](../maintenance/temporary-drafts.md). B4e global/réauthentification et B4f restent distincts. Aucun nouveau merge autorisé, aucune production/infra/L5/CONTRACT. Les états B4c antérieurs ci-dessus sont historiques.
+
+PR B4d [#29](https://github.com/Alexdmt0110/Barbook/pull/29) ouverte et relue, base0c4a558/heada80c160,42fichiers/7commits et douze checks success. Dernier complément documentaire à vérifier ; aucun merge sans accord explicite Alex.

@@ -41,3 +41,5 @@ B4e doit encore exposer et qualifier logout global après réauthentification et
 **Aucun BLOCKER/P1 restant identifié dans B4d ; favorable à l’ouverture de la PR, sans accord de merge.** Pas de nouveau P2 demandant arbitrage produit identifié dans ce périmètre. La qualification globale L4 reste partielle.
 
 Après publication documentaire : vraie PR, comparer tous les blobs/fichiers/diff/commits/base/head, lire discussions et mergeabilité, puis observer les six contrôles du dernier HEAD. Toute correction BLOCKER/P1 impose une nouvelle revue complète. Conserver toutes les branches historiques et attendre l'autorisation explicite d'Alex pour cette nouvelle PR.
+
+PR #29 ouverte après ce gate : diff réel42fichiers/7commits au checkpointa80c160, tous blobs et lignes +/- comparés, base/head cohérents, zéro discussion, aucun conflit. Douze checks push+PR success. Le dernier complément de pilotage reste documentaire et doit avoir ses propres checks observés ; aucun accord de merge implicite.

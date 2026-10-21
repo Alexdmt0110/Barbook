@@ -1,31 +1,31 @@
 # Handoff canonique Barbook — L4 B4d
 
 ```yaml
-checkpoint_utc: "2026-10-21T12:40:53+00:00"
+checkpoint_utc: "2026-10-21T12:47:20+00:00"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
-handoff_status: "EN_COURS"
-feature: "L4 B4d : brouillons temporaires qualifiés sur branche ; PR à ouvrir"
+handoff_status: "PRET_A_PASSER"
+feature: "L4 B4d : PR #29 ouverte et diff vérifié ; merge à valider"
 branch: "feature/session-drafts"
 base_branch: "main"
 base_sha: "0c4a5580f3fe7d8e71c83c0434aadc3ce46d1e73"
-remote_head_sha: "2062903e3a4175d3c37474a1f3e3f1a202d74e2b"
-local_head_sha: "2062903e3a4175d3c37474a1f3e3f1a202d74e2b"
+remote_head_sha: "a80c16001fbe210bd9bbaf357bf2b936a33eb93c"
+local_head_sha: "a80c16001fbe210bd9bbaf357bf2b936a33eb93c"
 worktree: "documents de qualification seuls en préparation ; code poussé et qualifié"
-pr: "B4d non ouverte ; aucune autorisation de merge"
-tests: "232backend/175frontend/118PG-HTTP/4Chromium ; six checks code success"
+pr: "https://github.com/Alexdmt0110/Barbook/pull/29 ; OPEN, non mergée ; base main0c4a558"
+tests: "232backend/175frontend/118PG-HTTP/4Chromium ; douze checks push+PR a80c160 success ; dernier checkpoint à observer"
 migrations: "sept historiques uniquement en CI jetables ; aucune nouvelle/personnelle/production"
-changes_pushed: "6231cb5/8debc7b/dde1083/5a93256/60252ea/2062903"
+changes_pushed: "6231cb5/8debc7b/dde1083/5a93256/60252ea/2062903/a80c160"
 unpushed_changes: "documents de ce checkpoint avant leur propre publication"
 decisions_validated: "#28 intégrée ; développement L4 seul ; D1/D2 inchangées ; WORK seul"
 decisions_pending: "chaque nouveau merge ; aucun L5/CONTRACT/production"
-next_atomic_step: "publier ces documents, ouvrir la vraie PR, comparer diff/blobs/commits/base/head/discussions/mergeabilité ; lire six checks puis attendre Alex"
+next_atomic_step: "vérifier refs/HEAD et six checks du dernier checkpoint documentaire ; attendre accord explicite Alex pour #29, aucun merge implicite"
 risks_and_blockers: "aucun BLOCKER/P1 B4d restant identifié ; limites stockage/navigateurs et B4e/B4f documentées"
 production_effect: "aucun"
 ```
 
-Cette photographie précède sa propre publication. Les refs/PR/CI GitHub réelles restent autoritaires ; le commit documentaire sera un successeur du code2062903 sans changement applicatif. Ne pas inventer de SHA auto-référentiel ni recréer une branche/PR déjà présente.
+Cette photographie précède sa propre publication. Les refs/PR/CI GitHub réelles restent autoritaires ; le commit documentaire sera un successeur du checkpointa80c160 sans changement applicatif. Ne pas inventer de SHA auto-référentiel ni recréer une branche/PR déjà présente.
 
 ## B4d qualifié sur branche — 21 octobre 2026
 
@@ -48,3 +48,9 @@ Création et organisation existantes, mémoire/sessionStorage24h, restauration/a
 Après PR vérifiée : attendre accord explicite d'Alex pour son merge ; conserver toutes les branches. Après merge distinct et main requalifié seulement, reprendre B4e sur une nouvelle branche avec Design Review : endpoint/UI de déconnexion globale après réauthentification et courses multi-onglets/réseau/requêtes en vol, puis B4f et18critères globaux. Le store interne revokeAll ne constitue pas encore cette fonctionnalité publique. Aucun sélecteur partagé ni édition/corbeille L5/D5 livré.
 
 Git : commits/push/PR seulement pour ce checkpoint, aucun nouveau merge. VM : aucun déploiement. SQL : aucune migration nouvelle/propriétaire ; sept historiques sur CI jetables seulement. Infra : aucun changement ; seuls trois triggers push exacts de la branche ajoutés aux workflows existants, sans changement de jobs/actions/permissions/ruleset. TLS/Secure réel/proxy/Safari/iOS/backup/restore/rollback et base propriétaire ne sont pas qualifiés.
+
+## PR #29 réellement ouverte et relue
+
+[PR #29](https://github.com/Alexdmt0110/Barbook/pull/29), base0c4a558/heada80c160 :42fichiers,7commits avant ce dernier complément documentaire. Tous les blobs et toutes les lignes ajoutées/retirées du vrai diff GitHub correspondent au diff local ; aucun patch manquant. Zéro commentaire/revue/inline ; mergeable=true, aucun conflit. Les douze contrôles push+PR de ce HEAD sont maintenant success ; code2062903 et ses preuves ne changent pas. Ce complément enregistre seulement le numéro/état de PR dans le pilotage. Observer le dernier HEAD de ces seuls documents avant tout merge.
+
+PRET_A_PASSER signifie une reprise durable, pas une fin de L4 ni une autorisation de merge. Attendre Alex pour #29. Aucun démarrage de B4e sur cette branche.
