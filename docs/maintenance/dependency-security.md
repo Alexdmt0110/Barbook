@@ -1,5 +1,17 @@
 # Sécurité des dépendances
 
+## Contrôle du 21 octobre 2026 — CI B4b
+
+L'audit de2b7b924 a signalé quatre paquets hauts, runtime zéro : SDK MCP1.31.0 épinglé par Angular CLI21.2.27 et Vite7.3.6 épinglé par Angular build21.2.27. Ce sont des outils de développement, pas des modules du navigateur compilé. Leurs chemins MCP/serveur/éditeur restent néanmoins à corriger ; aucune exception d'audit n'est ajoutée.
+
+Revue préventive : conserver Angular21, ne pas exécuter audit fix --force (qui propose22). Le registre ne propose pas de patch CLI/build21 ultérieur. Override SDK **limité au parent @angular/cli** vers1.32.0 (mineure, Node>=18) et Vite7.3.7 (patch, Node24 compatible), commun aux consommateurs build/Vitest déjà en7.3.6. Aucun ajout de service MCP ni usage métier de ces outils. Les imports réels CLI SDK mcp/server/stdio/types et l'absence de taskStore dans le CLI ont été inspectés ; aucun serveur HTTP MCP n'est démarré par Barbook.
+
+Sources des correctifs : [MCP SDK GHSA-22jm-h49p-29qw](https://github.com/modelcontextprotocol/typescript-sdk/security/advisories/GHSA-22jm-h49p-29qw), [Vite/launch-editor GHSA-698v-4r3x-3vcv](https://github.com/vitejs/launch-editor/security/advisories/GHSA-698v-4r3x-3vcv). Les quatre avis SDK et trois avis Vite signalés par npm sont éliminés par ces versions ; le résultat npm après résolution est vérifié, pas déduit des seules versions.
+
+Après npm ci : audits complet/runtime zéro. Vérifier aussi lint/build/Vitest, le serveur Angular réel en E2E, et le test de compatibilité inclus dans verify : véritable handshake initialize puis tools/list du CLI MCP en lecture seule/local-only sur stdio, sans appeler d'outil ni de service externe. Une simple importation ne prouverait pas que les API d'enregistrement de ses outils fonctionnent avec l'override.
+
+Ces overrides sont temporaires : les retirer quand les versions compatibles de CLI/build emploient nativement les correctifs, après npm ci/audits/verify/compatibilité/E2E verts. Aucun upgrade majeur, changement runtime applicatif, migration ou déploiement. Les résultats L1 ci-dessous restent historiques.
+
 ## Contrôle du 16 octobre 2026 — L1
 
 Revue préventive : corriger les chaînes signalées sans changer de version majeure Angular/Nest/Prisma, conserver les contrôles et les overrides Prisma existants, puis vérifier les lockfiles, l'installation reproductible et les chemins affectés. Le passage Jest 29 → 30 est limité aux outils de tests et justifié par la suppression de la chaîne braces non corrigée ; Node 24 et TypeScript 5.9 satisfont ses prérequis. Aucun changement métier, API, schéma ou migration.

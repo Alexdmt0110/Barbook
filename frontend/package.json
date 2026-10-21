@@ -8,8 +8,13 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint --max-warnings=0",
-    "verify": "npm run lint && npm run build && npm test -- --watch=false",
+    "verify": "npm run lint && npm run build && npm test -- --watch=false && npm run test:dependency-compatibility",
+    "test:dependency-compatibility": "node --test test/dependency-compatibility.cjs",
     "audit:security": "npm audit --package-lock-only --audit-level=moderate && npm audit --package-lock-only --omit=dev --audit-level=moderate"
+  },
+  "overrides": {
+    "@angular/cli": { "@modelcontextprotocol/sdk": "1.32.0" },
+    "vite": "7.3.7"
   },
   "private": true,
   "packageManager": "npm@11.7.0",
