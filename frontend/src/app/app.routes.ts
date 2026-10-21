@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { draftExitGuard } from './core/drafts/draft-exit.guard';
 import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
@@ -48,6 +49,7 @@ export const routes: Routes = [
       },
       {
         path: 'cocktails/new',
+        canDeactivate: [draftExitGuard],
         title: 'Nouveau cocktail · Barbook',
         loadComponent: () =>
           import('./features/cocktails/cocktail-create/cocktail-create').then(
@@ -56,6 +58,7 @@ export const routes: Routes = [
       },
       {
         path: 'cocktails/:slug',
+        canDeactivate: [draftExitGuard],
         title: 'Cocktail · Barbook',
         loadComponent: () =>
           import('./features/cocktails/cocktail-detail/cocktail-detail').then(

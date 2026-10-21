@@ -1,3 +1,4 @@
+import { DraftStore } from '../../../core/drafts/draft-store.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
@@ -44,6 +45,7 @@ describe('CocktailCreate', () => {
   let navigateSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(async () => {
+    sessionStorage.clear();
     await TestBed.configureTestingModule({
       imports: [CocktailCreate],
       providers: [
@@ -71,6 +73,10 @@ describe('CocktailCreate', () => {
   });
 
   function createComponent(): CocktailCreate {
+    TestBed.inject(DraftStore).confirmIdentity({
+      userId: 'test-user',
+      workspaceId: 'test-workspace',
+    });
     const fixture = TestBed.createComponent(CocktailCreate);
 
     return fixture.componentInstance;
@@ -427,5 +433,70 @@ describe('CocktailCreate', () => {
     expect(cocktailsService.requests).toEqual([]);
 
     expect(navigateSpy).not.toHaveBeenCalled();
+  });
+  it('restores invalid raw fields and ingredient metadata only after explicit choice, without sending', () => {
+    const first = createComponent();
+    first.form.controls.name.setValue('unfinished');
+    first.onIngredientSelected(0, { id: 'gin', slug: 'gin', name: 'Gin', defaultAbv: 40 });
+    first.ingredients.at(0).controls.amount.setValue(-5);
+    first.ingredients.at(0).controls.unit.setValue('CL');
+    first.form.controls.notes.setValue('notes privées');
+    const restored = createComponent();
+    expect(restored.draft.candidate()).not.toBeNull();
+    expect(restored.form.controls.name.value).toBe('');
+    restored.submit();
+    expect(cocktailsService.requests).toHaveLength(0);
+    restored.restoreDraft();
+    expect(restored.ingredients.at(0).getRawValue()).toMatchObject({
+      ingredientName: 'Gin',
+      amount: -5,
+      unit: 'CL',
+      ingredientDefaultAbv: 40,
+    });
+    expect(restored.form.controls.notes.value).toBe('notes privées');
+    expect(restored.form.invalid).toBe(true);
+    expect(cocktailsService.requests).toHaveLength(0);
+  });
+  it('restores selected ingredient ABV semantics and clears the draft after successful explicit submission', () => {
+    const first = createComponent();
+    fillRequiredFields(first);
+    first.onIngredientSelected(0, { id: 'gin', slug: 'gin', name: 'Gin', defaultAbv: 40 });
+    first.ingredients.at(0).controls.ingredientDefaultAbv.setValue(42);
+    first.ingredients.at(0).controls.amount.setValue(5);
+    const restored = createComponent();
+    restored.restoreDraft();
+    restored.submit();
+    expect(cocktailsService.requests[0].ingredients[0]).toMatchObject({ abvOverride: 42 });
+    expect(restored.draft.dirty()).toBe(false);
+    expect(createComponent().draft.candidate()).toBeNull();
+  });
+  it('keeps an unknown outcome across reload and never retries until explicit verification', () => {
+    const first = createComponent();
+    fillRequiredFields(first);
+    first.ingredients.at(0).controls.ingredientName.setValue('Gin');
+    first.ingredients.at(0).controls.amount.setValue(5);
+    cocktailsService.response = throwError(() => new HttpErrorResponse({ status: 0 }));
+    first.submit();
+    expect(first.draft.uncertain()).toBe(true);
+    first.submit();
+    expect(cocktailsService.requests).toHaveLength(1);
+    const restored = createComponent();
+    restored.restoreDraft();
+    restored.submit();
+    expect(cocktailsService.requests).toHaveLength(1);
+    restored.draft.verifiedAbsent();
+    restored.submit();
+    expect(cocktailsService.requests).toHaveLength(2);
+  });
+  it('abandons both persisted and visible values without a POST and cannot submit after context changes', () => {
+    const component = createComponent();
+    fillRequiredFields(component);
+    component.discardDraft();
+    expect(component.form.controls.name.value).toBe('');
+    expect(component.draft.dirty()).toBe(false);
+    fillRequiredFields(component);
+    TestBed.inject(DraftStore).confirmIdentity({ userId: 'other', workspaceId: 'other' });
+    component.submit();
+    expect(cocktailsService.requests).toHaveLength(0);
   });
 });

@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import {
@@ -19,6 +19,10 @@ import { CocktailOrganizationEditor } from './cocktail-organization-editor/cockt
   styleUrl: './cocktail-detail.css',
 })
 export class CocktailDetail implements OnInit {
+  private readonly editor = viewChild(CocktailOrganizationEditor);
+  canLeave(): boolean {
+    return this.editor()?.canLeave() ?? true;
+  }
   private readonly route = inject(ActivatedRoute);
 
   private readonly cocktailsService = inject(CocktailsService);

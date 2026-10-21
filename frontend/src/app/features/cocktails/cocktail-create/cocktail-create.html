@@ -20,7 +20,8 @@
     </p>
   </header>
 
-  <form
+  <app-draft-notice [draft]="draft" (restore)="restoreDraft()" (discard)="discardDraft()" />
+  <form [attr.inert]="draft.candidate() ? '' : null"
     class="cocktail-form"
     [formGroup]="form"
     (ngSubmit)="submit()"
@@ -817,7 +818,7 @@
       <button
         class="submit-action"
         type="submit"
-        [disabled]="isSubmitting()"
+        [disabled]="isSubmitting() || !!draft.candidate() || draft.uncertain()"
       >
         @if (isSubmitting()) {
           Création…

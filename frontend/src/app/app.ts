@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { DraftStore } from './core/drafts/draft-store.service';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -7,4 +8,6 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {}
+export class App {
+  readonly drafts = inject(DraftStore);
+}

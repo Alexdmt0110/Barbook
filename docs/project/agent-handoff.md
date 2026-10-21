@@ -1,3 +1,7 @@
+# Reprise B4d — formulaires intégrés, qualification CI à poursuivre
+
+Branche feature/session-drafts, base main0c4a558 (#28 intégrée et six checks post-merge verts). Design6231cb5, store8debc7b publiés, six checks store success. Bloc suivant : formulaires création/organisation, restauration/abandon/TTL/version, purge et résultat inconnu ;170tests frontend locaux et typecheck E2E verts avant publication de ce checkpoint. Nouvelle CI complète requise, puis Review Gate complet depuis main et PR sans merge. Le prochain commit documentaire consignera le SHA réel de ce bloc après publication. Aucune PR B4d créée pour le moment ; lire refs/CI GitHub avant reprise. Autorisation L4 inchangée, chaque merge distinct reste soumis à Alex.
+
 # Reprise courante — L4 B4d
 
 21 octobre 2026 : #28 intégrée avec autorisation explicite, main0c4a5580f3fe7d8e71c83c0434aadc3ce46d1e73 qualifié, six checks success ; preuves dans [checkpoint](checkpoint-l4.md). Branche feature/session-drafts publiée depuis ce main. [Design Review préventive](l4-b4d-design.md) préparée avant code. Prochain commit : store de brouillons borné et cycle identité/expiration/purge, tests de sécurité ; puis formulaires et Chromium, Review Gate et nouvelle PR sans merge. B4e/B4f restent autorisés dans L4 mais distincts ; aucune production/L5/CONTRACT. WORK seul. Photographies ci-dessous historiques, lire les refs GitHub réelles à la reprise.

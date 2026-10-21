@@ -1,8 +1,13 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DraftStore } from '../../../core/drafts/draft-store.service';
+import { FormDraft } from '../../../core/drafts/form-draft';
+import { DraftNotice } from '../../../core/drafts/draft-notice';
+import { isCreationDraft } from './cocktail-create.draft';
 import { toSlug } from '../../../shared/utils/slug';
 import { IngredientSuggestion } from '../../ingredients/data-access/ingredient.models';
 import { IngredientAutocomplete } from '../../ingredients/ui/ingredient-autocomplete';
@@ -37,11 +42,14 @@ import {
 
 @Component({
   selector: 'app-cocktail-create',
-  imports: [ReactiveFormsModule, RouterLink, IngredientAutocomplete],
+  imports: [ReactiveFormsModule, RouterLink, IngredientAutocomplete, DraftNotice],
   templateUrl: './cocktail-create.html',
   styleUrl: './cocktail-create.css',
 })
 export class CocktailCreate {
+  readonly draft = new FormDraft(inject(DraftStore), 'create:new', 1, isCreationDraft);
+  private readonly destroyRef = inject(DestroyRef);
+  private restoring = false;
   private readonly formBuilder = inject(FormBuilder);
 
   private readonly cocktailsService = inject(CocktailsService);
@@ -102,6 +110,70 @@ export class CocktailCreate {
     steps: this.formBuilder.array<StepFormControl>([this.createStepControl()]),
   });
 
+  constructor() {
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      if (!this.restoring) this.captureDraft();
+    });
+  }
+
+  private draftValue() {
+    return {
+      form: this.form.getRawValue(),
+      selected: this.ingredients.controls.map(
+        (group) => this.selectedIngredients.get(group) ?? null,
+      ),
+    };
+  }
+  private captureDraft(): void {
+    this.draft.capture(this.draftValue());
+  }
+  restoreDraft(): void {
+    const value = this.draft.restore();
+    if (!isCreationDraft(value)) return;
+    this.restoring = true;
+    this.ingredients.clear();
+    this.garnishes.clear();
+    this.steps.clear();
+    for (const ingredient of value.form.ingredients) {
+      const group = this.createIngredientGroup();
+      group.setValue(ingredient);
+      this.ingredients.push(group);
+    }
+    for (const garnish of value.form.garnishes) {
+      const group = this.createGarnishGroup();
+      group.setValue(garnish);
+      this.garnishes.push(group);
+    }
+    for (const step of value.form.steps) {
+      const control = this.createStepControl();
+      control.setValue(step);
+      this.steps.push(control);
+    }
+    this.form.setValue(value.form);
+    value.selected.forEach((selected, i) => {
+      if (selected) this.selectedIngredients.set(this.ingredients.at(i), selected);
+    });
+    this.restoring = false;
+  }
+  discardDraft(): void {
+    this.draft.discard();
+    this.restoring = true;
+    this.ingredients.clear();
+    this.ingredients.push(this.createIngredientGroup());
+    this.garnishes.clear();
+    this.steps.clear();
+    this.steps.push(this.createStepControl());
+    this.form.reset();
+    this.restoring = false;
+  }
+  canLeave(): boolean {
+    return this.draft.canLeave();
+  }
+  @HostListener('window:beforeunload', ['$event'])
+  beforeUnload(event: BeforeUnloadEvent): void {
+    this.draft.beforeUnload(event);
+  }
+
   get ingredients() {
     return this.form.controls.ingredients;
   }
@@ -130,6 +202,7 @@ export class CocktailCreate {
     this.ingredients.removeAt(index);
 
     this.syncMainAlcoholSelection();
+    this.captureDraft();
   }
 
   onIngredientNameChanged(index: number, name: string): void {
@@ -142,6 +215,7 @@ export class CocktailCreate {
     }
 
     this.syncMainAlcoholSelection();
+    this.captureDraft();
   }
 
   onIngredientSelected(index: number, ingredient: IngredientSuggestion): void {
@@ -154,6 +228,7 @@ export class CocktailCreate {
     group.controls.ingredientDefaultAbv.setValue(ingredient.defaultAbv);
 
     this.syncMainAlcoholSelection();
+    this.captureDraft();
   }
 
   onIngredientUnitChange(index: number): void {
@@ -233,6 +308,7 @@ export class CocktailCreate {
       return;
     }
 
+    if (!this.draft.begin(this.draftValue())) return;
     this.isSubmitting.set(true);
 
     this.errorMessage.set(null);
@@ -246,16 +322,19 @@ export class CocktailCreate {
     this.cocktailsService
       .createPersonalCocktail(request)
       .pipe(
+        takeUntilDestroyed(this.destroyRef),
         finalize(() => {
           this.isSubmitting.set(false);
         }),
       )
       .subscribe({
         next: (createdCocktail) => {
+          this.draft.succeeded();
           void this.router.navigate(['/cocktails', createdCocktail.slug]);
         },
 
         error: (error: unknown) => {
+          this.draft.rejected(error);
           this.errorMessage.set(this.resolveErrorMessage(error));
         },
       });

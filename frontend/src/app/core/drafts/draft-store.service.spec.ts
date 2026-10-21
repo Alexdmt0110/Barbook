@@ -136,4 +136,24 @@ describe('DraftStore identity and lifetime', () => {
     store.remove(lease, 'organization:other');
     expect(store.find(lease, 'create:new')?.uncertain).toBe(true);
   });
+  it('never reassigns interim memory if purge remains blocked across multiple account changes', () => {
+    const storage = TestBed.inject(BrowserStorageService);
+    const lease = bind();
+    store.save(lease, 'create:new', 1, 'A');
+    vi.spyOn(storage, 'write').mockReturnValue(false);
+    vi.spyOn(storage, 'remove').mockReturnValue(false);
+    store.purge();
+    store.confirmIdentity(a);
+    store.save(store.lease(), 'create:new', 1, 'new private A');
+    store.confirmIdentity({ userId: 'B', workspaceId: 'WB' });
+    expect(store.find(store.lease(), 'create:new')).toBeNull();
+  });
+  it('invalidates old form leases across same-account reauthentication while keeping its entries', () => {
+    const lease = bind();
+    store.save(lease, 'create:new', 1, 'saved');
+    store.suspend();
+    store.confirmIdentity(a);
+    expect(store.save(lease, 'create:new', 1, 'late')).toBe(false);
+    expect(store.find(store.lease(), 'create:new')?.value).toBe('saved');
+  });
 });

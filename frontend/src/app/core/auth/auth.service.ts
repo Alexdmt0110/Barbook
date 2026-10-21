@@ -104,7 +104,7 @@ export class AuthService {
       this.pendingLogout ??= this.session();
       const snapshot = this.pendingLogout;
       this.drafts.purge();
-      if (snapshot) this.channel?.postMessage({ kind: 'logout', owner: this.draftOwner(snapshot) });
+      if (snapshot) this.notify('logout', snapshot);
       this.drafts.suspend();
       this.generation++;
       this.session.set(null);
@@ -166,10 +166,18 @@ export class AuthService {
         tap((auth) => {
           this.drafts.confirmIdentity(this.draftOwner(auth));
           this.session.set(auth);
-          this.channel?.postMessage({ kind: 'identity', owner: this.draftOwner(auth) });
+          this.notify('identity', auth);
         }),
       );
     });
+  }
+
+  private notify(kind: 'logout' | 'identity', auth: AuthResponse): void {
+    try {
+      this.channel?.postMessage({ kind, owner: this.draftOwner(auth) });
+    } catch {
+      /* Local intent remains applied if broadcasting is unavailable. */
+    }
   }
 
   private draftOwner(auth: AuthResponse): DraftOwner {

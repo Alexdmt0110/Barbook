@@ -44,12 +44,10 @@ export class DraftStore {
   readonly purgeFailed = signal(false);
 
   confirmIdentity(owner: DraftOwner): void {
-    if (this.purgePending && !this.eraseStorage()) {
-      this.owner = owner;
-      this.active = true;
-      return; // Never import the inaccessible old namespace in this process.
-    }
+    // Change owner before retrying an inaccessible purge: memory may contain new
+    // drafts from the interim owner and must never be reassigned to another one.
     if (this.owner && !sameOwner(this.owner, owner)) this.purge();
+    if (this.purgePending) this.eraseStorage();
     if (!sameOwner(this.owner, owner)) {
       this.generation++;
       this.owner = { ...owner };
@@ -59,6 +57,7 @@ export class DraftStore {
   }
 
   suspend(): void {
+    this.generation++;
     this.active = false;
   }
   lease(): DraftLease | null {
@@ -122,6 +121,22 @@ export class DraftStore {
     }
     this.entries = [...previous, structuredClone(entry)];
     return this.persist();
+  }
+
+  prepareMutation(lease: DraftLease | null, key: string, version: number, value: unknown): boolean {
+    if (!this.valid(lease)) return false;
+    // If the uncertain marker cannot be persisted, remove any older apparently
+    // unsent snapshot before allowing a request. Otherwise a refresh could revive it.
+    return this.save(lease, key, version, value, true) || this.eraseStorage();
+  }
+
+  setUncertain(lease: DraftLease | null, key: string, uncertain: boolean): void {
+    if (!this.valid(lease)) return;
+    this.prune();
+    this.entries = this.entries.map((entry) =>
+      entry.key === key ? { ...entry, uncertain } : entry,
+    );
+    this.persist();
   }
 
   remove(lease: DraftLease | null, key: string): void {

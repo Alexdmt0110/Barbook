@@ -1,4 +1,9 @@
-<section class="organization-editor" aria-labelledby="cocktail-organization-title">
+<app-draft-notice [draft]="draft" (restore)="restoreDraft()" (discard)="discardDraft()" />
+<section
+  [attr.inert]="draft.candidate() ? '' : null"
+  class="organization-editor"
+  aria-labelledby="cocktail-organization-title"
+>
   <div class="organization-heading">
     <div>
       <p class="organization-eyebrow">Bibliothèque</p>
@@ -229,7 +234,7 @@
       <button
         type="button"
         class="primary-action save-organization-button"
-        [disabled]="busy() || hasConflict()"
+        [disabled]="busy() || hasConflict() || draft.conflict() || draft.uncertain()"
         (click)="saveOrganization()"
       >
         @if (isSaving()) {
