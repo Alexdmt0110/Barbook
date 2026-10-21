@@ -535,4 +535,33 @@ test('expired PostgreSQL session is rejected and returns to login without storin
   expect(await page.evaluate(() => sessionStorage.getItem('barbook.accessToken'))).toBeNull();
   expect(await page.evaluate(() => document.cookie.includes('barbook-session-dev'))).toBe(false);
   await expect(page.getByRole('button', { name: 'Se connecter', exact: true })).toBeVisible();
+
+  // Cookies remain available while both Web Storage getters are forbidden.
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.addInitScript(() => {
+    for (const name of ['localStorage', 'sessionStorage']) {
+      Object.defineProperty(window, name, {
+        configurable: true,
+        get: () => { throw new DOMException('Blocked fixture storage', 'SecurityError'); },
+      });
+    }
+  });
+  await page.reload();
+  await page.getByLabel('Adresse email', { exact: true }).fill(
+    browserFixtureEmail(testInfo.project.name, 'expired'),
+  );
+  await page.getByLabel('Mot de passe', { exact: true }).fill(password);
+  await page.getByRole('button', { name: 'Se connecter', exact: true }).click();
+  await expect(page).toHaveURL('http://127.0.0.1:4200/cocktails');
+  await page.getByRole('button', { name: /Thème d’affichage/ }).click();
+  await page.getByRole('dialog', { name: 'Choisir le thème d’affichage' })
+    .getByRole('button', { name: /^Clair/ }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await page.reload();
+  await expect(page).toHaveURL('http://127.0.0.1:4200/cocktails');
+  await expect(page.getByRole('button', { name: 'Déconnexion', exact: true })).toBeVisible();
+  // A fresh bootstrap uses the HttpOnly cookie, without restoring a persisted theme.
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  expect(errors).toEqual([]);
 });

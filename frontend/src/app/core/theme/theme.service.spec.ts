@@ -116,4 +116,25 @@ describe('ThemeService', () => {
 
     expect(storage.getItem('barbook.theme')).toBeNull();
   });
+  it('keeps the chosen theme in memory when the localStorage getter is forbidden', () => {
+    const document = TestBed.inject(DOCUMENT);
+    Object.defineProperty(document.defaultView, 'localStorage', {
+      get: () => { throw new DOMException('Blocked', 'SecurityError'); },
+    });
+    expect(() => service.initialize()).not.toThrow();
+    expect(service.currentTheme()).toBe(Theme.Dark);
+    service.setTheme(Theme.HighContrast);
+    expect(service.currentTheme()).toBe(Theme.HighContrast);
+    expect(documentElement.dataset['theme']).toBe(Theme.HighContrast);
+  });
+
+  it('applies the theme even when persistence fails with a full quota', () => {
+    vi.spyOn(storage, 'setItem').mockImplementation(() => {
+      throw new DOMException('Full', 'QuotaExceededError');
+    });
+    expect(() => service.setTheme(Theme.Light)).not.toThrow();
+    expect(service.currentTheme()).toBe(Theme.Light);
+    expect(documentElement.style.colorScheme).toBe('light');
+  });
+
 });

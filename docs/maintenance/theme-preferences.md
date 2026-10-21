@@ -142,3 +142,9 @@ La feature n'introduit aucune dépendance backend ou base de données.
 Le thème n'est actuellement pas synchronisé entre plusieurs navigateurs ou appareils.
 
 Le choix dépend du stockage local du navigateur utilisé.
+
+## Stockage tolérant B4c
+
+ThemeService utilise BrowserStorageService.read/write (zone local, clé barbook.theme). Le try englobe le getter localStorage et la méthode ; fenêtre absente, SecurityError et quota plein ne bloquent ni bootstrap ni changement de thème. Le signal courant reste en mémoire ; après refresh avec persistance bloquée, le thème sombre par défaut revient. Le service ne fait aucun clear global et ne contient aucun cache privé.
+
+BrowserStorageService offre read(zone,clé) → string|null et write/remove → booléen, zones local/session ; les appels sont best-effort et le consommateur garde son état mémoire. AuthService emploie remove pour la seule ancienne clé JWT, sans lecture ni secret nouveau en stockage JS. Les futurs brouillons B4d devront vérifier identité/workspace/TTL/version séparément et signaler l'absence de persistance ; cette brique ne les sérialise pas.

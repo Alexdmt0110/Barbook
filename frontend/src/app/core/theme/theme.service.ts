@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable, signal } from '@angular/core';
+import { BrowserStorageService } from '../storage/browser-storage.service';
 import { Theme, themes } from './theme.models';
 
 const THEME_STORAGE_KEY = 'barbook.theme';
@@ -9,6 +10,7 @@ const THEME_STORAGE_KEY = 'barbook.theme';
 })
 export class ThemeService {
   private readonly document = inject(DOCUMENT);
+  private readonly storage = inject(BrowserStorageService);
 
   readonly currentTheme = signal<Theme>(Theme.Dark);
 
@@ -36,37 +38,12 @@ export class ThemeService {
   }
 
   private readStoredTheme(): Theme {
-    const storage = this.getStorage();
-
-    if (!storage) {
-      return Theme.Dark;
-    }
-
-    try {
-      const storedTheme = storage.getItem(THEME_STORAGE_KEY);
-
-      return this.isTheme(storedTheme) ? storedTheme : Theme.Dark;
-    } catch {
-      return Theme.Dark;
-    }
+    const storedTheme = this.storage.read('local', THEME_STORAGE_KEY);
+    return this.isTheme(storedTheme) ? storedTheme : Theme.Dark;
   }
 
   private writeStoredTheme(theme: Theme): void {
-    const storage = this.getStorage();
-
-    if (!storage) {
-      return;
-    }
-
-    try {
-      storage.setItem(THEME_STORAGE_KEY, theme);
-    } catch {
-      // A blocked storage must not prevent Barbook from working.
-    }
-  }
-
-  private getStorage(): Storage | null {
-    return this.document.defaultView?.localStorage ?? null;
+    this.storage.write('local', THEME_STORAGE_KEY, theme);
   }
 
   private isTheme(value: string | null): value is Theme {
