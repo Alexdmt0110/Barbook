@@ -40,11 +40,11 @@ export class WebSessionService {
   ): Promise<AuthResponse> {
     const credential = this.credential(request);
     const session = await this.sessions.inspect(credential);
-    if (!session) throw new UnauthorizedException('Authentication required.');
+    if (!session) return this.authenticationFailure(credential);
     const response = await this.describe(session);
     this.assertRequestContext(request, response, bootstrap);
     if (!(await this.sessions.authenticate(credential))) {
-      throw new UnauthorizedException('Session expired or revoked.');
+      return this.authenticationFailure(credential);
     }
     return response;
   }
@@ -57,6 +57,26 @@ export class WebSessionService {
     this.assertRequestContext(request, await this.describe(session), false);
     await this.sessions.revoke(credential);
     // No Set-Cookie: a late logout response must not erase a newer login.
+  }
+
+  async globalLogoutContext(
+    request: Request,
+  ): Promise<{ userId: string; credential: string }> {
+    const credential = this.credential(request);
+    const session = await this.sessions.inspect(credential);
+    if (!session || !credential) return this.authenticationFailure(credential);
+    this.assertRequestContext(request, await this.describe(session), false);
+    return { userId: session.userId, credential };
+  }
+
+  private async authenticationFailure(credential: unknown): Promise<never> {
+    if (await this.sessions.wasRevoked(credential)) {
+      throw new UnauthorizedException({
+        code: 'SESSION_REVOKED',
+        message: 'Session revoked.',
+      });
+    }
+    throw new UnauthorizedException('Session expired or unavailable.');
   }
 
   private assertRequestContext(
