@@ -505,7 +505,7 @@ test('register, create, classify, manage folders and log back in', async ({ page
   } finally {
     await secondTab.close();
   }
-  await loseCreationResponse(page, `${prefix} lost response`, fillRecipeForm);
+  await loseCreationResponse(page, `${prefix} lost response`, fillRecipeForm, await browserHeaders(page));
 });
 
 test('expired PostgreSQL session is rejected and returns to login without storing credentials', async ({

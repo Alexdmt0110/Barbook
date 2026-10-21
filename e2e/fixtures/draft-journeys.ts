@@ -50,6 +50,7 @@ export async function loseCreationResponse(
   page: Page,
   name: string,
   fill: (page: Page, name: string) => Promise<void>,
+  headers: Record<string, string>,
 ): Promise<void> {
   await page.goto('/cocktails/new');
   await fill(page, name);
@@ -80,7 +81,10 @@ export async function loseCreationResponse(
     await expect(
       page.getByRole('button', { name: 'Créer le cocktail', exact: true }),
     ).toBeDisabled();
-    const actual = await page.request.get(`http://127.0.0.1:3000/api/cocktails/${committed!.slug}`);
+    const actual = await page.request.get(
+      `http://127.0.0.1:3000/api/cocktails/${committed!.slug}`,
+      { headers },
+    );
     expect(actual.status()).toBe(200);
     expect(((await actual.json()) as { name: string }).name).toBe(name);
     expect(posts).toBe(1);

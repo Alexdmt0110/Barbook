@@ -1,4 +1,9 @@
-import { draftNumber, draftObject, draftString } from '../../../core/drafts/draft-values';
+import {
+  draftKeys,
+  draftNumber,
+  draftObject,
+  draftString,
+} from '../../../core/drafts/draft-values';
 import { IngredientSuggestion } from '../../ingredients/data-access/ingredient.models';
 import { CocktailCreateFormValue } from './cocktail-create.form';
 import {
@@ -12,10 +17,28 @@ export interface CreationDraft {
   selected: (IngredientSuggestion | null)[];
 }
 export function isCreationDraft(value: unknown): value is CreationDraft {
-  if (!draftObject(value) || !draftObject(value['form']) || !Array.isArray(value['selected']))
+  if (
+    !draftObject(value) ||
+    !draftKeys(value, ['form', 'selected']) ||
+    !draftObject(value['form']) ||
+    !Array.isArray(value['selected'])
+  )
     return false;
   const f = value['form'];
   return (
+    draftKeys(f, [
+      'name',
+      'type',
+      'family',
+      'method',
+      'glass',
+      'ice',
+      'mainAlcoholName',
+      'notes',
+      'ingredients',
+      'garnishes',
+      'steps',
+    ]) &&
     ['name', 'family', 'glass', 'ice', 'mainAlcoholName', 'notes'].every((key) =>
       draftString(f[key]),
     ) &&
@@ -27,6 +50,14 @@ export function isCreationDraft(value: unknown): value is CreationDraft {
     f['ingredients'].every(
       (i) =>
         draftObject(i) &&
+        draftKeys(i, [
+          'ingredientName',
+          'ingredientDefaultAbv',
+          'amount',
+          'unit',
+          'specification',
+          'notes',
+        ]) &&
         ['ingredientName', 'specification', 'notes'].every((k) => draftString(i[k])) &&
         draftNumber(i['amount']) &&
         draftNumber(i['ingredientDefaultAbv']) &&
@@ -37,6 +68,7 @@ export function isCreationDraft(value: unknown): value is CreationDraft {
     f['garnishes'].every(
       (g) =>
         draftObject(g) &&
+        draftKeys(g, ['ingredientName', 'amount', 'unit', 'specification', 'usage']) &&
         ['ingredientName', 'specification', 'usage'].every((k) => draftString(g[k])) &&
         draftNumber(g['amount']) &&
         GARNISH_UNIT_OPTIONS.some((option) => option.value === g['unit']),
@@ -50,6 +82,7 @@ export function isCreationDraft(value: unknown): value is CreationDraft {
       (s) =>
         s === null ||
         (draftObject(s) &&
+          draftKeys(s, ['id', 'slug', 'name', 'defaultAbv']) &&
           ['id', 'slug', 'name'].every((k) => draftString(s[k])) &&
           draftNumber(s['defaultAbv'])),
     )

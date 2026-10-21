@@ -23,3 +23,5 @@ Commits atomiques immédiatement publiés et vérifiés ; six checks Actions à 
 ## Précision après revue du protocole, avant checkpoint UI
 
 Si l’écriture du marqueur « résultat inconnu » échoue, tenter d’effacer l’ancien snapshot avant mutation. Si les deux opérations sont refusées, bloquer cet envoi et expliquer la correction navigateur nécessaire ; conserver la saisie en mémoire. Cela évite qu’un ancien brouillon apparemment non envoyé réapparaisse après un POST committé dont la réponse a été perdue. Une suspension invalide les handles des anciens formulaires même si la reconnexion confirme le même compte. Un changement d’identité purge également la mémoire créée pendant un précédent échec d’effacement. Tests de ces trois courses ajoutés.
+
+Revue corrective : le guard doit accepter un composant null après destruction de l'outlet par l'auth ; les objets bruts importés doivent avoir exactement les contrôles attendus avant setValue. Vérifier à nouveau la forme à l'action restaurer et rendre les contrôles inertes pendant une mutation. Les traces/erreurs réelles et tests de régression précèdent la publication corrective. Reprendre la revue complète ensuite.

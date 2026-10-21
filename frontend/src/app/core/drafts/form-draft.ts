@@ -17,11 +17,11 @@ export class FormDraft {
     readonly store: DraftStore,
     readonly key: string,
     private version: number,
-    validate: (value: unknown) => boolean,
+    private readonly validate: (value: unknown, version: number) => boolean,
   ) {
     this.lease = store.lease();
     const candidate = store.find(this.lease, key);
-    if (candidate && validate(candidate.value)) this.candidate.set(candidate);
+    if (candidate && validate(candidate.value, candidate.version)) this.candidate.set(candidate);
     else if (candidate) {
       store.remove(this.lease, key);
       this.invalid.set(true);
@@ -36,7 +36,7 @@ export class FormDraft {
   restore(): unknown {
     // Re-read enforces TTL even if the prompt has been left open for 24 hours.
     const entry = this.store.find(this.lease, this.key);
-    if (!this.candidate() || !entry) {
+    if (!this.candidate() || !entry || !this.validate(entry.value, entry.version)) {
       this.candidate.set(null);
       this.invalid.set(true);
       return null;

@@ -499,4 +499,19 @@ describe('CocktailCreate', () => {
     component.submit();
     expect(cocktailsService.requests).toHaveLength(0);
   });
+  it('rejects extra form controls and incompatible form versions before applying untrusted storage', () => {
+    const first = createComponent();
+    first.form.controls.name.setValue('private');
+    const store = TestBed.inject(DraftStore);
+    const candidate = store.find(store.lease(), 'create:new')!;
+    const value = candidate.value as { form: Record<string, unknown> };
+    value.form['unknownControl'] = 'hostile';
+    store.save(store.lease(), 'create:new', 1, value);
+    const restored = createComponent();
+    expect(restored.draft.invalid()).toBe(true);
+    expect(() => restored.restoreDraft()).not.toThrow();
+    delete value.form['unknownControl'];
+    store.save(store.lease(), 'create:new', 0, value);
+    expect(createComponent().draft.invalid()).toBe(true);
+  });
 });

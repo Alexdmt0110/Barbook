@@ -47,7 +47,12 @@ import {
   styleUrl: './cocktail-create.css',
 })
 export class CocktailCreate {
-  readonly draft = new FormDraft(inject(DraftStore), 'create:new', 1, isCreationDraft);
+  readonly draft = new FormDraft(
+    inject(DraftStore),
+    'create:new',
+    1,
+    (value, version) => version === 1 && isCreationDraft(value),
+  );
   private readonly destroyRef = inject(DestroyRef);
   private restoring = false;
   private readonly formBuilder = inject(FormBuilder);

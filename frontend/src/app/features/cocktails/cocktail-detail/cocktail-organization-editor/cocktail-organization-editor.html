@@ -1,6 +1,6 @@
 <app-draft-notice [draft]="draft" (restore)="restoreDraft()" (discard)="discardDraft()" />
 <section
-  [attr.inert]="draft.candidate() ? '' : null"
+  [attr.inert]="draft.candidate() || busy() ? '' : null"
   class="organization-editor"
   aria-labelledby="cocktail-organization-title"
 >
