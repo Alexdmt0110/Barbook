@@ -1,3 +1,4 @@
+import { BrowserStorageService } from '../../../core/storage/browser-storage.service';
 import { DraftStore } from '../../../core/drafts/draft-store.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
@@ -513,5 +514,26 @@ describe('CocktailCreate', () => {
     delete value.form['unknownControl'];
     store.save(store.lease(), 'create:new', 0, value);
     expect(createComponent().draft.invalid()).toBe(true);
+  });
+  it('keeps the explicit abandon action available when persistence is refused', () => {
+    TestBed.inject(DraftStore).confirmIdentity({
+      userId: 'test-user',
+      workspaceId: 'test-workspace',
+    });
+    vi.spyOn(TestBed.inject(BrowserStorageService), 'write').mockReturnValue(false);
+    const fixture = TestBed.createComponent(CocktailCreate);
+    fixture.componentInstance.form.controls.name.setValue('memory only');
+    fixture.detectChanges();
+    const notice = fixture.nativeElement.querySelector('app-draft-notice') as HTMLElement;
+    expect(notice.textContent).toContain('Stockage navigateur indisponible ou saturé.');
+    expect(notice.textContent).not.toContain(
+      'Brouillon temporaire dans cet onglet, 24 heures maximum',
+    );
+    const abandon = [...notice.querySelectorAll('button')].find((button) =>
+      button.textContent?.includes('Abandonner'),
+    );
+    expect(abandon).toBeDefined();
+    abandon!.click();
+    expect(fixture.componentInstance.form.controls.name.value).toBe('');
   });
 });

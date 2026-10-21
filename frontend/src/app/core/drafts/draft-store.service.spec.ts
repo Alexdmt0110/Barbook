@@ -173,4 +173,15 @@ describe('DraftStore identity and lifetime', () => {
     expect(raw).not.toContain('expired private');
     expect(store.find(store.lease(), 'organization:other')!.expiresAt).toBe(expiry);
   });
+  it('removes an abandoned persisted copy when writes fail, retaining other recipes in memory', () => {
+    const lease = bind();
+    store.save(lease, 'create:new', 1, 'abandoned');
+    store.save(lease, 'organization:other', 4, 'retained');
+    vi.spyOn(TestBed.inject(BrowserStorageService), 'write').mockReturnValue(false);
+    store.remove(lease, 'create:new');
+    expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
+    expect(store.find(lease, 'create:new')).toBeNull();
+    expect(store.find(lease, 'organization:other')?.value).toBe('retained');
+    expect(store.memoryOnly()).toBe(true);
+  });
 });

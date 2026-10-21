@@ -121,8 +121,14 @@ export async function exerciseDraftQuota(page: Page): Promise<void> {
     await expect(page.getByRole('textbox', { name: /^Nom \*/ })).toHaveValue('Quota draft');
     await page.getByRole('button', { name: 'Abandonner le brouillon', exact: true }).click();
   } finally {
-    await page.evaluate(() =>
-      (window as unknown as { restoreDraftStorage: () => void }).restoreDraftStorage(),
-    );
+    // Preserve the original failing assertion if Playwright is already tearing down.
+    if (!page.isClosed())
+      await page
+        .evaluate(() =>
+          (window as unknown as { restoreDraftStorage: () => void }).restoreDraftStorage(),
+        )
+        .catch((error) => {
+          if (!page.isClosed()) throw error;
+        });
   }
 }

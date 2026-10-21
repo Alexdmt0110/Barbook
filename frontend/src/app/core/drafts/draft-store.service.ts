@@ -142,7 +142,9 @@ export class DraftStore {
   remove(lease: DraftLease | null, key: string): void {
     if (!this.valid(lease)) return;
     this.entries = this.entries.filter((entry) => entry.key !== key);
-    this.persist();
+    // An older persisted copy must not resurrect after an explicit discard.
+    // Other entries remain in memory if only whole-key removal is available.
+    if (!this.persist()) this.eraseStorage();
   }
 
   /** Local intent, before the HTTP logout. Invalidates even previously captured callbacks. */

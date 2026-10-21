@@ -53,12 +53,12 @@ import { FormDraft } from './form-draft';
         </button>
       </aside>
     }
-    @if (
-      draft().dirty() && !draft().candidate() && !draft().pending() && !draft().store.memoryOnly()
-    ) {
-      <p role="status">
-        Brouillon temporaire dans cet onglet, 24 heures maximum depuis la dernière saisie.
-      </p>
+    @if (draft().dirty() && !draft().candidate() && !draft().pending()) {
+      @if (!draft().store.memoryOnly()) {
+        <p role="status">
+          Brouillon temporaire dans cet onglet, 24 heures maximum depuis la dernière saisie.
+        </p>
+      }
       <button type="button" (click)="discard.emit()">Abandonner le brouillon</button>
     }
   `,
