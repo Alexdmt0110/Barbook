@@ -1,25 +1,25 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-21T08:13:22Z"
+checkpoint_utc: "2026-10-21T08:16:42Z"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
-handoff_status: "EN_ATTENTE_VALIDATION"
-feature: "L4 B4c : admission privée et stockage tolérant qualifiés ; PR à ouvrir"
+handoff_status: "PRET_A_PASSER"
+feature: "L4 B4c : PR #28 ouverte, diff vérifié ; merge à valider"
 branch: "feature/private-beta-admission"
 base_branch: "main"
-remote_head_sha: "167d20b933523bd64cc33fb6c99c775ad543b956"
-local_head_sha: "167d20b933523bd64cc33fb6c99c775ad543b956"
+remote_head_sha: "5de0790dd7685fb4cf30f363b32c2fe63b239912"
+local_head_sha: "5de0790dd7685fb4cf30f363b32c2fe63b239912"
 worktree: "checkpoint documentaire seul en préparation ; code qualifié poussé et propre avant ces documents"
-pr: "aucune PR B4c à cette photographie ; #27 MERGEE ; vérifier GitHub avant création"
+pr: "https://github.com/Alexdmt0110/Barbook/pull/28 ; OPEN, non mergée ; base main90d9356 ; vérifier checks du dernier HEAD"
 tests: "232backend/147frontend/118PG-HTTP/4Chromium ; six checks code success ; PG/navigateur seulement CI"
 migrations: "sept historiques inchangées ; aucune nouvelle, personnelle ou production"
 changes_pushed: "design70212e2 ; admissionbca7b34 ; stockage167d20b"
 unpushed_changes: "documents de ce checkpoint avant leur propre publication"
 decisions_validated: "merge #27 et suite L4 seuls ; D1/D2 inchangées ; WORK seul"
 decisions_pending: "tout nouveau merge ; L5/CONTRACT/production non autorisés"
-next_atomic_step: "publier ce checkpoint, ouvrir/relire vraie PR B4c et ses six checks puis attendre accord merge"
+next_atomic_step: "vérifier les six checks du dernier HEAD de #28 puis attendre accord merge ; après merge/main vert reprendre B4d"
 risks_and_blockers: "aucun BLOCKER/P1 B4c identifié ; B4d/B4e/B4f restent à réaliser"
 production_effect: "aucun"
 ```
@@ -49,3 +49,9 @@ Après vraie PR : attendre Alex pour le merge. Son accord sur #27 a été exécu
 B4e doit encore exposer et tester logout global après réauthentification ; ne pas prétendre cette route livrée parce que le store interne sait révoquer. Une requête déjà autorisée peut finir ; pas d'annulation rétroactive. Les réponses anciennes et le contexte A/B restent couverts par B4b et ses régressions, sans inventer un sélecteur partagé.
 
 Branches historiques conservées, notamment feature/web-session-cutover1e52381, secure-web-sessions4c97d89, dossiers95e21bc, docs/l3-merge-checkpoint39fd730 et archives. Git : commits/push/PR uniquement, aucun nouveau merge. VM : aucun déploiement. SQL : aucune migration nouvelle/propriétaire, seulement CI jetables. Infra : aucun changement ; seuls triggers push exacts ajoutés aux trois workflows, sans modification d'actions/jobs/permissions/ruleset.
+
+## PR #28 ouverte et contrôlée
+
+Checkpoint5de0790 publié/vérifié ; PR #28 créée, base90d9356/head5de0790,37fichiers et4commits. Tous les blobs et toutes les lignes ajoutées/retirées de la vraie PR correspondent au diff local main...HEAD. Aucune revue/commentaire/thread ni conflit ; mergeable=true. Ce dernier complément modifie seulement le handoff, le backlog structuré et l'index pour y enregistrer #28 ; code167d20b inchangé et déjà six checks verts. Les contrôles push/PR du dernier HEAD documentaire doivent être observés jusqu'à la fin ; leurs liens seront consignés dans la description de #28.
+
+PRET_A_PASSER indique une reprise durable, pas un accord merge ni la fin de L4. Aucun démarrage de B4d sur cette branche en attendant la décision de merge B4c. Toutes les autorisations restantes et exclusions précédentes restent inchangées.
