@@ -50,6 +50,16 @@ Le guard lira d'abord les métadonnées par inspect, sans écriture, pour vérif
 
 ## Points de protocole à fermer avant activation
 
+### Reprise du 21 octobre — revue préventive du protocole
+
+WORK reprend seul, main76f742b et brancheb579ef6 relus à distance, six checks verts, aucune PR ouverte et clone propre. Sources normatives relues. Le prochain bloc coordonne serveur, Angular et fixtures, sans migration.
+
+La déconnexion révoquera le credential de la requête, **sans Set-Cookie** : une réponse ancienne ne pourra ainsi effacer une connexion ultérieure. Le cookie résiduel est inerte, HttpOnly et refusé par le store ; une connexion suivante le remplace. Même règle sur401 : aucun effacement de cookie côté serveur. L'idempotence du logout déjà expiré/révoqué est protégée par Origin/marker ; une session encore active exige aussi contexte et CSRF. Cette précision remplace la suppression inconditionnelle envisagée plus haut.
+
+Le client capture une génération et un contexte pour chaque requête ; logout bloque immédiatement le contenu privé, mais conserve uniquement en mémoire les preuves CSRF/contexte nécessaires à un retry explicite si le résultat réseau est inconnu. Login/register vérifient /me avant installation. Les notifications inter-onglets invalident le contexte sans adopter une autre identité dans la vue courante ; le serveur reste la barrière lorsque les notifications manquent. Les réponses tardives ne peuvent remettre une identité en mémoire. Une transition de connexion concurrente peut remplacer le cookie ; la vérification /me doit détecter une identité différente et demander une connexion explicite.
+
+Tests : application Nest réelle avec PG pour mutations/rollback/expiration/révocation et contexte ; unités Angular pour absence de Bearer, bootstrap et réponses tardives ; adaptation des quatre parcours Chromium et fixture d'expiration DB strictement jetable. Aucun affaiblissement de quotas, assertion ou garde-fou. Git commit/push après vérification ; VM aucun déploiement ; SQL bases CI jetables uniquement ; infra inchangée.
+
 Une réponse logout ancienne peut arriver après un login d'un autre onglet : un Set-Cookie de suppression inconditionnel pourrait alors effacer le nouveau cookie. Le helper clearSessionCookie ne garantit pas à lui seul l'ordre des transitions. Définir/tester ce protocole avant son raccordement (coordination des transitions avec fallback sûr, ou révocation sans suppression globale inconditionnelle), sans demander une nouvelle décision produit. Le contrôle serveur du contexte reste obligatoire indépendamment des notifications.
 
 Si le POST register a réussi mais que le navigateur refuse le cookie, le compte existe réellement : la vérification /me doit produire un message honnête de connexion non établie, pas prétendre que l'inscription a été annulée ou rejouer automatiquement le POST. Même exigence de distinction entre résultat certain et inconnu pour les erreurs réseau. Ces cas ne sont pas encore qualifiés par les44tests de primitives.
