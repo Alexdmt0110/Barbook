@@ -15,7 +15,13 @@ export class AppShell {
   private readonly router = inject(Router);
 
   logout(): void {
-    this.authService.logout();
-    void this.router.navigateByUrl('/login');
+    this.authService.logout().subscribe({
+      next: () => {
+        void this.router.navigateByUrl('/login');
+      },
+      error: () => {
+        /* The shell keeps private content hidden and offers retry. */
+      },
+    });
   }
 }

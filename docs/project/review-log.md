@@ -213,3 +213,43 @@ Correction ciblée : casts integer explicites des constantes de durée, dans cr�
 6ffc67b : six checks success réellement lus ; logs168backend+NYC,131frontend,10garde-fous,88natifs/6suites dont26store et4Chromium. Sept migrations fresh/redeploy/status/drift et smoke vert ; audits complets/runtime backend/frontend zéro. Le P1 text*interval de47b479d est fermé par ces exécutions ; aucun test retiré ou affaibli.
 
 Revue complète main...branche après correction,24fichiers avant ce checkpoint, tous axes dans reviews/l4-b4a-review-gate.md ; aucun BLOCKER/P1 restant identifié dans le périmètre préparatoire. Sources/primitives/transactions/SQL/tests/docs/workflows relus, absence de changement frontend/dépendance/infra/ancienne migration vérifiée. B4a inactif côté routes reste explicite, pas de clôture globale L4. Checkpoint/handoff/catalogue mis à jour dans un bloc documentaire seul ; relire la vraie PR et les checks de son HEAD après publication. Merge distinct à valider par Alex ; aucune production.
+
+## #26 mergée ; Design Review B4b avant code
+
+Accord explicite Alex20octobre ; HEAD/base/diff26fichiers/quatre commits/12checks/discussions/mergeabilité revérifiés sans changement. Merge commit76f742b, mergedAt11:06:17UTC et arbre/parents/main/six checks post-merge vérifiés, logs168/131/88/4/sept migrations/audits zéro relus. Aucune branche historique supprimée/réécrite.
+
+B4b : nouvelle branche feature/web-session-cutover. Revue l4-b4b-design.md avant code : origine/cookie/CSRF/contexte côté web ; store réutilisé ; transactions d'inscription complètes ; pas de fallback Bearer ; génération client et interdiction d'installer B dans écran A ; expiration distincte du logout ; fixtures et vrais tests à adapter sans suppression d'assertion. Commits bornés de préparation inactive puis bascule coordonnée. Le présent commit ne change que pilotage/design et les trois triggers push exacts, sans actions/jobs/permissions/protection.
+
+## B4b préparation inactive — contrôles web et prélecture
+
+Design a69daab et baseline six checks success avant code. Helpers cohésifs web-session-security : configuration exacte/HTTPS production, parsing cookie canonique/borné/doublons, sérialisation/suppression avec attributs/absence de cache, origine/marker/contenu, CSRF constant-time et contexte attendu sans grant de droits.44tests via contrôleur Nest de test sur HTTP réel, non inclus dans le build et non enregistré dans AppModule. Ne pas confondre cette preuve des primitives avec leur raccordement aux routes métier.
+
+SessionService.inspect prélecture sans activité ; authenticate reste l'autorisation finale sous verrou. Deux cas natifs supplémentaires de prélecture sans renouvellement et révocation/expiration entre prélecture et validation finale ; aucun modèle/SQL de migration modifié. Revue : SQL paramétré/projection existante, pas de cache, coût d'une lecture indexée supplémentaire explicite dans le design ; les requêtes refusées par le futur guard n'auront pas besoin de prolonger la session.
+
+Local : verify212tests/20suites+NYC, lint zéro warning, build/Prisma, tsc incluant les tests et dix garde-fous passés. Ancien frontend/contrats JWT inchangés. Les deux nouvelles assertions PG sont compilées mais la CI native90 reste à observer après publication. Aucun package, middleware actif, guard de recette, cookie ou route de l'application modifié par cette préparation. Pas de nouvelle PR ni de merge avant la bascule cohérente et son Review Gate complet.
+
+## B4b préparation — qualification et point de reprise
+
+6500544 : six checks success et logs212backend+NYC/131frontend/90natifs/4Chromium/dix garde-fous/sept migrations/audits zéro relus. Les deux tests inspect ont réellement tourné dans PostgreSQL. Diff de préparation relu : helpers non importés par AppModule/guards métier, contrôleur de test exclu du build, seul inspect ajouté au store ; aucune migration/package/contrat/frontend modifié. Aucun BLOCKER/P1 identifié dans ce micro-bloc inactif ; ce n'est pas le Review Gate de B4b complet et aucune PR n'est créée.
+
+Point de reprise vert et poussé avant l'activation plus volumineuse : bascule coordonnée encore à faire. Le protocole d'ordonnancement cookie logout/login et les réponses de comptes anciens restent à qualifier avant activation ; ne pas brancher clearSessionCookie naïvement à un logout concurrent. Ces limites sont explicites, pas présentées comme des garanties déjà livrées. Mise à jour documentaire seule du handoff/checkpoint, sans modification des blobs qualifiés.
+
+## 21 octobre — activation B4b et correction du graphe Nest
+
+Design ecf9462 puis bascule coordonnée2b7b924,52fichiers/blobs/parent/arbre vérifiés. Local212backend/137frontend/build/lint/Prisma et tsc/safety passés ; CI Quality/back audit success. La vraie intégration PG/HTTP a révélé un export WebSessionService manquant pour la réinstanciation de SessionGuard dans CocktailsModule. P1 reproduit localement par un test du vrai AppModule sans DB (Prisma remplacé, guards/contrôleurs réels) ; correction de l'export et test passé, verify213backend/21suites+NYC complet vert. Ce test sera exécuté dans le Quality, sans attendre PG. Aucun contrôle désactivé. Revue complète à reprendre après correction et avant PR.
+
+L'audit frontend échoue désormais sur quatre paquets signalés hauts de la chaîne CLI SDK1.31.0/build Vite7.3.6 ; runtime audit zéro. Analyse/correction compatible en cours, pas d'audit fix --force ni migration Angular22 automatique. La CI reste rouge tant que ce point et l'intégration réelle ne sont pas qualifiés. Aucun nouveau merge.
+
+## B4b — qualification et Review Gate complet
+
+## État courant — 21 octobre 2026, B4b qualifié sur branche
+
+Main reste `76f742bc7de437fe7ed1d6528344be208d54159d` (#26 intégrée). La branche `feature/web-session-cutover` au code `8ff31b74b8643f21228fcfbf64fe1cc24e2ad1d8` active les sessions PostgreSQL, cookies HttpOnly, CSRF serveur, contexte attendu et bootstrap Angular ; Bearer/JWT et sa dépendance sont retirés. Aucun merge B4b ni déploiement. Les sections antérieures datées ci-dessous sont des preuves historiques, pas l'état actuel.
+
+Six checks de ce code success : [Quality39559982719](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982719), [Integration39559982657](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982657), [Audits39559982741](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982741). Logs relus : **213 backend,138 frontend,111 PostgreSQL/HTTP,4 Chromium desktop/mobile** ; dix garde-fous, sept migrations fresh/redeploy/status/drift et smoke, audits complets/runtime zéro. Local : verify backend/frontend, compatibilité NYC/CLI, tsc backend et E2E, safety et diffcheck passés ; pas de PostgreSQL/Chromium local prétendu.
+
+Les quatre parcours réels incluent désormais deux onglets partageant le cookie, logout dans le second et invalidation du premier, rejeu401 du credential révoqué, reconnexion explicite, CSRF invalide403 sans dossier créé, expiration DB, cookie HttpOnly inaccessible à document.cookie et absence d'accessToken. Les unités avec le vrai AuthService/interceptor ordonnent un logout tardif après reconnexion et vérifient que la nouvelle session reste installée. HTTP/PG : compte A/contexte ancien avec cookie B refusé avant lecture/écriture/logout ; origine/CSRF manquants ou hostiles ne prolongent pas l'activité ; fixation/rotation, échéances et rollback testés. Aucune simulation d'API dans Chromium, aucune inscription ou retry supplémentaire ni quota assoupli.
+
+[Review Gate B4b](reviews/l4-b4b-review-gate.md) repris sur toute la branche depuis main après les corrections Nest et dépendances : aucun BLOCKER/P1 restant identifié dans ce périmètre. Publication documentaire seule, puis vraie PR/diff/checks à contrôler ; **merge soumis à Alex**. Toutes les branches historiques conservées.
+
+B4c admission privée/storage, B4d brouillons24h/restauration/purge/version et B4e logout global/courses approfondies restent à réaliser. La préservation de sessionStorage à expiration ne constitue pas une sauvegarde des formulaires. Aucun compte partagé/workspace sélectionnable n'est livré ; mismatch couvert par clients HTTP hostiles, pas par un sélecteur inexistant. TLS/Secure réel, proxy, Safari/iOS, backup/restore/rollback propriétaire et déploiement non qualifiés. L4 n'est pas terminé ; L5/CONTRACT/production restent exclus.

@@ -6,9 +6,10 @@ export interface AuthenticatedUser {
 
 export interface AuthResponse {
   user: AuthenticatedUser;
-  accessToken: string;
+  workspaceId: string;
+  csrfToken: string;
 }
 
-export interface JwtPayload {
+export interface SessionIdentity {
   sub: string;
 }

@@ -13,7 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CurrentUserId } from '../auth/decorators/current-user-id.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { SessionGuard } from '../auth/guards/session.guard';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import {
   AddFolderCocktailsDto,
@@ -24,7 +24,7 @@ import {
 import { FoldersService } from './folders.service';
 
 @Controller('folders')
-@UseGuards(JwtAuthGuard)
+@UseGuards(SessionGuard)
 export class FoldersController {
   constructor(private readonly folders: FoldersService) {}
   @Get()

@@ -1,82 +1,43 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError, map, throwError } from 'rxjs';
+import { AUTH_SNAPSHOT } from './auth.models';
 import { AuthService } from './auth.service';
 
-const PUBLIC_AUTH_ENDPOINTS = new Set(['/api/auth/login', '/api/auth/register']);
-
-/**
- * Ajoute le token aux requêtes API privées
- * et invalide centralement une session refusée
- * par le backend.
- */
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
-  const authService = inject(AuthService);
-
-  const router = inject(Router);
-
-  const accessToken = authService.getAccessToken();
-
-  if (!accessToken || !isApiRequest(request.url) || isPublicAuthRequest(request.url)) {
-    return next(request);
+  // Only relative same-origin API URLs. Never attach context/CSRF externally.
+  if (!request.url.startsWith('/api/')) return next(request);
+  const auth = inject(AuthService);
+  const epoch = auth.epoch();
+  const path = request.url.split('?')[0];
+  const publicAuth = path === '/api/auth/login' || path === '/api/auth/register';
+  const snapshot = request.context.has(AUTH_SNAPSHOT)
+    ? request.context.get(AUTH_SNAPSHOT)
+    : auth.snapshot();
+  const unsafe = !['GET', 'HEAD', 'OPTIONS'].includes(request.method);
+  const headers: Record<string, string> = { 'X-Barbook-Request': '1' };
+  if (!publicAuth && snapshot) {
+    headers['X-Barbook-Expected-User'] = snapshot.user.id;
+    headers['X-Barbook-Expected-Workspace'] = snapshot.workspaceId;
+    if (unsafe) headers['X-Barbook-CSRF'] = snapshot.csrfToken;
   }
-
-  const authenticatedRequest = request.clone({
-    setHeaders: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  return next(authenticatedRequest).pipe(
+  return next(request.clone({ withCredentials: true, setHeaders: headers })).pipe(
+    map((event) => {
+      if (epoch !== auth.epoch()) throw new Error('La session a changé. Réponse abandonnée.');
+      return event;
+    }),
     catchError((error: unknown) => {
-      if (!(error instanceof HttpErrorResponse) || error.status !== 401) {
-        return throwError(() => error);
+      if (
+        epoch === auth.epoch() &&
+        !publicAuth &&
+        path !== '/api/auth/logout' &&
+        error instanceof HttpErrorResponse &&
+        (error.status === 401 ||
+          (error.status === 409 && error.error?.code === 'AUTH_CONTEXT_CHANGED'))
+      ) {
+        auth.expire();
       }
-
-      /*
-       * Pendant une restauration après
-       * rechargement, un token peut exister
-       * sans utilisateur encore chargé.
-       *
-       * Dans ce cas le guard connaît mieux
-       * la destination demandée et réalisera
-       * lui-même la redirection.
-       */
-      const shouldRedirect = authService.isAuthenticated();
-
-      const returnUrl = router.url;
-
-      authService.logout();
-
-      if (shouldRedirect && !isAuthenticationPage(returnUrl)) {
-        void router.navigate(['/login'], {
-          queryParams: {
-            returnUrl,
-          },
-        });
-      }
-
       return throwError(() => error);
     }),
   );
 };
-
-function isApiRequest(url: string): boolean {
-  return url.startsWith('/api/');
-}
-
-function isPublicAuthRequest(url: string): boolean {
-  const [path] = url.split('?');
-
-  return path !== undefined && PUBLIC_AUTH_ENDPOINTS.has(path);
-}
-
-function isAuthenticationPage(url: string): boolean {
-  return (
-    url === '/login' ||
-    url.startsWith('/login?') ||
-    url === '/register' ||
-    url.startsWith('/register?')
-  );
-}

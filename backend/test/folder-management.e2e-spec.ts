@@ -11,6 +11,7 @@ import { PrismaService } from '../src/database/prisma.service';
 import { FolderDetail, FolderPage } from '../src/folders/folder.types';
 import {
   Actor,
+  browserHeaders,
   createActor,
   createApplicationFixture,
   recipePayload,
@@ -24,13 +25,13 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
   let alice: Actor;
   let bob: Actor;
   const api = () => request(app.getHttpServer());
-  const auth = (actor = alice) => `Bearer ${actor.accessToken}`;
+  const auth = (actor = alice) => browserHeaders(actor);
   const folder = (actor = alice, name: string = randomUUID()) =>
     prisma.folder.create({ data: { workspaceId: actor.workspaceId, name } });
   async function recipe(actor = alice) {
     const response = await api()
       .post('/api/cocktails')
-      .set('Authorization', auth(actor))
+      .set(auth(actor))
       .send(recipePayload())
       .expect(201);
     return response.body as { id: string; slug: string };
@@ -38,14 +39,14 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
   const getDetail = async (slug: string) => {
     const response = await api()
       .get(`/api/cocktails/${slug}`)
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200);
     return response.body as CocktailDetail;
   };
   const organize = (slug: string, folderIds: string[], expectedVersion = 0) =>
     api()
       .put(`/api/cocktails/${slug}/organization`)
-      .set('Authorization', auth())
+      .set(auth())
       .send({ folderIds, expectedVersion, tagNames: ['Kept'] })
       .expect(200);
 
@@ -65,38 +66,27 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     const name = `Name ${randomUUID()}`;
     const response = await api()
       .post('/api/folders')
-      .set('Authorization', auth())
+      .set(auth())
       .send({ name: `  ${name}  ` })
       .expect(201);
     const created = response.body as { id: string; name: string };
     expect(created.name).toBe(name);
     const detail = await api()
       .get(`/api/folders/${created.id}`)
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200);
     expect(detail.body).toEqual({ ...created, version: 0, cocktailCount: 0 });
+    await api().post('/api/folders').set(auth()).send({ name }).expect(409);
     await api()
       .post('/api/folders')
-      .set('Authorization', auth())
-      .send({ name })
-      .expect(409);
-    await api()
-      .post('/api/folders')
-      .set('Authorization', auth())
+      .set(auth())
       .send({ name: name.toUpperCase() })
       .expect(201);
-    await api()
-      .post('/api/folders')
-      .set('Authorization', auth(bob))
-      .send({ name })
-      .expect(201);
+    await api().post('/api/folders').set(auth(bob)).send({ name }).expect(201);
     const raceName = `Concurrent ${randomUUID()}`;
     const race = await Promise.all(
       [0, 1].map(() =>
-        api()
-          .post('/api/folders')
-          .set('Authorization', auth())
-          .send({ name: raceName }),
+        api().post('/api/folders').set(auth()).send({ name: raceName }),
       ),
     );
     expect(race.map((r) => r.status).sort()).toEqual([201, 409]);
@@ -115,7 +105,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     const first = await api()
       .get('/api/folders/browse')
       .query({ search: marker.toLowerCase() })
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200);
     const page1 = first.body as FolderPage;
     expect(page1.total).toBe(27);
@@ -125,7 +115,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     const second = await api()
       .get('/api/folders/browse')
       .query({ search: marker, page: 2 })
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200);
     expect((second.body as FolderPage).items.map((f) => f.name)).toEqual(
       names.slice(25),
@@ -133,13 +123,13 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     const empty = await api()
       .get('/api/folders/browse')
       .query({ search: randomUUID() })
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200);
     expect(empty.body).toMatchObject({ items: [], total: 0, totalPages: 0 });
     const beyond = await api()
       .get('/api/folders/browse')
       .query({ search: marker, page: 3 })
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200);
     expect(beyond.body).toMatchObject({ items: [], total: 27, totalPages: 2 });
   });
@@ -151,32 +141,29 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     for (const id of [foreign.id, missing]) {
       const response = await api()
         .get(`/api/folders/${id}`)
-        .set('Authorization', auth())
+        .set(auth())
         .expect(404);
       expect(response.body).toMatchObject({ message: 'Folder not found.' });
       await api()
         .patch(`/api/folders/${id}`)
-        .set('Authorization', auth())
+        .set(auth())
         .send({ name: 'Unavailable', expectedVersion: 0 })
         .expect(404);
       await api()
         .delete(`/api/folders/${id}`)
         .query({ expectedVersion: 0 })
-        .set('Authorization', auth())
+        .set(auth())
         .expect(404);
       await api()
         .put(`/api/folders/${id}/cocktails/${created.id}`)
-        .set('Authorization', auth())
+        .set(auth())
         .expect(404);
       await api()
         .delete(`/api/folders/${id}/cocktails/${created.id}`)
-        .set('Authorization', auth())
+        .set(auth())
         .expect(404);
     }
-    await api()
-      .get('/api/folders/invalid')
-      .set('Authorization', auth())
-      .expect(400);
+    await api().get('/api/folders/invalid').set(auth()).expect(400);
     await api().get('/api/folders/browse').expect(401);
   });
 
@@ -185,7 +172,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     const b = await folder();
     const renamed = await api()
       .patch(`/api/folders/${a.id}`)
-      .set('Authorization', auth())
+      .set(auth())
       .send({ name: `  ${a.name} renamed  `, expectedVersion: 0 })
       .expect(200);
     expect(renamed.body).toMatchObject({
@@ -195,18 +182,18 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     });
     await api()
       .patch(`/api/folders/${a.id}`)
-      .set('Authorization', auth())
+      .set(auth())
       .send({ name: b.name, expectedVersion: 1 })
       .expect(409);
     await api()
       .patch(`/api/folders/${a.id}`)
-      .set('Authorization', auth())
+      .set(auth())
       .send({ name: 'Stale', expectedVersion: 0 })
       .expect(409);
     await api()
       .delete(`/api/folders/${a.id}`)
       .query({ expectedVersion: 0 })
-      .set('Authorization', auth())
+      .set(auth())
       .expect(409);
     const stored = await prisma.folder.findUniqueOrThrow({
       where: { id: a.id },
@@ -221,13 +208,13 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     await organize(one.slug, [a.id]);
     await api()
       .post(`/api/folders/${b.id}/cocktails`)
-      .set('Authorization', auth())
+      .set(auth())
       .send({ cocktailIds: [one.id, one.id.toUpperCase(), two.id] })
       .expect(200)
       .expect({ added: 2 });
     await api()
       .put(`/api/folders/${b.id}/cocktails/${one.id}`)
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200)
       .expect({ added: 0 });
     const linked = await getDetail(one.slug);
@@ -236,12 +223,12 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     expect(linked.folders).toHaveLength(2);
     await api()
       .delete(`/api/folders/${a.id}/cocktails/${one.id}`)
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200)
       .expect({ removed: 1 });
     await api()
       .delete(`/api/folders/${a.id}/cocktails/${one.id}`)
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200)
       .expect({ removed: 0 });
     const remaining = await getDetail(one.slug);
@@ -252,12 +239,12 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     expect(remaining.ingredients).toEqual(linked.ingredients);
     const counted = await api()
       .get(`/api/folders/${b.id}`)
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200);
     expect((counted.body as FolderDetail).cocktailCount).toBe(2);
     await api()
       .patch(`/api/folders/${b.id}`)
-      .set('Authorization', auth())
+      .set(auth())
       .send({ name: `${b.name} renamed`, expectedVersion: 0 })
       .expect(200);
     const afterRename = await getDetail(one.slug);
@@ -270,7 +257,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
 
     await api()
       .delete(`/api/folders/${b.id}/cocktails/${one.id}`)
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200)
       .expect({ removed: 1 });
     const empty = await getDetail(one.slug);
@@ -285,12 +272,12 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     for (const bad of [foreign.id, randomUUID()]) {
       await api()
         .post(`/api/folders/${target.id}/cocktails`)
-        .set('Authorization', auth())
+        .set(auth())
         .send({ cocktailIds: [own.id, bad] })
         .expect(404);
       await api()
         .delete(`/api/folders/${target.id}/cocktails/${bad}`)
-        .set('Authorization', auth())
+        .set(auth())
         .expect(404);
     }
     expect(
@@ -314,7 +301,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     await api()
       .delete(`/api/folders/${a.id}`)
       .query({ expectedVersion: 0 })
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200)
       .expect({ deleted: true });
     const remaining = await getDetail(one.slug);
@@ -333,7 +320,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     const filter = await api()
       .get('/api/cocktails')
       .query({ folderId: b.id })
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200);
     expect((filter.body as CocktailListResult).items.map((c) => c.id)).toEqual([
       one.id,
@@ -359,7 +346,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
       await api()
         .delete(`/api/folders/${target.id}`)
         .query({ expectedVersion: 0 })
-        .set('Authorization', auth())
+        .set(auth())
         .expect(500);
       expect(await getDetail(created.slug)).toEqual(before);
       expect(await prisma.folder.count({ where: { id: target.id } })).toBe(1);
@@ -376,7 +363,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
       ['one', 'two'].map((suffix) =>
         api()
           .patch(`/api/folders/${target.id}`)
-          .set('Authorization', auth())
+          .set(auth())
           .send({ name: `${target.name} ${suffix}`, expectedVersion: 0 }),
       ),
     );
@@ -385,7 +372,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
       [0, 1].map(() =>
         api()
           .put(`/api/folders/${target.id}/cocktails/${created.id}`)
-          .set('Authorization', auth()),
+          .set(auth()),
       ),
     );
     expect(adds.map((r) => r.status)).toEqual([200, 200]);
@@ -402,11 +389,9 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     const [full, local] = await Promise.all([
       api()
         .put(`/api/cocktails/${created.slug}/organization`)
-        .set('Authorization', auth())
+        .set(auth())
         .send({ folderIds: [a.id], tagNames: [marker], expectedVersion: 0 }),
-      api()
-        .put(`/api/folders/${b.id}/cocktails/${created.id}`)
-        .set('Authorization', auth()),
+      api().put(`/api/folders/${b.id}/cocktails/${created.id}`).set(auth()),
     ]);
     expect(local.status).toBe(200);
     expect([200, 409]).toContain(full.status);
@@ -433,10 +418,10 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
       api()
         .delete(`/api/folders/${target.id}`)
         .query({ expectedVersion: 0 })
-        .set('Authorization', auth()),
+        .set(auth()),
       api()
         .put(`/api/folders/${target.id}/cocktails/${created.id}`)
-        .set('Authorization', auth()),
+        .set(auth()),
     ]);
     expect(removed.status).toBe(200);
     expect([200, 404]).toContain(added.status);
@@ -462,13 +447,13 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     const cocktailIds = rows.map((row) => row.id);
     await api()
       .post(`/api/folders/${target.id}/cocktails`)
-      .set('Authorization', auth())
+      .set(auth())
       .send({ cocktailIds })
       .expect(200)
       .expect({ added: 100 });
     await api()
       .post(`/api/folders/${target.id}/cocktails`)
-      .set('Authorization', auth())
+      .set(auth())
       .send({ cocktailIds })
       .expect(200)
       .expect({ added: 0 });
@@ -484,7 +469,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     ).toBe(100);
     const detail = await api()
       .get(`/api/folders/${target.id}`)
-      .set('Authorization', auth())
+      .set(auth())
       .expect(200);
     expect((detail.body as FolderDetail).cocktailCount).toBe(100);
     const seen = new Set<string>();
@@ -492,7 +477,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
       const response = await api()
         .get('/api/cocktails')
         .query({ folderId: target.id, page, pageSize: 24 })
-        .set('Authorization', auth())
+        .set(auth())
         .expect(200);
       const result = response.body as CocktailListResult;
       expect(result.total).toBe(100);
@@ -514,7 +499,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     ]) {
       await api()
         .post(`${path}/cocktails`)
-        .set('Authorization', auth())
+        .set(auth())
         .send({ cocktailIds })
         .expect(400);
     }
@@ -528,7 +513,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
       await api()
         .get('/api/folders/browse')
         .query(query)
-        .set('Authorization', auth())
+        .set(auth())
         .expect(400);
     }
     for (const change of [
@@ -542,7 +527,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     ]) {
       await api()
         .patch(path)
-        .set('Authorization', auth())
+        .set(auth())
         .send({ name: 'Valid', expectedVersion: 0, ...change })
         .expect(400);
     }
@@ -550,9 +535,9 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
       await api()
         .delete(path)
         .query({ expectedVersion })
-        .set('Authorization', auth())
+        .set(auth())
         .expect(400);
     }
-    await api().delete(path).set('Authorization', auth()).expect(400);
+    await api().delete(path).set(auth()).expect(400);
   });
 });

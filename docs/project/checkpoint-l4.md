@@ -1,6 +1,20 @@
-# Checkpoint L4 — B4a qualifié, suite non réalisée
+# Checkpoint L4 — B4a intégré, B4b qualifié sur branche
 
-20 octobre 2026. Alex a validé D1a/D1b/D2a/D2b/D2c et autorisé les six blocs L4. **Seul B4a est développé et qualifié à ce checkpoint ; aucune PR L4 n'est encore mergée.** [Design et18critères](l4-design.md), [décisions](decisions.md), [Review Gate B4a](reviews/l4-b4a-review-gate.md), [handoff canonique](agent-handoff.md).
+## État courant — 21 octobre 2026, B4b qualifié sur branche
+
+Main reste `76f742bc7de437fe7ed1d6528344be208d54159d` (#26 intégrée). La branche `feature/web-session-cutover` au code `8ff31b74b8643f21228fcfbf64fe1cc24e2ad1d8` active les sessions PostgreSQL, cookies HttpOnly, CSRF serveur, contexte attendu et bootstrap Angular ; Bearer/JWT et sa dépendance sont retirés. Aucun merge B4b ni déploiement. Les sections antérieures datées ci-dessous sont des preuves historiques, pas l'état actuel.
+
+Six checks de ce code success : [Quality39559982719](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982719), [Integration39559982657](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982657), [Audits39559982741](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982741). Logs relus : **213 backend,138 frontend,111 PostgreSQL/HTTP,4 Chromium desktop/mobile** ; dix garde-fous, sept migrations fresh/redeploy/status/drift et smoke, audits complets/runtime zéro. Local : verify backend/frontend, compatibilité NYC/CLI, tsc backend et E2E, safety et diffcheck passés ; pas de PostgreSQL/Chromium local prétendu.
+
+Les quatre parcours réels incluent désormais deux onglets partageant le cookie, logout dans le second et invalidation du premier, rejeu401 du credential révoqué, reconnexion explicite, CSRF invalide403 sans dossier créé, expiration DB, cookie HttpOnly inaccessible à document.cookie et absence d'accessToken. Les unités avec le vrai AuthService/interceptor ordonnent un logout tardif après reconnexion et vérifient que la nouvelle session reste installée. HTTP/PG : compte A/contexte ancien avec cookie B refusé avant lecture/écriture/logout ; origine/CSRF manquants ou hostiles ne prolongent pas l'activité ; fixation/rotation, échéances et rollback testés. Aucune simulation d'API dans Chromium, aucune inscription ou retry supplémentaire ni quota assoupli.
+
+[Review Gate B4b](reviews/l4-b4b-review-gate.md) repris sur toute la branche depuis main après les corrections Nest et dépendances : aucun BLOCKER/P1 restant identifié dans ce périmètre. Publication documentaire seule, puis vraie PR/diff/checks à contrôler ; **merge soumis à Alex**. Toutes les branches historiques conservées.
+
+B4c admission privée/storage, B4d brouillons24h/restauration/purge/version et B4e logout global/courses approfondies restent à réaliser. La préservation de sessionStorage à expiration ne constitue pas une sauvegarde des formulaires. Aucun compte partagé/workspace sélectionnable n'est livré ; mismatch couvert par clients HTTP hostiles, pas par un sélecteur inexistant. TLS/Secure réel, proxy, Safari/iOS, backup/restore/rollback propriétaire et déploiement non qualifiés. L4 n'est pas terminé ; L5/CONTRACT/production restent exclus.
+
+# Historique de qualification B4a
+
+20 octobre 2026. Alex a validé D1a/D1b/D2a/D2b/D2c et autorisé les six blocs L4. **B4a est intégré par #26 après accord explicite ; B4b commence sur une nouvelle branche.** [Design et18critères](l4-design.md), [décisions](decisions.md), [Review Gate B4a](reviews/l4-b4a-review-gate.md), [handoff canonique](agent-handoff.md).
 
 ## Git et périmètre
 
@@ -55,3 +69,19 @@ Première CI native47b479d :19échecs/69succès, erreur42883 text*interval dans 
 Le store prouve des sous-cas de L4-05/06/07/18 ; aucun critère HTTP/UI entier n'est fermé par anticipation. L4-01/02/03/04/08–17 attendent leurs vrais parcours, même si des briques ou invariants internes sont déjà testés. Autre instance Nest ne vaut pas qualification du redémarrage d'un processus de production. Cookie Secure/TLS/cookies refusés, CSRF serveur et appareils partagés restent non qualifiés. La purge n'est pas planifiée et son scan n'est pas garanti borné à500 ; mesurer avant échelle supérieure.
 
 D1b inclut édition/corbeille dans la V1, mais L5 et D5/rétention restent exclus du développement L4. D3/D4/D6/D7/D8 et CONTRACT non clos. Pas d'application sur base propriétaire, recovery Prisma/backup/restore/rollback de bascule, VPS ou production. Branches historiques préservées, ruleset inchangé (deux Quality requis ; quatre autres checks observés). Git : commits/push/PR seulement. VM : aucune. SQL : sept migrations uniquement en bases CI jetables. Infra : aucun changement.
+
+## Intégration vérifiée de B4a et reprise B4b
+
+#26 effectivement mergée le20octobre2026 à11:06:17UTC par76f742bc7de437fe7ed1d6528344be208d54159d, parentsc99b080/4c97d89, arbre4be600b0c3957131a0d021ed8a21655e080b36d3 identique au head revu. Main à ce SHA, six checks post-merge success : [Quality39412588451](https://github.com/Alexdmt0110/Barbook/actions/runs/39412588451), [Integration39412588433](https://github.com/Alexdmt0110/Barbook/actions/runs/39412588433), [Security39412588400](https://github.com/Alexdmt0110/Barbook/actions/runs/39412588400). Logs relus168backend,131frontend,88natifs,4Chromium, sept migrations et audits zéro. Branches historiques toutes conservées à leurs refs antérieures.
+
+Nouvelle branche feature/web-session-cutover depuis76f742b ; [revue B4b](l4-b4b-design.md). Les photographies pré-merge ci-dessus sont conservées comme preuves historiques, pas comme état courant de la PR. B4b reste à réaliser ; aucune bascule cookie/CSRF ni protection de draft déjà livrée. Les autorisations/exclusions L4 restent inchangées.
+
+## B4b — premier micro-bloc préparatoire qualifié
+
+Code6500544141a5511fd76c5142990108b0712e1452, après design publiéa69daab : helpers web-session-security et44tests HTTP sur contrôleur de test exclu du build ; inspection Session sans activité et deux tests PG supplémentaires. Aucun nouveau guard/middleware actif, AuthController, contrat API, frontend ou dépendance modifié. B4b n'est pas terminé : les routes utilisent encore JWT, les helpers ne protègent pas encore les requêtes métier.
+
+Six checks success : [Quality39414957581](https://github.com/Alexdmt0110/Barbook/actions/runs/39414957581), [Integration39414957572](https://github.com/Alexdmt0110/Barbook/actions/runs/39414957572), [Security39414957578](https://github.com/Alexdmt0110/Barbook/actions/runs/39414957578). Logs relus :212backend/20suites+NYC,131frontend,90natifs/6suites,4Chromium,10garde-fous, sept migrations/drift/smoke et audits zéro. Local verify/lint/build/Prisma/tsc/safety passés ; aucun PG/Chromium local prétendu.
+
+Prochain bloc : guard/cookies/CSRF/login/register/me/logout et Angular coordonnés, adaptation des fixtures en conservant leurs assertions, qualification native et navigateur puis Review Gate complet avant une PR B4b. Aucune PR B4b ouverte pour cette préparation partielle. Risques de protocole avant activation : logout tardif vs login récent, réponse A tardive après B, absence de replay, cookies refusés après compte réellement créé. Journal de reprise courant obligatoire ; aucune nouvelle autorisation de développement L4 nécessaire, chaque merge futur reste distinct.
+
+PR B4b : [#27](https://github.com/Alexdmt0110/Barbook/pull/27) ouverte, non mergée ; diff réel70fichiers/9commits vérifié au checkpoint479a4b8, aucun commentaire/revue/conflit. Ce complément est documentaire seulement ; vérifier les six checks du dernier HEAD puis attendre Alex pour le merge.

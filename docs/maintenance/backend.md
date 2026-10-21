@@ -7,7 +7,7 @@ Le backend Barbook utilise :
 - NestJS ;
 - PostgreSQL ;
 - Prisma ORM ;
-- JWT pour l'authentification ;
+- sessions PostgreSQL révocables pour l'authentification ;
 - Jest pour les tests.
 
 L'API expose ses routes sous le préfixe `/api`.

@@ -1,6 +1,6 @@
 # ADR 0005 — Sessions web révocables en PostgreSQL
 
-Statut : décision cible acceptée par Alex le 20 octobre 2026 (D2). Mise en œuvre progressive L4 ; B4a prépare le store, B4b activera ensemble l'API et Angular. Remplace la cible JWT/refresh de l'[ADR 0002](0002-authentication-strategy.md), qui décrit encore le fonctionnement courant avant B4b.
+Statut : décision acceptée par Alex le 20 octobre 2026 (D2). B4a intégré ; bascule API/Angular implémentée sur branche B4b, qualification et merge à vérifier au handoff. L'ADR 0002 décrit le fonctionnement historique retiré. B4c–B4e restent distincts.
 
 ## Décision et limites
 

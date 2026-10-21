@@ -9,6 +9,7 @@ on:
       - main
       - feature/cocktail-folder-management
       - feature/secure-web-sessions
+      - feature/web-session-cutover
 
 permissions:
   contents: read
@@ -34,7 +35,6 @@ jobs:
       DATABASE_HOST: 127.0.0.1
       DATABASE_PORT: 5432
       FRONTEND_ORIGIN: http://localhost:4200
-      JWT_SECRET: ci_only_jwt_secret_at_least_32_characters_long
 
     steps:
       - name: Checkout repository

@@ -1,62 +1,162 @@
-import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
-import { AuthenticatedUser, AuthResponse, LoginRequest, RegisterRequest } from './auth.models';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { DestroyRef, computed, inject, Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import {
+  Observable,
+  catchError,
+  defer,
+  finalize,
+  map,
+  shareReplay,
+  switchMap,
+  tap,
+  throwError,
+} from 'rxjs';
+import { AUTH_SNAPSHOT, AuthResponse, LoginRequest, RegisterRequest } from './auth.models';
 
-const ACCESS_TOKEN_STORAGE_KEY = 'barbook.accessToken';
-
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly session = signal<AuthResponse | null>(null);
+  private generation = 0;
+  private bootstrap?: Observable<AuthResponse>;
+  private pendingLogout: AuthResponse | null = null;
+  private readonly channel =
+    typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel('barbook.auth');
+  readonly currentUser = computed(() => this.session()?.user ?? null);
+  readonly isAuthenticated = computed(() => this.session() !== null);
+  readonly logoutUncertain = signal(false);
 
-  private readonly currentUserSignal = signal<AuthenticatedUser | null>(null);
-  private readonly accessTokenSignal = signal<string | null>(
-    sessionStorage.getItem(ACCESS_TOKEN_STORAGE_KEY),
-  );
+  constructor() {
+    // Remove the retired credential; never read it or purge unrelated drafts.
+    try {
+      sessionStorage.removeItem('barbook.accessToken');
+    } catch {
+      /* Storage may be disabled. */
+    }
+    if (this.channel) this.channel.onmessage = () => this.expire();
+    inject(DestroyRef).onDestroy(() => this.channel?.close());
+  }
 
-  readonly currentUser = this.currentUserSignal.asReadonly();
-  readonly isAuthenticated = computed(
-    () => this.currentUserSignal() !== null && this.accessTokenSignal() !== null,
-  );
+  snapshot(): AuthResponse | null {
+    return this.session();
+  }
+  epoch(): number {
+    return this.generation;
+  }
 
   login(request: LoginRequest): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>('/api/auth/login', request)
-      .pipe(tap((response) => this.persistSession(response)));
+    return this.signIn('/api/auth/login', request);
   }
 
   register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>('/api/auth/register', request)
-      .pipe(tap((response) => this.persistSession(response)));
+    return this.signIn('/api/auth/register', request);
   }
 
-  loadCurrentUser(): Observable<AuthenticatedUser> {
-    return this.http
-      .get<AuthenticatedUser>('/api/auth/me')
-      .pipe(tap((user) => this.currentUserSignal.set(user)));
+  loadCurrentUser(): Observable<AuthResponse> {
+    if (!this.bootstrap) {
+      const epoch = this.generation;
+      this.bootstrap = this.http.get<AuthResponse>('/api/auth/me').pipe(
+        tap((auth) => {
+          if (epoch !== this.generation) throw new Error('La session a changé. Reconnecte-toi.');
+          const previous = this.session();
+          if (previous && !this.sameContext(previous, auth)) {
+            this.expire();
+            throw new Error('Le compte ou l’espace a changé. Reconnecte-toi.');
+          }
+          this.session.set(auth);
+        }),
+        finalize(() => {
+          this.bootstrap = undefined;
+        }),
+        shareReplay({ bufferSize: 1, refCount: true }),
+      );
+    }
+    return this.bootstrap;
   }
 
-  logout(): void {
-    this.currentUserSignal.set(null);
-    this.accessTokenSignal.set(null);
-    sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+  /** Involuntary expiry never revokes remotely or removes draft storage. */
+  expire(): void {
+    const wasAuthenticated = this.session() !== null;
+    this.generation++;
+    this.session.set(null);
+    this.bootstrap = undefined;
+    if (wasAuthenticated) {
+      void this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+    }
   }
 
-  getAccessToken(): string | null {
-    return this.accessTokenSignal();
+  logout(): Observable<void> {
+    return defer(() => {
+      this.pendingLogout ??= this.session();
+      const snapshot = this.pendingLogout;
+      this.generation++;
+      this.session.set(null);
+      this.bootstrap = undefined;
+      this.logoutUncertain.set(true);
+      return this.http
+        .post<void>(
+          '/api/auth/logout',
+          {},
+          {
+            context: new HttpContext().set(AUTH_SNAPSHOT, snapshot),
+          },
+        )
+        .pipe(
+          tap(() => {
+            this.pendingLogout = null;
+            this.logoutUncertain.set(false);
+            this.channel?.postMessage('changed');
+          }),
+        );
+    });
   }
 
-  hasStoredAccessToken(): boolean {
-    return this.accessTokenSignal() !== null;
+  private signIn(url: string, request: LoginRequest | RegisterRequest): Observable<AuthResponse> {
+    return defer(() => {
+      this.generation++;
+      this.session.set(null);
+      this.bootstrap = undefined;
+      this.pendingLogout = null;
+      this.logoutUncertain.set(false);
+      const epoch = this.generation;
+      return this.http.post<AuthResponse>(url, request).pipe(
+        switchMap((issued) =>
+          this.http.get<AuthResponse>('/api/auth/me').pipe(
+            map((confirmed) => {
+              if (
+                epoch !== this.generation ||
+                !this.sameContext(issued, confirmed) ||
+                issued.csrfToken !== confirmed.csrfToken
+              ) {
+                throw new Error('La connexion a changé dans un autre onglet. Reconnecte-toi.');
+              }
+              return confirmed;
+            }),
+            catchError(() =>
+              throwError(
+                () =>
+                  new Error(
+                    url.endsWith('/register')
+                      ? 'Le compte a été créé, mais la connexion n’est pas confirmée. Autorise les cookies puis connecte-toi ; ne recrée pas le compte.'
+                      : 'Identifiants acceptés, mais connexion non confirmée. Vérifie les cookies puis reconnecte-toi.',
+                  ),
+              ),
+            ),
+            // A successful registration is not rolled back when cookies are blocked.
+            // The UI must not offer an automatic replay of that POST.
+          ),
+        ),
+        tap((auth) => {
+          this.session.set(auth);
+          this.channel?.postMessage('changed');
+        }),
+      );
+    });
   }
 
-  private persistSession(response: AuthResponse): void {
-    this.currentUserSignal.set(response.user);
-    this.accessTokenSignal.set(response.accessToken);
-
-    sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, response.accessToken);
+  private sameContext(a: AuthResponse, b: AuthResponse): boolean {
+    return a.user.id === b.user.id && a.workspaceId === b.workspaceId;
   }
 }

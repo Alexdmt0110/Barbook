@@ -9,6 +9,7 @@ import { CocktailOrganizationResult } from '../src/cocktails/organization/cockta
 import { PrismaService } from '../src/database/prisma.service';
 import {
   Actor,
+  browserHeaders,
   createActor,
   createApplicationFixture,
   recipePayload,
@@ -20,16 +21,16 @@ describe('Versioned multiple folder HTTP contracts', () => {
   let alice: Actor;
   let bob: Actor;
   const api = () => request(app.getHttpServer());
-  const auth = (actor: Actor) => `Bearer ${actor.accessToken}`;
+  const auth = (actor: Actor) => browserHeaders(actor);
   const save = (slug: string, payload: object) =>
     api()
       .put(`/api/cocktails/${slug}/organization`)
-      .set('Authorization', auth(alice))
+      .set(auth(alice))
       .send(payload);
   async function recipe() {
     const response = await api()
       .post('/api/cocktails')
-      .set('Authorization', auth(alice))
+      .set(auth(alice))
       .send(recipePayload())
       .expect(201);
     return response.body as { id: string; slug: string };
@@ -41,7 +42,7 @@ describe('Versioned multiple folder HTTP contracts', () => {
   const detail = async (slug: string) => {
     const response = await api()
       .get(`/api/cocktails/${slug}`)
-      .set('Authorization', auth(alice))
+      .set(auth(alice))
       .expect(200);
     return response.body as CocktailDetail;
   };
@@ -74,7 +75,7 @@ describe('Versioned multiple folder HTTP contracts', () => {
       const filtered = await api()
         .get('/api/cocktails')
         .query({ folderId: id, tagId: result.tags[0].id })
-        .set('Authorization', auth(alice))
+        .set(auth(alice))
         .expect(200);
       const list = filtered.body as CocktailListResult;
       expect(list.total).toBe(1);
@@ -171,7 +172,7 @@ describe('Versioned multiple folder HTTP contracts', () => {
     const foreignList = await api()
       .get('/api/cocktails')
       .query({ folderId: own.id })
-      .set('Authorization', auth(bob))
+      .set(auth(bob))
       .expect(200);
     expect((foreignList.body as CocktailListResult).total).toBe(0);
   });

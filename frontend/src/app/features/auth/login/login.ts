@@ -28,6 +28,7 @@ export class Login {
   readonly passwordVisible = signal(false);
 
   readonly form = this.formBuilder.nonNullable.group({
+    rememberMe: false,
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
 
     password: ['', [Validators.required, Validators.maxLength(128)]],
@@ -78,7 +79,7 @@ export class Login {
 
   private resolveErrorMessage(error: unknown): string {
     if (!(error instanceof HttpErrorResponse)) {
-      return 'Une erreur inattendue est survenue.';
+      return error instanceof Error ? error.message : 'Une erreur inattendue est survenue.';
     }
 
     if (error.status === 0) {

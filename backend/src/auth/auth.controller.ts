@@ -5,53 +5,88 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
+import { Request, Response } from 'express';
 import {
   LOGIN_RATE_LIMIT,
   REGISTER_RATE_LIMIT,
 } from '../common/rate-limit.config';
-import { AuthService } from './auth.service';
-import { AuthResponse, AuthenticatedUser } from './auth.types';
-import { CurrentUserId } from './decorators/current-user-id.decorator';
+import { AuthService, IssuedAuthentication } from './auth.service';
+import { AuthResponse } from './auth.types';
+import { AuthenticatedRequest } from './authenticated-request';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { SessionBootstrap, SessionGuard } from './guards/session.guard';
+import { issueSessionCookie } from './sessions/web-session-security';
+import { WebSessionService } from './sessions/web-session.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly web: WebSessionService,
+  ) {}
 
   @Post('register')
-  @Throttle({
-    default: REGISTER_RATE_LIMIT,
-  })
+  @Throttle({ default: REGISTER_RATE_LIMIT })
   async register(
-    @Body()
-    dto: RegisterDto,
+    @Body() dto: RegisterDto,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<AuthResponse> {
-    return this.authService.register(dto);
+    response.setHeader('Cache-Control', 'no-store');
+    return this.issue(
+      response,
+      await this.authService.register(dto, this.web.credential(request)),
+    );
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @Throttle({
-    default: LOGIN_RATE_LIMIT,
-  })
+  @Throttle({ default: LOGIN_RATE_LIMIT })
   async login(
-    @Body()
-    dto: LoginDto,
+    @Body() dto: LoginDto,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<AuthResponse> {
-    return this.authService.login(dto);
+    response.setHeader('Cache-Control', 'no-store');
+    return this.issue(
+      response,
+      await this.authService.login(dto, this.web.credential(request)),
+    );
   }
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
-  async me(
-    @CurrentUserId()
-    userId: string,
-  ): Promise<AuthenticatedUser> {
-    return this.authService.getCurrentUser(userId);
+  @SessionBootstrap()
+  @UseGuards(SessionGuard)
+  me(@Req() request: AuthenticatedRequest): AuthResponse | undefined {
+    return request.sessionContext;
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<void> {
+    response.setHeader('Cache-Control', 'no-store');
+    await this.web.logout(request);
+  }
+
+  private issue(
+    response: Response,
+    issued: IssuedAuthentication,
+  ): AuthResponse {
+    issueSessionCookie(
+      response,
+      this.web.config,
+      issued.credential,
+      issued.session.persistent,
+    );
+    return issued.response;
   }
 }

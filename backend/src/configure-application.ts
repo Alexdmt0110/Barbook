@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { resolveWebSessionConfig } from './auth/sessions/web-session-security';
 
 /** Shared by the real server and integration tests so HTTP validation cannot drift. */
 export function configureApplication(app: NestExpressApplication): void {
@@ -9,7 +10,11 @@ export function configureApplication(app: NestExpressApplication): void {
 
   const config = app.get(ConfigService);
   app.setGlobalPrefix('api');
-  app.enableCors({ origin: config.getOrThrow<string>('FRONTEND_ORIGIN') });
+  const web = resolveWebSessionConfig(
+    config.getOrThrow<string>('FRONTEND_ORIGIN'),
+    config.get<string>('NODE_ENV', 'development'),
+  );
+  app.enableCors({ origin: web.origin, credentials: true });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

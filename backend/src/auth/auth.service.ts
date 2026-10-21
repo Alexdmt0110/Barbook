@@ -3,24 +3,35 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { isPrismaKnownRequestError } from '../common/prisma-errors';
 import { PrismaService } from '../database/prisma.service';
-import { WorkspaceKind, WorkspaceRole } from '../generated/prisma/client';
-import { AuthResponse, AuthenticatedUser, JwtPayload } from './auth.types';
+import {
+  Prisma,
+  WorkspaceKind,
+  WorkspaceRole,
+} from '../generated/prisma/client';
+import { AuthResponse, AuthenticatedUser } from './auth.types';
+import { IssuedSession, SessionService } from './sessions/session.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { PasswordService } from './password.service';
+
+export interface IssuedAuthentication extends IssuedSession {
+  response: AuthResponse;
+}
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly passwordService: PasswordService,
-    private readonly jwtService: JwtService,
+    private readonly sessions: SessionService,
   ) {}
 
-  async register(dto: RegisterDto): Promise<AuthResponse> {
+  async register(
+    dto: RegisterDto,
+    previousCredential?: string,
+  ): Promise<IssuedAuthentication> {
     const existingUser = await this.prisma.user.findUnique({
       where: {
         email: dto.email,
@@ -36,44 +47,50 @@ export class AuthService {
 
     const passwordHash = await this.passwordService.hash(dto.password);
 
-    let user: AuthenticatedUser;
-
     try {
-      user = await this.prisma.$transaction(async (transaction) => {
-        const createdUser = await transaction.user.create({
-          data: {
-            email: dto.email,
-            passwordHash,
-            displayName: dto.displayName,
-          },
-          select: {
-            id: true,
-            email: true,
-            displayName: true,
-          },
-        });
+      return await this.prisma.$transaction(
+        async (transaction) => {
+          const createdUser = await transaction.user.create({
+            data: {
+              email: dto.email,
+              passwordHash,
+              displayName: dto.displayName,
+            },
+            select: {
+              id: true,
+              email: true,
+              displayName: true,
+            },
+          });
 
-        const personalWorkspace = await transaction.workspace.create({
-          data: {
-            name: 'Personal Barbook',
-            kind: WorkspaceKind.PERSONAL,
-            personalOwnerId: createdUser.id,
-          },
-          select: {
-            id: true,
-          },
-        });
+          const personalWorkspace = await transaction.workspace.create({
+            data: {
+              name: 'Personal Barbook',
+              kind: WorkspaceKind.PERSONAL,
+              personalOwnerId: createdUser.id,
+            },
+            select: {
+              id: true,
+            },
+          });
 
-        await transaction.workspaceMember.create({
-          data: {
-            workspaceId: personalWorkspace.id,
-            userId: createdUser.id,
-            role: WorkspaceRole.OWNER,
-          },
-        });
+          await transaction.workspaceMember.create({
+            data: {
+              workspaceId: personalWorkspace.id,
+              userId: createdUser.id,
+              role: WorkspaceRole.OWNER,
+            },
+          });
 
-        return createdUser;
-      });
+          const issued = await this.sessions.create(
+            transaction,
+            createdUser.id,
+          );
+          await this.sessions.revoke(previousCredential, transaction);
+          return this.describe(createdUser, personalWorkspace.id, issued);
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted },
+      );
     } catch (error: unknown) {
       if (isPrismaKnownRequestError(error, 'P2002')) {
         throw new ConflictException(
@@ -83,11 +100,12 @@ export class AuthService {
 
       throw error;
     }
-
-    return this.createAuthResponse(user);
   }
 
-  async login(dto: LoginDto): Promise<AuthResponse> {
+  async login(
+    dto: LoginDto,
+    previousCredential?: string,
+  ): Promise<IssuedAuthentication> {
     const user = await this.prisma.user.findUnique({
       where: {
         email: dto.email,
@@ -115,44 +133,37 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password.');
     }
 
-    return this.createAuthResponse({
-      id: user.id,
-      email: user.email,
-      displayName: user.displayName,
-    });
+    return this.prisma.$transaction(
+      async (transaction) => {
+        const issued = await this.sessions.create(
+          transaction,
+          user.id,
+          dto.rememberMe === true,
+        );
+        const workspace = await transaction.workspace.findUnique({
+          where: { personalOwnerId: user.id },
+          select: { id: true },
+        });
+        if (!workspace) throw new UnauthorizedException('Account unavailable.');
+        await this.sessions.revoke(previousCredential, transaction);
+        return this.describe(user, workspace.id, issued);
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted },
+    );
   }
 
-  async getCurrentUser(userId: string): Promise<AuthenticatedUser> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: {
-        id: true,
-        email: true,
-        displayName: true,
-      },
-    });
-
-    if (!user) {
-      throw new UnauthorizedException('Invalid or expired access token.');
-    }
-
-    return user;
-  }
-
-  private async createAuthResponse(
+  private describe(
     user: AuthenticatedUser,
-  ): Promise<AuthResponse> {
-    const payload: JwtPayload = {
-      sub: user.id,
-    };
-
-    const accessToken = await this.jwtService.signAsync(payload);
-
+    workspaceId: string,
+    issued: IssuedSession,
+  ): IssuedAuthentication {
     return {
-      user,
-      accessToken,
+      ...issued,
+      response: {
+        user: { id: user.id, email: user.email, displayName: user.displayName },
+        workspaceId,
+        csrfToken: issued.session.csrfToken,
+      },
     };
   }
 }
