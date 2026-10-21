@@ -52,7 +52,7 @@ D1a/D1b/D2a/D2b/D2c validées, [design et critères](l4-design.md). #25 document
 | Bloc | Résultat attendu | État |
 | --- | --- | --- |
 | BB-L4-01 / B4a | contrats/ADR et store Session additif qualifiés ;88natifs dont26store, sept migrations ; auth actuelle préservée | MERGE #26 ; main76f742b qualifié |
-| BB-L4-02 / B4b | API/UI cookie/CSRF et contexte coordonnés, retrait Bearer | APPROUVE |
+| BB-L4-02 / B4b | API/UI cookie/CSRF et contexte coordonnés, retrait Bearer | QUALIFIE_SUR_BRANCHE ; PR/merge à vérifier |
 | BB-L4-03 / B4c | admission serveur fermée/liste, storage refusé toléré | APPROUVE |
 | BB-L4-04 / B4d / A010 / A012 | brouillons mémoire/sessionStorage 24 h, restauration isolée explicite, versions | APPROUVE |
 | BB-L4-05 / B4e | révocation globale, activité/onglets/réseau et courses | APPROUVE |
@@ -65,3 +65,15 @@ Preuves B4a et limites : [checkpoint-l4.md](checkpoint-l4.md), [Review Gate](rev
 Reprise B4b : [design préventif](l4-b4b-design.md). Préparation des contrôles web puis bascule coordonnée API/UI ; transport des fixtures actualisé sans retirer leurs assertions. Aucun cookie/CSRF HTTP/draft encore opérationnel à ce jalon documentaire.
 
 B4b première préparation qualifiée au code6500544 :44tests HTTP de primitives et2PG d'inspection supplémentaires, total212backend/90natifs. Les routes JWT et Angular restent inchangés ; bascule coordonnée non réalisée. Pas de PR B4b avant qualification complète. Handoff et checkpoint-l4.md contiennent la prochaine micro-tâche sans nouveau besoin d'autorisation L4.
+
+## État courant — 21 octobre 2026, B4b qualifié sur branche
+
+Main reste `76f742bc7de437fe7ed1d6528344be208d54159d` (#26 intégrée). La branche `feature/web-session-cutover` au code `8ff31b74b8643f21228fcfbf64fe1cc24e2ad1d8` active les sessions PostgreSQL, cookies HttpOnly, CSRF serveur, contexte attendu et bootstrap Angular ; Bearer/JWT et sa dépendance sont retirés. Aucun merge B4b ni déploiement. Les sections antérieures datées ci-dessous sont des preuves historiques, pas l'état actuel.
+
+Six checks de ce code success : [Quality39559982719](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982719), [Integration39559982657](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982657), [Audits39559982741](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982741). Logs relus : **213 backend,138 frontend,111 PostgreSQL/HTTP,4 Chromium desktop/mobile** ; dix garde-fous, sept migrations fresh/redeploy/status/drift et smoke, audits complets/runtime zéro. Local : verify backend/frontend, compatibilité NYC/CLI, tsc backend et E2E, safety et diffcheck passés ; pas de PostgreSQL/Chromium local prétendu.
+
+Les quatre parcours réels incluent désormais deux onglets partageant le cookie, logout dans le second et invalidation du premier, rejeu401 du credential révoqué, reconnexion explicite, CSRF invalide403 sans dossier créé, expiration DB, cookie HttpOnly inaccessible à document.cookie et absence d'accessToken. Les unités avec le vrai AuthService/interceptor ordonnent un logout tardif après reconnexion et vérifient que la nouvelle session reste installée. HTTP/PG : compte A/contexte ancien avec cookie B refusé avant lecture/écriture/logout ; origine/CSRF manquants ou hostiles ne prolongent pas l'activité ; fixation/rotation, échéances et rollback testés. Aucune simulation d'API dans Chromium, aucune inscription ou retry supplémentaire ni quota assoupli.
+
+[Review Gate B4b](reviews/l4-b4b-review-gate.md) repris sur toute la branche depuis main après les corrections Nest et dépendances : aucun BLOCKER/P1 restant identifié dans ce périmètre. Publication documentaire seule, puis vraie PR/diff/checks à contrôler ; **merge soumis à Alex**. Toutes les branches historiques conservées.
+
+B4c admission privée/storage, B4d brouillons24h/restauration/purge/version et B4e logout global/courses approfondies restent à réaliser. La préservation de sessionStorage à expiration ne constitue pas une sauvegarde des formulaires. Aucun compte partagé/workspace sélectionnable n'est livré ; mismatch couvert par clients HTTP hostiles, pas par un sélecteur inexistant. TLS/Secure réel, proxy, Safari/iOS, backup/restore/rollback propriétaire et déploiement non qualifiés. L4 n'est pas terminé ; L5/CONTRACT/production restent exclus.

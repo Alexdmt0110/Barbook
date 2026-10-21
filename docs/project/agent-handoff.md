@@ -1,51 +1,48 @@
 # Handoff canonique Barbook
 
 ```yaml
-checkpoint_utc: "2026-10-21T06:50:53Z"
+checkpoint_utc: "2026-10-21T07:13:35Z"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
-handoff_status: "EN_COURS"
-feature: "L4 B4b : bascule API/Angular implémentée ; qualification CI et Review Gate à réaliser"
+handoff_status: "EN_ATTENTE_VALIDATION"
+feature: "L4 B4b : bascule qualifiée ; PR à ouvrir puis merge soumis à Alex"
 branch: "feature/web-session-cutover"
 base_branch: "main"
-remote_head_sha: "ecf94629c858031102c026ad097e540851e4d70f"
-local_head_sha: "ecf94629c858031102c026ad097e540851e4d70f"
-worktree: "bloc de bascule coordonnée en cours de publication ; fichiers listés dans son commit"
-pr: "aucune PR B4b ; #26 intégrée"
-tests: "verify backend/frontend locaux ; tsc backend/E2E et10 garde-fous ; PostgreSQL/Chromium non exécutés localement"
-migrations: "aucune nouvelle ; sept historiques conservées ; aucune base propriétaire"
-changes_pushed: "B4a #26/main76f742b ; préparation6500544 ; checkpointb579ef6 ; design préciséecf9462"
-unpushed_changes: "ce bloc avant son propre commit ; lire la ref actuelle pour sa publication"
-decisions_validated: "L4 et reprise WORK seuls explicites ; D1/D2 inchangées"
-decisions_pending: "chaque nouveau merge ; L5/CONTRACT/production non autorisés"
-next_atomic_step: "vérifier les six checks du commit de bascule et corriger toute régression avant Review Gate"
-risks_and_blockers: "qualification PG/Chromium réelle en attente ; B4c–B4e non terminés"
+remote_head_sha: "8ff31b74b8643f21228fcfbf64fe1cc24e2ad1d8"
+local_head_sha: "8ff31b74b8643f21228fcfbf64fe1cc24e2ad1d8"
+worktree: "checkpoint documentaire en préparation ; aucune modification applicative non poussée"
+pr: "aucune à cette photographie ; ouvrir PR B4b après publication, vérifier GitHub avant reprise"
+tests: "213 backend/138 frontend/111 PostgreSQL-HTTP/4 Chromium ; six checks code success ; voir checkpoint-l4.md"
+migrations: "sept migrations historiques inchangées ; seulement CI jetables, aucune base propriétaire"
+changes_pushed: "bascule2b7b924 ; correctif Nest4807e5d ; deps7d90508 ; qualification8ff31b7"
+unpushed_changes: "documents de ce checkpoint avant leur propre publication"
+decisions_validated: "D1/D2 et L4 seuls ; reprendre branche existante"
+decisions_pending: "tout nouveau merge ; L5/CONTRACT/production non autorisés"
+next_atomic_step: "publier ce checkpoint ; ouvrir et relire la vraie PR B4b ; vérifier les six checks de son HEAD ; attendre accord merge"
+risks_and_blockers: "aucun BLOCKER/P1 identifié B4b ; B4c/B4d/B4e restent nécessaires avant clôture L4"
 production_effect: "aucun"
 ```
 
-Cette photographie précède son propre commit et ne peut contenir son SHA. GitHub/ref et les derniers commits font foi. Alex a confirmé la reprise exclusive de WORK ; aucun autre écrivain annoncé. Sources privées prompt maître/règles/PDF/reprise relues, non copiées dans Git public. Clone ecf9462 propre avant code, main76f742b, aucune PR ouverte et six checks checkpointb579ef6 success réellement relus.
+Cette photographie précède sa propre publication. Lire les refs GitHub, les PR et les derniers commits : le SHA ci-dessus est le code qualifié, pas le futur commit documentaire. Clone propre à8ff31b7 avant ces seuls documents ; sources privées prompt maître/règles/PDF/reprise relues. WORK reprend seul selon l'autorisation du propriétaire ; aucune branche recréée/réécrite/supprimée.
 
-## État technique de B4b
+## État courant — 21 octobre 2026, B4b qualifié sur branche
 
-AuthService crée Session dans la transaction ReadCommitted de register/login ; login révoque l'ancien credential dans cette transaction. AuthController ne sérialise que user/workspaceId/csrfToken, credential seulement vers Set-Cookie HttpOnly. SessionGuard/WebSessionService protègent tous les contrôleurs privés : Origin/transport/cookie, inspect sans activité, contexte propriétaire/workspace et CSRF, authenticate final sous verrou. Aucun fallback Bearer ; ancien guard, package JWT et JWT_SECRET de l'exemple/CI retirés. Les primitives et tests B4a/B4b existants restent conservés.
+Main reste `76f742bc7de437fe7ed1d6528344be208d54159d` (#26 intégrée). La branche `feature/web-session-cutover` au code `8ff31b74b8643f21228fcfbf64fe1cc24e2ad1d8` active les sessions PostgreSQL, cookies HttpOnly, CSRF serveur, contexte attendu et bootstrap Angular ; Bearer/JWT et sa dépendance sont retirés. Aucun merge B4b ni déploiement. Les sections antérieures datées ci-dessous sont des preuves historiques, pas l'état actuel.
 
-Logout révoque effectivement, ne renvoie jamais Set-Cookie et est idempotent si le cookie n'a plus d'autorité. Une réponse tardive ne peut effacer un nouveau cookie. Un cookie résiduel révoqué reste HttpOnly et inerte. Les requêtes déjà autorisées peuvent terminer : pas d'annulation rétroactive. Le contexte attendu protège les vieux onglets même sans notification.
+Six checks de ce code success : [Quality39559982719](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982719), [Integration39559982657](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982657), [Audits39559982741](https://github.com/Alexdmt0110/Barbook/actions/runs/39559982741). Logs relus : **213 backend,138 frontend,111 PostgreSQL/HTTP,4 Chromium desktop/mobile** ; dix garde-fous, sept migrations fresh/redeploy/status/drift et smoke, audits complets/runtime zéro. Local : verify backend/frontend, compatibilité NYC/CLI, tsc backend et E2E, safety et diffcheck passés ; pas de PostgreSQL/Chromium local prétendu.
 
-Angular conserve seulement identité/workspace/CSRF en mémoire, vérifie /me après login/register, retire l'ancienne clé JWT sans lire son contenu, ne rejoue aucune mutation. Génération par requête et invalidation sur401/contexte409. BroadcastChannel invalide les autres onglets sans leur installer une nouvelle identité dans une vue ancienne. L'expiration involontaire n'appelle pas logout ni purge de sessionStorage. Logout masque l'outlet privé, confirme seulement après réponse et propose un retry explicite si réseau incertain. Rester connecté n'est pas coché par défaut.
+Les quatre parcours réels incluent désormais deux onglets partageant le cookie, logout dans le second et invalidation du premier, rejeu401 du credential révoqué, reconnexion explicite, CSRF invalide403 sans dossier créé, expiration DB, cookie HttpOnly inaccessible à document.cookie et absence d'accessToken. Les unités avec le vrai AuthService/interceptor ordonnent un logout tardif après reconnexion et vérifient que la nouvelle session reste installée. HTTP/PG : compte A/contexte ancien avec cookie B refusé avant lecture/écriture/logout ; origine/CSRF manquants ou hostiles ne prolongent pas l'activité ; fixation/rotation, échéances et rollback testés. Aucune simulation d'API dans Chromium, aucune inscription ou retry supplémentaire ni quota assoupli.
 
-Les assertions dossiers/recettes des tests PG sont conservées ; seul le transport change. Le test d'expiration navigateur ne forge plus de JWT : CLI de fixture DB protégé par requireTestDatabase, jamais route HTTP ni code compilé de production. Quatre essais existants desktop/mobile et quota d'inscription conservés. Le nouveau web-sessions.e2e-spec couvre CSRF/contexte/origine/refus sans activité, rotation/rejeu, échéances et rollback Session. Ces tests doivent encore passer réellement en CI avant toute conclusion.
+[Review Gate B4b](reviews/l4-b4b-review-gate.md) repris sur toute la branche depuis main après les corrections Nest et dépendances : aucun BLOCKER/P1 restant identifié dans ce périmètre. Publication documentaire seule, puis vraie PR/diff/checks à contrôler ; **merge soumis à Alex**. Toutes les branches historiques conservées.
 
-## Vérifications et prochaine étape
+B4c admission privée/storage, B4d brouillons24h/restauration/purge/version et B4e logout global/courses approfondies restent à réaliser. La préservation de sessionStorage à expiration ne constitue pas une sauvegarde des formulaires. Aucun compte partagé/workspace sélectionnable n'est livré ; mismatch couvert par clients HTTP hostiles, pas par un sélecteur inexistant. TLS/Secure réel, proxy, Safari/iOS, backup/restore/rollback propriétaire et déploiement non qualifiés. L4 n'est pas terminé ; L5/CONTRACT/production restent exclus.
 
-Local : npm run verify backend/front, npx tsc --noEmit --incremental false backend, npm run typecheck E2E ; npm run test:integration:safety dix passés ; audits lock backend complet/runtime zéro après retrait JWT. Les quatre scénarios Playwright sont listés avec configuration synthétique jetable ; ce listing ne lance ni DB ni navigateur. Aucun PostgreSQL/Docker/Chromium local disponible prétendu. La CI doit exécuter les natifs et le vrai navigateur, lire ses logs et corriger les échecs sans ignorer/relâcher les contrôles.
 
-Avant PR : qualification des courses et parcours critiques B4b, puis Review Gate complet main...branche (tous axes), zéro BLOCKER/P1. Pas de PR fondée sur le seul build. Après correction BLOCKER/P1 reprendre toute la revue. Lire la vraie PR et ses six checks, puis attendre Alex pour tout merge.
+## Reprise sûre et autorisations
 
-B4c admission serveur fermée/liste et accès storage, B4d vrais brouillons24h/purge/version/restauration et B4e logout global/approfondissement des courses restent à réaliser ; ne pas les annoncer opérationnels. Le contenu sessionStorage existant n'est pas supprimé à expiration mais les formulaires ne sont pas encore sauvegardés/restaurés par B4d. Safari/iOS/TLS/proxy réels, backup/restore et rollback propriétaire restent non qualifiés. Aucun inventaire VPS ni déploiement dans ce travail.
+Ne pas refaire la bascule. Lire la PR existante avant toute création, son HEAD/base/main, discussions, diff et six checks. Le merge de #26 était autorisé et exécuté le20octobre11:06:17UTC ; main76f742b, parentsc99b080/4c97d89 et six checks post-merge vérifiés. L'autorisation ne s'étend pas au merge B4b. Après accord distinct et merge contrôlé, poursuivre B4c depuis main vert, avec revue préventive et sans migration propriétaire.
 
-## Git et autorisations
+Store/guards : inspect sans activité, contexte/CSRF puis authenticate final sous verrou ; droits métier conservés. Login/register créent une session dans la transaction ; seul son hash est en DB, credential exclusivement en Set-Cookie. Logout révoque sans Set-Cookie, empêchant une réponse ancienne d'effacer une nouvelle connexion. Les requêtes déjà autorisées peuvent finir ; pas d'annulation rétroactive. Angular garde identité/CSRF en mémoire, vérifie/me et rejette les réponses anciennes sans retry de mutation. Une panne logout masque le privé et propose un retry explicite. Les notifications invalident les autres onglets ; elles ne donnent aucun droit.
 
-Main76f742bc7de437fe7ed1d6528344be208d54159d contient #26, mergedAt2026-10-20T11:06:17Z, six checks post-merge success et preuves au checkpoint-l4/#26. Toutes les branches historiques sont conservées, notamment dossiers95e21bc, secure-web-sessions4c97d89, docs/l3-merge-checkpoint39fd730. Ne pas rebaser, réécrire, supprimer ou dupliquer.
-
-Git : commit atomique de bascule puis push immédiat API avec parent attendu/arbre index complet, contrôle ref/parent/message/fichiers/blobs et clone fast-forward. VM : aucun déploiement. SQL : aucune migration nouvelle/propriétaire ; seulement CI jetables autorisées. Infra : aucune ; retrait des variables JWT inutilisées uniquement, sans changement de jobs/actions/permissions/ruleset. Développement L4 déjà autorisé, chaque merge distinct attend Alex. Aucun L5, CONTRACT, production, coût tiers ni changement d'infrastructure.
+Branches historiques conservées : dossiers95e21bc, secure-web-sessions4c97d89 et docs/l3-merge-checkpoint39fd730, ainsi que les archives. Git : commits/push/PR uniquement, aucun merge B4b autorisé. VM : aucun déploiement. SQL : aucune migration nouvelle/personnelle/production, tests CI jetables seuls. Infra : aucun changement, jobs/actions/permissions/ruleset conservés.
