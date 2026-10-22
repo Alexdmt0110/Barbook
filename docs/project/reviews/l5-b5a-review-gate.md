@@ -1,6 +1,6 @@
 # Review Gate L5 B5a — préparation additive
 
-2026-10-22T10:07:31+00:00. Revue complète main94552a9...feature/recipe-lifecycle-contracts, codeb273dcf, précédé du design9cbed43 et de l’arbitrage74c778e. Aucun BLOCKER/P1 identifié par revue et vérifications locales. **Qualification PostgreSQL/HTTP/Chromium sur PR encore à exécuter ; pas de succès natif revendiqué.** La PR de qualification restera draft tant que sixchecks/logs et revue finale ne sont pas acquis. Aucun accord de merge.
+2026-10-22T10:07:31+00:00. Revue complète main94552a9...feature/recipe-lifecycle-contracts, codeb273dcf, précédé du design9cbed43 et de l’arbitrage74c778e. Aucun BLOCKER/P1 identifié par revue et vérifications locales. **Qualification native du code acquise sur fd3e890 : sixchecks success, sixlogs relus ;238/191/160/4 et audits0.** Complémentsdocumentaires et handoff final doivent obtenir leurs propres sixchecks avant passage ready. Aucun accord de merge.
 
 | Axe obligatoire | Conclusion |
 | --- | --- |
@@ -17,3 +17,14 @@
 | OPS/production readiness | Aucunworkflow/infra/deploy modifié. Tentative de triggerexact rejetée par approbationautomatique, abandonnée ; CI utilise événementsPR déjà configurés. Aucune migration personnelle/production ou purgephysique. Ancienbinaire sûr uniquement avantactivation ; pas de rollback destructif. |
 
 Condition avant passage ready : lire diff réel/HEAD/base/commits/discussions/mergeabilité et les sixchecks du dernierHEAD, logs natifs réels ; reprendre revue entière après toutcorrectifP1. Tests de refus409legacy, lots atomiques et anciennes intentions après restauration : contrats cibles, pas fonctionnalités activées par ce bloc. Après accord explicite mergeB5a et mainqualifié seulement, poursuivre basculecoordonnéeB5b.
+
+
+## Revue finale de toute la branche après qualification native
+
+Codeb273dcf inclus dans fd3e89080e3d6e970e97b9dc25447797285f4e04 : sixchecks success et sixlogs relus. [Quality39760878427](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878427) :238backend/23suites,191frontend/27fichiers. [Integration39760878585](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878585) :160PostgreSQL/HTTP/11suites, dont14migration et5HTTPnouveaux, quatreparcoursChromium ; huitmigrationsfresh/redeploy/status/drift/smoke et dixgarde-fous. [Audits39760878501](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878501) : backend/frontend complets etruntime zéro. Les nouveaux tests ont tous passé sans correctionCI de code, quota/assertion/retry/timeout affaibli. Aucune migration propriétaire, uniquement Actions jetables.
+
+Revue renouvelée main94552a9...branche : migration/Prisma/fixtures, D5, contrats/dossiers/legacy/ABV, workflows et locks, périmètre docs/66IDs. Aucun BLOCKER/P1 restant identifié dans **B5a préparatoire** ; aucun défaut applicable caché par la qualification des parcours futurs. Le lecteur ancien conserve sa sémantique car aucun writer public n'active les nouveaux états ; testsHTTP refusent ces injections. Les14natifs relisent toutescolonnes historiques de13tables, sessions/liaisons comprises ; vraie panne deDDL puis reprise, datesinvalides/infinies/DST, overrides exacts, index/unicité/FK.
+
+Complémentwriterindirect : la suppression de dossier n’est pas exemptée ; contrat cible de précondition d’ensemble expectedMembershipToken ajouté avant activation, comparé sousverrou sans inférence. Coût/format et essais de concurrence restent à implémenter dans la basculecoordonnéeB5b ; pas de token ni nouvel endpoint exécuté par ce bloc. Deuxversions sans compteur redondant, aucune nouvelle dépendance/configuration. Tous les tests409legacy/obsolète/lot/concurrence/cycle demandés restent gates obligatoires de la bascule, pas des fonctionnalités déclarées livrées ici.
+
+Le vrai diffPR32 initial :15fichiers/4commits, tousblobs et touteslignes ajoutées/supprimées concordent au clone, base94552a9/headfd3e890, zérocommentaire/revue/inline, mergeabletrue. Derniers complémentsdocumentaires à relire et leurs sixchecks à attendre. Main et18branches historiques inchangés ;19refs avec brancheL5. Aucun P2applicatif introduit à arbitrer dans ce bloc ; dettes existantes non fermées en masse. PR32 reste sans autorisation de merge.

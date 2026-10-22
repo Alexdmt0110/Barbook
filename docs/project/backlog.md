@@ -1,5 +1,10 @@
 # Backlog d'exécution
 
+## État courant L5 — B5a qualifié, PR32 en attente de merge autorisé
+
+D5 et L5-COMPAT-01B validés ; blocageinitial levé. B5a prépare le modèle/contrats inactifs, PR32 depuis main94552a9. Codeb273dcf qualifié par sixchecksfd3e890 :238backend/191frontend/160PG-HTTP/4Chromium/audits0 ;19cas natifs nouveaux. [Contrat](../maintenance/recipe-lifecycle.md), [Gate](reviews/l5-b5a-review-gate.md). Aucun endpointédition/corbeille ou nouvelleadmissibilitélegacy actif. B5b commencera par basculecoordonnée API/Angular après accordmergeB5a et mainqualifié. Complémentdocumentaire du dernierHEAD à contrôler, aucunmergeautorisé. Les étatsbloqués ci-dessous sont historiques.
+
+
 ## L5 — autorisé le 22 octobre 2026, Design Review bloquée avant code
 
 D5 validée (corbeille30joursserveur, expiration≠effacement, identité/slug/liens valides conservés, pas de purge/archivage/média). L5 B5a–B5f autorisé dans le carnet personnel ; chaque merge distinct. Main94552a9/#31 et sixchecks recontrôlés, aucune PR ouverte initialement. Branche feature/recipe-lifecycle-contracts publiée immédiatement depuis ce main dans un worktree propre, ancien instantané L4 intact.

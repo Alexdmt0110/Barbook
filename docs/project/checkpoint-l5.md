@@ -23,3 +23,10 @@ Main94552a9 et branche74c778e recontrôlés, aucune PR ouverte ; sixchecks main 
 ## B5a préparatoire publié — code b273dcf
 
 Design9cbed43 publié avant code ; checkpoint parent/arbre/message/10blobs vérifiés. Codeb273dcf publié (schema, migration8 additive, testsnatifs14migration+5HTTP), quatreblobs/parent/arbre vérifiés et worktreepropre. Aucun workflow Angular/controller/service modifié. Locaux : npmci838, npmrunverify238/23suites/lint/build/Prisma/NYC, tsc et10garde-fous passés ; premières erreurslint des nouveaux tests corrigées avantpublication, aucun seuildésactivé. PostgreSQL/HTTP/Chromium L5 non encore exécutés, qualification viaPR nécessaire. [Gate initial complet](reviews/l5-b5a-review-gate.md).
+
+
+## Qualification native B5a et Gate final — 22 octobre 2026
+
+Codeb273dcf inclus dans fd3e89080e3d6e970e97b9dc25447797285f4e04 : sixchecks success et sixlogs relus. [Quality39760878427](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878427) :238backend/23suites,191frontend/27fichiers. [Integration39760878585](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878585) :160PostgreSQL/HTTP/11suites, dont14migration et5HTTPnouveaux, quatreparcoursChromium ; huitmigrationsfresh/redeploy/status/drift/smoke et dixgarde-fous. [Audits39760878501](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878501) : backend/frontend complets etruntime zéro. Les nouveaux tests ont tous passé sans correctionCI de code, quota/assertion/retry/timeout affaibli. Aucune migration propriétaire, uniquement Actions jetables.
+
+[Gate de toutebranche](reviews/l5-b5a-review-gate.md) repris après preuves natives ; aucun BLOCKER/P1 B5a identifié. PR32draft, préparationinactive seulement. Complément du contratdeDELETEfolder couvert par préconditiond’ensemble, aucuneactivation ni workflow modifié. Prochainpas : derniercheckpointdocumentaire, lecturedu vrai diff et sixchecks de sonHEAD, puis ready sansmerge.

@@ -319,3 +319,10 @@ Revue préventive : contradiction de compatibilité prouvée par appels HTTP ind
 ## Reprise L5 après validation explicite de l’option B
 
 BlocageL5-COMPAT-01 levé : routesconservées, préconditionsobligatoires sur toutesécrituresdeclassement,409sans effet siabsentes/périmées, aucuneinférence, lotatomique ; Angular actualisé conjointement à la bascule. B5a EN_COURS_PREPARATION_INACTIVE sur feature/recipe-lifecycle-contracts ; modèle/CHECK/defaults uniquement, activationcoordonnée au débutB5b. [Contrats](../maintenance/recipe-lifecycle.md), [design](l5-design.md). Les anciens étatsbloqués sont historiques, aucun nouveau merge autorisé.
+
+
+## Qualification native B5a et Gate final — 22 octobre 2026
+
+Codeb273dcf inclus dans fd3e89080e3d6e970e97b9dc25447797285f4e04 : sixchecks success et sixlogs relus. [Quality39760878427](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878427) :238backend/23suites,191frontend/27fichiers. [Integration39760878585](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878585) :160PostgreSQL/HTTP/11suites, dont14migration et5HTTPnouveaux, quatreparcoursChromium ; huitmigrationsfresh/redeploy/status/drift/smoke et dixgarde-fous. [Audits39760878501](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878501) : backend/frontend complets etruntime zéro. Les nouveaux tests ont tous passé sans correctionCI de code, quota/assertion/retry/timeout affaibli. Aucune migration propriétaire, uniquement Actions jetables.
+
+[Gate de toutebranche](reviews/l5-b5a-review-gate.md) repris après preuves natives ; aucun BLOCKER/P1 B5a identifié. PR32draft, préparationinactive seulement. Complément du contratdeDELETEfolder couvert par préconditiond’ensemble, aucuneactivation ni workflow modifié. Prochainpas : derniercheckpointdocumentaire, lecturedu vrai diff et sixchecks de sonHEAD, puis ready sansmerge.
