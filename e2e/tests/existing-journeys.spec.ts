@@ -160,14 +160,23 @@ test('register, create, classify, manage folders and log back in', async ({ page
 
   // A second real client changes the version; the UI must preserve its stale draft.
   const remoteHeaders = await browserHeaders(page);
+  const concurrentTag = `Concurrent ${suffix}`;
   const remoteSave = await page.request.put(
     `http://127.0.0.1:3000/api/cocktails/${created.slug}/organization`,
     {
       headers: remoteHeaders,
-      data: { folderIds: folders.map((f) => f.id), tagNames: [tagName], expectedVersion: 1 },
+      data: { folderIds: folders.map((f) => f.id), tagNames: [tagName, concurrentTag], expectedVersion: 1 },
     },
   );
   expect(remoteSave.status()).toBe(200);
+  expect(((await remoteSave.json()) as { organizationVersion: number }).organizationVersion).toBe(2);
+  // Return to the original set through a real second change: the old version must still be stale.
+  const remoteReturn = await page.request.put(
+    `http://127.0.0.1:3000/api/cocktails/${created.slug}/organization`,
+    { headers: remoteHeaders, data: { folderIds: folders.map((f) => f.id), tagNames: [tagName], expectedVersion: 2 } },
+  );
+  expect(remoteReturn.status()).toBe(200);
+  expect(((await remoteReturn.json()) as { organizationVersion: number }).organizationVersion).toBe(3);
   await page.getByLabel('Nom du nouveau tag', { exact: true }).fill('Draft');
   await page.getByRole('button', { name: 'Ajouter', exact: true }).click();
   const conflictResponse = page.waitForResponse(
