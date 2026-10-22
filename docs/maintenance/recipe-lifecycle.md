@@ -2,7 +2,7 @@
 
 ## État d’activation
 
-**Sur la branche B5b `feature/recipe-content-editing`**, la bascule coordonnée API/Angular des préconditions et les endpoints de contenu sont implémentés. B5a est intégré sur main `dfe39a2` ; B5b doit obtenir sa qualification native, sa PR puis un accord de merge distinct. Les endpoints corbeille/restauration et l'interface d'édition/brouillons restent B5c–e. Aucune purge/archivage/média/collaboration. D5 validée, [DesignReview B5b](../project/l5-b5b-design.md).
+**Sur la branche B5b `feature/recipe-content-editing`, PR33**, la bascule coordonnée API/Angular des préconditions et les endpoints de contenu sont implémentés. Code830c47d qualifié : sixchecks/sixlogs261backend/192frontend/187PG-HTTP/4Chromium/audits0 ; [Gate et limites](../project/reviews/l5-b5b-review-gate.md). B5a est intégré sur main `dfe39a2` ; B5b attend les checks du dernier checkpoint documentaire puis un accord de merge distinct. Les endpoints corbeille/restauration et l'interface d'édition/brouillons restent B5c–e. Aucune purge/archivage/média/collaboration. D5 validée, [DesignReview B5b](../project/l5-b5b-design.md).
 
 ## Contrat de contenu B5b
 

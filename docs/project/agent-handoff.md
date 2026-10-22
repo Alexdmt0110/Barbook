@@ -1,27 +1,27 @@
-# Handoff canonique Barbook — B5b développé, qualification native en cours
+# Handoff canonique Barbook — B5b serveur qualifié, attente validation PR33
 
 ```yaml
-checkpoint_utc: "2026-10-22T12:23:54Z"
+checkpoint_utc: "2026-10-22T12:42:01Z"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
-handoff_status: "EN_COURS"
+handoff_status: "EN_ATTENTE_VALIDATION"
 feature: "L5 B5b : classement préconditionné et édition serveur atomique"
 branch: "feature/recipe-content-editing"
 base_branch: "main"
 base_sha: "dfe39a2bd0b2f91490b8c8cd97189ee3f8b3976f"
-remote_head_sha: "3d5727dc7cdd5d59e000045de629625f1b259975"
-local_head_sha: "3d5727dc7cdd5d59e000045de629625f1b259975"
+remote_head_sha: "830c47d23fe5cb21b0962340560c2d47001dfd43"
+local_head_sha: "830c47d23fe5cb21b0962340560c2d47001dfd43"
 worktree: "documentation de qualification à publier ; code propre et publié"
-pr: "B5b à créer en draft après Gate locale ; aucun accord de merge"
-tests: "verify backend261/25 et frontend192/27, lint/build/Prisma/compat, tsc backend/e2e, dix guards et diffcheck locaux réussis ; PG/HTTP/Chromium B5b à exécuter dans Actions"
+pr: "https://github.com/Alexdmt0110/Barbook/pull/33 ; draft puis ready seulement après sixchecks du présent checkpoint ; aucun accord de merge"
+tests: "Code830c47d : sixchecks success/sixlogs261backend/192frontend/187PG-HTTP/4Chromium/audits0 ; locaux verify/tsc/gardes verts ; présent checkpoint doit obtenir ses propres sixchecks"
 migrations: "aucune nouvelle B5b ; huit intégrées B5a testées uniquement Actions jetables, aucune personnelle/production"
-changes_pushed: "407b0b0 design ; 1e2bb39 bascule coordonnée ; 74999ee contenu atomique ; 3d5727d cleanup borné des fixtures, chaque parent/arbre/message/fichiers vérifié"
+changes_pushed: "407b0b0 design ;1e2bb39 bascule ;74999ee contenu ;3d5727d cleanup ;fa7b945 Gate ;6a7b3d2 observateur PG ;830c47d vraie mutation distante Chromium, tous publiés/vérifiés"
 unpushed_changes: "présente documentation avant sa propre publication"
 decisions_validated: "D1/D2/D5 ; L5-COMPAT-01B ; merge32 et poursuite B5b/L5 explicitement autorisés"
 decisions_pending: "autorisation explicite de toute nouvelle PR avant merge ; aucun arbitrage métier bloquant nouveau identifié"
-next_atomic_step: "publier docs/Gate ; ouvrir PR draft, lire vrai diff et qualifier six checks/logs ; corriger et reprendre revue entière si défaut"
-risks_and_blockers: "preuve native B5b encore attendue ; UI/drafts édition B5c, cycle B5d/e et qualification globale B5f restent à livrer"
+next_atomic_step: "qualifier sixchecks du dernier checkpoint puis ready ; attendre accord explicite merge33 ; après merge autorisé/main qualifié seulement, B5c UI/drafts"
+risks_and_blockers: "aucun BLOCKER/P1 B5b restant identifié ; UI/drafts B5c, cycle B5d/e et qualification globale B5f restent à livrer ; aucun accord de merge33"
 production_effect: "aucun"
 ```
 
@@ -45,6 +45,10 @@ Angular conserve la version avec la sélection multipage ; recherche ne rajeunit
 
 ## Tests et état de qualification
 
+**Qualification native acquise sur830c47d** : sixchecks success/sixjournaux lus. Quality39779623242 :261backend/192frontend ; Integration39779623354 :187PG-HTTP/13suites,4Chromium54,9s,huitmigrations et10gardes ; Security39779623270 : audits complets/runtime0. [Gate renouvelée](reviews/l5-b5b-review-gate.md). Artefact12424819959 téléchargé/digest vérifié, captures classement multiple et détail dossier clair desktop/mobile inspectées, texte hostile échappé et mise en page lisible. Les mentions d'attente ci-dessous sont la photographie avant première CI, pas l'état courant.
+
+Première CI :184/187natifs,3échecs d'observation directe des deux waiters ;6a7b3d2 parcourt récursivement pg_blocking_pids en gardant deux attentes et délai5s,187passent. Chromium2/4 car fixture de conflit renvoyait un no-op identique ;830c47d fait ajout/retrait réels de tag distant, versions2/3 et409 ancien explicitement vérifiés ;4passent. Code produit inchangé, aucun timeout/retry/quota/guard/assertion409 relâché. Revue entière main...branche reprise après chaque correction. Dernier checkpoint documentaire exige ses propres sixchecks, puis metadataPR seulement ; éviter un cycle infini de commits de suivi.
+
 Locaux Node24.19/npm11.9 : npm ci backend838/frontend585/e2e6, aucun package/lock changé. `npm run verify` backend261tests/25suites et frontend192/27fichiers code0 ; lint/build/Prisma generate/validate et compatNYC/Angular réussis. `npx tsc --noEmit --incremental false` backend, `npm run typecheck` e2e, `npm run test:integration:safety`10 et `git diff --check` réussis. Logs scratch /tmp/barbook-b5b-backend-verify.log et /tmp/barbook-b5b-frontend-verify.log ; GitHub/Actions fourniront preuve durable.
 
 PG/HTTP/Chromium nouveaux **non exécutés localement**, binaires absents ; qualification via workflowsPR existants sans modificationCI. Deux nouvelles suites natives : organization-preconditions et cocktail-content. Vrais triggers/pannes/rollback à chaque étape et attentes de verrou PG observées, comparaison données avant/après ; aucune simulation de serveur annoncée comme preuve. Cycles SQL synthétiques vérifient barrières monotones mais ne qualifient pas les endpoints B5d encore absents. Ne pas annoncer ces tests passés avant lecture des logs.
@@ -55,6 +59,6 @@ Anciennes assertions400 null/missing et doubles succès sans version adaptées �
 
 Worktree actif barbook-l5, ancien barbook-folders àdf6c890/indexf5a9132 laissé intact ; aucune réécriture/stash/reset/delete. Les commits sont créés/publiés par APIs GitHub, ref en fast-forward avec HEAD attendu, puis clone récupéré sans force. Un fetch simple d'une nouvelle branche ne crée pas ici son suivi : fetch explicite refs/heads/...:refs/remotes/origin/... puis switch depuis le SHA ; ne pas forcer un checkout sale.
 
-Prochain pas : publier docs, PR draft conforme aux sept rubriques, vérifier réel base/head/fichiers/blobs/commits/discussions/checks. Attendre sixchecks, lire sixlogs et inspecter parcours concernés ; si rouge, diagnostiquer/corriger dans cette branche et répéter Gate entière. Ready seulement une fois qualifié ; aucun merge sans Alex. Après accord et main qualifié seulement, B5c.
+Prochain pas courant : finir les sixchecks du dernier checkpoint et lire les sixlogs ; PR33 réelle45fichiers, tousblobs initiaux comparés au clone, base dfe39a2, zérocommentaire/revue/inline, mergeabletrue. Recontrôler HEAD/diff et passer ready seulement sivert ; aucun merge sans Alex. Après accord et main qualifié seulement, B5c. Toute CI rouge impose diagnostic/correction et Gate entière ; les étapes de qualification décrites comme futures plus haut sont historiques.
 
 Git : branche/commits/PR uniquement. VM : aucun. SQL : tests natifs seulement DB jetables gardées ; aucune nouvelle migration B5b ou migration propriétaire. Infra : aucun, workflows inchangés. Aucune purge physique, CONTRACT, L6–L8 ou nouveau coût/service. Ancien binaire incompatible avec unknown/corbeille activés : retour seulement vers binaire compatible, pas de rollback destructif.

@@ -2,7 +2,7 @@
 
 ## État courant L5 — B5a intégré, B5b développé sur branche
 
-PR32 fusionnée avec accord explicite, main `dfe39a2` qualifié par six checks post-merge (238/191/160/4, audits zéro). B5b sur `feature/recipe-content-editing` : design407b0b0, bascule coordonnée de toutes préconditions API/Angular1e2bb39 et contenu atomique/ABV74999ee. Locaux261 backend/192 frontend et lint/build/Prisma/typage/gardes réussis ; qualification native du dernier HEAD encore à observer avant ready. [Design](l5-b5b-design.md), [contrat](../maintenance/recipe-lifecycle.md), [Gate](reviews/l5-b5b-review-gate.md). B5c–f restent à réaliser après accords de merge et main qualifié. Aucun merge B5b autorisé ; aucun OPS/L6–L8. Les anciens états bloqués/en attente ci-dessous sont historiques.
+PR32 fusionnée avec accord explicite, main `dfe39a2` qualifié par six checks post-merge (238/191/160/4, audits zéro). B5b sur `feature/recipe-content-editing`, PR33 : design407b0b0, bascule API/Angular1e2bb39 et contenu atomique/ABV74999ee ; fixtures corrigées6a7b3d2/830c47d sans changement produit. **Code830c47d qualifié : sixchecks et sixlogs261backend/192frontend/187PG-HTTP/4Chromium, audits0** ; captures desktop/mobile inspectées. Derniers documents/checkpoint doivent obtenir leurs sixchecks avant ready. [Design](l5-b5b-design.md), [contrat](../maintenance/recipe-lifecycle.md), [Gate](reviews/l5-b5b-review-gate.md). B5c–f restent à réaliser après accords de merge et main qualifié. Aucun merge33 autorisé ; aucun OPS/L6–L8. Les anciens états ci-dessous sont historiques.
 
 
 ## L5 — autorisé le 22 octobre 2026, Design Review bloquée avant code

@@ -1,5 +1,17 @@
 # Checkpoint L5 — Design Review avant code
 
+## B5b serveur qualifié — PR33 en attente d'autorisation distincte
+
+HEAD de code qualifié `830c47d23fe5cb21b0962340560c2d47001dfd43`, base `dfe39a2bd0b2f91490b8c8cd97189ee3f8b3976f`. Six checks success et six logs relus :261backend/192frontend/187PG-HTTP/4Chromium54,9s, audits zéro. Runs Quality39779623242, Integration39779623354 et Security39779623270 liés au [Gate](reviews/l5-b5b-review-gate.md). Huit migrations et dix gardes verts sur DB Actions jetables ; quatre captures de classement/dossier desktop/mobile inspectées, digest de l'artefact vérifié. Aucune CI maquillée : observateur PG transitive corrigé et fixture Chromium effectue de vrais changements, assertions409/deux waiters/délais/quotas conservés.
+
+Journal, contrats, roadmap et six fiches L5 actualisés ;60autres fiches identiques à main. Ce checkpoint documentaire doit obtenir ses propres six checks avant ready. **PR33 n'est pas autorisée au merge.** Après accord explicite/main qualifié seulement, B5c réutilisation UI/drafts L4. Aucun déploiement, nouvelle migration B5b, base propriétaire, infra, CONTRACT ou purge.
+
+## Qualification B5b — correctifs de fixtures, code applicatif inchangé
+
+PR33 draft, base dfe39a2,45 fichiers/5commits initiaux ; vrais blobs et patches/fichiers lus, tous blobs concordent au clone, zéro commentaires/revues/inline, mergeable true. fa7b945 : quality261/192 et audits0 verts, natifs184/187, trois attentes de verrou non observées directement. Correctif6a7b3d2f8ee156274cc9af05d68ba371dfae7cd1 (arbre d032d944) : observer la chaîne transitive pg_blocking_pids, sans changer deux attentes/délai/assertions ; **187natifs/13suites passés**, deux nouvelles suites et rollback/races réels, logs lus job119825776212/run39779119429. Chromium2/4 révèle fixture no-op ; correctif830c47d23fe5cb21b0962340560c2d47001dfd43 (arbre5cb8fc12) effectue deux vraies modifications puis vérifie409 sur ancienne version. Typage e2e réussi, code produit inchangé, aucune assertion/limite affaiblie.
+
+Parents/arbres/messages/fichiers des deux correctifs publiés immédiatement et vérifiés ; revue **entière** contre main renouvelée ([Gate](reviews/l5-b5b-review-gate.md)). Six checks/quatreChromium du dernier HEAD attendus ; PR33 pas encore ready, aucun merge autorisé. Toutes19anciennes refs conservées (20avec brancheB5b), main dfe39a2 inchangé.
+
 ## B5b développé — qualification native à observer
 
 Complément `3d5727dc7cdd5d59e000045de629625f1b259975` : cleanup borné des recettes synthétiques de chaque suite avant cascade workspace et FK legacy Restrict, typage/lint réussis ; revue de toute branche renouvelée. Aucun autre jeu de données concerné.

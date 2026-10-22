@@ -1,5 +1,21 @@
 # Review Gate L5 B5b
 
+## Verdict de qualification native — 22 octobre 2026
+
+**B5b serveur qualifié sur `830c47d23fe5cb21b0962340560c2d47001dfd43` : six checks completed/success, six journaux lus.** [Quality39779623242](https://github.com/Alexdmt0110/Barbook/actions/runs/39779623242) :261 backend/25suites et192 frontend/27fichiers. [Integration39779623354](https://github.com/Alexdmt0110/Barbook/actions/runs/39779623354) :187 PostgreSQL/HTTP/13suites, les deux nouvelles suites passent, quatre Chromium desktop/mobile (54,9s), huit migrations fresh/redeploy/status/drift/smoke et dix garde-fous. [Security39779623270](https://github.com/Alexdmt0110/Barbook/actions/runs/39779623270) : audits backend/frontend complets/runtime zéro.
+
+Artefact12424819959 téléchargé, SHA-256 `7650aa67b8809a0b633c2a36cea9e0ed936a6075a6258aba0984906d9f55bc26` concordant. Captures classement multiple et détail dossier clair desktop/mobile réellement inspectées : noms hostiles échappés comme texte, contrôles et messages lisibles, mise en page sans débordement ; assertions clavier/largeur et parcours L4 conservés. Pas d'audit humain lecteur d'écran ni Safari/iOS réel prétendu.
+
+Revue entière dfe39a2...830c47d reprise après corrections de fixtures : aucun BLOCKER/P1 restant identifié dans B5b, aucun nouveau comportement produit modifié pour satisfaire CI. PR33 reste sans accord de merge ; les derniers documents/checkpoint doivent obtenir leurs six checks avant ready. B5c–f et les dix critères globaux restent partiels comme précisé ci-dessous. Les mentions d'attente et les échecs ci-dessous sont des photographies historiques, pas le verdict courant.
+
+## Revue entière après corrections de qualification
+
+Code applicatif74999ee inchangé ; tous les axes ci-dessous ont été repris sur main dfe39a2...830c47d après les correctifs de tests. Première CI fa7b945 :184/187 natifs, trois échecs de l'observateur exigeant deux bloqueurs directs ; PostgreSQL peut chaîner le second waiter derrière le premier. 6a7b3d2 suit récursivement pg_blocking_pids en conservant deux attentes réelles, assertions métier et délai5s. **187/187 natifs et13suites passent réellement** sur ce HEAD ([Integration39779119429](https://github.com/Alexdmt0110/Barbook/actions/runs/39779119429), job119825776212, log lu), dont tous rollback/concurrence et les deux nouvelles suites.
+
+Chromium sur6a7b3d2 :2/4, hypothèse historique de fixture révélée : le second client renvoyait le même classement et attendait artificiellement un incrément. Le no-op doit conserver la version selon le contrat. 830c47d effectue ajout puis retrait réels d'un tag distant, vérifie les versions2 puis3, garde le même état final et l'assertion409 de l'ancienne intention. Aucun code produit, quota, retry, timeout ni assertion409 assoupli ; typage e2e réussi. Six checks et quatre Chromium du nouveau HEAD à observer avant verdict final.
+
+Revue renouvelée de toute la branche : contrats/DTO, transactions et verrou, instantanés, no-op/ABV, anciennes routes/consommateurs, erreurs/confidentialité, tests/fixtures, dépendances/CI inchangées, DOM/versions, performance bornée, docs/66fiches/OPS. Aucun BLOCKER/P1 applicatif identifié ; qualification navigateur encore attendue, pas d'accord de merge. Les preuves de source fa7b945 et6a7b3d2 sont historiques et ne remplacent pas les checks du dernier HEAD.
+
 Revue entière renouvelée après `3d5727d` : cleanup des seules recettes synthétiques de chaque nouvelle suite avant cascade du workspace, pour libérer les références legacy Restrict ; lint/tsc de nouveau réussis. Aucun changement de comportement applicatif, assertion, timeout ou quota. Verdict local/statique et attente native ci-dessous maintenus.
 
 22 octobre 2026. Revue entière `main dfe39a2...feature/recipe-content-editing`, après les commits de design407b0b0, bascule1e2bb39 et contenu74999ee. Autorisation de développement B5b explicite ; aucun accord de merge de cette branche. Verdict **local/statique : aucun BLOCKER/P1 identifié**. Qualification PostgreSQL/HTTP/Chromium et six checks du dernier HEAD nécessaires avant ready ; résultats natifs B5b non encore acquis à cette photographie.

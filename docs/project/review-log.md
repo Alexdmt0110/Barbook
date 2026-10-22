@@ -1,5 +1,9 @@
 # Revues de développement
 
+## L5 B5b — Qualification native et Gate renouvelée
+
+830c47d : sixchecks success/sixlogs261backend/192frontend/187PG-HTTP/4Chromium54,9s/audits0 ; [preuves et revue entière](reviews/l5-b5b-review-gate.md). Trois échecs d'observation directe des bloqueurs PG corrigés par parcours transitive réel, puis deux échecs Chromium de fixture identique/no-op corrigés par de vraies mutations distantes avec versions2/3 et409 ancien conservé. Aucune règle de sécurité, assertion métier, timeout/retry/quota modifié. Captures classement/dossier desktop/mobile téléchargées avec digest vérifié et inspectées. Aucun BLOCKER/P1 restant B5b identifié ; PR33 soumise à accord de merge distinct après sixchecks du dernier checkpoint documentaire. L5 global non clos.
+
 ## L5 B5b — Design et revue entière avant qualification native
 
 PR32 intégrée/qualifiée sur main dfe39a2, preuves au checkpointL5. Design407b0b0 avant code ; bascule coordonnée1e2bb39 et contenu74999ee, chaque commit immédiatement publié et parent/arbre/fichiers vérifiés. Tous writers historiques, lots et suppression indirecte de dossier couverts par préconditions ; nouveau contenu atomique/version indépendante/modes ABV et snapshots cohérents. [Gate de toute branche](reviews/l5-b5b-review-gate.md) : aucun BLOCKER/P1 statique/local identifié ;261 backend,192 frontend, lint/build/Prisma/typage/gardes verts. Tests natifs nouveaux et quatre Chromium doivent passer réellement avant ready ; aucune preuve B5d/B5c inventée. Toute correction impose de reprendre la review entière. Aucun merge de cette branche autorisé.
