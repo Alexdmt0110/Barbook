@@ -216,3 +216,14 @@ Review Gate entier repris après les corrections : aucun BLOCKER/P1 restant iden
 
 
 PR B4e/B4f réellement ouverte : [#30](https://github.com/Alexdmt0110/Barbook/pull/30), base de86dd0/head676f7fa au contrôle initial ;39fichiers/12commits, tous blobs et toutes lignes ajoutées/retirées comparés au clone, aucun patch manquant, zéro commentaire/revue/inline. Mergeable=true, état blocked pendant CI en cours, aucun conflit et aucun auto-merge. Code/fixture/sécurité déjà qualifiés sur9b7fa1e ; ce complément ne modifie que le suivi. Observer le dernier HEAD et ses six contrôles, puis attendre Alex : aucun merge de#30 autorisé.
+
+
+## Clôture technique courante — 22 octobre 2026
+
+L4 B4a–B4f est **CLOTURE_TECHNIQUEMENT_SUR_MAIN**, après autorisation explicite et merge de [#30](https://github.com/Alexdmt0110/Barbook/pull/30). Main `0f63272ddbe7bb3a884384531e9b41a314d09525`, arbre `d1b5acab59c9077a7ba8ec5a968d84ae693f6526` identique au HEAD qualifié `5e1660f`. Les six contrôles post-merge sont success, leurs six journaux relus : **238 backend, 191 frontend, 141 PostgreSQL/HTTP, 4 Chromium** ; audits complets/runtime zéro. Les 18 critères sont satisfaits dans le périmètre de preuves et limites de la [matrice](l4-b4f-qualification.md), sans BLOCKER/P1 L4 identifié.
+
+[Bilan de clôture](l4-closure.md) : fonctionnalités livrées, vérifications, risques résiduels et conditions avant production. Le présent suivi documentaire est publié sur `docs/l4-closure` et nécessite une nouvelle PR et une autorisation de merge distincte ; il n'est pas encore intégré à main. Développement arrêté : **L5 non autorisé**. Aucun déploiement, migration personnelle/production, changement d'infrastructure ou CONTRACT. Les états antérieurs ci-dessous sont historiques.
+
+Pré-merge30 : HEAD5e1660f/base de86dd0,39fichiers/14commits vérifiés intégralement, zéro discussion nouvelle, mergeableclean et12checks success. Merge0f63272 confirmé à07:38:59UTC, deux parents de86dd0/5e1660f, arbre d1b5acab identique au HEAD revu. Les17refs préexistantes conservées, hors main tous SHA inchangés. Six contrôles propres au merge et six logs lus : Quality39741959079, Integration39741959068, Audits39741958863 ;238/191/141/4 (Chromium53.2s), sept migrations historiques sur CI jetables, dix garde-fous, audits0. Vitest4.1.12 et tests actifs, aucun skip/todo/only trouvé. JSON66IDs avec seules quatre fiches L4 mises à jour ; aucune clôture globale des dettes historiques.
+
+Revue documentaire préventive : enregistrer les faits intégrés et conditions de production, distinguer clôture technique/main et nouvelle PR de suivi, arrêter le développement. Review Gate de tous les documents de cette branche consigné dans l4-closure.md ; aucun effet runtime et aucun BLOCKER/P1 documentaire identifié. Vérifier ensuite vraie PR et six contrôles. Aucun merge suivant autorisé par l'accord de#30.

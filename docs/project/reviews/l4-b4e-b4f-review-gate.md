@@ -1,5 +1,14 @@
 # Review Gate L4 B4e/B4f — 22octobre2026
 
+## Clôture technique courante — 22 octobre 2026
+
+L4 B4a–B4f est **CLOTURE_TECHNIQUEMENT_SUR_MAIN**, après autorisation explicite et merge de [#30](https://github.com/Alexdmt0110/Barbook/pull/30). Main `0f63272ddbe7bb3a884384531e9b41a314d09525`, arbre `d1b5acab59c9077a7ba8ec5a968d84ae693f6526` identique au HEAD qualifié `5e1660f`. Les six contrôles post-merge sont success, leurs six journaux relus : **238 backend, 191 frontend, 141 PostgreSQL/HTTP, 4 Chromium** ; audits complets/runtime zéro. Les 18 critères sont satisfaits dans le périmètre de preuves et limites de la [matrice](../l4-b4f-qualification.md), sans BLOCKER/P1 L4 identifié.
+
+[Bilan de clôture](../l4-closure.md) : fonctionnalités livrées, vérifications, risques résiduels et conditions avant production. Le présent suivi documentaire est publié sur `docs/l4-closure` et nécessite une nouvelle PR et une autorisation de merge distincte ; il n'est pas encore intégré à main. Développement arrêté : **L5 non autorisé**. Aucun déploiement, migration personnelle/production, changement d'infrastructure ou CONTRACT. Les états antérieurs ci-dessous sont historiques.
+
+## Revue avant merge — historique conservé
+
+
 Revue complète main de86dd0...feature/global-session-revocation, reprise de zéro après corrections du retour de document, du fixture BFCache et de Vitest. Code applicatif f5a9132, fixture34fe83b et sécurité7d3bee2 ; dernier checkpoint documentaire9b7fa1e. Statut : QUALIFIE_SUR_BRANCHE, six checks du code9b7fa1e success et logs relus. Aucun accord de merge n'est fourni par ce document.
 
 ## Revue de toute la branche

@@ -1,5 +1,11 @@
 # Backlog d'exécution
 
+## Clôture technique courante — 22 octobre 2026
+
+L4 B4a–B4f est **CLOTURE_TECHNIQUEMENT_SUR_MAIN**, après autorisation explicite et merge de [#30](https://github.com/Alexdmt0110/Barbook/pull/30). Main `0f63272ddbe7bb3a884384531e9b41a314d09525`, arbre `d1b5acab59c9077a7ba8ec5a968d84ae693f6526` identique au HEAD qualifié `5e1660f`. Les six contrôles post-merge sont success, leurs six journaux relus : **238 backend, 191 frontend, 141 PostgreSQL/HTTP, 4 Chromium** ; audits complets/runtime zéro. Les 18 critères sont satisfaits dans le périmètre de preuves et limites de la [matrice](l4-b4f-qualification.md), sans BLOCKER/P1 L4 identifié.
+
+[Bilan de clôture](l4-closure.md) : fonctionnalités livrées, vérifications, risques résiduels et conditions avant production. Le présent suivi documentaire est publié sur `docs/l4-closure` et nécessite une nouvelle PR et une autorisation de merge distincte ; il n'est pas encore intégré à main. Développement arrêté : **L5 non autorisé**. Aucun déploiement, migration personnelle/production, changement d'infrastructure ou CONTRACT. Les états antérieurs ci-dessous sont historiques.
+
 Le [catalogue détaillé](audit/03-Vision-et-catalogue.md) et [backlog.json](backlog.json) conservent les 66 identifiants. Le [registre des 24 constats](audit/02-Audit-qualite-securite-UX.md) est une photographie d'audit ; les preuves d'exécution ci-dessous et le handoff font foi pour la phase B. Une autorisation partielle ne valide pas toute la fiche associée.
 
 | ID | Priorité / lot | État vérifié | Résultat attendu et critères | Preuve / dépendances |
@@ -55,10 +61,10 @@ D1a/D1b/D2a/D2b/D2c validées, [design et critères](l4-design.md). #25 document
 | BB-L4-02 / B4b | API/UI cookie/CSRF et contexte coordonnés, retrait Bearer | MERGE #27 ; main90d9356 qualifié |
 | BB-L4-03 / B4c | admission serveur fermée/liste, storage refusé toléré | MERGE #28 ; main0c4a558 qualifié |
 | BB-L4-04 / B4d / A010 / A012 | brouillons mémoire/sessionStorage 24 h, restauration isolée explicite, versions | #29 MERGEE de86dd0 ; six checks main qualifiés |
-| BB-L4-05 / B4e | révocation globale, activité/onglets/réseau et courses | QUALIFIE_SUR_BRANCHE ; six checks success9b7fa1e |
-| BB-L4-06 / B4f | Review Gate complet, six checks, vraie PR et handoff | EN_COURS ; aucun merge futur autorisé |
+| BB-L4-05 / B4e | révocation globale, activité/onglets/réseau et courses | MERGE #30 ; main0f63272 et six checks post-merge success |
+| BB-L4-06 / B4f | Review Gate complet, six checks, vraie PR et handoff | CLOTURE_TECHNIQUEMENT_SUR_MAIN ; 18critères revalidés, aucun BLOCKER/P1 L4 |
 
-Les critères L4-01 à L4-18 ne sont pas encore déclarés passés. B4a ne sécurise pas à lui seul les parcours JWT. L5, D5/rétention, CONTRACT, infrastructure et production restent exclus ; les branches historiques sont conservées.
+État historique B4a : les critères L4-01 à L4-18 n’étaient pas encore déclarés passés ; voir la clôture courante en tête. B4a ne sécurise pas à lui seul les parcours JWT. L5, D5/rétention, CONTRACT, infrastructure et production restent exclus ; les branches historiques sont conservées.
 
 Preuves B4a et limites : [checkpoint-l4.md](checkpoint-l4.md), [Review Gate](reviews/l4-b4a-review-gate.md). F003 demeure partielle ; F001/F002/F051 sont approuvées mais leur nouvelle implémentation web n'a pas commencé. Aucune inscription privée/cookie/CSRF HTTP/restauration de brouillon prétendue livrée par le store seul.
 
