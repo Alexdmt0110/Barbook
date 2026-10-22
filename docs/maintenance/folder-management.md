@@ -59,3 +59,8 @@ L'onglet Dossiers ouvre l'index (pages de 25, recherche explicite, création san
 Le sélecteur « Ajouter des cocktails » charge le catalogue par pages de 12, permet recherche et choix sur plusieurs pages (100 max par ajout), et désactive les recettes déjà présentes. Les choix restent en mémoire à la fermeture/réouverture dans cette page, se vident après réussite, et restent après échec ; répéter l'ajout est idempotent côté serveur. Retirer dans la liste touche seulement ce dossier, sans confirmation destructive de recette. Les requêtes d'une ancienne route sont annulées côté UI ; cela ne promet pas l'annulation d'une mutation déjà commise côté serveur. Revenir/recharger permet de retrouver son état réel.
 
 Les tests UI couvrent chargements/réseau, saisies/conflits, confirmation, pagination diminuée, route réutilisée et sélection persistante. Les parcours Chromium utilisent deux vraies pages de candidats, testent les trois thèmes et conservent des captures sous l'artefact7 jours ; le handoff dit lesquelles ont été effectivement inspectées.
+
+
+## Arbitrage L5-COMPAT-01B — contrat cible, non activé dans B5a
+
+La compatibilité des appels sans version décrite ci-dessus est historique et sera remplacée lors de la bascule coordonnéeL5 : toutes écritures de classement devront fournir leur précondition, absente/obsolète409sans effet, routes conservées. [Formats des lots et singles, consommateurs et tests](recipe-lifecycle.md). Ne pas supposer cette règle déjà active au seul ajout du schémaB5a. Aucun ancien appel ne recevra de version inférée à la bascule.

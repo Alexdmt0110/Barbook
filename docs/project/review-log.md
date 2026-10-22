@@ -305,3 +305,24 @@ L4 B4a–B4f est **CLOTURE_TECHNIQUEMENT_SUR_MAIN**, après autorisation explici
 Pré-merge30 : HEAD5e1660f/base de86dd0,39fichiers/14commits vérifiés intégralement, zéro discussion nouvelle, mergeableclean et12checks success. Merge0f63272 confirmé à07:38:59UTC, deux parents de86dd0/5e1660f, arbre d1b5acab identique au HEAD revu. Les17refs préexistantes conservées, hors main tous SHA inchangés. Six contrôles propres au merge et six logs lus : Quality39741959079, Integration39741959068, Audits39741958863 ;238/191/141/4 (Chromium53.2s), sept migrations historiques sur CI jetables, dix garde-fous, audits0. Vitest4.1.12 et tests actifs, aucun skip/todo/only trouvé. JSON66IDs avec seules quatre fiches L4 mises à jour ; aucune clôture globale des dettes historiques.
 
 Revue documentaire préventive : enregistrer les faits intégrés et conditions de production, distinguer clôture technique/main et nouvelle PR de suivi, arrêter le développement. Review Gate de tous les documents de cette branche consigné dans l4-closure.md ; aucun effet runtime et aucun BLOCKER/P1 documentaire identifié. Vérifier ensuite vraie PR et six contrôles. Aucun merge suivant autorisé par l'accord de#30.
+
+
+## L5 — autorisé le 22 octobre 2026, Design Review bloquée avant code
+
+D5 validée (corbeille30joursserveur, expiration≠effacement, identité/slug/liens valides conservés, pas de purge/archivage/média). L5 B5a–B5f autorisé dans le carnet personnel ; chaque merge distinct. Main94552a9/#31 et sixchecks recontrôlés, aucune PR ouverte initialement. Branche feature/recipe-lifecycle-contracts publiée immédiatement depuis ce main dans un worktree propre, ancien instantané L4 intact.
+
+[Design Review transversale](l5-design.md) : **L5-COMPAT-01 bloque avant modèle/code**. Les anciennes mutations de liens sans version ne permettent pas de distinguer une intention avant suppression/restauration d'une nouvelle intention. Proposition A : conserver les routes mais exiger une précondition de cycle pour les recettes ayant traversé la corbeille ; accord d'Alex nécessaire sur cette incompatibilité, aucune règle implicite appliquée. [D5 et décisions](decisions.md), [checkpoint](checkpoint-l5.md). Aucun test applicatif/migration/SQL/workflow modifié, pas de PR avant arbitrage. Pas de L6–L8/CONTRACT/infra/déploiement ni basepropriétaire. Les états précédents sont historiques.
+
+Revue préventive : contradiction de compatibilité prouvée par appels HTTP indiscernables après restauration ; suspension de modèle/code demandée par la consigne explicite d’Alex. Pas de fauxgreen ni de PR malgré le blocage. Décisions D1/D2 préservées, D5 validée ; propositions techniques identifiées comme non implémentées.
+
+
+## Reprise L5 après validation explicite de l’option B
+
+BlocageL5-COMPAT-01 levé : routesconservées, préconditionsobligatoires sur toutesécrituresdeclassement,409sans effet siabsentes/périmées, aucuneinférence, lotatomique ; Angular actualisé conjointement à la bascule. B5a EN_COURS_PREPARATION_INACTIVE sur feature/recipe-lifecycle-contracts ; modèle/CHECK/defaults uniquement, activationcoordonnée au débutB5b. [Contrats](../maintenance/recipe-lifecycle.md), [design](l5-design.md). Les anciens étatsbloqués sont historiques, aucun nouveau merge autorisé.
+
+
+## Qualification native B5a et Gate final — 22 octobre 2026
+
+Codeb273dcf inclus dans fd3e89080e3d6e970e97b9dc25447797285f4e04 : sixchecks success et sixlogs relus. [Quality39760878427](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878427) :238backend/23suites,191frontend/27fichiers. [Integration39760878585](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878585) :160PostgreSQL/HTTP/11suites, dont14migration et5HTTPnouveaux, quatreparcoursChromium ; huitmigrationsfresh/redeploy/status/drift/smoke et dixgarde-fous. [Audits39760878501](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878501) : backend/frontend complets etruntime zéro. Les nouveaux tests ont tous passé sans correctionCI de code, quota/assertion/retry/timeout affaibli. Aucune migration propriétaire, uniquement Actions jetables.
+
+[Gate de toutebranche](reviews/l5-b5a-review-gate.md) repris après preuves natives ; aucun BLOCKER/P1 B5a identifié. PR32draft, préparationinactive seulement. Complément du contratdeDELETEfolder couvert par préconditiond’ensemble, aucuneactivation ni workflow modifié. Prochainpas : derniercheckpointdocumentaire, lecturedu vrai diff et sixchecks de sonHEAD, puis ready sansmerge.
