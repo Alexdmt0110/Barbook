@@ -41,3 +41,8 @@ Git : documents sur branche publiés, pas demergeautorisé. VMaucun ; SQLaucunea
 ## État courant après arbitrage B explicite
 
 L5-COMPAT-01 levé par Alex ; les paragraphes bloqués ci-dessus sont historiques. Branche74c778e/main94552a9 recontrôlés, aucune PRouverte ; WORK reprend B5a. Contracts recipe-lifecycle.md et complémentl5-design.md : deuxversions indépendantes avec bumpdes deux au cycle, préconditions de tous écrivains obligatoires à la basculecoordonnée B5b, lotcouvertureexacte et atomicité. B5a prépare schéma/CHECKs/defaults/upgrade inactifs ; ne pas prétendre la corbeille ou le refuslegacy déjà opérationnels. Prochainpas : implémentation additive selonDesign puis vrais tests/6CI et Gate de toutebranche avant PR ; aucun merge autorisé.
+
+
+## Checkpoint courant — B5a préparation publiée
+
+Design9cbed43 puis codeb273dcf poussés et vérifiés ; modèleadditif/19casnatifs, aucunwriter actif nouveau. Locaux verifybackend238/23suites/lint/build/Prisma/NYC, tsc et10garde-fous passés ; npmci838. [Gate initial](reviews/l5-b5a-review-gate.md) de toutebranche, aucune anomalieBLOCKER/P1 identifiée ; preuvesPG/HTTP/Chromium encore à observer enCI. Prochainpas : PRdraftdequalification utilisant workflowsPR existants, lire diff/checks/logs puis revuefinale et ready sivert. Pas de merge autorisé. TentativeajouttriggerCI rejetéeautomatiquement, abandonnée ; aucunworkflowmodifié.

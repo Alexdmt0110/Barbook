@@ -18,3 +18,8 @@ Publication documentaire atomique prévue ; contrôler parent/arbre/message/fich
 ## Reprise après arbitrageB — 2026-10-22T09:57:17+00:00
 
 Main94552a9 et branche74c778e recontrôlés, aucune PR ouverte ; sixchecks main success,19refs présentes. OptionB explicitement validée, arrêtcompatibilité levé. Contrats precis/lot/version sans inférence et inventaire Angular/tests publiés avant code. B5a reste préparationinactive : colonnes/defaults/CHECK et upgrade/rollback testés, pas de nouvelles routes ou garanties actives. Bascule de tous consommateurs à débutB5b après merge B5a autorisé et mainqualifié. Aucun autre lot/OPS autorisé.
+
+
+## B5a préparatoire publié — code b273dcf
+
+Design9cbed43 publié avant code ; checkpoint parent/arbre/message/10blobs vérifiés. Codeb273dcf publié (schema, migration8 additive, testsnatifs14migration+5HTTP), quatreblobs/parent/arbre vérifiés et worktreepropre. Aucun workflow Angular/controller/service modifié. Locaux : npmci838, npmrunverify238/23suites/lint/build/Prisma/NYC, tsc et10garde-fous passés ; premières erreurslint des nouveaux tests corrigées avantpublication, aucun seuildésactivé. PostgreSQL/HTTP/Chromium L5 non encore exécutés, qualification viaPR nécessaire. [Gate initial complet](reviews/l5-b5a-review-gate.md).
