@@ -13,3 +13,8 @@ Main94552a9 correspond à#31, mergedAt2026-10-22T09:03:02Z, parents0f63272/659f7
 Documentation deD5, inventaire des écrivains/lecteurs, contrats provisoires, alternatives de version/ABV, planmigration additive/testseulement, matrice10critères et risques rédigés. Aucun critèreL5 déclaré passé. Tests locaux de documents : JSON66IDs/sixfiches liées au L5seulement, liens/fences, dixcritères et diffcheck ; ni testPG/HTTP/Chromium L5 exécuté ni CI nouvelle revendiquée. Pas de Review Gate applicatif ni PR car arbitrage de contrat ouvert. Réponse d'Alex requise selon consigne4du lancementL5 ; D5 elle-même reste validée.
 
 Publication documentaire atomique prévue ; contrôler parent/arbre/message/fichiers/blobsdistants, puis arrêt. Gitcommits/pushbranche uniquement ; VM/SQL/Infraaucun ; aucun nouvel état enproduction.
+
+
+## Reprise après arbitrageB — 2026-10-22T09:57:17+00:00
+
+Main94552a9 et branche74c778e recontrôlés, aucune PR ouverte ; sixchecks main success,19refs présentes. OptionB explicitement validée, arrêtcompatibilité levé. Contrats precis/lot/version sans inférence et inventaire Angular/tests publiés avant code. B5a reste préparationinactive : colonnes/defaults/CHECK et upgrade/rollback testés, pas de nouvelles routes ou garanties actives. Bascule de tous consommateurs à débutB5b après merge B5a autorisé et mainqualifié. Aucun autre lot/OPS autorisé.

@@ -314,3 +314,8 @@ D5 validée (corbeille30joursserveur, expiration≠effacement, identité/slug/li
 [Design Review transversale](l5-design.md) : **L5-COMPAT-01 bloque avant modèle/code**. Les anciennes mutations de liens sans version ne permettent pas de distinguer une intention avant suppression/restauration d'une nouvelle intention. Proposition A : conserver les routes mais exiger une précondition de cycle pour les recettes ayant traversé la corbeille ; accord d'Alex nécessaire sur cette incompatibilité, aucune règle implicite appliquée. [D5 et décisions](decisions.md), [checkpoint](checkpoint-l5.md). Aucun test applicatif/migration/SQL/workflow modifié, pas de PR avant arbitrage. Pas de L6–L8/CONTRACT/infra/déploiement ni basepropriétaire. Les états précédents sont historiques.
 
 Revue préventive : contradiction de compatibilité prouvée par appels HTTP indiscernables après restauration ; suspension de modèle/code demandée par la consigne explicite d’Alex. Pas de fauxgreen ni de PR malgré le blocage. Décisions D1/D2 préservées, D5 validée ; propositions techniques identifiées comme non implémentées.
+
+
+## Reprise L5 après validation explicite de l’option B
+
+BlocageL5-COMPAT-01 levé : routesconservées, préconditionsobligatoires sur toutesécrituresdeclassement,409sans effet siabsentes/périmées, aucuneinférence, lotatomique ; Angular actualisé conjointement à la bascule. B5a EN_COURS_PREPARATION_INACTIVE sur feature/recipe-lifecycle-contracts ; modèle/CHECK/defaults uniquement, activationcoordonnée au débutB5b. [Contrats](../maintenance/recipe-lifecycle.md), [design](l5-design.md). Les anciens étatsbloqués sont historiques, aucun nouveau merge autorisé.

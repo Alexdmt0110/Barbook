@@ -430,7 +430,7 @@
       "id": "BB-F-015",
       "titre": "Édition complète d'une recette",
       "statut_observe": "absente ; seul le classement est modifiable.",
-      "statut_execution": "L5_APPROUVE_DESIGN_BLOQUE_COMPATIBILITE_LEGACY",
+      "statut_execution": "L5_B5a_EN_COURS_PREPARATION_INACTIVE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
@@ -452,14 +452,14 @@
       ],
       "decisions": [],
       "documentation": "l5-design.md ; decisions.md ; checkpoint-l5.md ; agent-handoff.md",
-      "prochain_bloc": "Attendre arbitrage explicite L5-COMPAT-01 avant modèle/code ; D5 validée. Aucun merge/CONTRACT/production/infra/L6-L8.",
+      "prochain_bloc": "B5a schéma/contrats préparatoires puis qualification et PR ; arbitrageB validé, activation coordonnée API/Angular à débutB5b après accord merge B5a.",
       "autorisation": "L5_B5a_B5f_APPROUVE_2026_10_22_PERSONNEL_SEULEMENT"
     },
     {
       "id": "BB-F-016",
       "titre": "Archivage, suppression et récupération",
       "statut_observe": "absente.",
-      "statut_execution": "L5_APPROUVE_DESIGN_BLOQUE_COMPATIBILITE_LEGACY",
+      "statut_execution": "L5_B5a_EN_COURS_PREPARATION_INACTIVE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
@@ -483,7 +483,7 @@
         "D5"
       ],
       "documentation": "l5-design.md ; decisions.md ; checkpoint-l5.md ; agent-handoff.md",
-      "prochain_bloc": "Attendre arbitrage explicite L5-COMPAT-01 avant modèle/code ; D5 validée. Aucun merge/CONTRACT/production/infra/L6-L8.",
+      "prochain_bloc": "B5a schéma/contrats préparatoires puis qualification et PR ; arbitrageB validé, activation coordonnée API/Angular à débutB5b après accord merge B5a.",
       "autorisation": "L5_B5a_B5f_APPROUVE_2026_10_22_PERSONNEL_SEULEMENT"
     },
     {
@@ -544,7 +544,7 @@
       "id": "BB-F-019",
       "titre": "Composition structurée, étapes et garnitures",
       "statut_observe": "implémentée sans test suffisant — règles et CHECK présents.",
-      "statut_execution": "L5_PARTIEL_APPROUVE_DESIGN_BLOQUE_COMPATIBILITE_LEGACY",
+      "statut_execution": "L5_B5a_EN_COURS_PREPARATION_INACTIVE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
@@ -564,14 +564,14 @@
       ],
       "decisions": [],
       "documentation": "l5-design.md ; decisions.md ; checkpoint-l5.md ; agent-handoff.md",
-      "prochain_bloc": "Attendre arbitrage explicite L5-COMPAT-01 avant modèle/code ; D5 validée. Aucun merge/CONTRACT/production/infra/L6-L8.",
+      "prochain_bloc": "B5a schéma/contrats préparatoires puis qualification et PR ; arbitrageB validé, activation coordonnée API/Angular à débutB5b après accord merge B5a.",
       "autorisation": "L5_B5a_B5f_APPROUVE_2026_10_22_PERSONNEL_SEULEMENT"
     },
     {
       "id": "BB-F-020",
       "titre": "Degré alcoolique estimé et incertitudes",
       "statut_observe": "partielle — calcul avant dilution en ML ; présentation à clarifier.",
-      "statut_execution": "L5_PARTIEL_APPROUVE_DESIGN_BLOQUE_COMPATIBILITE_LEGACY",
+      "statut_execution": "L5_B5a_EN_COURS_PREPARATION_INACTIVE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
@@ -592,7 +592,7 @@
       ],
       "decisions": [],
       "documentation": "l5-design.md ; decisions.md ; checkpoint-l5.md ; agent-handoff.md",
-      "prochain_bloc": "Attendre arbitrage explicite L5-COMPAT-01 avant modèle/code ; D5 validée. Aucun merge/CONTRACT/production/infra/L6-L8.",
+      "prochain_bloc": "B5a schéma/contrats préparatoires puis qualification et PR ; arbitrageB validé, activation coordonnée API/Angular à débutB5b après accord merge B5a.",
       "autorisation": "L5_B5a_B5f_APPROUVE_2026_10_22_PERSONNEL_SEULEMENT"
     },
     {
@@ -892,7 +892,7 @@
       "id": "BB-F-029",
       "titre": "Unités canoniques et conversions explicites",
       "statut_observe": "partielle — ML/G et mesures de bar, conversion cL et précision à corriger.",
-      "statut_execution": "L5_PARTIEL_APPROUVE_DESIGN_BLOQUE_COMPATIBILITE_LEGACY",
+      "statut_execution": "L5_B5a_EN_COURS_PREPARATION_INACTIVE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
@@ -912,7 +912,7 @@
       ],
       "decisions": [],
       "documentation": "l5-design.md ; decisions.md ; checkpoint-l5.md ; agent-handoff.md",
-      "prochain_bloc": "Attendre arbitrage explicite L5-COMPAT-01 avant modèle/code ; D5 validée. Aucun merge/CONTRACT/production/infra/L6-L8.",
+      "prochain_bloc": "B5a schéma/contrats préparatoires puis qualification et PR ; arbitrageB validé, activation coordonnée API/Angular à débutB5b après accord merge B5a.",
       "autorisation": "L5_B5a_B5f_APPROUVE_2026_10_22_PERSONNEL_SEULEMENT"
     },
     {
@@ -1506,7 +1506,7 @@
       "id": "BB-F-051",
       "titre": "Saisie protégée, erreurs et récupération",
       "statut_observe": "partielle — erreurs/retry présents, pas de protection de brouillon.",
-      "statut_execution": "L5_PARTIEL_APPROUVE_DESIGN_BLOQUE_COMPATIBILITE_LEGACY",
+      "statut_execution": "L5_B5a_EN_COURS_PREPARATION_INACTIVE",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
@@ -1527,7 +1527,7 @@
       ],
       "decisions": [],
       "documentation": "l5-design.md ; decisions.md ; checkpoint-l5.md ; agent-handoff.md",
-      "prochain_bloc": "Attendre arbitrage explicite L5-COMPAT-01 avant modèle/code ; D5 validée. Aucun merge/CONTRACT/production/infra/L6-L8.",
+      "prochain_bloc": "B5a schéma/contrats préparatoires puis qualification et PR ; arbitrageB validé, activation coordonnée API/Angular à débutB5b après accord merge B5a.",
       "autorisation": "L5_B5a_B5f_APPROUVE_2026_10_22_PERSONNEL_SEULEMENT"
     },
     {

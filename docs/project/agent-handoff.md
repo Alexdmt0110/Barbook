@@ -5,7 +5,7 @@ checkpoint_utc: "2026-10-22T09:29:23+00:00"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
-handoff_status: "BLOQUE"
+handoff_status: "EN_COURS"
 feature: "L5 B5a–B5f autorisé, D5 validée ; Design Review transversale L5-COMPAT-01"
 branch: "feature/recipe-lifecycle-contracts"
 base_branch: "main"
@@ -36,3 +36,8 @@ OptionB recommandée : garder tous les chemins legacy, ajouter une précondition
 Validation des documents/JSON66IDs (sixfichesL5,60autres inchangées), liens/fences et diffcheck, puis commit/push atomique et checkpointdistant. Aucun test applicatif/PG/HTTP/Chromium L5 ni nouvelleCI passée revendiqués ; aucun BLOCKER/P1applicatif prétendu résolu. Pas de PR tant que cette incompatibilité n'est pas arbitrée. À la reprise : lire réponsesAlex, refs/main/branche/PR/handoff actuels puis compléterDesign avant code.
 
 Git : documents sur branche publiés, pas demergeautorisé. VMaucun ; SQLaucuneaction ; Infraaucun. Pas de purgephysique/donnéesréelles, basepersonnelle/production, CONTRACT, déploiement, L6–L8, coûtouserviceexterne. Ne pas continuer en arrière-plan après cette session.
+
+
+## État courant après arbitrage B explicite
+
+L5-COMPAT-01 levé par Alex ; les paragraphes bloqués ci-dessus sont historiques. Branche74c778e/main94552a9 recontrôlés, aucune PRouverte ; WORK reprend B5a. Contracts recipe-lifecycle.md et complémentl5-design.md : deuxversions indépendantes avec bumpdes deux au cycle, préconditions de tous écrivains obligatoires à la basculecoordonnée B5b, lotcouvertureexacte et atomicité. B5a prépare schéma/CHECKs/defaults/upgrade inactifs ; ne pas prétendre la corbeille ou le refuslegacy déjà opérationnels. Prochainpas : implémentation additive selonDesign puis vrais tests/6CI et Gate de toutebranche avant PR ; aucun merge autorisé.

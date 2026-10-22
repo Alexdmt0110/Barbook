@@ -121,3 +121,10 @@ B4e applique ADR0005 : password courant + cookie encore autoritaire, verrou User
 Main94552a9 et six checks post-merge#31 success recontrôlés ; aucune PR ouverte initialement. Autorisation explicite L5 B5a–B5f et D5, décisions techniques ordinaires/tests/commits/push dans ce seul périmètre. WORK reprend seul. Branche feature/recipe-lifecycle-contracts publiée immédiatement depuis main. Ancien instantané local L4 laissé intact ; index identique au commit historique f5a9132 déjà intégré, nouveau worktree propre isolé.
 
 Aucun modèle/code/migration/workflow modifié. [Revue](l5-design.md) : incompatibilité importante avec les appels historiques sans précondition de recette ; soumettre le choix à Alex avant B5a. Aucun merge autorisé. Les paragraphes antérieurs qui indiquent L5 non autorisé sont des photographies historiques ; seule cette décision récente autorise L5, sans lever les interdictions d'exploitation.
+
+
+## L5-COMPAT-01 — OPTION B VALIDÉE le 22 octobre 2026
+
+Alex autorise explicitement la rupture comportementale de toutes les écritures de classement : précondition adaptée obligatoire, absente/obsolète409sans effet, aucune inférence serveur ; routes historiques maintenues et Angular actualisé conjointement. Lots : une précondition par recette, contrôles complets avant mutation, atomicité et protection des IDs/workspaces. Aucun bypasslegacy ni retraitCONTRACT. Le blocage de la DesignReview74c778e est levé ; reprise B5a puis blocsL5 selon PR/merge explicites. [Contrats et activation](../maintenance/recipe-lifecycle.md).
+
+Choix technique ordinaire : deux versions indépendantes contenu/classement, toutes deux incrémentées par les transitions corbeille ; pas de compteurcycle redondant. Préparation additive inactive B5a puis bascule coordonnée dans B5b avant toute activation de corbeille/édition. Les règlesD5 sont inchangées ; aucun merge/déploiement/DBpropriétaire/infra/CONTRACT/purge/L6–L8 autorisé.

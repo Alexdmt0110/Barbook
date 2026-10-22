@@ -94,3 +94,8 @@ Qualification code9b7fa1e confirmée : six contrôles success, logs238backend/19
 
 
 PR B4e/B4f réellement ouverte : [#30](https://github.com/Alexdmt0110/Barbook/pull/30), base de86dd0/head676f7fa au contrôle initial ;39fichiers/12commits, tous blobs et toutes lignes ajoutées/retirées comparés au clone, aucun patch manquant, zéro commentaire/revue/inline. Mergeable=true, état blocked pendant CI en cours, aucun conflit et aucun auto-merge. Code/fixture/sécurité déjà qualifiés sur9b7fa1e ; ce complément ne modifie que le suivi. Observer le dernier HEAD et ses six contrôles, puis attendre Alex : aucun merge de#30 autorisé.
+
+
+## Reprise L5 après validation explicite de l’option B
+
+BlocageL5-COMPAT-01 levé : routesconservées, préconditionsobligatoires sur toutesécrituresdeclassement,409sans effet siabsentes/périmées, aucuneinférence, lotatomique ; Angular actualisé conjointement à la bascule. B5a EN_COURS_PREPARATION_INACTIVE sur feature/recipe-lifecycle-contracts ; modèle/CHECK/defaults uniquement, activationcoordonnée au débutB5b. [Contrats](../maintenance/recipe-lifecycle.md), [design](l5-design.md). Les anciens étatsbloqués sont historiques, aucun nouveau merge autorisé.
