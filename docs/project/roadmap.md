@@ -1,8 +1,8 @@
 # Roadmap autorisée
 
-## État courant L5 — B5a qualifié, PR32 en attente de merge autorisé
+## État courant L5 — B5a intégré, B5b développé sur branche
 
-D5 et L5-COMPAT-01B validés ; blocageinitial levé. B5a prépare le modèle/contrats inactifs, PR32 depuis main94552a9. Codeb273dcf qualifié par sixchecksfd3e890 :238backend/191frontend/160PG-HTTP/4Chromium/audits0 ;19cas natifs nouveaux. [Contrat](../maintenance/recipe-lifecycle.md), [Gate](reviews/l5-b5a-review-gate.md). Aucun endpointédition/corbeille ou nouvelleadmissibilitélegacy actif. B5b commencera par basculecoordonnée API/Angular après accordmergeB5a et mainqualifié. Complémentdocumentaire du dernierHEAD à contrôler, aucunmergeautorisé. Les étatsbloqués ci-dessous sont historiques.
+PR32 fusionnée avec accord explicite, main `dfe39a2` qualifié par six checks post-merge (238/191/160/4, audits zéro). B5b sur `feature/recipe-content-editing` : design407b0b0, bascule coordonnée de toutes préconditions API/Angular1e2bb39 et contenu atomique/ABV74999ee. Locaux261 backend/192 frontend et lint/build/Prisma/typage/gardes réussis ; qualification native du dernier HEAD encore à observer avant ready. [Design](l5-b5b-design.md), [contrat](../maintenance/recipe-lifecycle.md), [Gate](reviews/l5-b5b-review-gate.md). B5c–f restent à réaliser après accords de merge et main qualifié. Aucun merge B5b autorisé ; aucun OPS/L6–L8. Les anciens états bloqués/en attente ci-dessous sont historiques.
 
 
 ## L5 — autorisé le 22 octobre 2026, Design Review bloquée avant code
@@ -28,7 +28,7 @@ Phase A validée comme base. L0–L2 autorisés le 16 octobre ; merges #20–#24
 | L3 — Dossiers B3a–B3c | MERGE #24 ; main vert | merge commit d7ea95f autorisé/exécuté, six checks main success ; checkpoint documentaire #25 également intégré |
 | B3d — CONTRACT | NON_APPROUVE | retrait legacy seulement après inventaire des usages, bascule compatible, backup/restore et accord destructif distinct |
 | L4 — Sessions et saisie sûre | CLOTURE_TECHNIQUEMENT_SUR_MAIN ; #26–#30 MERGE | 18critères satisfaits dans leur portée ; six checks main0f63272 success ; bilan/limites et clôture documentaire en PR distincte |
-| L5 — Cycle recette | APPROUVE_B5a_B5f ; DESIGN_BLOQUE | D5 validée ; arbitrage L5-COMPAT-01 avant modèle/code ; aucune PR |
+| L5 — Cycle recette | APPROUVE_B5a_B5f ; B5a_MERGE ; B5b_QUALIFICATION | D5 et optionB validés ; édition serveur/préconditions sur branche ; B5c–f et chaque merge distinct restent à qualifier/autoriser |
 | L6 — Photos privées | PROPOSE_NON_APPROUVE | D2/D6 ; contrôles fichier, accès privé, stockage/cleanup et sauvegardes |
 | L7 — Qualification V1 | PROPOSE_NON_APPROUVE | parcours, navigateurs/appareils, zoom/clavier, performances et docs exactes |
 | L8 — Release/OPS | PROPOSE_NON_APPROUVE | D7/D8 ; inventaire VPS/staging, images, restauration/rollback, production avec accord distinct |

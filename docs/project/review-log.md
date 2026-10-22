@@ -1,5 +1,9 @@
 # Revues de développement
 
+## L5 B5b — Design et revue entière avant qualification native
+
+PR32 intégrée/qualifiée sur main dfe39a2, preuves au checkpointL5. Design407b0b0 avant code ; bascule coordonnée1e2bb39 et contenu74999ee, chaque commit immédiatement publié et parent/arbre/fichiers vérifiés. Tous writers historiques, lots et suppression indirecte de dossier couverts par préconditions ; nouveau contenu atomique/version indépendante/modes ABV et snapshots cohérents. [Gate de toute branche](reviews/l5-b5b-review-gate.md) : aucun BLOCKER/P1 statique/local identifié ;261 backend,192 frontend, lint/build/Prisma/typage/gardes verts. Tests natifs nouveaux et quatre Chromium doivent passer réellement avant ready ; aucune preuve B5d/B5c inventée. Toute correction impose de reprendre la review entière. Aucun merge de cette branche autorisé.
+
 ## L0 — Revue préventive, 16 octobre 2026
 
 Besoin : reprise durable et mécanisme d'écriture réel avant code. Périmètre : documents canoniques, catalogue/audit validés, branche dédiée et handoff. Exclusions : changement applicatif, dépendance, DB, production et branche dossiers. Risques : publication de sources privées/secrets, état Git obsolète, confusion autorisation/catalogue, double écrivain. Mesures : uniquement livrables d'audit sans sources privées, refs distantes contrôlées, champs d'autorisation explicites, publication non forcée et un propriétaire WORK. Tests : cohérence JSON/IDs/liens, scan des fichiers ajoutés, diff --check, lecture des SHA/message/fichiers distants après publication.

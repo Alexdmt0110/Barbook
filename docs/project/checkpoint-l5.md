@@ -1,5 +1,13 @@
 # Checkpoint L5 — Design Review avant code
 
+## B5b développé — qualification native à observer
+
+Complément `3d5727dc7cdd5d59e000045de629625f1b259975` : cleanup borné des recettes synthétiques de chaque suite avant cascade workspace et FK legacy Restrict, typage/lint réussis ; revue de toute branche renouvelée. Aucun autre jeu de données concerné.
+
+Branche `feature/recipe-content-editing` depuis main dfe39a2 qualifié. Design407b0b06b3b23b262d91e78708b4f9a5e39763ad publié avant code ; bascule1e2bb394917c63be6632bfa8a02451c482494837 (arbre3a45130c) :30 fichiers cohérents API/Angular/tests. Contenu74999ee3d4153b7509891e7e337cd346a6b38626 (arbre5584f6f0) :7 fichiers, lecture/PUT transactionnel, modes ABV, snapshots et tests ; parents/arbres/messages/fichiers distants vérifiés. Aucun commit applicatif sur main.
+
+Locaux : `npm run verify` backend261/25 suites et frontend192/27 fichiers code0 ; `npx tsc --noEmit --incremental false` backend, `npm run typecheck` e2e, `npm run test:integration:safety`10 et `git diff --check` verts. PostgreSQL/HTTP/Chromium B5b non exécutés localement, attendus sur Actions jetables. Review Gate entière sans BLOCKER/P1 statique/local identifié avant PR de qualification ; aucun seuil/retry/quota/guard désactivé. Prochain pas : publier cette documentation, créer PR draft et lire vrai diff/checks/logs ; corriger puis reprendre Gate complète si nécessaire. Pas d'accord de merge B5b.
+
 ## PR32 intégrée, main qualifié — 22 octobre 2026
 
 Autorisation explicite d'Alex limitée à PR32 exécutée par merge commit `dfe39a2bd0b2f91490b8c8cd97189ee3f8b3976f`, mergedAt `2026-10-22T11:53:03Z` (13:53:03 Paris). Parents exacts `94552a94a51fdb8e9ae9a0aa4b41e47ce0906894` et `29c090ae689e7847425fc019eb56d7b83e3fd829`, arbre `1a10f637f6cb88648d32b470f8409bd0e88c61ef`, identique au HEAD approuvé. Diff réel 15 fichiers/6 commits et tous blobs concordants ; aucune modification depuis Gate, zéro commentaire/revue/inline, mergeable clean avant fusion. Les 19 branches présentes avant fusion sont conservées.
