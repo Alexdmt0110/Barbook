@@ -1,4 +1,12 @@
-# Handoff canonique Barbook — B5a préparatoire qualifié, attente merge PR32
+# Handoff canonique Barbook — PR32 intégrée, B5b en cours
+
+## État courant autoritaire — 22 octobre 2026, 13:58 Paris
+
+PR32 fusionnée avec accord explicite : `dfe39a2bd0b2f91490b8c8cd97189ee3f8b3976f`, mergedAt `2026-10-22T11:53:03Z`, parents `94552a9`/`29c090a`, arbre `1a10f637f6cb88648d32b470f8409bd0e88c61ef`. Main pointe réellement sur ce merge ; six checks post-merge success et six journaux lus (238/191/160/4, audits zéro), preuves complètes au [checkpoint](checkpoint-l5.md). Toutes les branches historiques sont conservées.
+
+Alex a explicitement autorisé B5b et la suite L5 sous gates ; chaque nouvelle PR exige son accord avant fusion. Branche `feature/recipe-content-editing` publiée depuis main qualifié ; worktree `barbook-l5` propre avant rédaction du design, HEAD local/distant `dfe39a2bd0b2f91490b8c8cd97189ee3f8b3976f`. WORK reste responsable, EN_COURS. [Design B5b](l5-b5b-design.md) avant code ; aucun changement applicatif à ce checkpoint. npm ci local : backend838 et frontend585 packages installés, aucun lock modifié. Pas de PostgreSQL/Chromium local ; qualification native future via workflows PR existants, aucun workflow à changer.
+
+Prochaine unité : préconditions obligatoires sur tous writers, lots/empreinte de suppression dossier et consommateurs Angular/tests ensemble ; puis contenu atomique/ABV. Publier chaque commit immédiatement avec vérification parent/arbre/blobs. Tests409/rollback/concurrence à exécuter, pas acquis par le merge B5a. Aucun arbitrage métier bloquant nouveau identifié. Aucun déploiement, SQL propriétaire, infra, CONTRACT, purge ou L6–L8. Le YAML et les paragraphes suivants sont la photographie historique B5a avant sa propre publication ; ce nouvel état et GitHub prévalent.
 
 ```yaml
 checkpoint_utc: "2026-10-22T10:14:51+00:00"

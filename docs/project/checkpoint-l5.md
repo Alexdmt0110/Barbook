@@ -1,5 +1,13 @@
 # Checkpoint L5 — Design Review avant code
 
+## PR32 intégrée, main qualifié — 22 octobre 2026
+
+Autorisation explicite d'Alex limitée à PR32 exécutée par merge commit `dfe39a2bd0b2f91490b8c8cd97189ee3f8b3976f`, mergedAt `2026-10-22T11:53:03Z` (13:53:03 Paris). Parents exacts `94552a94a51fdb8e9ae9a0aa4b41e47ce0906894` et `29c090ae689e7847425fc019eb56d7b83e3fd829`, arbre `1a10f637f6cb88648d32b470f8409bd0e88c61ef`, identique au HEAD approuvé. Diff réel 15 fichiers/6 commits et tous blobs concordants ; aucune modification depuis Gate, zéro commentaire/revue/inline, mergeable clean avant fusion. Les 19 branches présentes avant fusion sont conservées.
+
+Six checks post-merge success et six journaux relus : 238 backend/23 suites, 191 frontend/27 fichiers, 160 PostgreSQL-HTTP/11 suites, 4 Chromium/50,6 s, audits backend/frontend complets et runtime zéro. Huit migrations initial/redeploy/status/drift et dix garde-fous réussis uniquement en Actions jetables. [Quality39773950009](https://github.com/Alexdmt0110/Barbook/actions/runs/39773950009), [Integration39773949852](https://github.com/Alexdmt0110/Barbook/actions/runs/39773949852), [Security39773950016](https://github.com/Alexdmt0110/Barbook/actions/runs/39773950016).
+
+B5b expressément autorisé après ce jalon. Branche `feature/recipe-content-editing` publiée depuis le merge qualifié avant rédaction ; [Design Review B5b](l5-b5b-design.md) avant code. Prochain bloc : bascule cohérente de tous writers de classement/API/Angular/tests, puis contenu atomique. Aucun autre merge autorisé. VM/infra aucun, aucune migration propriétaire, CONTRACT, purge ou L6–L8.
+
 ## L5 — autorisé le 22 octobre 2026, Design Review bloquée avant code
 
 D5 validée (corbeille30joursserveur, expiration≠effacement, identité/slug/liens valides conservés, pas de purge/archivage/média). L5 B5a–B5f autorisé dans le carnet personnel ; chaque merge distinct. Main94552a9/#31 et sixchecks recontrôlés, aucune PR ouverte initialement. Branche feature/recipe-lifecycle-contracts publiée immédiatement depuis ce main dans un worktree propre, ancien instantané L4 intact.
