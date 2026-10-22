@@ -71,7 +71,11 @@ export class AuthService {
         tap((auth) => {
           if (epoch !== this.generation) throw new Error('La session a changé. Reconnecte-toi.');
           const previous = this.session();
-          if (previous && !this.sameContext(previous, auth)) {
+          if (
+            previous &&
+            (!this.sameContext(previous, auth) || previous.csrfToken !== auth.csrfToken)
+          ) {
+            if (!this.sameContext(previous, auth)) this.drafts.purge();
             this.expire();
             throw new Error('Le compte ou l’espace a changé. Reconnecte-toi.');
           }
@@ -86,6 +90,13 @@ export class AuthService {
       );
     }
     return this.bootstrap;
+  }
+
+  /** A resumed document needs fresh authorization; discard earlier responses. */
+  revalidateSession(): Observable<AuthResponse> {
+    this.generation++;
+    this.bootstrap = undefined;
+    return this.loadCurrentUser();
   }
 
   /** Involuntary expiry never revokes remotely or removes draft storage. */

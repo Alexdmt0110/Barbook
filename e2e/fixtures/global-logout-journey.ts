@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { chromium, expect, Page } from '@playwright/test';
 import { acceptDraftNavigation } from './draft-journeys';
 
 /** Independent cookie jars are devices; responses are lost only after real server commit. */
@@ -8,14 +8,25 @@ export async function globalLogoutJourney(
   password: string,
   screenshotPath: string,
 ): Promise<void> {
-  const browser = page.context().browser();
-  if (!browser) throw new Error('A real browser is required.');
+  const browser = await chromium.launch({ ignoreDefaultArgs: ['--disable-back-forward-cache'] });
   const device = await browser.newContext({ viewport: page.viewportSize(), locale: 'fr-FR' });
   const remote = await device.newPage();
   acceptDraftNavigation(remote);
   const pattern = '**/api/auth/logout-all';
   let requests = 0;
   try {
+    await remote.addInitScript(() => {
+      window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+          sessionStorage.setItem('barbook.bfcache-proof', 'restored');
+          const shell = document.querySelector('app-shell > .app-shell');
+          sessionStorage.setItem(
+            'barbook.bfcache-hidden',
+            shell ? getComputedStyle(shell).visibility : 'missing',
+          );
+        }
+      });
+    });
     await remote.goto('http://127.0.0.1:4200/login');
     await remote.getByLabel('Adresse email', { exact: true }).fill(email);
     await remote.getByLabel('Mot de passe', { exact: true }).fill(password);
@@ -51,6 +62,7 @@ export async function globalLogoutJourney(
     // Wrong password did not revoke either real device; local screen stays locked honestly.
     expect((await remote.request.get('http://127.0.0.1:3000/api/auth/me')).status()).toBe(200);
     expect((await page.request.get('http://127.0.0.1:3000/api/auth/me')).status()).toBe(200);
+    await remote.goto('http://127.0.0.1:3000/api');
     await expect(page.getByRole('heading', { name: 'Créer un cocktail', exact: true })).toHaveCount(
       0,
     );
@@ -73,12 +85,21 @@ export async function globalLogoutJourney(
     );
     // No BroadcastChannel crosses these contexts: the real server reports voluntary revocation.
     const refused = remote.waitForResponse((r) => new URL(r.url()).pathname === '/api/auth/me');
-    await remote.reload();
+    await remote.goBack({ waitUntil: 'commit' });
     const response = await refused;
     expect(response.status()).toBe(401);
     expect(((await response.json()) as { code: string }).code).toBe('SESSION_REVOKED');
     await expect(remote).toHaveURL(/\/login\?returnUrl=/);
     expect(await remote.evaluate(() => sessionStorage.getItem('barbook.drafts.v1'))).toBeNull();
+    expect(await remote.evaluate(() => sessionStorage.getItem('barbook.bfcache-proof'))).toBe(
+      'restored',
+    );
+    expect(await remote.evaluate(() => sessionStorage.getItem('barbook.bfcache-hidden'))).toBe(
+      'hidden',
+    );
+    await expect(
+      remote.getByRole('heading', { name: 'Créer un cocktail', exact: true }),
+    ).toHaveCount(0);
     for (const cookie of [remoteCookie, localCookie]) {
       const replay = await page.request.get('http://127.0.0.1:3000/api/auth/me', {
         headers: { Cookie: `barbook-session-dev=${cookie.value}` },
@@ -89,5 +110,6 @@ export async function globalLogoutJourney(
   } finally {
     await page.unroute(pattern);
     await device.close();
+    await browser.close();
   }
 }

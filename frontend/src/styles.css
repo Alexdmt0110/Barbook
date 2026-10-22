@@ -226,3 +226,6 @@ img {
   display: block;
   max-width: 100%;
 }
+
+/* pagehide sets this before a private document can enter the back/forward cache. */
+html[data-session-paused] app-shell > .app-shell { visibility: hidden; }

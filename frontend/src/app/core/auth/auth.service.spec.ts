@@ -297,6 +297,36 @@ describe('AuthService cookie session', () => {
     establish();
     expect(service.currentUser()).toEqual(auth.user);
   });
+  it('revalidates a resumed document without discarding a same-session form lease', () => {
+    establish();
+    const drafts = TestBed.inject(DraftStore);
+    const lease = drafts.lease();
+    drafts.save(lease, 'create:new', 1, 'preserved');
+    service.revalidateSession().subscribe();
+    http.expectOne('/api/auth/me').flush(auth);
+    expect(service.snapshot()).toEqual(auth);
+    expect(drafts.save(lease, 'create:new', 1, 'still editable')).toBe(true);
+  });
+  it('refuses a replacement cookie on resume even for the same owner, preserving explicit recovery', () => {
+    establish();
+    const drafts = TestBed.inject(DraftStore);
+    drafts.save(drafts.lease(), 'create:new', 1, 'preserved');
+    service.revalidateSession().subscribe({ error: () => undefined });
+    http.expectOne('/api/auth/me').flush({ ...auth, csrfToken: 'replacement' });
+    expect(service.isAuthenticated()).toBe(false);
+    expect(sessionStorage.getItem(DRAFT_KEY)).toContain('preserved');
+  });
+  it('purges the previous owner when a different real identity is found on resume', () => {
+    establish();
+    const drafts = TestBed.inject(DraftStore);
+    drafts.save(drafts.lease(), 'create:new', 1, 'private A');
+    service.revalidateSession().subscribe({ error: () => undefined });
+    http
+      .expectOne('/api/auth/me')
+      .flush({ ...auth, user: { ...auth.user, id: 'B' }, workspaceId: 'WB' });
+    expect(service.isAuthenticated()).toBe(false);
+    expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
+  });
   it('removes the retired JWT at initialization without reading it as authority', () => {
     TestBed.resetTestingModule();
     sessionStorage.setItem('barbook.accessToken', 'old-jwt');

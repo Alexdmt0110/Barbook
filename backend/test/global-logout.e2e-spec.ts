@@ -49,7 +49,19 @@ describe('Reauthenticated global logout over real HTTP and PostgreSQL', () => {
     bob = await createActor(app);
   });
   afterEach(async () => {
-    await app?.close();
+    try {
+      await prisma?.user.deleteMany({
+        where: {
+          id: {
+            in: [alice?.user.id, bob?.user.id].filter(
+              (id): id is string => !!id,
+            ),
+          },
+        },
+      });
+    } finally {
+      await app?.close();
+    }
   });
   afterAll(async () => {
     await pool?.end();
@@ -115,6 +127,25 @@ describe('Reauthenticated global logout over real HTTP and PostgreSQL', () => {
       await other.close();
     }
   });
+  it('rolls all revocations back when PostgreSQL refuses the statement, without claiming204', async () => {
+    await issue();
+    const before = await rows();
+    const name = `bb_global_${randomUUID().replaceAll('-', '')}`;
+    await pool.query(
+      `CREATE FUNCTION "${name}"() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF EXISTS (SELECT 1 FROM "Session" WHERE "userId"='${alice.user.id}' AND "revokedAt" IS NOT NULL) THEN RAISE EXCEPTION 'synthetic global revocation failure'; END IF; RETURN NULL; END $$`,
+    );
+    await pool.query(
+      `CREATE TRIGGER "${name}" AFTER UPDATE ON "Session" FOR EACH STATEMENT EXECUTE FUNCTION "${name}"()`,
+    );
+    try {
+      const result = await logoutAll().expect(500);
+      expect(result.headers['set-cookie']).toBeUndefined();
+      expect(await rows()).toEqual(before);
+    } finally {
+      await pool.query(`DROP TRIGGER "${name}" ON "Session"`);
+      await pool.query(`DROP FUNCTION "${name}"()`);
+    }
+  });
   it('requires the current account password without changing session activity on failure', async () => {
     const before = await rows();
     const failure = await logoutAll(alice, 'incorrect password').expect(401);
@@ -122,29 +153,37 @@ describe('Reauthenticated global logout over real HTTP and PostgreSQL', () => {
     expect(await rows()).toEqual(before);
     await api().get('/api/auth/me').set(browserHeaders(alice)).expect(200);
   });
-  it.each(['csrf', 'origin', 'marker', 'user', 'workspace', 'bearer'])(
-    'rejects hostile %s before revocation or renewal',
-    async (mode) => {
-      const headers = browserHeaders(alice);
-      if (mode === 'csrf') headers['X-Barbook-CSRF'] = bob.csrfToken;
-      if (mode === 'origin') headers.Origin = 'https://attacker.example';
-      if (mode === 'marker') delete headers['X-Barbook-Request'];
-      if (mode === 'user') headers['X-Barbook-Expected-User'] = bob.user.id;
-      if (mode === 'workspace')
-        headers['X-Barbook-Expected-Workspace'] = bob.workspaceId;
-      if (mode === 'bearer') {
-        delete headers.Cookie;
-        headers.Authorization = `Bearer ${alice.credential}`;
-      }
-      const before = await rows();
-      const result = await api()
-        .post('/api/auth/logout-all')
-        .set(headers)
-        .send({ password: FIXTURE_PASSWORD });
-      expect(mode === 'bearer' ? [401] : [403, 409]).toContain(result.status);
-      expect(await rows()).toEqual(before);
-    },
-  );
+  it.each([
+    'csrf',
+    'missing csrf',
+    'origin',
+    'missing origin',
+    'marker',
+    'user',
+    'workspace',
+    'bearer',
+  ])('rejects hostile %s before revocation or renewal', async (mode) => {
+    const headers = browserHeaders(alice);
+    if (mode === 'csrf') headers['X-Barbook-CSRF'] = bob.csrfToken;
+    if (mode === 'missing csrf') delete headers['X-Barbook-CSRF'];
+    if (mode === 'origin') headers.Origin = 'https://attacker.example';
+    if (mode === 'missing origin') delete headers.Origin;
+    if (mode === 'marker') delete headers['X-Barbook-Request'];
+    if (mode === 'user') headers['X-Barbook-Expected-User'] = bob.user.id;
+    if (mode === 'workspace')
+      headers['X-Barbook-Expected-Workspace'] = bob.workspaceId;
+    if (mode === 'bearer') {
+      delete headers.Cookie;
+      headers.Authorization = `Bearer ${alice.credential}`;
+    }
+    const before = await rows();
+    const result = await api()
+      .post('/api/auth/logout-all')
+      .set(headers)
+      .send({ password: FIXTURE_PASSWORD });
+    expect(mode === 'bearer' ? [401] : [403, 409]).toContain(result.status);
+    expect(await rows()).toEqual(before);
+  });
   it.each([
     {},
     { password: '' },
