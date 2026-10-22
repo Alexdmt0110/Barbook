@@ -213,3 +213,6 @@ Code applicatif f5a9132, fixtureBFCache34fe83b et patchsécurité7d3bee2 inclus 
 Statut : QUALIFIE_SUR_BRANCHE pour les18critères dans la portée de preuves/limites de chaque ligne ; aucune qualification production propriétaire. Les prochains commits sont documentaires ; lire aussi leurs six contrôles avant merge de la future PR.
 
 Review Gate entier repris après les corrections : aucun BLOCKER/P1 restant identifié ; documentation maintenance/matrice18critères/suivi66fiches et revue prêts à publication.17branches distantes réellement relues, main de86dd0 et tous les historiques inchangés ; aucun nouveau merge autorisé.
+
+
+PR B4e/B4f réellement ouverte : [#30](https://github.com/Alexdmt0110/Barbook/pull/30), base de86dd0/head676f7fa au contrôle initial ;39fichiers/12commits, tous blobs et toutes lignes ajoutées/retirées comparés au clone, aucun patch manquant, zéro commentaire/revue/inline. Mergeable=true, état blocked pendant CI en cours, aucun conflit et aucun auto-merge. Code/fixture/sécurité déjà qualifiés sur9b7fa1e ; ce complément ne modifie que le suivi. Observer le dernier HEAD et ses six contrôles, puis attendre Alex : aucun merge de#30 autorisé.
