@@ -8,7 +8,10 @@ export async function globalLogoutJourney(
   password: string,
   screenshotPath: string,
 ): Promise<void> {
-  const browser = await chromium.launch({ ignoreDefaultArgs: ['--disable-back-forward-cache'] });
+  const browser = await chromium.launch({
+    channel: 'chromium',
+    ignoreDefaultArgs: ['--disable-back-forward-cache'],
+  });
   const device = await browser.newContext({ viewport: page.viewportSize(), locale: 'fr-FR' });
   const remote = await device.newPage();
   acceptDraftNavigation(remote);
@@ -83,23 +86,63 @@ export async function globalLogoutJourney(
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
-    // No BroadcastChannel crosses these contexts: the real server reports voluntary revocation.
-    const refused = remote.waitForResponse((r) => new URL(r.url()).pathname === '/api/auth/me');
-    await remote.goBack({ waitUntil: 'commit' });
-    const response = await refused;
-    expect(response.status()).toBe(401);
-    expect(((await response.json()) as { code: string }).code).toBe('SESSION_REVOKED');
-    await expect(remote).toHaveURL(/\/login\?returnUrl=/);
-    expect(await remote.evaluate(() => sessionStorage.getItem('barbook.drafts.v1'))).toBeNull();
-    expect(await remote.evaluate(() => sessionStorage.getItem('barbook.bfcache-proof'))).toBe(
-      'restored',
+    // BFCache restoration is deliberately outside Playwright Page's lifecycle tracker.
+    // Observe the actual Chromium document and HTTP response through its native protocol.
+    const cdp = await device.newCDPSession(remote);
+    const notRestored: unknown[] = [];
+    let refusedRequest: string | undefined;
+    let refusedStatus: number | undefined;
+    cdp.on('Page.backForwardCacheNotUsed', (event) =>
+      notRestored.push(event.notRestoredExplanations),
     );
-    expect(await remote.evaluate(() => sessionStorage.getItem('barbook.bfcache-hidden'))).toBe(
-      'hidden',
-    );
-    await expect(
-      remote.getByRole('heading', { name: 'Créer un cocktail', exact: true }),
-    ).toHaveCount(0);
+    cdp.on('Network.responseReceived', (event) => {
+      if (new URL(event.response.url).pathname === '/api/auth/me') {
+        refusedRequest = event.requestId;
+        refusedStatus = event.response.status;
+      }
+    });
+    await cdp.send('Page.enable');
+    await cdp.send('Network.enable');
+    const history = await cdp.send('Page.getNavigationHistory');
+    const previous = history.entries[history.currentIndex - 1];
+    expect(previous.url).toBe('http://127.0.0.1:4200/cocktails/new');
+    await cdp.send('Page.navigateToHistoryEntry', { entryId: previous.id });
+    type RestoredDocument = {
+      url: string;
+      proof: string | null;
+      hidden: string | null;
+      draft: string | null;
+      privateHeading: boolean;
+    };
+    let restored: RestoredDocument | undefined;
+    await expect
+      .poll(async () => {
+        try {
+          const result = await cdp.send('Runtime.evaluate', {
+            expression: `JSON.stringify({ url: location.href, proof: sessionStorage.getItem('barbook.bfcache-proof'), hidden: sessionStorage.getItem('barbook.bfcache-hidden'), draft: sessionStorage.getItem('barbook.drafts.v1'), privateHeading: Array.from(document.querySelectorAll('h1')).some(e => e.textContent?.trim() === 'Créer un cocktail') })`,
+            returnByValue: true,
+          });
+          if (typeof result.result.value !== 'string') return false;
+          restored = JSON.parse(result.result.value) as RestoredDocument;
+          return new URL(restored.url).pathname === '/login';
+        } catch (error) {
+          if (
+            error instanceof Error &&
+            /Cannot find context|Execution context was destroyed/.test(error.message)
+          )
+            return false;
+          throw error;
+        }
+      })
+      .toBe(true);
+    expect(restored?.proof, JSON.stringify(notRestored)).toBe('restored');
+    expect(restored?.hidden).toBe('hidden');
+    expect(restored?.draft).toBeNull();
+    expect(restored?.privateHeading).toBe(false);
+    expect(refusedStatus).toBe(401);
+    expect(refusedRequest).toBeDefined();
+    const refused = await cdp.send('Network.getResponseBody', { requestId: refusedRequest! });
+    expect((JSON.parse(refused.body) as { code: string }).code).toBe('SESSION_REVOKED');
     for (const cookie of [remoteCookie, localCookie]) {
       const replay = await page.request.get('http://127.0.0.1:3000/api/auth/me', {
         headers: { Cookie: `barbook-session-dev=${cookie.value}` },

@@ -190,3 +190,10 @@ Frontend complet : `VITEST_MAX_WORKERS=1 npm test -- --watch=false`191/191,27fic
 Reprendre toute la revue main...branche après cette correctionP1. Push/checkpoint puis B4f ; ne pas qualifier natifs/browser sur la seule présence des tests. Aucun nouveau merge, déploiement, migration nouvelle/propriétaire, infra, CONTRACT ou L5.
 
 Build production frontend après correction terminé code0, compatibilité Angular CLI code0. Aucun test/timeout/retry affaibli. La correction est prête pour publication atomique et revue entière renouvelée ; elle ne constitue pas encore une preuve BFCache/PG native.
+
+
+### 22octobre — CI du code complet et correction de la preuve BFCache
+
+Code f5a9132 et handoff66715a9 publiés et vérifiés ; CI39734802863 / Audits39734802800 / Integration39734802751. Backend238/23suites, frontend191/27fichiers et PG141/9suites success, logs relus.23nouveaux cas global natifs réellement passés ; sept migrations historiques fresh/redeploy/status/drift et smoke,10garde-fous. Browser119678316620 :2expirations passent,2parcours globaux échouent exclusivement sur preuve pageshow.persisted absente après401/purge réussis. Les captures de confirmation mobile/desktop et traces sont récupérées ; mobile390 lisible sans débordement. Aucune assertion supprimée.
+
+La documentation officielle https://playwright.dev/docs/api/class-page#page-go-back précise que le suivi Page.goBack ne supporte pas BFCache. Conception complémentaire consignée avant correction : utiliser Chromium complet/new-headless et CDP natif pour retour historique, lecture du document et réponse réseau, sans dépendre du suivi Page après restauration. Conserver toutes les preuves persist/masque/401code/purge/absence de contenu/replay, raisons natives de non-restauration dans l'erreur. Typecheck E2E du correctif passé ; aucun changement applicatif, de timeout/retry/quota/projet/inscription/infra. La dernière preuve native BFCache reste non qualifiée avant nouveau run. Documents maintenance et matrice B4f encore locaux en préparation, non prêts à PR.
