@@ -1,58 +1,50 @@
-# Handoff canonique Barbook — L4 B4e/B4f
+# Handoff canonique Barbook — clôture L4 et arrêt
 
 ```yaml
-checkpoint_utc: "2026-10-22T07:10:06+00:00"
+checkpoint_utc: "2026-10-22T07:50:01+00:00"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
-work_owner: "WORK"
+work_owner: "AUCUN"
 handoff_status: "EN_ATTENTE_VALIDATION"
-feature: "B4e et B4f qualifiés sur branche ; PR #30 ouverte"
-branch: "feature/global-session-revocation"
+feature: "L4 B4a–B4f clôturé techniquement sur main ; développement arrêté"
+branch: "docs/l4-closure"
 base_branch: "main"
-base_sha: "de86dd0e11c938e202c038e9049876af651a0ccb"
-remote_head_sha: "29d19ebc856db1e0ba1c3a46dad5d8720aff9152"
-local_head_sha: "29d19ebc856db1e0ba1c3a46dad5d8720aff9152"
-worktree: "propre avant la rédaction de ce checkpoint"
-pr: "https://github.com/Alexdmt0110/Barbook/pull/30"
-tests: "9b7fa1e : six checks success, logs réels 238backend/191frontend/141PG-HTTP/4Chromium ; audits complets/runtime zéro"
-migrations: "sept historiques sur CI jetables ; aucune nouvelle/personnelle/production"
-changes_pushed: "13 commits depuis main ; code, qualification18critères, Review Gate et suivi PR30 publiés"
+base_sha: "0f63272ddbe7bb3a884384531e9b41a314d09525"
+remote_head_sha: "92c8f1691fd3563ba329137ff5aba2bbb7dda31f"
+local_head_sha: "92c8f1691fd3563ba329137ff5aba2bbb7dda31f"
+worktree: "propre avant rédaction de ce handoff"
+pr: "#30 MERGEE ; https://github.com/Alexdmt0110/Barbook/pull/31 OUVERTE_DOCUMENTATION"
+tests: "main0f63272 six contrôles success et logs238backend/191frontend/141PG-HTTP/4Chromium ; audits0 ; CI PR31 du successeur de ce handoff à observer réellement"
+migrations: "sept historiques uniquement sur CI jetables ; aucune nouvelle/personnelle/production"
+changes_pushed: "merge30 vérifié ;92c8f16 huit documents de clôture, parent/arbre/message/fichiers/blobs vérifiés"
 unpushed_changes: "ce handoff avant sa propre publication"
-decisions_validated: "développement B4e puis B4f autorisé ; D1/D2 inchangées ; WORK seul"
-decisions_pending: "autorisation explicite d'Alex pour merge PR30 ; aucun autre merge autorisé"
-next_atomic_step: "observer les six contrôles push et leurs six homologues PR du HEAD final ; relire refs/diff/discussions ; attendre validation explicite PR30"
-risks_and_blockers: "aucun BLOCKER/P1 L4 identifié dans le Review Gate ; CI du checkpoint documentaire final à observer réellement"
+decisions_validated: "merge30 et clôture L4 autorisés explicitement par Alex le22octobre2026"
+decisions_pending: "merge PR31 nécessite autorisation explicite distincte ; périmètre/lancement L5 et D5 non autorisés"
+next_atomic_step: "aucun développement ; vérifier dernier HEAD/diff/CI PR31 puis attendre Alex ; toute reprise commence par refs/handoff/PR réels"
+risks_and_blockers: "aucun BLOCKER/P1 L4 ou documentaire identifié ; limites dans l4-closure.md ; aucun environnement de production qualifié"
 production_effect: "aucun"
 ```
 
-Photographie précédant sa propre publication ; refs/HEAD/CI GitHub autoritaires. Aucun SHA auto-référentiel inventé. Le statut qualifié s'applique à la branche, pas à main ni à la production.
+Photographie avant sa propre publication, pas de SHA auto-référentiel inventé. GitHub et les contrôles du dernier HEAD font foi. Aucun outil ne poursuit un travail de développement après la fin de session.
 
-## Faits d'intégration
+## Intégration et qualification acquises
 
-PR #29 explicitement autorisée puis intégrée le 21 octobre 2026 à 13:15:45 UTC (15:15:45 Paris) : merge `de86dd0e11c938e202c038e9049876af651a0ccb`, parents `0c4a5580f3fe7d8e71c83c0434aadc3ce46d1e73` et `7d795003b24e8360d8a70620961a6c215885b96a`, arbre `6db7ad7e7e473068f501a4e1d03f802f621d069d` identique au HEAD revu. Main et six contrôles post-merge réellement vérifiés, logs 232/175/118/4 lus. Main reste de86dd0 ; branches historiques conservées (17 refs avec la nouvelle branche).
+[PR #30](https://github.com/Alexdmt0110/Barbook/pull/30) fusionnée après accord explicite à2026-10-22T07:38:59Z (09:38:59Paris), par merge commit **0f63272ddbe7bb3a884384531e9b41a314d09525**. Parents de86dd0e11c938e202c038e9049876af651a0ccb et5e1660fef98a07e2f3c58c39ad1d275dd5daec2c ; arbre d1b5acab59c9077a7ba8ec5a968d84ae693f6526 identique au HEAD revu. mergedAt/parents/arbre/refmain réellement lus ; clone main avancé fast-forward et propre. Les17refs préexistantes au merge sont conservées, horsmain SHA inchangés ; docs/l4-closure constitue la18e.
 
-PR #30 ouverte le 22 octobre 2026 : diff réel à 676f7fa, base de86dd0, 39 fichiers/12 commits ; chaque blob et toutes les lignes ajoutées/supprimées correspondent au clone. Zéro commentaire, revue ou discussion inline, mergeable=true, CI alors en cours. Commit documentaire 29d19eb publié ensuite : parent/arbre/message/six blobs vérifiés, clone synchronisé et propre. Relire le diff et les checks du successeur de ce handoff avant de conclure. PR30 non fusionnée, auto-merge désactivé.
+Avant merge : HEAD5e1660f/base de86dd0,39fichiers/14commits, tous blobs et toutes lignes du diff réel comparés au clone, zéro commentaire/revue/inline, mergeableclean et12checks push+PR success. Aucun changement depuis la qualification.
 
-## B4e et correctifs qualifiés
+Après merge : six contrôles propres à main0f63272 completed/success et six logs relus. [Quality39741959079](https://github.com/Alexdmt0110/Barbook/actions/runs/39741959079) :238backend/23suites,191frontend/27fichiers ; [Integration39741959068](https://github.com/Alexdmt0110/Barbook/actions/runs/39741959068) :141PG-HTTP/9suites dont23cas globaux,4Chromium53.2s,10garde-fous, sept migrationsfresh/redeploy/status/drift/upgrade etsmoke ; [Audits39741958863](https://github.com/Alexdmt0110/Barbook/actions/runs/39741958863) : backend/frontend complets/runtime zéro. Vitest4.1.12 réellement exécuté ; aucun it/test/describe.skip/todo/only trouvé. Scripts/workflows sélectionnent toujours les tests sécurité/admission/drafts/global/BFCache.
 
-Backend 7a10fb4 : logout-all réauthentifié, contexte/CSRF/origine, User→Session ReadCommitted, credential encore valide et hash password courant après attente, révocation de toutes les lignes sans renouvellement/Set-Cookie. Client 4522bea : intention volontaire et purge annoncées avant HTTP, mot de passe effacé, global non confirmé sur réseau/perte/erreur, retry explicite sans fallback local, réponses anciennes et notifications ciblées par empreinte de session.
+Commandes exécutées en CI : npmci et npmrunverify backend/frontend ; backend test:integration:safety, tsc, test:integration:prepare, test:e2e etsmoke ; E2Etypecheck/audit/npmtest avec vrai Chromium/API/PG. Le clone n'a pas PostgreSQL/Chromium local ; aucune preuve locale native prétendue. Pour la seule documentation : JSON66IDs/62fiches hors L4 identiques,18critères, liens/fences et gitdiff--check contrôlés. Pas de tests applicatifs locaux répétés sans changement runtime.
 
-Design df6c890 puis correction f5a9132 : masque pagehide synchrone et /me frais pageshow/retour visible ; contexte identique préserve formulaire/lease, changement utilisateur purge, nouveau cookie même compte exige reconnexion, expiration/réseau garde le brouillon suspendu, révocation le purge. Aucun heartbeat ni replay. Résultat tardif incapable de déconnecter B ou d'interférer avec une nouvelle intention de logout.
+## Clôture et artefacts à examiner
 
-Après échec de la preuve BFCache sur66715a9 (2/4 browser), fixture corrigé34fe83b sans assertion relaxée : Chromium complet et CDP natif vérifient la vraie restauration, masque au pageshow,401 SESSION_REVOKED/purge et absence de contenu privé. 23 nouveaux tests natifs couvrent appareils/instances multiples, isolement Bob, headers/DTO/rate429, rollback après UPDATE, révocation/password changés pendant attente, deux ordres login/global, expiration Session et requête déjà autorisée.
+[Bilan canonique](l4-closure.md), [matrice18critères revalidée](l4-b4f-qualification.md), [roadmap](roadmap.md), [backlog](backlog.md), [checkpoint](checkpoint-l4.md) et [Review Gate](reviews/l4-b4e-b4f-review-gate.md). L4 satisfait dans le périmètre de preuves/limites indiqué, aucun BLOCKER/P1 restant identifié ; ne pas fermer en bloc les autres dettes historiques. B4a–e intégrés par#26–#30 : sessionsPostgreSQL, cookie/CSRF sansBearer, admission privée serveur, drafts24h isolés/restauration explicite/version, global réauthentifié sans résurrection et BFCache masqué/revalidé.
 
-## Qualification réelle et Review Gate
+[PR #31](https://github.com/Alexdmt0110/Barbook/pull/31) documentaire ouverte depuis main0f63272, premier commit92c8f16. Aucun code/lock/schema/migration/workflow modifié. Le présent handoff ajoute un second commit documentaire. Vérifier le vrai diff final, refs, commentaires, mergeabilité et six contrôles CI PR au dernier HEAD ; ne pas attribuer les six checks de main à cette PR. L'autorisation de#30 ne couvre pas#31 : **ne pas merger sans nouvel accord explicite**. La documentation de clôture est durable sur branche et PR, pas encore intégrée à main.
 
-HEAD code qualifié `9b7fa1e151771a7517cbc51b1c2d4a21560c93ca` : six checks success et tous les logs lus. [CI39737042589](https://github.com/Alexdmt0110/Barbook/actions/runs/39737042589) : backend238/23 suites et frontend191/27 fichiers (Vitest4.1.12). [Integration39737042497](https://github.com/Alexdmt0110/Barbook/actions/runs/39737042497) : PostgreSQL/HTTP141/9 suites, Chromium4 passés54.5s, sept migrations fresh/redeploy/status/drift/smoke et10garde-fous. [Audits39737042545](https://github.com/Alexdmt0110/Barbook/actions/runs/39737042545) : backend/frontend complets et runtime zéro. Le checkpoint documentaire final doit encore obtenir ses propres contrôles.
+## Risques et conditions d'arrêt
 
-Correctif sécurité7d3bee2 : GHSA-qxg6-89mg-rqv8/GHSA-xp26-3454-mjgp, minimum Vitest^4.1.12, lock limité à Vitest+sept modules@vitest ; Chai/tinyrainbow/backend/runtime/overrides inchangés. npmci585packages reproductible. Local frontend `VITEST_MAX_WORKERS=1 npm run verify` : lint/build/191tests/compatCLI passés ; audits zéro. Backend verify238/Prisma/tsc/NYC,6tests réauth detectOpenHandles sans handle signalé ; typageE2E et10garde-fous passés. Timeouts frontend historiques sous charge consignés, aucune limite modifiée. Aucun PostgreSQL/Chromium local prétendu. Captures desktop1365/mobile390 de la confirmation (même code UI) inspectées, lisibles sans débordement.
+Offline/dormant et preuve de révocation déjà prunée : pas de purge physique immédiate garantie. Storage refusé : mémoire seulement/avertissement, effacement physique impossible à garantir. Requête déjà autorisée peut terminer ; connexion en vol peut remplacer cookie, mais préconditions/générations protègent les anciennes saisies. Pas de replay automatique. Cookieinterdit par réglage physique, Safari/iOS réel/lecteurd'écran humain, TLS/proxy/Secure réel, rebootVPS, backup/restore/rollback propriétaire et charge réelle non qualifiés. Conditions préproduction proposées dans le bilan, aucune mise en œuvre autorisée.
 
-Qualification B4f : [matrice des 18 critères](l4-b4f-qualification.md), [Review Gate complet](reviews/l4-b4e-b4f-review-gate.md), [checkpoint](checkpoint-l4.md), [journal de revue](review-log.md). Revue entière main...branche après chaque correctionP1 : fonctionnel/validation/DB/erreurs/sécurité/tests/cohésion/a11y/performance/dépendances/docs/OPS/production readiness, aucun BLOCKER/P1 restant dans le périmètre L4. Documentation de maintenance et décisions publiées676f7fa. Catalogue66IDs : seuls F001/F002/F003/F051 suivis,62 autres inchangés.
-
-## Limites et suite autorisée
-
-Appareil offline/dormant non effaçable avant constat ; preuve de révocation pouvant disparaître après prune ; stockage complètement refusé empêchant effacement physique garanti ; requête déjà autorisée pouvant finir. Cookie de connexion déjà en vol pouvant être remplacé mais contexte/CSRF refusant l'ancienne saisie. Réglage navigateur interdisant les cookies non exercé physiquement (unit UI et HTTP sans cookie couverts). Pas de Safari/iOS/TLS/proxy/backup/restore/rollback propriétaire qualifiés, sélecteur partagé ou édition/corbeilleL5. Brouillons24h isolés et restauration explicite après identité/version ; aucune resoumission automatique.
-
-Prochaine décision : autorisation explicite d'Alex pour le merge de PR #30, puis contrôles pré/post-merge réels par merge commit conservant l'historique. Ne pas fusionner sans cet accord. Conserver toutes les branches. Aucun déploiement, migration personnelle/production, changement d'infrastructure, CONTRACT ou lancementL5 autorisé.
-
-Git : commits/push seuls ; VM aucun ; SQL aucune nouvelle/personnelle/production ; Infra aucun, trois triggers exacts de branche seuls. Sources privées project_sources lues, non copiées au dépôt.
+Arrêt du développement après clôture. Propositions seulement : examiner le bilan et PR31, décider séparément périmètreL5/critères/exclusions/D5/rétention puis DesignReview avant éventuel lancement. Aucun L5 commencé, ni L6–L8. Aucun déploiement, migration personnelle/production, infrastructure, CONTRACT ou suppression de branche autorisé. Git : commits/PR documentaire seulement ; VMaucun ; SQLpropriétaireaucun ; Infraaucun.
