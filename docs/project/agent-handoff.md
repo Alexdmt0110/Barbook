@@ -1,48 +1,58 @@
-# Handoff canonique Barbook — L5 Design Review bloquée avant code
+# Handoff canonique Barbook — B5a préparatoire qualifié, attente merge PR32
 
 ```yaml
-checkpoint_utc: "2026-10-22T09:29:23+00:00"
+checkpoint_utc: "2026-10-22T10:14:51+00:00"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
-handoff_status: "EN_COURS"
-feature: "L5 B5a–B5f autorisé, D5 validée ; Design Review transversale L5-COMPAT-01"
+handoff_status: "EN_ATTENTE_VALIDATION"
+feature: "L5 B5a préparation additive inactive, PR32 ; D5 et L5-COMPAT-01B validés"
 branch: "feature/recipe-lifecycle-contracts"
 base_branch: "main"
 base_sha: "94552a94a51fdb8e9ae9a0aa4b41e47ce0906894"
-remote_head_sha: "94552a94a51fdb8e9ae9a0aa4b41e47ce0906894"
-local_head_sha: "94552a94a51fdb8e9ae9a0aa4b41e47ce0906894"
-worktree: "documentsD5/design/suivi avant leur propre publication ; aucun modèle/code"
-pr: "aucune ; #31 MERGEE ; pas de PR L5 avant arbitrage"
-tests: "main94552a9 sixchecks success recontrôlés ; validationdocumentaire locale ; aucune CI/testapplicatif L5 revendiqué"
-migrations: "aucune créée/appliquée ; plan additif limité aux bases testjetables"
-changes_pushed: "branche publiée immédiatement au merge94552a9 ; ce handoff précède sa propre publication"
-unpushed_changes: "l5-design.md,checkpoint-l5.md,decisions.md,roadmap.md,backlog.md/json,review-log.md,agent-handoff.md"
-decisions_validated: "D1/D2, D5 explicite et périmètreL5personnel B5a–B5f le22octobre2026"
-decisions_pending: "L5-COMPAT-01 : anciennes routes sans précondition après suppression/restauration ; B recommandée/A/C à arbitrer"
-next_atomic_step: "attendre Alex avant tout modèle/code ; puis reprendreDesign/B5a selon décision explicite"
-risks_and_blockers: "ancienne et nouvelle intention sans version indiscernables ; compatibilité comportementale complète incompatible avec invalidation exigée"
+remote_head_sha: "546f400dca9f32246d720fc09d15af50a7f33d19"
+local_head_sha: "546f400dca9f32246d720fc09d15af50a7f33d19"
+worktree: "propre avant rédaction du présent handoff"
+pr: "https://github.com/Alexdmt0110/Barbook/pull/32 ; draft de qualification, ready seulement après sixchecks finaux ; aucun merge autorisé"
+tests: "codeb273dcf dansfd3e890 : sixchecks success et sixlogs238backend/191frontend/160PG-HTTP/4Chromium/audits0 ; derniers documents et handoff doivent obtenir leurs propres sixchecks"
+migrations: "8e20261022100000_recipe_lifecycle_prepare, Actions PG16jetable uniquement ; aucune personnelle/production"
+changes_pushed: "74c778e designbloqué ;9cbed43 arbitrage/contrats ;b273dcf modèle/tests ;fd3e890 revueinitiale ;546f400 qualification/gate"
+unpushed_changes: "ce handoff avant sa propre publication"
+decisions_validated: "D1/D2 ; D5 et L5personnelB5a–f ; L5-COMPAT-01 optionB explicite"
+decisions_pending: "autorisation explicite du merge32 ; aucune décisionmétier structurante bloquante identifiée pour B5a"
+next_atomic_step: "attendre accord merge32 après diff/checks finaux ; après mergeautorisé/mainqualifié seulement, basculecoordonnée API/Angular au débutB5b"
+risks_and_blockers: "préparationinactive : pas de corbeille/édition ni nouvelleadmissibilitélegacy actives ; rollbackancienbinaire non sûr après activationfuture"
 production_effect: "aucun"
 ```
 
-Photographie avant sa publication ; SHA de branche réel surGitHub fait foi, aucune auto-référence inventée. Le propriétaire a autorisé le développementL5 conditionnel à une DesignReview sans incompatibilité importante ; celle-ci en a trouvé une et impose donc cet arrêt. D5 est validée, pas une question à rouvrir.
+Photographie avant sa propre publication ; GitHub et CI du dernierHEAD font foi, pas de SHA auto-référentiel inventé. Aucun outil ne poursuit un développement après la fin de session.
 
-[Design transversal](l5-design.md) contient inventaire des consommateurs et routes historiques, contrats envisagés, alternatives et motifs, versions distinctes, ABVbrut/inconnu/override0, lienslegacy et compteurs, migrationtestseulement/réversibilité limitée, matrice10critères et B5a–f. [Décisions](decisions.md) et [checkpoint](checkpoint-l5.md). Aucun modèle, API, testapplicatif, workflow ou migration modifié ; aucune fonctionnalitéL5 annoncée livrée.
+## État intégré et reprise sûre
 
-Main réellement94552a9 (#31 mergée, parents0f63272/659f7bc, mergedAt09:03:02UTC, arbre f2912e6), sixchecks verts au lancement. Ancienworktree barbook-folders conserve df6c890/indexidentiquef5a9132 déjà intégré ; pas de reset/stash/force et aucun fichier écrasé. Nouveauworktree barbook-l5 sur branche adaptée, sans concurrenceL4 ni anciennefeature reprise. Aucune PR ouverte initialement,18refs historiques conservées et nouvellebranche publiée.
+Main94552a9 (#31 mergée, parents0f63272/659f7bc, arbre f2912e6) a été recontrôlé, sixchecks success ; aucunePRouverte au départ. BrancheL5 créée/publiée depuis ce main ;19refs,18historiques conservées. Ancienworktree barbook-folders àdf6c890/indexidentiquef5a9132 déjà intégré a été laissé intact, aucun reset/stash/force. Worktree de travail : barbook-l5, branche ci-dessus.
 
-OptionB recommandée : garder tous les chemins legacy, ajouter une précondition adaptée et refuser409sans effet les anciennes commandes sans précondition sur toutes les écritures de classement ; Angular actualisé de façon coordonnée. Incompatibilité à approuver explicitement avant code. OptionA : limiter ce refus aux recettes passées par la corbeille ; laisse les anciens risques de remplacement sans version sur les autres recettes et exige une exception explicite à la protection concurrente générale. OptionC : relâcher exigence d'invalidation aprèsrestauration, non recommandée. Un simple verrou/deletedAt/CSRF/générationUI ne distingue pas deux intentionsHTTP identiques ; ne pas coder cette fausse protection.
+L5-COMPAT-01 levé explicitement : toutes écrituresdeclassement exigent préconditionadaptée, absente/obsolète409sans effet ; routesconservées, aucune version inférée, miseàjourcoordonnéeAngular. Lot : couvertureexacte de chaqueID, contrôles sousverrou avant effet, rollbacktotal. [Contrat cible](../maintenance/recipe-lifecycle.md) précise singles/lot et suppressionindirectedossier couverte par expectedMembershipToken d’ensemble. Ces contrats sont **à activer ensemble dans B5b**, pas présentés déjà actifs dans B5a.
 
-Validation des documents/JSON66IDs (sixfichesL5,60autres inchangées), liens/fences et diffcheck, puis commit/push atomique et checkpointdistant. Aucun test applicatif/PG/HTTP/Chromium L5 ni nouvelleCI passée revendiqués ; aucun BLOCKER/P1applicatif prétendu résolu. Pas de PR tant que cette incompatibilité n'est pas arbitrée. À la reprise : lire réponsesAlex, refs/main/branche/PR/handoff actuels puis compléterDesign avant code.
+D5 :30jourscalendaires serveur, restaurationinterditeaprèséchéance même si ligneprésente ; ID/workspace/slug réservés, liensvalides etréférenceimage conservés ; pas de purge/archivage/média. Deuxversions seulement : contenu/classement indépendants, suppression/restauration incrémenteront les deux sansreset. Classement sans effet ne change pas version mais vérifie sa précondition. Le client ne rajeunit pas une intention après409.
 
-Git : documents sur branche publiés, pas demergeautorisé. VMaucun ; SQLaucuneaction ; Infraaucun. Pas de purgephysique/donnéesréelles, basepersonnelle/production, CONTRACT, déploiement, L6–L8, coûtouserviceexterne. Ne pas continuer en arrière-plan après cette session.
+## Livraison exacte B5a et preuves
 
+Codeb273dcf ajoute contentVersion0, deletedAt/restoreUntilNULL, abvUnknownfalse et indexworkspace/deletedAt ; migration8 additive/transactionnelle avec CHECKversion>=0, pairefinie/dateUTC+30jours et unknownsansoverride. Aucune ancienne migration, service/controller/Angular, dépendance/lock ou workflow modifié. Pas de writerpublic pour nouveaux états. Héritage/override0/overrideégal/inconnu historiques conservés ; nouvel inconnu explicite représentable seulement enDB de test avant lecteurscoordonnés.
 
-## État courant après arbitrage B explicite
+Locaux : npmci838packages ; npmrunverifybackend code0 (238tests23suites, lint/build/Prismavalidate/compatNYC), npx tsc --noEmit --incremental false,10fixtureguards et diffcheck passés. Premières erreurslint des nouveaux tests corrigées avant publication, sans désactivation de règle. Dépréciationsoutils/NPMenvproxy historiques comprises, aucun paquet misàjour. Frontend inchangé, requalifié enCI ; PostgreSQL/Chromium non disponibles localement, aucune preuve locale native prétendue.
 
-L5-COMPAT-01 levé par Alex ; les paragraphes bloqués ci-dessus sont historiques. Branche74c778e/main94552a9 recontrôlés, aucune PRouverte ; WORK reprend B5a. Contracts recipe-lifecycle.md et complémentl5-design.md : deuxversions indépendantes avec bumpdes deux au cycle, préconditions de tous écrivains obligatoires à la basculecoordonnée B5b, lotcouvertureexacte et atomicité. B5a prépare schéma/CHECKs/defaults/upgrade inactifs ; ne pas prétendre la corbeille ou le refuslegacy déjà opérationnels. Prochainpas : implémentation additive selonDesign puis vrais tests/6CI et Gate de toutebranche avant PR ; aucun merge autorisé.
+Qualification native **fd3e89080e3d6e970e97b9dc25447797285f4e04** inclut le codeb273dcf : sixchecks success/sixlogs relus. [Quality39760878427](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878427) :238backend/191frontend. [Integration39760878585](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878585) :160PG-HTTP/11suites, quatreChromium52.5s, huitmigrationsfresh/redeploy/status/drift/smoke,10garde-fous. [Audits39760878501](https://github.com/Alexdmt0110/Barbook/actions/runs/39760878501) : complet/runtimebackend/frontend0.19nouveaux natifs touspassés (14migration et5HTTP), aucune correctionCIcode ni seuil/timeout/assertion/quota assoupli.
 
+Tests nouveaux : toutescolonneshistoriques de13tables préservées dont sessionnonvide/liaisons, defaultsancienswriters, panneDDLaprèsALTER puisrollbacketretry, datesincomplètes/infinies/±1ms, DSTNewYork/Paris, sourcesABV/override0/égal/inconnu, index/slugréservé/FKlegacy. HTTP réels refusent injections de nouveaux états et prouvent création/détailcompatibles. Ils ne prétendent pas prouver les nouveaux409/lot/cycle qui n’existent pas encore.
 
-## Checkpoint courant — B5a préparation publiée
+[Gate complet](reviews/l5-b5a-review-gate.md) de toutebranche main94552a9...HEAD repris après preuvesnatives ; aucun BLOCKER/P1 B5a identifié, limites exactes. [Design](l5-design.md), [checkpoint](checkpoint-l5.md), [décisions](decisions.md), roadmap/backlog actualisés ;66IDs et60autresfiches identiques. Les10critèresL5 restent des critèresdu lotentier, pas déclarés livrés par cette préparation.
 
-Design9cbed43 puis codeb273dcf poussés et vérifiés ; modèleadditif/19casnatifs, aucunwriter actif nouveau. Locaux verifybackend238/23suites/lint/build/Prisma/NYC, tsc et10garde-fous passés ; npmci838. [Gate initial](reviews/l5-b5a-review-gate.md) de toutebranche, aucune anomalieBLOCKER/P1 identifiée ; preuvesPG/HTTP/Chromium encore à observer enCI. Prochainpas : PRdraftdequalification utilisant workflowsPR existants, lire diff/checks/logs puis revuefinale et ready sivert. Pas de merge autorisé. TentativeajouttriggerCI rejetéeautomatiquement, abandonnée ; aucunworkflowmodifié.
+## PR et condition d’arrêt
+
+PR32draft ouverte après revuelocale complète sans défautidentifié, pour qualification sur les workflowsPRexistants. Diff réel initial15fichiers/4commits, tousblobs/touteslignes comparés auclone, base94552a9/headfd3e890, zérocommentaire/revue/inline etmergeabletrue. Complément546f400 etprésenthandoff documentaire : relire le diff et les sixchecks du dernierHEAD, puis ready seulement siverts. **Ne pas merger sans accord explicite d’Alex.** Pas de B5b enavance sur sa base nonmergée.
+
+À la reprise après mergeautorisé et mainqualifié : commencerB5b par basculecoordonnée des préconditions sur **tous** écrivains et Angular/fixtures : sans/stale409avant effet, lotatomic/IDsétrangers, rollbackDB, racesdossier, invalidationcycles ; NativeHTTP/PG etE2Eobligatoires. Ensuite seulement édition/corbeille par blocsautorisés. Aucune génération du jeton courant pour accepter une intention ancienne. Ancienbinaire non sûr après activation des nouveaux états, pas de migrationinverse destructrice.
+
+Approbationautomatique a refusé l’ajoutdu triggerdebrancheCI comme configuration horsautorisation ; tentative abandonnée et entièrement retirée avantcommit. Aucunworkflowmodifié ni contournement ; qualificationviaPRexistante. Aucun blocage restant de ce côté, aucune permissioninfrastructure demandée.
+
+Git : commits/push/checkpoints/PR32 uniquement. VMaucun ; SQLuniquementmigration et fixturesCIjetables ; aucune personnelle/production. Infraaucun. AucunCONTRACT, purgephysique, L6–L8, coût/serviceexterne ou suppression/réécriture debranche.
