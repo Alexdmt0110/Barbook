@@ -1,7 +1,7 @@
 # Handoff canonique Barbook — L4 B4e/B4f
 
 ```yaml
-checkpoint_utc: "2026-10-22T06:33:38Z"
+checkpoint_utc: "2026-10-22T06:46:00Z"
 source_of_truth: "https://github.com/Alexdmt0110/Barbook"
 phase: "B"
 work_owner: "WORK"
@@ -10,18 +10,18 @@ feature: "L4 B4e développé ; B4f qualification globale en cours"
 branch: "feature/global-session-revocation"
 base_branch: "main"
 base_sha: "de86dd0e11c938e202c038e9049876af651a0ccb"
-remote_head_sha: "f5a913279854fb9d4f5d2eeff55d99401ecb9ad1"
-local_head_sha: "f5a913279854fb9d4f5d2eeff55d99401ecb9ad1"
+remote_head_sha: "34fe83b2b429cbba83eea0210fc8d9e7967ec77b"
+local_head_sha: "34fe83b2b429cbba83eea0210fc8d9e7967ec77b"
 worktree: "propre avant ce checkpoint documentaire"
 pr: "#29 MERGED ; aucune PR B4e ouverte"
 tests: "local backend238/23suites, frontend191/27fichiers, lint/build/Prisma/tsc/E2E types/10garde-fous/compatibilités passés ; dernier code à qualifier sur Actions"
 migrations: "sept historiques sur CI jetables uniquement ; aucune nouvelle/personnelle/production"
-changes_pushed: "1667810,7a10fb4,acbd2e8,4522bea,df6c890,f5a9132"
+changes_pushed: "1667810,7a10fb4,acbd2e8,4522bea,df6c890,f5a9132,66715a9,34fe83b"
 unpushed_changes: "ce seul handoff avant sa propre publication"
 decisions_validated: "développement B4e puis B4f autorisé ; WORK seul ; D1/D2 inchangées"
 decisions_pending: "chaque nouveau merge exige accord Alex ; aucun déploiement/infra/CONTRACT/L5"
 next_atomic_step: "observer six checks du checkpoint documentaire contenant f5a9132, lire les logs natifs/browser ; corriger puis refaire Review Gate entier et matrice18critères"
-risks_and_blockers: "dernier BFCache/global23natifs et nouveaux parcours browser non encore exécutés ; qualification B4f non close"
+risks_and_blockers: "141natifs et238/191unitaires passés ; preuve BFCache66715a9 échouée2/4browser, correctif du fixture34fe83b à requalifier"
 production_effect: "aucun"
 ```
 
@@ -48,3 +48,9 @@ Après six checks réels du code actuel et corrections éventuelles : relecture 
 Limites : appareil offline/dormant non effaçable à distance avant constat serveur ; preuve de révocation peut disparaître après prune ; storage totalement refusé empêche effacement garanti ; requête déjà autorisée peut finir et n'est pas annulée rétroactivement. Pas de Safari/iOS/TLS/proxy/backup/restore/rollback propriétaire qualifiés ; aucun sélecteur workspace partagé, édition/corbeille L5, CONTRACT ou production.
 
 Git : branche/push seulement ; VM aucun ; SQL aucune nouvelle/personnelle/production ; Infra aucun changement, triggers exacts de branche seuls. Sources privées dans project_sources lues, non copiées au dépôt.
+
+## Checkpoint correctif de la preuve BFCache
+
+CI66715a9 :238backend/191frontend/141PG-HTTP réellement passés,9suites natives dont23cas globaux ; migrations fresh/redeploy/status/drift/smoke et10garde-fous. Browser2expirations passent,2parcours globaux échouent à la preuve persist après401/purge réussis. Aucune assertion/timeouts/retry assouplis. Captures et traces récupérées ; formulaire mobile lisible sans débordement.
+
+34fe83b corrige la méthode de preuve : Playwright Page.goBack ne supporte pas BFCache (documentation officielle consultée) ; Chromium complet/new headless, navigation d'historique et observations Page/Network/Runtime via CDP natif. Assertions persist/masque/401code/purge/absence de contenu/replay conservées ; raisons natives de non-restauration exposées en cas d'échec. Typecheck E2E passé. Aucun changement applicatif. Observer les six checks du successeur documentaire de34fe83b ; pas de PR tant que ce P1 de qualification reste ouvert. Maintenance et matrice B4f sont encore locales, à finaliser/publier après réussite.
