@@ -1,5 +1,12 @@
 # Roadmap autorisée
 
+## L5 — autorisé le 22 octobre 2026, Design Review bloquée avant code
+
+D5 validée (corbeille30joursserveur, expiration≠effacement, identité/slug/liens valides conservés, pas de purge/archivage/média). L5 B5a–B5f autorisé dans le carnet personnel ; chaque merge distinct. Main94552a9/#31 et sixchecks recontrôlés, aucune PR ouverte initialement. Branche feature/recipe-lifecycle-contracts publiée immédiatement depuis ce main dans un worktree propre, ancien instantané L4 intact.
+
+[Design Review transversale](l5-design.md) : **L5-COMPAT-01 bloque avant modèle/code**. Les anciennes mutations de liens sans version ne permettent pas de distinguer une intention avant suppression/restauration d'une nouvelle intention. Proposition B : conserver les routes mais exiger une précondition adaptée sur toutes les écritures de classement ; accord d'Alex nécessaire sur cette incompatibilité, aucune règle implicite appliquée. [D5 et décisions](decisions.md), [checkpoint](checkpoint-l5.md). Aucun test applicatif/migration/SQL/workflow modifié, pas de PR avant arbitrage. Pas de L6–L8/CONTRACT/infra/déploiement ni basepropriétaire. Les états précédents sont historiques.
+
+
 ## Clôture technique courante — 22 octobre 2026
 
 L4 B4a–B4f est **CLOTURE_TECHNIQUEMENT_SUR_MAIN**, après autorisation explicite et merge de [#30](https://github.com/Alexdmt0110/Barbook/pull/30). Main `0f63272ddbe7bb3a884384531e9b41a314d09525`, arbre `d1b5acab59c9077a7ba8ec5a968d84ae693f6526` identique au HEAD qualifié `5e1660f`. Les six contrôles post-merge sont success, leurs six journaux relus : **238 backend, 191 frontend, 141 PostgreSQL/HTTP, 4 Chromium** ; audits complets/runtime zéro. Les 18 critères sont satisfaits dans le périmètre de preuves et limites de la [matrice](l4-b4f-qualification.md), sans BLOCKER/P1 L4 identifié.
@@ -16,7 +23,7 @@ Phase A validée comme base. L0–L2 autorisés le 16 octobre ; merges #20–#24
 | L3 — Dossiers B3a–B3c | MERGE #24 ; main vert | merge commit d7ea95f autorisé/exécuté, six checks main success ; checkpoint documentaire #25 également intégré |
 | B3d — CONTRACT | NON_APPROUVE | retrait legacy seulement après inventaire des usages, bascule compatible, backup/restore et accord destructif distinct |
 | L4 — Sessions et saisie sûre | CLOTURE_TECHNIQUEMENT_SUR_MAIN ; #26–#30 MERGE | 18critères satisfaits dans leur portée ; six checks main0f63272 success ; bilan/limites et clôture documentaire en PR distincte |
-| L5 — Cycle recette | PROPOSE_NON_APPROUVE | édition/version, suppression/restauration selon D5, quantités/ABV |
+| L5 — Cycle recette | APPROUVE_B5a_B5f ; DESIGN_BLOQUE | D5 validée ; arbitrage L5-COMPAT-01 avant modèle/code ; aucune PR |
 | L6 — Photos privées | PROPOSE_NON_APPROUVE | D2/D6 ; contrôles fichier, accès privé, stockage/cleanup et sauvegardes |
 | L7 — Qualification V1 | PROPOSE_NON_APPROUVE | parcours, navigateurs/appareils, zoom/clavier, performances et docs exactes |
 | L8 — Release/OPS | PROPOSE_NON_APPROUVE | D7/D8 ; inventaire VPS/staging, images, restauration/rollback, production avec accord distinct |

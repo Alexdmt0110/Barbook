@@ -41,11 +41,15 @@ Le 20 octobre 2026, Alex valide explicitement D1a/D1b/D2a/D2b/D2c et autorise L4
 
 **À décider :** les membres peuvent-ils supprimer des recettes, modifier des prix, publier une carte ? Faut-il lecture seule ? Les contributions restent-elles à l'équipe au départ d'un membre (recommandé) ? Ce cadrage sera nécessaire avant L10, pas avant les correctifs V1.
 
-### D5 — Suppression, récupération et rétention
+### D5 — Suppression, récupération et rétention — VALIDÉ le 22 octobre 2026
 
-**Recommandation :** suppression de recette vers une corbeille récupérable 30 jours, purge physique contrôlée ensuite ; archivage non destructif séparé si son utilité est confirmée. Dossier supprimé = liens retirés, recettes conservées. La fermeture de compte/espace nécessite son propre aperçu et traitement du dernier propriétaire.
+Alex autorise L5 B5a–B5f exclusivement sur les recettes du carnet personnel. Corbeille après confirmation, sans destruction immédiate. Récupération pendant30jours calendaires calculés côté serveur ; restauration interdite à l'échéance même si la ligne reste physiquement présente. Fin de récupération ne signifie jamais effacement physique.
 
-**À décider :** durée de corbeille et politique média/export ; suppression immédiate éventuelle seulement avec accord explicite. Une politique de suppression doit aussi expliquer les délais des sauvegardes, sans promettre leur purge instantanée.
+ID/workspace/slug d'origine conservés ; renommage du nom affiché sans modification du slug. Unicité workspace/slug maintenue et slug réservé en corbeille, y compris après échéance tant que la ligne n'est pas purgée. Dossiers/tags : liens encore valides récupérés, aucun élément supprimé recréé ; supprimer un dossier ne supprime jamais ses recettes. Référence image existante conservée selon règles actuelles, sans traitement média.
+
+Purge physique, traitement automatique, bouton définitif, archivage, politiques média/sauvegardes exclus de L5 initial ; cadrage et accord distincts nécessaires avant exploitation. Les migrations additives restent limitées aux bases de test jetables autorisées. Chaque PR doit recevoir un accord explicite avant merge ; aucun L6–L8, déploiement, base personnelle/production, infra ou CONTRACT autorisé.
+
+La [Design Review transversale L5](l5-design.md) précède toute modification applicative. Un arbitrage de compatibilité est ouvert : les anciens appels de classement sans version ne permettent pas de distinguer une intention antérieure à une suppression/restauration d'une intention nouvelle. D5 est validée ; sa mise en œuvre reste bloquée par cet arbitrage, pas remise en question.
 
 ### D6 — Photos et visibilité
 
@@ -110,3 +114,10 @@ B4d développé sur feature/session-drafts ; [conception préventive](l4-b4d-des
 Alex a autorisé #29 uniquement puis les blocs B4e et B4f déjà validés. Merge de86dd0 confirmé, parents0c4a558/7d79500, mergedAt2026-10-21T13:15:45Z, main et six contrôles post-merge qualifiés, branches historiques conservées. Aucune autorisation de merge futur.
 
 B4e applique ADR0005 : password courant + cookie encore autoritaire, verrou User avant Session, pas de résurrection ni annulation rétroactive des requêtes autorisées. Confirmation volontaire purge locale annoncée même si réauthentification/réseau échoue ; global ne se dégrade jamais silencieusement en logout simple. Notifications ciblées par empreinte du CSRF précédent, revalidation masquée du document à sa reprise. Aucun droit donné au storage ou BroadcastChannel. La qualification réelle et ses limites sont dans l4-b4f-qualification.md ; pas de clôture anticipée avant six contrôles/Review Gate. Aucun nouveau choix produit/coût/infra, migration propriétaire, CONTRACT, L5 ou déploiement.
+
+
+## 22 octobre 2026 — lancement L5 autorisé, Design Review bloquée avant code
+
+Main94552a9 et six checks post-merge#31 success recontrôlés ; aucune PR ouverte initialement. Autorisation explicite L5 B5a–B5f et D5, décisions techniques ordinaires/tests/commits/push dans ce seul périmètre. WORK reprend seul. Branche feature/recipe-lifecycle-contracts publiée immédiatement depuis main. Ancien instantané local L4 laissé intact ; index identique au commit historique f5a9132 déjà intégré, nouveau worktree propre isolé.
+
+Aucun modèle/code/migration/workflow modifié. [Revue](l5-design.md) : incompatibilité importante avec les appels historiques sans précondition de recette ; soumettre le choix à Alex avant B5a. Aucun merge autorisé. Les paragraphes antérieurs qui indiquent L5 non autorisé sont des photographies historiques ; seule cette décision récente autorise L5, sans lever les interdictions d'exploitation.

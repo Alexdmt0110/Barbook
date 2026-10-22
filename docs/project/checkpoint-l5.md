@@ -1,0 +1,15 @@
+# Checkpoint L5 — Design Review avant code
+
+## L5 — autorisé le 22 octobre 2026, Design Review bloquée avant code
+
+D5 validée (corbeille30joursserveur, expiration≠effacement, identité/slug/liens valides conservés, pas de purge/archivage/média). L5 B5a–B5f autorisé dans le carnet personnel ; chaque merge distinct. Main94552a9/#31 et sixchecks recontrôlés, aucune PR ouverte initialement. Branche feature/recipe-lifecycle-contracts publiée immédiatement depuis ce main dans un worktree propre, ancien instantané L4 intact.
+
+[Design Review transversale](l5-design.md) : **L5-COMPAT-01 bloque avant modèle/code**. Les anciennes mutations de liens sans version ne permettent pas de distinguer une intention avant suppression/restauration d'une nouvelle intention. Proposition B : conserver les routes mais exiger une précondition adaptée sur toutes les écritures de classement ; accord d'Alex nécessaire sur cette incompatibilité, aucune règle implicite appliquée. [D5 et décisions](decisions.md), [checkpoint](checkpoint-l5.md). Aucun test applicatif/migration/SQL/workflow modifié, pas de PR avant arbitrage. Pas de L6–L8/CONTRACT/infra/déploiement ni basepropriétaire. Les états précédents sont historiques.
+
+HorodatageUTC : 2026-10-22T09:29:23+00:00. Base réelle 94552a94a51fdb8e9ae9a0aa4b41e47ce0906894 ; branche créée/publiée au même SHA. Les18refs historiques seront recontrôlées après publication. Ancienworktree df6c890 avec index exactementf5a9132 déjà intégré, aucun unstaged ; préservé sans reset/stash/force. Nouveau worktree barbook-l5 propre avant rédaction.
+
+Main94552a9 correspond à#31, mergedAt2026-10-22T09:03:02Z, parents0f63272/659f7bc et arbre f2912e6aa55eb27257bccebc7288aa2c8a8d0b5b, sixchecks réellement success recontrôlés au lancement. Le handoff de#31 était une photographie antérieure ; aucune repriseL4 ni nouvellemigration décidée.
+
+Documentation deD5, inventaire des écrivains/lecteurs, contrats provisoires, alternatives de version/ABV, planmigration additive/testseulement, matrice10critères et risques rédigés. Aucun critèreL5 déclaré passé. Tests locaux de documents : JSON66IDs/sixfiches liées au L5seulement, liens/fences, dixcritères et diffcheck ; ni testPG/HTTP/Chromium L5 exécuté ni CI nouvelle revendiquée. Pas de Review Gate applicatif ni PR car arbitrage de contrat ouvert. Réponse d'Alex requise selon consigne4du lancementL5 ; D5 elle-même reste validée.
+
+Publication documentaire atomique prévue ; contrôler parent/arbre/message/fichiers/blobsdistants, puis arrêt. Gitcommits/pushbranche uniquement ; VM/SQL/Infraaucun ; aucun nouvel état enproduction.
