@@ -365,8 +365,14 @@ describe('Atomic personal content editing over real HTTP and PostgreSQL', () => 
   async function waiters(pid: number) {
     const deadline = Date.now() + 5000;
     while (Date.now() < deadline) {
+      // A second row waiter may wait on the first waiter's tuple lock, not directly on the holder.
       const result = await pool.query(
-        'SELECT pid FROM pg_stat_activity WHERE $1=ANY(pg_blocking_pids(pid))',
+        `WITH RECURSIVE blocked(pid) AS (
+          SELECT pid FROM pg_stat_activity WHERE $1=ANY(pg_blocking_pids(pid))
+          UNION
+          SELECT activity.pid FROM pg_stat_activity activity
+          JOIN blocked ON blocked.pid=ANY(pg_blocking_pids(activity.pid))
+        ) SELECT DISTINCT pid FROM blocked`,
         [pid],
       );
       if (result.rows.length >= 2) return;
