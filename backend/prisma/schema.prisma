@@ -171,7 +171,10 @@ model Cocktail {
   tags              CocktailTag[]
   folderMemberships CocktailFolder[]
 
-  organizationVersion Int @default(0)
+  organizationVersion Int       @default(0)
+  contentVersion      Int       @default(0)
+  deletedAt           DateTime? @db.Timestamptz(3)
+  restoreUntil        DateTime? @db.Timestamptz(3)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -184,6 +187,7 @@ model Cocktail {
   @@index([workspaceId, type])
   @@index([workspaceId, mainAlcoholId])
   @@index([workspaceId, method])
+  @@index([workspaceId, deletedAt])
 }
 
 model CocktailFolder {
@@ -228,6 +232,7 @@ model CocktailIngredient {
   unit          MeasurementUnit
   specification String?
   abvOverride   Decimal?        @db.Decimal(5, 2)
+  abvUnknown    Boolean         @default(false)
   notes         String?
   sortOrder     Int
 
