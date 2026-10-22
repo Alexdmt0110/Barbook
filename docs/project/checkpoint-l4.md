@@ -154,3 +154,65 @@ Relances lues :5/5 ciblés puis175/175 dans25fichiers avec deux workers ; compat
 ## PR B4d ouverte — dernier complément documentaire
 
 #29 créée après Review Gate, base0c4a558/heada80c160,42fichiers/7commits ; tous les blobs, toutes les lignes ajoutées/retirées et les refs du vrai diff correspondent au clone. Aucun commentaire/revue/inline, mergeable=true sans conflit ; douze checks push+PR success lus. Complément de pilotage seulement pour numéro de PR et reprise ; code2062903 inchangé. Vérifier le dernier HEAD documentaire/ses six checks avant tout merge, qui doit recevoir l’accord distinct d’Alex. Branches historiques conservées, aucune production/L5/CONTRACT.
+
+
+## 21 octobre 2026 — #29 intégrée, main qualifié, ouverture B4e
+
+Autorisation explicite Alex limitée à #29 : HEAD7d795003b24e8360d8a70620961a6c215885b96a/base0c4a5580f3fe7d8e71c83c0434aadc3ce46d1e73 revérifiés,42fichiers/8commits, tous blobs et toutes lignes +/- identiques ; zéro commentaire/revue/inline, mergeable=true/clean,12checks push+PR success. Merge commit non destructif de86dd0e11c938e202c038e9049876af651a0ccb, mergedAt2026-10-21T13:15:45Z ; parents0c4a558/7d79500 et arbre6db7ad7e7e473068f501a4e1d03f802f621d069d confirmés ; main pointe réellement dessus.
+
+Les six checks main sont success : Backend119243778657, Frontend119243777935, PostgreSQL119243776141, Chromium119243776318, audits119243775690/119243775136. Logs relus232backend/175frontend/118PG-HTTP/4Chromium ; sept migrations historiques, fraîche/redeploy/status/drift/smoke, audits zéro. Le téléchargement Chromium a rencontré deux DNS transitoires puis réussi ; les quatre parcours ont réellement passé49.8s. Les16branches sont conservées, tous les anciens HEAD hors main sont inchangés.
+
+Autorisation de développement B4e puis B4f donnée ; aucune autorisation de merge futur. Branche feature/global-session-revocation publiée immédiatement depuis main de86dd0, tracking local établi ; design préventif dans l4-b4e-design.md avant code. Les trois workflows ne reçoivent que le trigger push exact de cette branche, sans changement de jobs/actions/permissions. Git : merge29 confirmé + nouvelle branche ; VM aucun ; SQL aucune migration nouvelle/propriétaire ; Infra aucun changement.
+
+
+### B4e — endpoint global et preuves préparées
+
+Après design1667810, POST logout-all exige contexte/CSRF/origine, password1..128 et quota login inchangé. AuthService vérifie Argon2 hors transaction ; ReadCommitted verrouille User→Session, contrôle validité après attente et hash courant puis revokeAll. Aucun renouvellement/Set-Cookie. SESSION_REVOKED distingue les lignes volontairement révoquées conservées ; expiry/inconnu restent distincts.
+
+Local `npm run verify` backend terminé code0 : lint/build/238tests23suites/Prisma validate/NYC. Jest signale un worker fermé de force après réussite ; ne pas assimiler à une preuve d'absence de handles ouverts. `npx tsc --noEmit --incremental false` backend passé, typecheck E2E passé. Les20nouveaux tests HTTP/PG de ce checkpoint sont écrits mais PAS encore exécutés ; aucune DB locale/propriétaire utilisée. Les contrôles Actions du design1667810 ne sont pas apparus (collection check-runs et actions/runs réelle vide) ; ne pas prétendre six verts. À surveiller au prochain push ; aucune PR avant preuves natives/browser et revue entière. Frontend/UI/tests/browser B4e restent des modifications locales non publiées en cours, à qualifier séparément.
+
+
+### B4e — client, intention volontaire et notifications
+
+Backend7a10fb4 et complément préventifacbd2e8 publiés, vrais parents/arbres/blobs vérifiés. Client : commande globale avec réauthentification, purge volontaire annoncée avant saisie, mot de passe effacé à chaque tentative, résultat inconnu sans replay ni rétrogradation vers logout simple ; timeout15s laisse le résultat inconnu. Login explicite et epoch protègent B des réponses de A. SESSION_REVOKED purge localement ; expiry suspend sans suppression. Notifications liées à une empreinteSHA256 du CSRF précédent et à owner, génération recontrôlée après digest ; jamais credential ni CSRF brut diffusé. Constructor/post BroadcastChannel refusés sans crash.
+
+Frontend lint/build réussis ; suite initiale179/183 (quatre timeouts historiques inchangés), puis182/183 avec un worker (timeout historique création5s), puis ciblée52/52 auth+création passée, sans modifier délais/assertions/CI. Les nouveaux cas sont passés ; cela ne constitue pas une suite complète183/183. Backend test ciblé `npx jest global-logout.spec.ts --runInBand --detectOpenHandles`6/6 et sortie0 sans handles signalés ; verify238 passé auparavant. Typage E2E et backend passés. Deux contextes Chromium indépendants, mauvaise réauthentification, vraie révocation204 perdue et absence de replay ajoutés aux quatre parcours existants ; aucune nouvelle inscription, quota/retry/timeout navigateur inchangé. Ces parcours modifiés ne sont PAS encore exécutés.
+
+La revue globale découvre L4-16 à approfondir : aucun handler pageshow/pagehide actuellement, donc restauration BFCache non qualifiée. Préparer design et correctif avant la revue entière finale. Les trois checkpoints B4e n'ont toujours aucun run/check Actions ; cause non établie, aucun changement de configuration critique. Git : commits de branche seulement ; VM/SQL propriétaire/Infra aucun.
+
+
+### B4e/B4f — correction L4-16 et validation locale complète
+
+Après design préventifdf6c890, SessionResume masque synchroniquement le wrapper privé au pagehide ; pageshow/retour visible requiert /me frais, sans heartbeat. Contexte et CSRF identiques préservent formulaire/lease ; changement d'identité purge, cookie remplacé suspend et exige reconnexion. Erreur réseau conserve le draft et verrouille ;401revoked purge. La génération empêche un résultat de revalidation ancien d'expirer B ou d'annuler une intention de logout plus récente. Abonnement annulé au pagehide et masque maintenu ; cleanup à destruction. Le parcours Chromium indépendant active explicitement le BFCache et exige pageshow.persisted + wrapper caché avant revalidation, puis401/purge ; ce parcours reste à exécuter.
+
+Frontend complet : `VITEST_MAX_WORKERS=1 npm test -- --watch=false`191/191,27fichiers, sortie0 ; aucun délai/retry/assertion modifié. Les précédents timeouts locaux historiques sont résolus dans cette exécution. Lint frontend passé ; backend nouveau spec lint et tsc passés ; typecheck E2E passé ;10garde-fous fixture passés. La source Playwright locale confirme --disable-back-forward-cache dans coreBundle.js, ce seul argument est omis dans le navigateur indépendant de test. Native ajoute rollback après UPDATE réellement exécuté puis erreurDB, CSRF/origine absents, cleanup des seuls acteurs de ce spec :23nouveaux cas préparés, toujours PAS exécutés. Aucun PostgreSQL/Chromium installé/local prétendu.
+
+Reprendre toute la revue main...branche après cette correctionP1. Push/checkpoint puis B4f ; ne pas qualifier natifs/browser sur la seule présence des tests. Aucun nouveau merge, déploiement, migration nouvelle/propriétaire, infra, CONTRACT ou L5.
+
+Build production frontend après correction terminé code0, compatibilité Angular CLI code0. Aucun test/timeout/retry affaibli. La correction est prête pour publication atomique et revue entière renouvelée ; elle ne constitue pas encore une preuve BFCache/PG native.
+
+
+### 22octobre — CI du code complet et correction de la preuve BFCache
+
+Code f5a9132 et handoff66715a9 publiés et vérifiés ; CI39734802863 / Audits39734802800 / Integration39734802751. Backend238/23suites, frontend191/27fichiers et PG141/9suites success, logs relus.23nouveaux cas global natifs réellement passés ; sept migrations historiques fresh/redeploy/status/drift et smoke,10garde-fous. Browser119678316620 :2expirations passent,2parcours globaux échouent exclusivement sur preuve pageshow.persisted absente après401/purge réussis. Les captures de confirmation mobile/desktop et traces sont récupérées ; mobile390 lisible sans débordement. Aucune assertion supprimée.
+
+La documentation officielle https://playwright.dev/docs/api/class-page#page-go-back précise que le suivi Page.goBack ne supporte pas BFCache. Conception complémentaire consignée avant correction : utiliser Chromium complet/new-headless et CDP natif pour retour historique, lecture du document et réponse réseau, sans dépendre du suivi Page après restauration. Conserver toutes les preuves persist/masque/401code/purge/absence de contenu/replay, raisons natives de non-restauration dans l'erreur. Typecheck E2E du correctif passé ; aucun changement applicatif, de timeout/retry/quota/projet/inscription/infra. La dernière preuve native BFCache reste non qualifiée avant nouveau run. Documents maintenance et matrice B4f encore locaux en préparation, non prêts à PR.
+
+
+### 22octobre — BFCache prouvé et audit Vitest corrigé
+
+Checkpoint0ab0795 : CI39735903186 success238backend/191frontend ; Integration39735903163 success141PG-HTTP/9suites et4Chromium45.4s. La preuve BFCache native CDP a réellement passé sur les deux parcours : pageshow.persisted, masque avant revalidation,401 SESSION_REVOKED, purge et absence de contenu privé ; réponse globale204 réellement perdue, aucun replay. Aucun événement/HTTP fabriqué ni assertion retirée. Captures de confirmation66715a9 (même code applicatif) desktop/mobile inspectées : lisibles et sans débordement.
+
+Audit frontend119681589866 rouge sur deux modérées GHSA-qxg6-89mg-rqv8/GHSA-xp26-3454-mjgp mises à jour21octobre : Vitest/@vitest/mocker4.1.11. Conception avant correction dans l4-b4e-design.md. Minimum devDependency^4.1.12 et lock borné à Vitest+sept modules@vitest4.1.12 ; Chai/tinyrainbow conservés à leur version précédente, aucun autre paquet/runtime/backend/override modifié. npmci reproductible585packages sortie0 ; audits complets/runtime zéro. `VITEST_MAX_WORKERS=1 npm run verify` frontend code0 : lint/build/191tests27fichiers/compatCLI. Aucun seuil CI relaxé. Publication atomique du correctif sécurité puis six contrôles actuels et nouvelle revue entière avant PR.
+
+
+## Preuves finales du code — checkpoint9b7fa1e
+
+Code applicatif f5a9132, fixtureBFCache34fe83b et patchsécurité7d3bee2 inclus dans9b7fa1e151771a7517cbc51b1c2d4a21560c93ca ; six checks success réellement lus et logs relus : [CI39737042589](https://github.com/Alexdmt0110/Barbook/actions/runs/39737042589), [Integration39737042497](https://github.com/Alexdmt0110/Barbook/actions/runs/39737042497), [Audits39737042545](https://github.com/Alexdmt0110/Barbook/actions/runs/39737042545). Backend238/23suites, frontend191/27fichiers sous Vitest4.1.12, PG-HTTP141/9suites dont23cas globaux, quatre parcoursChromium. Sept migrations historiques fresh/redeploy/status/drift/smoke,10garde-fous, audits complets/runtime0 backend et frontend. Les assertions de vraie restauration BFCache, masque avant revalidation,401code/purge et perte du204 ont toutes passé.
+
+Statut : QUALIFIE_SUR_BRANCHE pour les18critères dans la portée de preuves/limites de chaque ligne ; aucune qualification production propriétaire. Les prochains commits sont documentaires ; lire aussi leurs six contrôles avant merge de la future PR.
+
+Review Gate entier repris après les corrections : aucun BLOCKER/P1 restant identifié ; documentation maintenance/matrice18critères/suivi66fiches et revue prêts à publication.17branches distantes réellement relues, main de86dd0 et tous les historiques inchangés ; aucun nouveau merge autorisé.
+
+
+PR B4e/B4f réellement ouverte : [#30](https://github.com/Alexdmt0110/Barbook/pull/30), base de86dd0/head676f7fa au contrôle initial ;39fichiers/12commits, tous blobs et toutes lignes ajoutées/retirées comparés au clone, aucun patch manquant, zéro commentaire/revue/inline. Mergeable=true, état blocked pendant CI en cours, aucun conflit et aucun auto-merge. Code/fixture/sécurité déjà qualifiés sur9b7fa1e ; ce complément ne modifie que le suivi. Observer le dernier HEAD et ses six contrôles, puis attendre Alex : aucun merge de#30 autorisé.

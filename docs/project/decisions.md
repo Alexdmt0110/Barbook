@@ -103,3 +103,10 @@ Alex autorise explicitement #27 uniquement et la suite des blocs L4, à commence
 Alex autorise explicitement #28 uniquement, puis B4d dans L4 déjà validé. Merge commit0c4a5580f3fe7d8e71c83c0434aadc3ce46d1e73 confirmé, mergedAt2026-10-21T11:05:03Z (13:05:03Paris), parents90d9356/f44306a et arbre42fe8ccac17771d1e8367f276bf622ecfd63c557 conforme au HEAD revu. Main à ce merge, six checks post-merge success et logs232backend/147frontend/118PG-HTTP/4Chromium relus. Toutes les branches historiques conservées.
 
 B4d développé sur feature/session-drafts ; [conception préventive](l4-b4d-design.md). Pas de nouvelle décision produit ni de merge implicite. B4e/B4f restent distincts ; logout global après réauthentification reste à livrer. Aucune base personnelle/production, infrastructure, migration nouvelle, déploiement, CONTRACT ou L5.
+
+
+## 22octobre2026 — autorisation #29 appliquée, B4e/B4f dans L4
+
+Alex a autorisé #29 uniquement puis les blocs B4e et B4f déjà validés. Merge de86dd0 confirmé, parents0c4a558/7d79500, mergedAt2026-10-21T13:15:45Z, main et six contrôles post-merge qualifiés, branches historiques conservées. Aucune autorisation de merge futur.
+
+B4e applique ADR0005 : password courant + cookie encore autoritaire, verrou User avant Session, pas de résurrection ni annulation rétroactive des requêtes autorisées. Confirmation volontaire purge locale annoncée même si réauthentification/réseau échoue ; global ne se dégrade jamais silencieusement en logout simple. Notifications ciblées par empreinte du CSRF précédent, revalidation masquée du document à sa reprise. Aucun droit donné au storage ou BroadcastChannel. La qualification réelle et ses limites sont dans l4-b4f-qualification.md ; pas de clôture anticipée avant six contrôles/Review Gate. Aucun nouveau choix produit/coût/infra, migration propriétaire, CONTRACT, L5 ou déploiement.

@@ -155,6 +155,44 @@ export class AuthService {
     );
   }
 
+  async logoutAll(
+    userId: string,
+    credential: string,
+    password: string,
+  ): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { passwordHash: true },
+    });
+    if (
+      !user ||
+      !(await this.passwordService.verify(user.passwordHash, password))
+    ) {
+      throw new UnauthorizedException({
+        code: 'REAUTHENTICATION_FAILED',
+        message: 'Password verification failed.',
+      });
+    }
+    await this.prisma.$transaction(
+      async (tx) => {
+        await this.sessions.lockForGlobalRevocation(tx, userId, credential);
+        // User remains locked: a password changed during Argon2 cannot authorize this action.
+        const current = await tx.user.findUnique({
+          where: { id: userId },
+          select: { passwordHash: true },
+        });
+        if (current?.passwordHash !== user.passwordHash) {
+          throw new UnauthorizedException({
+            code: 'REAUTHENTICATION_FAILED',
+            message: 'Password changed. Authenticate again.',
+          });
+        }
+        await this.sessions.revokeAll(tx, userId);
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted },
+    );
+  }
+
   private describe(
     user: AuthenticatedUser,
     workspaceId: string,

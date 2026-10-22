@@ -54,9 +54,9 @@ D1a/D1b/D2a/D2b/D2c validées, [design et critères](l4-design.md). #25 document
 | BB-L4-01 / B4a | contrats/ADR et store Session additif qualifiés ;88natifs dont26store, sept migrations ; auth actuelle préservée | MERGE #26 ; main76f742b qualifié |
 | BB-L4-02 / B4b | API/UI cookie/CSRF et contexte coordonnés, retrait Bearer | MERGE #27 ; main90d9356 qualifié |
 | BB-L4-03 / B4c | admission serveur fermée/liste, storage refusé toléré | MERGE #28 ; main0c4a558 qualifié |
-| BB-L4-04 / B4d / A010 / A012 | brouillons mémoire/sessionStorage 24 h, restauration isolée explicite, versions | PR #29 OUVERTE ; code2062903 qualifié ; merge à valider |
-| BB-L4-05 / B4e | révocation globale, activité/onglets/réseau et courses | APPROUVE |
-| BB-L4-06 / B4f | Review Gate complet, six checks, vraie PR et handoff | APPROUVE ; merge à valider |
+| BB-L4-04 / B4d / A010 / A012 | brouillons mémoire/sessionStorage 24 h, restauration isolée explicite, versions | #29 MERGEE de86dd0 ; six checks main qualifiés |
+| BB-L4-05 / B4e | révocation globale, activité/onglets/réseau et courses | QUALIFIE_SUR_BRANCHE ; six checks success9b7fa1e |
+| BB-L4-06 / B4f | Review Gate complet, six checks, vraie PR et handoff | EN_COURS ; aucun merge futur autorisé |
 
 Les critères L4-01 à L4-18 ne sont pas encore déclarés passés. B4a ne sécurise pas à lui seul les parcours JWT. L5, D5/rétention, CONTRACT, infrastructure et production restent exclus ; les branches historiques sont conservées.
 
@@ -100,3 +100,14 @@ B4d brouillons24h/restauration/purge/identité/workspace/version, B4e logout glo
 État courant21octobre : #28 intégrée après autorisation explicite, main0c4a558/six checks post-merge success. B4d sur feature/session-drafts, code2062903 ;175frontend/232backend/118PG-HTTP/4Chromium requalifiés, six checks success. [Design](l4-b4d-design.md), [Review Gate](reviews/l4-b4d-review-gate.md), [contrat brouillons](../maintenance/temporary-drafts.md). Chaque nouvelle PR reste soumise à un accord de merge distinct ; B4e/B4f ne sont pas clôturés.
 
 PR #29 ouverte,42fichiers/7commits au checkpointa80c160, vrai diff/blobs relus et douze checks push+PR success. Ce complément de pilotage est documentaire ; observer ses propres checks puis attendre Alex.
+
+
+## État courant — 22octobre2026, B4e/B4f
+
+#29 intégrée de86dd0 avec accord limité, main et six contrôles post-merge qualifiés, branches historiques conservées. B4e développé sur feature/global-session-revocation : backend global réauthentifié, User→Session et races natives ; UI volontaire/réseau inconnu/notifications liées à la session ; pagehide/pageshow et reprise visible masqués puis revalidés. Codef5a9132, qualification de la méthode BFCache34fe83b en cours.141PG-HTTP/238backend/191frontend réellement passés sur66715a9,2/4browser (BFCache manquant) ; ne pas annoncer L4 terminé. [Matrice18critères](l4-b4f-qualification.md) et [contrat](../maintenance/global-session-revocation.md). Les paragraphes antérieurs restent historiques. Seuls F001/F002/F003/F051 changent,62autres fiches identiques. Aucun merge futur, déploiement, migration propriétaire, infra, CONTRACT ou L5.
+
+
+Qualification code9b7fa1e confirmée : six contrôles success, logs238backend/191frontend/141PG-HTTP/4Chromium relus, Vitest4.1.12/audits0. BFCache natif corrigé et réellement passé ; [Review Gate complet](reviews/l4-b4e-b4f-review-gate.md) sans BLOCKER/P1 restant identifié, [18critères et limites](l4-b4f-qualification.md). Publication documentaire puis vraie PR, aucune autorisation de merge future.
+
+
+PR B4e/B4f réellement ouverte : [#30](https://github.com/Alexdmt0110/Barbook/pull/30), base de86dd0/head676f7fa au contrôle initial ;39fichiers/12commits, tous blobs et toutes lignes ajoutées/retirées comparés au clone, aucun patch manquant, zéro commentaire/revue/inline. Mergeable=true, état blocked pendant CI en cours, aucun conflit et aucun auto-merge. Code/fixture/sécurité déjà qualifiés sur9b7fa1e ; ce complément ne modifie que le suivi. Observer le dernier HEAD et ses six contrôles, puis attendre Alex : aucun merge de#30 autorisé.

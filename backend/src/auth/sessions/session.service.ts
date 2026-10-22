@@ -145,6 +145,43 @@ export class SessionService {
     `;
   }
 
+  /** User precedes Session, matching create/revokeAll; never renews activity. */
+  async lockForGlobalRevocation(
+    transaction: Prisma.TransactionClient,
+    userId: string,
+    credential: unknown,
+  ): Promise<void> {
+    if (
+      !isOpaqueToken(credential) ||
+      !(await this.lockUser(transaction, userId))
+    ) {
+      throw new UnauthorizedException('Session unavailable.');
+    }
+    const rows = await transaction.$queryRaw<{ id: string }[]>`
+      WITH candidate AS MATERIALIZED (
+        SELECT "id", "userId", "revokedAt", "idleExpiresAt", "expiresAt"
+        FROM "Session" WHERE "tokenHash" = ${hashSessionCredential(credential)}
+        FOR UPDATE
+      )
+      SELECT "id" FROM candidate
+      WHERE "userId" = ${userId} AND "revokedAt" IS NULL
+        AND "idleExpiresAt" > clock_timestamp() AND "expiresAt" > clock_timestamp()
+    `;
+    if (rows.length !== 1) {
+      throw new UnauthorizedException('Session expired or revoked.');
+    }
+  }
+
+  /** A retained revocation record distinguishes voluntary loss from expiry. */
+  async wasRevoked(credential: unknown): Promise<boolean> {
+    if (!isOpaqueToken(credential)) return false;
+    const rows = await this.prisma.$queryRaw<{ id: string }[]>`
+      SELECT "id" FROM "Session"
+      WHERE "tokenHash" = ${hashSessionCredential(credential)} AND "revokedAt" IS NOT NULL
+    `;
+    return rows.length === 1;
+  }
+
   /** Not scheduled automatically; validity never depends on cleanup. */
   async prune(): Promise<number> {
     return this.prisma.$executeRaw`

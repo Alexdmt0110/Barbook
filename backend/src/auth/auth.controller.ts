@@ -18,6 +18,7 @@ import {
 import { AuthService, IssuedAuthentication } from './auth.service';
 import { AuthResponse } from './auth.types';
 import { AuthenticatedRequest } from './authenticated-request';
+import { LogoutAllDto } from './dto/logout-all.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { SessionBootstrap, SessionGuard } from './guards/session.guard';
@@ -75,6 +76,23 @@ export class AuthController {
   ): Promise<void> {
     response.setHeader('Cache-Control', 'no-store');
     await this.web.logout(request);
+  }
+
+  @Post('logout-all')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Throttle({ default: LOGIN_RATE_LIMIT })
+  async logoutAll(
+    @Body() dto: LogoutAllDto,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<void> {
+    response.setHeader('Cache-Control', 'no-store');
+    const context = await this.web.globalLogoutContext(request);
+    await this.authService.logoutAll(
+      context.userId,
+      context.credential,
+      dto.password,
+    );
   }
 
   private issue(

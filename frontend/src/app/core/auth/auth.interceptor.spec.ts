@@ -92,8 +92,20 @@ describe('authInterceptor web boundary', () => {
       .flush({ code: 'AUTH_CONTEXT_CHANGED' }, { status: 409, statusText: 'Conflict' });
     expect(expire).toHaveBeenCalledOnce();
   });
+  it('distinguishes revocation from expiry and excludes failed global reauthentication', () => {
+    client.post('/api/auth/logout-all', {}).subscribe({ error: () => undefined });
+    http
+      .expectOne('/api/auth/logout-all')
+      .flush({ code: 'REAUTHENTICATION_FAILED' }, { status: 401, statusText: 'Unauthorized' });
+    expect(expire).not.toHaveBeenCalled();
+    client.get('/api/cocktails').subscribe({ error: () => undefined });
+    http
+      .expectOne('/api/cocktails')
+      .flush({ code: 'SESSION_REVOKED' }, { status: 401, statusText: 'Unauthorized' });
+    expect(expire).toHaveBeenCalledWith(true);
+  });
   it('does not convert a 500 into expiry or revoke after a logout failure', () => {
-    for (const url of ['/api/cocktails', '/api/auth/logout']) {
+    for (const url of ['/api/cocktails', '/api/auth/logout', '/api/auth/logout-all']) {
       client.post(url, {}).subscribe({ error: () => undefined });
       http.expectOne(url).flush({}, { status: 500, statusText: 'Unavailable' });
     }

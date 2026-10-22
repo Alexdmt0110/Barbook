@@ -1,3 +1,4 @@
+import { globalLogoutJourney } from '../fixtures/global-logout-journey';
 import { exerciseDraftQuota, acceptDraftNavigation, loseCreationResponse, restoreConflictedOrganization, restoreCreationAfterRefresh } from '../fixtures/draft-journeys';
 import { expect, Page, test } from '@playwright/test';
 import { browserFixtureEmail } from '../fixtures/registration-emails';
@@ -507,6 +508,7 @@ test('register, create, classify, manage folders and log back in', async ({ page
   }
   await loseCreationResponse(page, `${prefix} lost response`, fillRecipeForm, await browserHeaders(page));
   await exerciseDraftQuota(page);
+  await globalLogoutJourney(page, email, password, testInfo.outputPath('global-logout-confirmation.png'));
 });
 
 test('expired PostgreSQL session is rejected and returns to login without storing credentials', async ({

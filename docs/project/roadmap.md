@@ -9,7 +9,7 @@ Phase A validée comme base. L0–L2 autorisés le 16 octobre ; merges #20–#24
 | L2 — Intégration | MERGE #23 | PostgreSQL/HTTP/Chromium et six checks sur main ; rien déployé |
 | L3 — Dossiers B3a–B3c | MERGE #24 ; main vert | merge commit d7ea95f autorisé/exécuté, six checks main success ; checkpoint documentaire #25 également intégré |
 | B3d — CONTRACT | NON_APPROUVE | retrait legacy seulement après inventaire des usages, bascule compatible, backup/restore et accord destructif distinct |
-| L4 — Sessions et saisie sûre | APPROUVE ; B4a/B4b/B4c MERGE #26/#27/#28 ; B4d QUALIFIE_SUR_BRANCHE | D1/D2 validées, six blocs du design L4 ; session PostgreSQL et brouillons sessionStorage24h ; PR/merge distincts |
+| L4 — Sessions et saisie sûre | APPROUVE ; B4a/b/c/d MERGE #26–#29 ; B4e/B4f QUALIFIE_SUR_BRANCHE | D1/D2 validées, six blocs du design L4 ; session PostgreSQL et brouillons sessionStorage24h ; PR/merge distincts |
 | L5 — Cycle recette | PROPOSE_NON_APPROUVE | édition/version, suppression/restauration selon D5, quantités/ABV |
 | L6 — Photos privées | PROPOSE_NON_APPROUVE | D2/D6 ; contrôles fichier, accès privé, stockage/cleanup et sauvegardes |
 | L7 — Qualification V1 | PROPOSE_NON_APPROUVE | parcours, navigateurs/appareils, zoom/clavier, performances et docs exactes |
@@ -70,3 +70,14 @@ B4d brouillons24h/restauration/purge/identité/workspace/version, B4e logout glo
 #28 intégrée par0c4a558 après accord explicite ; six checks post-merge qualifiés, branches historiques conservées. B4d développé sur feature/session-drafts au code2062903, tests locaux175frontend/232backend ; six checks success et [Review Gate](reviews/l4-b4d-review-gate.md) complet favorables à la nouvelle PR, sans accord de merge. Mémoire/sessionStorage24h, restauration explicite liée à identité/workspace/recette/version, purge et absence de replay ; [contrat](../maintenance/temporary-drafts.md). B4e global/réauthentification et B4f restent distincts. Aucun nouveau merge autorisé, aucune production/infra/L5/CONTRACT. Les états B4c antérieurs ci-dessus sont historiques.
 
 PR B4d [#29](https://github.com/Alexdmt0110/Barbook/pull/29) ouverte et relue, base0c4a558/heada80c160,42fichiers/7commits et douze checks success. Dernier complément documentaire à vérifier ; aucun merge sans accord explicite Alex.
+
+
+## Reprise courante — 22octobre2026, B4e/B4f
+
+#29 intégrée par merge commitde86dd0, six checks main qualifiés, branches conservées. B4e développé et poussé ; backend238/frontend191/PG-HTTP141 réellement passés sur66715a9. La preuve BFCache native reste à qualifier après échec2/4browser ;34fe83b corrige le fixture selon la documentation officielle, sans assertion ni délai assouplis. [Matrice des18critères](l4-b4f-qualification.md), revue entière après corrections puis vraie PR ; chaque merge futur attend Alex. Main ne contient pas encore B4e. L5, CONTRACT, déploiement et infra restent exclus. Les reprises précédentes sont historiques.
+
+
+Qualification code9b7fa1e confirmée : six contrôles success, logs238backend/191frontend/141PG-HTTP/4Chromium relus, Vitest4.1.12/audits0. BFCache natif corrigé et réellement passé ; [Review Gate complet](reviews/l4-b4e-b4f-review-gate.md) sans BLOCKER/P1 restant identifié, [18critères et limites](l4-b4f-qualification.md). Publication documentaire puis vraie PR, aucune autorisation de merge future.
+
+
+PR B4e/B4f réellement ouverte : [#30](https://github.com/Alexdmt0110/Barbook/pull/30), base de86dd0/head676f7fa au contrôle initial ;39fichiers/12commits, tous blobs et toutes lignes ajoutées/retirées comparés au clone, aucun patch manquant, zéro commentaire/revue/inline. Mergeable=true, état blocked pendant CI en cours, aucun conflit et aucun auto-merge. Code/fixture/sécurité déjà qualifiés sur9b7fa1e ; ce complément ne modifie que le suivi. Observer le dernier HEAD et ses six contrôles, puis attendre Alex : aucun merge de#30 autorisé.
