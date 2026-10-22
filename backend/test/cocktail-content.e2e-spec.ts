@@ -57,10 +57,15 @@ describe('Atomic personal content editing over real HTTP and PostgreSQL', () => 
   });
   afterAll(async () => {
     try {
-      if (alice && bob)
+      if (alice && bob) {
+        // Only this suite's disposable recipes; release legacy Restrict references before workspace cascades.
+        await prisma.cocktail.deleteMany({
+          where: { workspaceId: { in: [alice.workspaceId, bob.workspaceId] } },
+        });
         await prisma.user.deleteMany({
           where: { id: { in: [alice.user.id, bob.user.id] } },
         });
+      }
     } finally {
       await app?.close();
       await pool?.end();

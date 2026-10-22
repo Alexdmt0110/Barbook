@@ -57,10 +57,14 @@ describe('Mandatory organization preconditions over real HTTP and PostgreSQL', (
   });
   afterAll(async () => {
     try {
-      if (alice && bob)
+      if (alice && bob) {
+        await prisma.cocktail.deleteMany({
+          where: { workspaceId: { in: [alice.workspaceId, bob.workspaceId] } },
+        });
         await prisma.user.deleteMany({
           where: { id: { in: [alice.user.id, bob.user.id] } },
         });
+      }
     } finally {
       await app?.close();
       await pool?.end();
