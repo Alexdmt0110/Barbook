@@ -79,6 +79,7 @@ describe('Cocktails', () => {
   const cocktails: CocktailSummary[] = [
     {
       id: 'cocktail-daiquiri',
+      organizationVersion: 0,
       slug: 'daiquiri',
       name: 'Daiquiri',
       type: 'CLASSIC',
@@ -116,6 +117,7 @@ describe('Cocktails', () => {
     },
     {
       id: 'cocktail-negroni',
+      organizationVersion: 0,
       slug: 'negroni',
       name: 'Negroni',
       type: 'CLASSIC',

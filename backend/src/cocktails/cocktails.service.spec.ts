@@ -177,6 +177,7 @@ describe('CocktailsService', () => {
       expect(cocktailCount).toHaveBeenCalledWith({
         where: {
           workspaceId: 'workspace-123',
+          deletedAt: null,
         },
       });
 
@@ -260,6 +261,7 @@ describe('CocktailsService', () => {
 
       const expectedWhere = {
         workspaceId: 'workspace-123',
+        deletedAt: null,
         name: {
           contains: 'neg',
           mode: 'insensitive',

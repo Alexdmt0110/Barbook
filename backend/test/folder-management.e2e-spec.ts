@@ -43,6 +43,47 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
       .expect(200);
     return response.body as CocktailDetail;
   };
+  const versions = (pairs: [string, number][]) =>
+    pairs.map(([cocktailId, expectedVersion]) => ({
+      cocktailId,
+      expectedVersion,
+    }));
+  const deletionQuery = async (id: string) => {
+    const response = await api()
+      .get(`/api/folders/${id}/deletion-preview`)
+      .set(auth())
+      .expect(200);
+    const preview = response.body as {
+      version: number;
+      expectedMembershipToken: string;
+    };
+    expect(preview.expectedMembershipToken).toMatch(/^[a-f0-9]{64}$/);
+    return {
+      expectedVersion: preview.version,
+      expectedMembershipToken: preview.expectedMembershipToken,
+    };
+  };
+  const membershipResult =
+    (field: 'added' | 'removed', count: number, pairs: [string, number][]) =>
+    (response: request.Response) => {
+      expect(Object.keys(response.body as object).sort()).toEqual(
+        [field, 'versions'].sort(),
+      );
+      expect(response.body).toHaveProperty(field, count);
+      const body = response.body as {
+        versions: { cocktailId: string; organizationVersion: number }[];
+      };
+      expect(
+        body.versions.sort((a, b) => a.cocktailId.localeCompare(b.cocktailId)),
+      ).toEqual(
+        pairs
+          .map(([cocktailId, organizationVersion]) => ({
+            cocktailId,
+            organizationVersion,
+          }))
+          .sort((a, b) => a.cocktailId.localeCompare(b.cocktailId)),
+      );
+    };
   const organize = (slug: string, folderIds: string[], expectedVersion = 0) =>
     api()
       .put(`/api/cocktails/${slug}/organization`)
@@ -209,28 +250,42 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     await api()
       .post(`/api/folders/${b.id}/cocktails`)
       .set(auth())
-      .send({ cocktailIds: [one.id, one.id.toUpperCase(), two.id] })
+      .send({
+        cocktailIds: [one.id, one.id.toUpperCase(), two.id],
+        expectedVersions: versions([
+          [one.id, 1],
+          [two.id, 0],
+        ]),
+      })
       .expect(200)
-      .expect({ added: 2 });
+      .expect(
+        membershipResult('added', 2, [
+          [one.id, 2],
+          [two.id, 1],
+        ]),
+      );
     await api()
       .put(`/api/folders/${b.id}/cocktails/${one.id}`)
+      .query({ expectedVersion: 2 })
       .set(auth())
       .expect(200)
-      .expect({ added: 0 });
+      .expect(membershipResult('added', 0, [[one.id, 2]]));
     const linked = await getDetail(one.slug);
     expect(linked.organizationVersion).toBe(2);
     expect(linked.folder?.id).toBe(a.id);
     expect(linked.folders).toHaveLength(2);
     await api()
       .delete(`/api/folders/${a.id}/cocktails/${one.id}`)
+      .query({ expectedVersion: 2 })
       .set(auth())
       .expect(200)
-      .expect({ removed: 1 });
+      .expect(membershipResult('removed', 1, [[one.id, 3]]));
     await api()
       .delete(`/api/folders/${a.id}/cocktails/${one.id}`)
+      .query({ expectedVersion: 3 })
       .set(auth())
       .expect(200)
-      .expect({ removed: 0 });
+      .expect(membershipResult('removed', 0, [[one.id, 3]]));
     const remaining = await getDetail(one.slug);
     expect(remaining.organizationVersion).toBe(3);
     expect(remaining.folder?.id).toBe(b.id);
@@ -257,9 +312,10 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
 
     await api()
       .delete(`/api/folders/${b.id}/cocktails/${one.id}`)
+      .query({ expectedVersion: 3 })
       .set(auth())
       .expect(200)
-      .expect({ removed: 1 });
+      .expect(membershipResult('removed', 1, [[one.id, 4]]));
     const empty = await getDetail(one.slug);
     expect(empty.organizationVersion).toBe(4);
     expect(empty.folder).toBeNull();
@@ -273,7 +329,13 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
       await api()
         .post(`/api/folders/${target.id}/cocktails`)
         .set(auth())
-        .send({ cocktailIds: [own.id, bad] })
+        .send({
+          cocktailIds: [own.id, bad],
+          expectedVersions: versions([
+            [own.id, 0],
+            [bad, 0],
+          ]),
+        })
         .expect(404);
       await api()
         .delete(`/api/folders/${target.id}/cocktails/${bad}`)
@@ -298,9 +360,10 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     await organize(two.slug, [a.id]);
     const before = await getDetail(one.slug);
     expect(before.folder?.id).toBe(a.id);
+    const observed = await deletionQuery(a.id);
     await api()
       .delete(`/api/folders/${a.id}`)
-      .query({ expectedVersion: 0 })
+      .query(observed)
       .set(auth())
       .expect(200)
       .expect({ deleted: true });
@@ -335,6 +398,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     const created = await recipe();
     await organize(created.slug, [target.id]);
     const before = await getDetail(created.slug);
+    const observed = await deletionQuery(target.id);
     const name = `bb_folder_${randomUUID().replaceAll('-', '')}`;
     await pool.query(
       `CREATE FUNCTION "${name}"() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF OLD."id"='${target.id}' THEN RAISE EXCEPTION 'synthetic folder failure'; END IF; RETURN OLD; END $$`,
@@ -345,7 +409,7 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     try {
       await api()
         .delete(`/api/folders/${target.id}`)
-        .query({ expectedVersion: 0 })
+        .query(observed)
         .set(auth())
         .expect(500);
       expect(await getDetail(created.slug)).toEqual(before);
@@ -372,13 +436,13 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
       [0, 1].map(() =>
         api()
           .put(`/api/folders/${target.id}/cocktails/${created.id}`)
+          .query({ expectedVersion: 0 })
           .set(auth()),
       ),
     );
-    expect(adds.map((r) => r.status)).toEqual([200, 200]);
-    expect(adds.map((r) => (r.body as { added: number }).added).sort()).toEqual(
-      [0, 1],
-    );
+    expect(adds.map((r) => r.status).sort()).toEqual([200, 409]);
+    const winner = adds.find((r) => r.status === 200)!;
+    membershipResult('added', 1, [[created.id, 1]])(winner);
     expect((await getDetail(created.slug)).organizationVersion).toBe(1);
   });
 
@@ -391,15 +455,17 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
         .put(`/api/cocktails/${created.slug}/organization`)
         .set(auth())
         .send({ folderIds: [a.id], tagNames: [marker], expectedVersion: 0 }),
-      api().put(`/api/folders/${b.id}/cocktails/${created.id}`).set(auth()),
+      api()
+        .put(`/api/folders/${b.id}/cocktails/${created.id}`)
+        .query({ expectedVersion: 0 })
+        .set(auth()),
     ]);
-    expect(local.status).toBe(200);
-    expect([200, 409]).toContain(full.status);
+    expect([local.status, full.status].sort()).toEqual([200, 409]);
     const stored = await getDetail(created.slug);
     expect(stored.folders.map((item) => item.id).sort()).toEqual(
-      full.status === 200 ? [a.id, b.id].sort() : [b.id],
+      full.status === 200 ? [a.id] : [b.id],
     );
-    expect(stored.organizationVersion).toBe(full.status === 200 ? 2 : 1);
+    expect(stored.organizationVersion).toBe(1);
     expect(stored.tags.map((item) => item.name)).toEqual(
       full.status === 200 ? [marker] : [],
     );
@@ -414,21 +480,25 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
   it('handles deletion racing an add without an orphan or lost recipe', async () => {
     const target = await folder();
     const created = await recipe();
+    const observed = await deletionQuery(target.id);
     const [removed, added] = await Promise.all([
-      api()
-        .delete(`/api/folders/${target.id}`)
-        .query({ expectedVersion: 0 })
-        .set(auth()),
+      api().delete(`/api/folders/${target.id}`).query(observed).set(auth()),
       api()
         .put(`/api/folders/${target.id}/cocktails/${created.id}`)
+        .query({ expectedVersion: 0 })
         .set(auth()),
     ]);
-    expect(removed.status).toBe(200);
-    expect([200, 404]).toContain(added.status);
+    expect([removed.status, added.status]).toEqual(
+      removed.status === 200 ? [200, 404] : [409, 200],
+    );
     const remaining = await getDetail(created.slug);
-    expect(remaining.folders).toEqual([]);
-    expect(remaining.folder).toBeNull();
-    expect(remaining.organizationVersion).toBe(added.status === 200 ? 2 : 0);
+    expect(remaining.folders.map((item) => item.id)).toEqual(
+      added.status === 200 ? [target.id] : [],
+    );
+    expect(remaining.folder?.id ?? null).toBe(
+      added.status === 200 ? target.id : null,
+    );
+    expect(remaining.organizationVersion).toBe(added.status === 200 ? 1 : 0);
   });
 
   it('accepts the full 100-recipe batch with complete counts, bounded pages and idempotent versions', async () => {
@@ -448,15 +518,33 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
     await api()
       .post(`/api/folders/${target.id}/cocktails`)
       .set(auth())
-      .send({ cocktailIds })
+      .send({
+        cocktailIds,
+        expectedVersions: versions(cocktailIds.map((id) => [id, 0])),
+      })
       .expect(200)
-      .expect({ added: 100 });
+      .expect(
+        membershipResult(
+          'added',
+          100,
+          cocktailIds.map((id) => [id, 1]),
+        ),
+      );
     await api()
       .post(`/api/folders/${target.id}/cocktails`)
       .set(auth())
-      .send({ cocktailIds })
+      .send({
+        cocktailIds,
+        expectedVersions: versions(cocktailIds.map((id) => [id, 1])),
+      })
       .expect(200)
-      .expect({ added: 0 });
+      .expect(
+        membershipResult(
+          'added',
+          0,
+          cocktailIds.map((id) => [id, 1]),
+        ),
+      );
     expect(
       await prisma.cocktail.count({
         where: {
@@ -538,6 +626,6 @@ describe('Folder management with real HTTP and PostgreSQL', () => {
         .set(auth())
         .expect(400);
     }
-    await api().delete(path).set(auth()).expect(400);
+    await api().delete(path).set(auth()).expect(409);
   });
 });

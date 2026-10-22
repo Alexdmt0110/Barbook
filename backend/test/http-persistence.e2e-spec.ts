@@ -310,7 +310,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     await api()
       .put(`/api/cocktails/${created.slug}/organization`)
       .set(bearer(bob))
-      .send({ folderId: null, tagNames: [] })
+      .send({ folderId: null, expectedVersion: 0, tagNames: [] })
       .expect(404);
     const list = await api()
       .get('/api/cocktails')
@@ -336,8 +336,8 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     await api()
       .put(`/api/cocktails/${own.slug}/organization`)
       .set(bearer(bob))
-      .send({ folderId: folder.id, tagNames: [] })
-      .expect(400);
+      .send({ folderId: folder.id, expectedVersion: 0, tagNames: [] })
+      .expect(404);
   });
 
   it('persists folder/tags and intersecting filters, with independent workspace names', async () => {
@@ -353,7 +353,11 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     const organized = await api()
       .put(`/api/cocktails/${created.slug}/organization`)
       .set(bearer(alice))
-      .send({ folderId: folder.id, tagNames: ['Agrumes', '  agrumes  '] })
+      .send({
+        folderId: folder.id,
+        expectedVersion: 0,
+        tagNames: ['Agrumes', '  agrumes  '],
+      })
       .expect(200);
     const organization = organized.body as {
       folder: { id: string };
@@ -384,7 +388,7 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     await api()
       .put(`/api/cocktails/${created.slug}/organization`)
       .set(bearer(alice))
-      .send({ folderId: null, tagNames: [] })
+      .send({ folderId: null, expectedVersion: 1, tagNames: [] })
       .expect(200);
     expect(
       await prisma.cocktailTag.count({ where: { cocktailId: created.id } }),
@@ -441,7 +445,11 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
     await api()
       .put(`/api/cocktails/${created.slug}/organization`)
       .set(bearer(alice))
-      .send({ folderId: originalFolder.id, tagNames: ['Original'] })
+      .send({
+        folderId: originalFolder.id,
+        expectedVersion: 0,
+        tagNames: ['Original'],
+      })
       .expect(200);
     const otherOriginalFolder = await createFolder(alice);
     await api()
@@ -564,10 +572,12 @@ describe('PostgreSQL HTTP contracts and transactions', () => {
         api()
           .put(`/api/cocktails/${created.slug}/organization`)
           .set(bearer(alice))
-          .send(value),
+          .send({ ...value, expectedVersion: 0 }),
       ),
     );
-    expect(results.map((response) => response.status)).toEqual([200, 200]);
+    expect(results.map((response) => response.status).sort()).toEqual([
+      200, 409,
+    ]);
     const response = await api()
       .get(`/api/cocktails/${created.slug}`)
       .set(bearer(alice))

@@ -156,7 +156,7 @@ describe('Versioned multiple folder HTTP contracts', () => {
       folderIds: [own.id, foreign.id],
       expectedVersion: 0,
       tagNames: ['Foreign must not persist'],
-    }).expect(400);
+    }).expect(404);
     expect((await detail(created.slug)).organizationVersion).toBe(0);
     expect(
       await prisma.cocktailFolder.count({ where: { cocktailId: created.id } }),
@@ -185,7 +185,6 @@ describe('Versioned multiple folder HTTP contracts', () => {
       { folderIds: ['invalid'] },
       { folderIds: Array<string>(1001).fill(own.id) },
       { folderId: null },
-      { expectedVersion: null },
       { expectedVersion: -1 },
       { expectedVersion: 0.5 },
       { expectedVersion: '0' },
@@ -197,7 +196,12 @@ describe('Versioned multiple folder HTTP contracts', () => {
         ...change,
       }).expect(400);
     }
-    await save(created.slug, { folderIds: [], tagNames: [] }).expect(400);
+    await save(created.slug, { folderIds: [], tagNames: [] }).expect(409);
+    await save(created.slug, {
+      folderIds: [],
+      tagNames: [],
+      expectedVersion: null,
+    }).expect(409);
     await save(created.slug, { tagNames: [] }).expect(400);
     expect((await detail(created.slug)).organizationVersion).toBe(0);
   });

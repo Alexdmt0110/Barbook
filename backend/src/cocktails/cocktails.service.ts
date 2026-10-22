@@ -49,6 +49,7 @@ export class CocktailsService {
 
     const where: Prisma.CocktailWhereInput = {
       workspaceId,
+      deletedAt: null,
       ...(normalizedSearch
         ? {
             name: {
@@ -104,6 +105,7 @@ export class CocktailsService {
         ],
         select: {
           id: true,
+          organizationVersion: true,
           slug: true,
           name: true,
           type: true,
@@ -189,6 +191,7 @@ export class CocktailsService {
       select: {
         id: true,
         organizationVersion: true,
+        deletedAt: true,
         slug: true,
         name: true,
         type: true,
@@ -278,7 +281,7 @@ export class CocktailsService {
       },
     });
 
-    if (!cocktail) {
+    if (!cocktail || cocktail.deletedAt) {
       throw new NotFoundException('Cocktail not found.');
     }
 

@@ -32,6 +32,7 @@ describe('CocktailsService', () => {
     const cocktails: CocktailSummary[] = [
       {
         id: 'cocktail-1',
+        organizationVersion: 0,
         slug: 'daiquiri',
         name: 'Daiquiri',
         type: 'CLASSIC',

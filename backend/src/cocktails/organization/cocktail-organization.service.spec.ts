@@ -22,6 +22,8 @@ interface Organization {
   folderId: string | null;
   organizationVersion: number;
   _count: { folderMemberships: number };
+  folderMemberships: { folderId: string }[];
+  tags: { tag: Tag }[];
 }
 function fixture() {
   return {
@@ -32,6 +34,8 @@ function fixture() {
         folderId: null,
         organizationVersion: 0,
         _count: { folderMemberships: 0 },
+        folderMemberships: [],
+        tags: [],
       }),
       update: query({ organizationVersion: 1 }),
     },
@@ -70,6 +74,8 @@ describe('CocktailOrganizationService', () => {
       folderId: 'b',
       organizationVersion: 0,
       _count: { folderMemberships: 1 },
+      folderMemberships: [{ folderId: 'b' }],
+      tags: [],
     });
     tx.folder.findMany.mockResolvedValue([
       { id: 'a', name: 'A' },
@@ -127,26 +133,24 @@ describe('CocktailOrganizationService', () => {
     const single = await service.updatePersonalCocktailOrganization(
       'user',
       'negroni',
-      { folderId: 'a', tagNames: [] },
+      { folderId: 'a', expectedVersion: 0, tagNames: [] },
     );
     expect(single.folders).toEqual([{ id: 'a', name: 'A' }]);
     const empty = await service.updatePersonalCocktailOrganization(
       'user',
       'negroni',
-      { folderId: null, tagNames: [] },
+      { folderId: null, expectedVersion: 0, tagNames: [] },
     );
     expect(empty).toEqual({
       folders: [],
       folder: null,
       tags: [],
-      organizationVersion: 1,
+      organizationVersion: 0,
     });
     expect(tx.cocktailFolder.deleteMany).toHaveBeenCalledWith({
       where: { workspaceId: 'workspace', cocktailId: 'cocktail' },
     });
-    expect(tx.cocktailTag.deleteMany).toHaveBeenCalledWith({
-      where: { workspaceId: 'workspace', cocktailId: 'cocktail' },
-    });
+    expect(tx.cocktailTag.deleteMany).toHaveBeenCalledTimes(1);
   });
 
   it('rejects stale versions and legacy writes over a multiple set before creating tags or links', async () => {
@@ -155,6 +159,8 @@ describe('CocktailOrganizationService', () => {
       folderId: 'a',
       organizationVersion: 2,
       _count: { folderMemberships: 2 },
+      folderMemberships: [{ folderId: 'a' }, { folderId: 'b' }],
+      tags: [],
     });
     for (const dto of [
       { folderIds: [], expectedVersion: 1, tagNames: ['Unwritten'] },
@@ -170,7 +176,6 @@ describe('CocktailOrganizationService', () => {
   });
 
   it.each([
-    { folderIds: [], tagNames: [] },
     { folderIds: [], folderId: null, expectedVersion: 0, tagNames: [] },
     { tagNames: [] },
   ])('rejects an incomplete or mixed contract %j', async (dto) => {
@@ -188,7 +193,7 @@ describe('CocktailOrganizationService', () => {
         expectedVersion: 0,
         tagNames: ['Unwritten'],
       }),
-    ).rejects.toBeInstanceOf(BadRequestException);
+    ).rejects.toBeInstanceOf(NotFoundException);
     expect(tx.tag.createMany).not.toHaveBeenCalled();
     expect(tx.cocktail.update).not.toHaveBeenCalled();
   });
@@ -226,6 +231,7 @@ describe('CocktailOrganizationService', () => {
     await expect(
       service.updatePersonalCocktailOrganization('user', 'negroni', {
         folderId: null,
+        expectedVersion: 0,
         tagNames: ['Missing'],
       }),
     ).rejects.toBeInstanceOf(InternalServerErrorException);

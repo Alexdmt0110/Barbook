@@ -1,6 +1,13 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { FolderDetail, FolderPage, FolderQuery, FolderReference } from './folder.models';
+import {
+  FolderDetail,
+  FolderPage,
+  FolderQuery,
+  FolderReference,
+  FolderDeletionPreview,
+  RecipePrecondition,
+} from './folder.models';
 
 @Injectable({ providedIn: 'root' })
 export class FoldersService {
@@ -21,17 +28,26 @@ export class FoldersService {
   rename(id: string, name: string, expectedVersion: number) {
     return this.http.patch<FolderDetail>(this.path(id), { name, expectedVersion });
   }
-  remove(id: string, expectedVersion: number) {
+  deletionPreview(id: string) {
+    return this.http.get<FolderDeletionPreview>(`${this.path(id)}/deletion-preview`);
+  }
+  remove(id: string, expectedVersion: number, expectedMembershipToken: string) {
     return this.http.delete<{ deleted: true }>(this.path(id), {
-      params: new HttpParams().set('expectedVersion', expectedVersion),
+      params: new HttpParams()
+        .set('expectedVersion', expectedVersion)
+        .set('expectedMembershipToken', expectedMembershipToken),
     });
   }
-  addCocktails(id: string, cocktailIds: readonly string[]) {
-    return this.http.post<{ added: number }>(`${this.path(id)}/cocktails`, { cocktailIds });
+  addCocktails(id: string, expectedVersions: readonly RecipePrecondition[]) {
+    return this.http.post<{ added: number }>(`${this.path(id)}/cocktails`, {
+      cocktailIds: expectedVersions.map((item) => item.cocktailId),
+      expectedVersions,
+    });
   }
-  removeCocktail(id: string, cocktailId: string) {
+  removeCocktail(id: string, cocktailId: string, expectedVersion: number) {
     return this.http.delete<{ removed: number }>(
       `${this.path(id)}/cocktails/${encodeURIComponent(cocktailId)}`,
+      { params: new HttpParams().set('expectedVersion', expectedVersion) },
     );
   }
   private path(id: string) {

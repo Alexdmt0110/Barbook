@@ -71,6 +71,7 @@ describe('CocktailsService organization filtering', () => {
 
     const expectedWhere = {
       workspaceId: 'workspace-123',
+      deletedAt: null,
       folderMemberships: {
         some: { workspaceId: 'workspace-123', folderId: FOLDER_ID },
       },
@@ -92,6 +93,7 @@ describe('CocktailsService organization filtering', () => {
 
     const expectedWhere = {
       workspaceId: 'workspace-123',
+      deletedAt: null,
       tags: {
         some: {
           workspaceId: 'workspace-123',
@@ -121,6 +123,7 @@ describe('CocktailsService organization filtering', () => {
 
     const expectedWhere = {
       workspaceId: 'workspace-123',
+      deletedAt: null,
       folderMemberships: {
         some: { workspaceId: 'workspace-123', folderId: FOLDER_ID },
       },

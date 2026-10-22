@@ -7,6 +7,7 @@ import {
   IsUUID,
   Length,
   Min,
+  Max,
   ValidateIf,
 } from 'class-validator';
 
@@ -41,12 +42,12 @@ export class UpdateCocktailOrganizationDto {
   folderIds?: string[];
 
   @ValidateIf(
-    (object: UpdateCocktailOrganizationDto) =>
-      object.expectedVersion !== undefined,
+    (object: UpdateCocktailOrganizationDto) => object.expectedVersion != null,
   )
   @IsInt()
   @Min(0)
-  expectedVersion?: number;
+  @Max(2147483647)
+  expectedVersion?: number | null;
 
   @Transform(({ value }: TransformValue) => trimStringArray(value))
   @IsArray()

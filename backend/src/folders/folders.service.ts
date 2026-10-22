@@ -8,6 +8,13 @@ import { isPrismaKnownRequestError } from '../common/prisma-errors';
 import { lockOrganizationWorkspace } from '../database/lock-organization-workspace';
 import { PrismaService } from '../database/prisma.service';
 import { Prisma } from '../generated/prisma/client';
+import {
+  ExpectedRecipeVersion,
+  membershipToken,
+  recipePreconditions,
+  requireVersion,
+  requireVersionCapacity,
+} from '../cocktails/organization/organization-preconditions';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import { BrowseFoldersDto, RenameFolderDto } from './dto/folder-commands.dto';
 import { FolderDetail, FolderPage, FolderReference } from './folder.types';
@@ -16,7 +23,9 @@ const detailSelect = {
   id: true,
   name: true,
   version: true,
-  _count: { select: { memberships: true } },
+  _count: {
+    select: { memberships: { where: { cocktail: { deletedAt: null } } } },
+  },
 } satisfies Prisma.FolderSelect;
 function toDetail(folder: {
   id: string;
@@ -120,16 +129,45 @@ export class FoldersService {
     }
   }
 
+  async deletionPreview(userId: string, folderId: string) {
+    const workspaceId = await this.workspaceId(userId);
+    return this.prisma.$transaction(
+      async (tx) => {
+        const folder = await this.requireFolder(tx, workspaceId, folderId);
+        const recipes = await this.affectedRecipes(tx, workspaceId, folderId);
+        return {
+          id: folder.id,
+          name: folder.name,
+          version: folder.version,
+          expectedMembershipToken: membershipToken(recipes),
+        };
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
+    );
+  }
+
   async remove(
     userId: string,
     folderId: string,
-    expectedVersion: number,
+    expectedVersion?: number | null,
+    expectedMembershipToken?: string | null,
   ): Promise<{ deleted: true }> {
     const workspaceId = await this.workspaceId(userId);
     return this.prisma.$transaction(async (tx) => {
       await lockOrganizationWorkspace(tx, workspaceId);
       const folder = await this.requireFolder(tx, workspaceId, folderId);
       this.checkVersion(folder.version, expectedVersion);
+      const recipes = await this.affectedRecipes(tx, workspaceId, folderId);
+      if (
+        !expectedMembershipToken ||
+        membershipToken(recipes) !== expectedMembershipToken
+      )
+        throw new ConflictException(
+          'Folder memberships have changed. Request a new preview.',
+        );
+      recipes.forEach((recipe) =>
+        requireVersionCapacity(recipe.organizationVersion),
+      );
       // Repair the legacy representative before its Restrict FK is evaluated.
       // One grouped update; only affected recipes get a new organization version.
       await tx.$executeRaw`
@@ -142,10 +180,10 @@ export class FoldersService {
           ) ELSE c."folderId" END,
           "organizationVersion" = c."organizationVersion" + 1,
           "updatedAt" = CURRENT_TIMESTAMP
-        WHERE c."workspaceId" = ${workspaceId} AND EXISTS (
+        WHERE c."workspaceId" = ${workspaceId} AND (c."folderId" = ${folderId} OR EXISTS (
           SELECT 1 FROM "CocktailFolder" cf WHERE cf."workspaceId" = ${workspaceId}
             AND cf."cocktailId" = c."id" AND cf."folderId" = ${folderId}
-        )
+        ))
       `;
       await tx.folder.delete({
         where: { workspaceId_id: { workspaceId, id: folderId } },
@@ -158,18 +196,23 @@ export class FoldersService {
     userId: string,
     folderId: string,
     cocktailIds: readonly string[],
-  ): Promise<{ added: number }> {
+    expectedVersions?: readonly ExpectedRecipeVersion[] | null,
+  ) {
     const workspaceId = await this.workspaceId(userId);
     const ids = [...new Set(cocktailIds.map((id) => id.toLowerCase()))];
     return this.prisma.$transaction(async (tx) => {
       await lockOrganizationWorkspace(tx, workspaceId);
       await this.requireFolder(tx, workspaceId, folderId);
       const cocktails = await tx.cocktail.findMany({
-        where: { workspaceId, id: { in: ids } },
-        select: { id: true },
+        where: { workspaceId, id: { in: ids }, deletedAt: null },
+        select: { id: true, organizationVersion: true },
       });
       if (cocktails.length !== ids.length)
         throw new NotFoundException('Cocktail not found.');
+      const expected = recipePreconditions(ids, expectedVersions);
+      cocktails.forEach((recipe) =>
+        requireVersion(recipe.organizationVersion, expected.get(recipe.id)),
+      );
       const existing = await tx.cocktailFolder.findMany({
         where: { workspaceId, folderId, cocktailId: { in: ids } },
         select: { cocktailId: true },
@@ -177,6 +220,11 @@ export class FoldersService {
       const linked = new Set(existing.map((row) => row.cocktailId));
       const added = ids.filter((id) => !linked.has(id));
       if (added.length > 0) {
+        cocktails
+          .filter((recipe) => added.includes(recipe.id))
+          .forEach((recipe) =>
+            requireVersionCapacity(recipe.organizationVersion),
+          );
         await tx.cocktailFolder.createMany({
           data: added.map((cocktailId) => ({
             workspaceId,
@@ -193,7 +241,14 @@ export class FoldersService {
           data: { folderId },
         });
       }
-      return { added: added.length };
+      return {
+        added: added.length,
+        versions: cocktails.map((recipe) => ({
+          cocktailId: recipe.id,
+          organizationVersion:
+            recipe.organizationVersion + (added.includes(recipe.id) ? 1 : 0),
+        })),
+      };
     });
   }
 
@@ -201,16 +256,29 @@ export class FoldersService {
     userId: string,
     folderId: string,
     cocktailId: string,
-  ): Promise<{ removed: number }> {
+    expectedVersion?: number | null,
+  ) {
     const workspaceId = await this.workspaceId(userId);
     return this.prisma.$transaction(async (tx) => {
       await lockOrganizationWorkspace(tx, workspaceId);
       await this.requireFolder(tx, workspaceId, folderId);
       const cocktail = await tx.cocktail.findUnique({
         where: { workspaceId_id: { workspaceId, id: cocktailId } },
-        select: { id: true, folderId: true },
+        select: {
+          id: true,
+          folderId: true,
+          deletedAt: true,
+          organizationVersion: true,
+        },
       });
-      if (!cocktail) throw new NotFoundException('Cocktail not found.');
+      if (!cocktail || cocktail.deletedAt)
+        throw new NotFoundException('Cocktail not found.');
+      requireVersion(cocktail.organizationVersion, expectedVersion);
+      const existing = await tx.cocktailFolder.findUnique({
+        where: { cocktailId_folderId: { cocktailId, folderId } },
+        select: { cocktailId: true },
+      });
+      if (existing) requireVersionCapacity(cocktail.organizationVersion);
       const result = await tx.cocktailFolder.deleteMany({
         where: { workspaceId, folderId, cocktailId },
       });
@@ -233,7 +301,16 @@ export class FoldersService {
           },
         });
       }
-      return { removed: result.count };
+      return {
+        removed: result.count,
+        versions: [
+          {
+            cocktailId,
+            organizationVersion:
+              cocktail.organizationVersion + (result.count ? 1 : 0),
+          },
+        ],
+      };
     });
   }
 
@@ -262,11 +339,25 @@ export class FoldersService {
     return folder;
   }
 
-  private checkVersion(actual: number, expected: number): void {
-    if (actual !== expected)
-      throw new ConflictException(
-        'Folder has changed. Reload it before continuing.',
-      );
+  private checkVersion(actual: number, expected?: number | null): void {
+    requireVersion(actual, expected);
+  }
+
+  private affectedRecipes(
+    tx: Prisma.TransactionClient,
+    workspaceId: string,
+    folderId: string,
+  ) {
+    return tx.cocktail.findMany({
+      where: {
+        workspaceId,
+        OR: [
+          { folderId },
+          { folderMemberships: { some: { workspaceId, folderId } } },
+        ],
+      },
+      select: { id: true, organizationVersion: true },
+    });
   }
 
   private rethrowNameConflict(error: unknown): never {

@@ -110,7 +110,6 @@ describe('UpdateCocktailOrganizationDto', () => {
     { folderIds: null },
     { folderIds: ['invalid'] },
     { folderIds: Array(1001).fill('550e8400-e29b-41d4-a716-446655440000') },
-    { expectedVersion: null },
     { expectedVersion: -1 },
     { expectedVersion: 0.5 },
     { expectedVersion: '0' },

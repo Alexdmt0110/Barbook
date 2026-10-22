@@ -156,6 +156,23 @@ export class FolderDetail implements OnInit {
   remove(): void {
     const folder = this.folder();
     if (!folder || this.busy()) return;
+    this.actionError.set(null);
+    this.metadataLoading.set(true);
+    this.folders
+      .deletionPreview(folder.id)
+      .pipe(
+        takeUntil(this.routeReset),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.metadataLoading.set(false)),
+      )
+      .subscribe({
+        next: (preview) => this.confirmRemoval(preview),
+        error: (error: unknown) => this.actionError.set(folderError(error)),
+      });
+  }
+  private confirmRemoval(
+    folder: import('../data-access/folder.models').FolderDeletionPreview,
+  ): void {
     if (
       !window.confirm(
         `Supprimer le dossier « ${folder.name} » ? Les cocktails, leurs tags et leurs autres dossiers seront conservés.`,
@@ -165,7 +182,7 @@ export class FolderDetail implements OnInit {
     this.actionError.set(null);
     this.isMutating.set(true);
     this.folders
-      .remove(folder.id, folder.version)
+      .remove(folder.id, folder.version, folder.expectedMembershipToken)
       .pipe(
         takeUntil(this.routeReset),
         takeUntilDestroyed(this.destroyRef),
@@ -180,12 +197,13 @@ export class FolderDetail implements OnInit {
   }
   removeCocktail(id: string): void {
     const folder = this.folder();
-    if (!folder || this.busy()) return;
+    const recipe = this.members()?.items.find((item) => item.id === id);
+    if (!folder || !recipe || this.busy() || this.membersLoading()) return;
     this.isMutating.set(true);
     this.actionError.set(null);
     this.success.set(null);
     this.folders
-      .removeCocktail(folder.id, id)
+      .removeCocktail(folder.id, id, recipe.organizationVersion)
       .pipe(
         takeUntil(this.routeReset),
         takeUntilDestroyed(this.destroyRef),
