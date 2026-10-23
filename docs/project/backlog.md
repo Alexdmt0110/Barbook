@@ -137,3 +137,6 @@ BlocageL5-COMPAT-01 levé : routesconservées, préconditionsobligatoires sur to
 # État courant L5 B5c — 23 octobre 2026
 
 PR33 intégrée après accord sur main58461d1, six checks post-merge vérifiés261/192/187/4/audits0. F015/F019/F020/F029/F051 : interface complète et brouillons d'édition développés sur feature/recipe-editing-ui, code c254f98,218frontend/261backend locaux ; tests natifs à observer, pas encore intégrés. F016 cycle corbeille/restauration reste B5d/e ; aucun effacement/archivage. Nouvelle PR soumise au Review Gate et accord distinct avant merge ; aucun développement du bloc suivant avant main qualifié. Catalogue66fiches conservé, états historiques ci-dessous remplacés par cette photographie et le journal.
+# Qualification B5c courante — PR34, 23 octobre 2026
+
+0a89c05 :261backend/219frontend/187PG-HTTP/8Chromium et audits0, sixchecks/sixlogs réellement lus, captures inspectées, Gate entière sans BLOCKER/P1 restant B5c. F015/F019/F020/F029/F051 qualifiés dans ce périmètre sur branche ; F016 corbeille/restauration reste non livré B5d/e, L5 global partiel. Main58461d1 intègreB5b ; merge34 attend Alex et les checks du dernier checkpoint, aucune nouvelle PR documentaire séparée.66fiches/IDs conservés,60autres fiches identiques ; anciennes étapes ci-dessous historiques.
