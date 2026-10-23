@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { CocktailContentSnapshot, ReplaceCocktailContentRequest } from './cocktail-content.models';
 import {
   CocktailDetail,
   CocktailListQuery,
@@ -65,6 +66,22 @@ export class CocktailsService {
 
   createPersonalCocktail(cocktail: CreateCocktailRequest): Observable<CreateCocktailResult> {
     return this.http.post<CreateCocktailResult>('/api/cocktails', cocktail);
+  }
+
+  getPersonalCocktailContent(id: string): Observable<CocktailContentSnapshot> {
+    return this.http.get<CocktailContentSnapshot>(
+      `/api/cocktails/id/${encodeURIComponent(id)}/content`,
+    );
+  }
+
+  replacePersonalCocktailContent(
+    id: string,
+    content: ReplaceCocktailContentRequest,
+  ): Observable<CocktailContentSnapshot> {
+    return this.http.put<CocktailContentSnapshot>(
+      `/api/cocktails/id/${encodeURIComponent(id)}/content`,
+      content,
+    );
   }
 
   getPersonalFolders(): Observable<CocktailSummaryFolder[]> {
