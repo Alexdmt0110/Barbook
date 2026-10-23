@@ -39,7 +39,7 @@
     <button
       type="button"
       class="primary"
-      [disabled]="busy() || selected().length === 0"
+      [disabled]="busy() || needsReview() || selected().length === 0"
       (click)="add()"
     >
       {{ isAdding() ? 'Ajout…' : 'Ajouter la sélection' }}</button
@@ -47,6 +47,15 @@
       Actualiser les recettes disponibles
     </button>
   </div>
+  @if (needsReview()) {
+    <p role="alert">
+      La sélection est conservée. Vérifie l'état du dossier avant une nouvelle intention ; aucun
+      renvoi automatique n'a lieu.
+    </p>
+    <button type="button" [disabled]="busy()" (click)="reviewSelection()">
+      Recommencer la sélection après vérification
+    </button>
+  }
   @if (actionError()) {
     <p role="alert" class="feedback error">{{ actionError() }}</p>
   }

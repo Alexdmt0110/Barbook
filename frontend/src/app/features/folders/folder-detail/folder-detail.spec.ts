@@ -75,10 +75,18 @@ describe('FolderDetail', () => {
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     fixture.componentInstance.remove();
+    http
+      .expectOne('/api/folders/a/deletion-preview')
+      .flush({ ...metadata, expectedMembershipToken: 'snapshot' });
     http.expectNone((req) => req.method === 'DELETE');
     confirm.mockReturnValue(true);
     fixture.componentInstance.remove();
-    const request = http.expectOne('/api/folders/a?expectedVersion=5');
+    http
+      .expectOne('/api/folders/a/deletion-preview')
+      .flush({ ...metadata, expectedMembershipToken: 'snapshot' });
+    const request = http.expectOne(
+      '/api/folders/a?expectedVersion=5&expectedMembershipToken=snapshot',
+    );
     expect(confirm).toHaveBeenCalledWith(
       expect.stringContaining(
         'Les cocktails, leurs tags et leurs autres dossiers seront conservés.',
@@ -94,14 +102,14 @@ describe('FolderDetail', () => {
     http
       .expectOne((req) => req.url === '/api/cocktails')
       .flush({
-        items: [{ id: 'one', slug: 'one', name: 'One' }],
+        items: [{ id: 'one', slug: 'one', name: 'One', organizationVersion: 9 }],
         total: 25,
         page: 2,
         pageSize: 24,
         totalPages: 2,
       });
     fixture.componentInstance.removeCocktail('one');
-    http.expectOne('/api/folders/a/cocktails/one').flush({ removed: 1 });
+    http.expectOne('/api/folders/a/cocktails/one?expectedVersion=9').flush({ removed: 1 });
     http
       .expectOne((req) => req.url === '/api/cocktails')
       .flush({ ...empty, total: 24, page: 2, totalPages: 1 });
@@ -144,7 +152,7 @@ describe('FolderDetail', () => {
     http.expectOne((req) => req.url === '/api/cocktails').flush(empty);
     const picker = fixture.debugElement.query(By.directive(FolderCocktailPicker))
       .componentInstance as FolderCocktailPicker;
-    picker.selected.set([{ id: 'one', name: 'One' }]);
+    picker.selected.set([{ id: 'one', name: 'One', organizationVersion: 0 }]);
     fixture.componentInstance.togglePicker();
     fixture.detectChanges();
     expect((fixture.nativeElement.querySelector('#folder-picker') as HTMLElement).hidden).toBe(
@@ -152,7 +160,7 @@ describe('FolderDetail', () => {
     );
     fixture.componentInstance.togglePicker();
     fixture.detectChanges();
-    expect(picker.selected()).toEqual([{ id: 'one', name: 'One' }]);
+    expect(picker.selected()).toEqual([{ id: 'one', name: 'One', organizationVersion: 0 }]);
     http.expectNone((req) => req.url === '/api/cocktails');
   });
 });

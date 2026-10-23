@@ -49,6 +49,7 @@ export class CocktailsService {
 
     const where: Prisma.CocktailWhereInput = {
       workspaceId,
+      deletedAt: null,
       ...(normalizedSearch
         ? {
             name: {
@@ -86,62 +87,66 @@ export class CocktailsService {
         : {}),
     };
 
-    const [total, cocktails] = await this.prisma.$transaction([
-      this.prisma.cocktail.count({
-        where,
-      }),
-      this.prisma.cocktail.findMany({
-        where,
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-        orderBy: [
-          {
-            name: 'asc',
-          },
-          {
-            id: 'asc',
-          },
-        ],
-        select: {
-          id: true,
-          slug: true,
-          name: true,
-          type: true,
-          family: true,
-          method: true,
-          glass: true,
-          imageUrl: true,
-          updatedAt: true,
-          mainAlcohol: {
-            select: {
-              id: true,
-              name: true,
+    const [total, cocktails] = await this.prisma.$transaction(
+      [
+        this.prisma.cocktail.count({
+          where,
+        }),
+        this.prisma.cocktail.findMany({
+          where,
+          skip: (page - 1) * pageSize,
+          take: pageSize,
+          orderBy: [
+            {
+              name: 'asc',
             },
-          },
-          folder: {
-            select: {
-              id: true,
-              name: true,
+            {
+              id: 'asc',
             },
-          },
-          folderMemberships: {
-            orderBy: { folderId: 'asc' },
-            select: { folder: { select: { id: true, name: true } } },
-          },
-          tags: {
-            select: {
-              tag: {
-                select: {
-                  id: true,
-                  name: true,
-                  slug: true,
+          ],
+          select: {
+            id: true,
+            organizationVersion: true,
+            slug: true,
+            name: true,
+            type: true,
+            family: true,
+            method: true,
+            glass: true,
+            imageUrl: true,
+            updatedAt: true,
+            mainAlcohol: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            folder: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            folderMemberships: {
+              orderBy: { folderId: 'asc' },
+              select: { folder: { select: { id: true, name: true } } },
+            },
+            tags: {
+              select: {
+                tag: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                  },
                 },
               },
             },
           },
-        },
-      }),
-    ]);
+        }),
+      ],
+      { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
+    );
 
     const items: CocktailSummary[] = cocktails.map(
       ({ tags, folderMemberships, ...cocktail }): CocktailSummary => ({
@@ -179,106 +184,113 @@ export class CocktailsService {
       );
     }
 
-    const cocktail = await this.prisma.cocktail.findUnique({
-      where: {
-        workspaceId_slug: {
-          workspaceId: personalWorkspace.id,
-          slug,
-        },
-      },
-      select: {
-        id: true,
-        organizationVersion: true,
-        slug: true,
-        name: true,
-        type: true,
-        family: true,
-        method: true,
-        glass: true,
-        ice: true,
-        notes: true,
-        imageUrl: true,
-        updatedAt: true,
-        mainAlcohol: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        folder: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        folderMemberships: {
-          orderBy: { folderId: 'asc' },
-          select: { folder: { select: { id: true, name: true } } },
-        },
-        tags: {
-          select: {
-            tag: {
-              select: {
-                id: true,
-                name: true,
-                slug: true,
-              },
+    const [cocktail] = await this.prisma.$transaction(
+      [
+        this.prisma.cocktail.findUnique({
+          where: {
+            workspaceId_slug: {
+              workspaceId: personalWorkspace.id,
+              slug,
             },
           },
-        },
-        ingredients: {
-          orderBy: {
-            sortOrder: 'asc',
-          },
           select: {
             id: true,
-            amount: true,
-            unit: true,
-            specification: true,
-            abvOverride: true,
+            organizationVersion: true,
+            deletedAt: true,
+            slug: true,
+            name: true,
+            type: true,
+            family: true,
+            method: true,
+            glass: true,
+            ice: true,
             notes: true,
-            ingredient: {
+            imageUrl: true,
+            updatedAt: true,
+            mainAlcohol: {
               select: {
                 id: true,
                 name: true,
-                slug: true,
-                defaultAbv: true,
               },
             },
-          },
-        },
-        garnishes: {
-          orderBy: {
-            sortOrder: 'asc',
-          },
-          select: {
-            id: true,
-            amount: true,
-            unit: true,
-            specification: true,
-            usage: true,
-            ingredient: {
+            folder: {
               select: {
                 id: true,
                 name: true,
-                slug: true,
+              },
+            },
+            folderMemberships: {
+              orderBy: { folderId: 'asc' },
+              select: { folder: { select: { id: true, name: true } } },
+            },
+            tags: {
+              select: {
+                tag: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                  },
+                },
+              },
+            },
+            ingredients: {
+              orderBy: {
+                sortOrder: 'asc',
+              },
+              select: {
+                id: true,
+                amount: true,
+                unit: true,
+                specification: true,
+                abvOverride: true,
+                abvUnknown: true,
+                notes: true,
+                ingredient: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    defaultAbv: true,
+                  },
+                },
+              },
+            },
+            garnishes: {
+              orderBy: {
+                sortOrder: 'asc',
+              },
+              select: {
+                id: true,
+                amount: true,
+                unit: true,
+                specification: true,
+                usage: true,
+                ingredient: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                  },
+                },
+              },
+            },
+            steps: {
+              orderBy: {
+                sortOrder: 'asc',
+              },
+              select: {
+                id: true,
+                content: true,
               },
             },
           },
-        },
-        steps: {
-          orderBy: {
-            sortOrder: 'asc',
-          },
-          select: {
-            id: true,
-            content: true,
-          },
-        },
-      },
-    });
+        }),
+      ],
+      { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
+    );
 
-    if (!cocktail) {
+    if (!cocktail || cocktail.deletedAt) {
       throw new NotFoundException('Cocktail not found.');
     }
 
@@ -294,8 +306,10 @@ export class CocktailsService {
         unit: recipeIngredient.unit,
         specification: recipeIngredient.specification,
         abv: this.decimalToNumber(
-          recipeIngredient.abvOverride ??
-            recipeIngredient.ingredient.defaultAbv,
+          recipeIngredient.abvUnknown
+            ? null
+            : (recipeIngredient.abvOverride ??
+                recipeIngredient.ingredient.defaultAbv),
         ),
         notes: recipeIngredient.notes,
       }),

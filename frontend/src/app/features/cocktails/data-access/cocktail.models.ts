@@ -35,6 +35,7 @@ export interface CocktailSummaryTag {
 
 export interface CocktailSummary {
   id: string;
+  organizationVersion: number;
   slug: string;
   name: string;
   type: CocktailType;

@@ -4,6 +4,7 @@ import { PrismaModule } from '../database/prisma.module';
 import { FoldersController } from '../folders/folders.controller';
 import { FoldersService } from '../folders/folders.service';
 import { CocktailCreationService } from './cocktail-creation.service';
+import { CocktailContentService } from './cocktail-content.service';
 import { CocktailsController } from './cocktails.controller';
 import { CocktailsService } from './cocktails.service';
 import { CocktailOrganizationController } from './organization/cocktail-organization.controller';
@@ -20,6 +21,7 @@ import { CocktailOrganizationService } from './organization/cocktail-organizatio
     FoldersService,
     CocktailsService,
     CocktailCreationService,
+    CocktailContentService,
     CocktailOrganizationService,
   ],
 })

@@ -20,6 +20,7 @@ import {
   BrowseFoldersDto,
   DeleteFolderQueryDto,
   RenameFolderDto,
+  RecipeVersionQueryDto,
 } from './dto/folder-commands.dto';
 import { FoldersService } from './folders.service';
 
@@ -46,6 +47,13 @@ export class FoldersController {
   ) {
     return this.folders.detail(userId, id.toLowerCase());
   }
+  @Get(':id/deletion-preview')
+  deletionPreview(
+    @CurrentUserId() userId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.folders.deletionPreview(userId, id.toLowerCase());
+  }
   @Patch(':id')
   rename(
     @CurrentUserId() userId: string,
@@ -60,7 +68,12 @@ export class FoldersController {
     @Param('id', ParseUUIDPipe) id: string,
     @Query() query: DeleteFolderQueryDto,
   ) {
-    return this.folders.remove(userId, id.toLowerCase(), query.expectedVersion);
+    return this.folders.remove(
+      userId,
+      id.toLowerCase(),
+      query.expectedVersion,
+      query.expectedMembershipToken,
+    );
   }
   @Post(':id/cocktails')
   @HttpCode(200)
@@ -69,28 +82,44 @@ export class FoldersController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: AddFolderCocktailsDto,
   ) {
-    return this.folders.addCocktails(userId, id.toLowerCase(), dto.cocktailIds);
+    return this.folders.addCocktails(
+      userId,
+      id.toLowerCase(),
+      dto.cocktailIds,
+      dto.expectedVersions,
+    );
   }
   @Put(':id/cocktails/:cocktailId')
   addOne(
     @CurrentUserId() userId: string,
     @Param('id', ParseUUIDPipe) id: string,
     @Param('cocktailId', ParseUUIDPipe) cocktailId: string,
+    @Query() query: RecipeVersionQueryDto,
   ) {
-    return this.folders.addCocktails(userId, id.toLowerCase(), [
-      cocktailId.toLowerCase(),
-    ]);
+    return this.folders.addCocktails(
+      userId,
+      id.toLowerCase(),
+      [cocktailId.toLowerCase()],
+      [
+        {
+          cocktailId: cocktailId.toLowerCase(),
+          expectedVersion: query.expectedVersion,
+        },
+      ],
+    );
   }
   @Delete(':id/cocktails/:cocktailId')
   removeOne(
     @CurrentUserId() userId: string,
     @Param('id', ParseUUIDPipe) id: string,
     @Param('cocktailId', ParseUUIDPipe) cocktailId: string,
+    @Query() query: RecipeVersionQueryDto,
   ) {
     return this.folders.removeCocktail(
       userId,
       id.toLowerCase(),
       cocktailId.toLowerCase(),
+      query.expectedVersion,
     );
   }
 }

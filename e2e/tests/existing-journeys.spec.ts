@@ -160,14 +160,23 @@ test('register, create, classify, manage folders and log back in', async ({ page
 
   // A second real client changes the version; the UI must preserve its stale draft.
   const remoteHeaders = await browserHeaders(page);
+  const concurrentTag = `Concurrent ${suffix}`;
   const remoteSave = await page.request.put(
     `http://127.0.0.1:3000/api/cocktails/${created.slug}/organization`,
     {
       headers: remoteHeaders,
-      data: { folderIds: folders.map((f) => f.id), tagNames: [tagName], expectedVersion: 1 },
+      data: { folderIds: folders.map((f) => f.id), tagNames: [tagName, concurrentTag], expectedVersion: 1 },
     },
   );
   expect(remoteSave.status()).toBe(200);
+  expect(((await remoteSave.json()) as { organizationVersion: number }).organizationVersion).toBe(2);
+  // Return to the original set through a real second change: the old version must still be stale.
+  const remoteReturn = await page.request.put(
+    `http://127.0.0.1:3000/api/cocktails/${created.slug}/organization`,
+    { headers: remoteHeaders, data: { folderIds: folders.map((f) => f.id), tagNames: [tagName], expectedVersion: 2 } },
+  );
+  expect(remoteReturn.status()).toBe(200);
+  expect(((await remoteReturn.json()) as { organizationVersion: number }).organizationVersion).toBe(3);
   await page.getByLabel('Nom du nouveau tag', { exact: true }).fill('Draft');
   await page.getByRole('button', { name: 'Ajouter', exact: true }).click();
   const conflictResponse = page.waitForResponse(
@@ -339,7 +348,11 @@ test('register, create, classify, manage folders and log back in', async ({ page
       new URL(r.url()).pathname === `/api/folders/${collection.id}/cocktails`,
   );
   await page.getByRole('button', { name: 'Ajouter la sélection', exact: true }).click();
-  expect(await (await batchResponse).json()).toEqual({ added: 3 });
+  const batch = await (await batchResponse).json() as { added: number; versions: { cocktailId: string; organizationVersion: number }[] };
+  expect(batch.added).toBe(3);
+  expect(batch.versions).toHaveLength(3);
+  expect(new Set(batch.versions.map((item) => item.cocktailId)).size).toBe(3);
+  expect(batch.versions.every((item) => Number.isInteger(item.organizationVersion) && item.organizationVersion > 0)).toBe(true);
   const members = page.getByLabel('Recettes du dossier', { exact: true });
   await expect(members.getByRole('link', { name, exact: true })).toBeVisible();
   await expect(members.getByRole('link', { name: 'New', exact: true })).toBeVisible();
@@ -349,7 +362,9 @@ test('register, create, classify, manage folders and log back in', async ({ page
       new URL(r.url()).pathname === `/api/folders/${collection.id}/cocktails/${created.id}`,
   );
   await members.getByRole('button', { name: `Retirer ${name} de ce dossier`, exact: true }).click();
-  expect(await (await removeResponse).json()).toEqual({ removed: 1 });
+  const removal = await removeResponse;
+  const removedBody = await removal.json() as { removed: number; versions: { cocktailId: string; organizationVersion: number }[] };
+  expect(removedBody).toEqual({ removed: 1, versions: [{ cocktailId: created.id, organizationVersion: Number(new URL(removal.url()).searchParams.get('expectedVersion')) + 1 }] });
   await expect(members.getByRole('link', { name, exact: true })).toHaveCount(0);
   const afterRemove = await page.request.get(
     `http://127.0.0.1:3000/api/cocktails/${created.slug}`,
@@ -373,7 +388,8 @@ test('register, create, classify, manage folders and log back in', async ({ page
       new URL(r.url()).pathname === `/api/folders/${collection.id}/cocktails`,
   );
   await page.getByRole('button', { name: 'Ajouter la sélection', exact: true }).click();
-  expect(await (await readdResponse).json()).toEqual({ added: 1 });
+  const readded = await (await readdResponse).json() as { added: number; versions: { cocktailId: string; organizationVersion: number }[] };
+  expect(readded).toEqual({ added: 1, versions: [{ cocktailId: created.id, organizationVersion: removedBody.versions[0].organizationVersion + 1 }] });
   await expect(members.getByRole('link', { name, exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Fermer la sélection', exact: true }).click();
   const renamedName = `${collectionName} renommée`;
@@ -433,6 +449,7 @@ test('register, create, classify, manage folders and log back in', async ({ page
   const deletion = await deletedResponse;
   expect(deletion.status()).toBe(200);
   expect(new URL(deletion.url()).searchParams.get('expectedVersion')).toBe('1');
+  expect(new URL(deletion.url()).searchParams.get('expectedMembershipToken')).toMatch(/^[a-f0-9]{64}$/);
   await expect(page).toHaveURL('http://127.0.0.1:4200/folders');
   await expect(page.getByRole('heading', { name: renamedName, exact: true })).toHaveCount(0);
   const afterDelete = await page.request.get(

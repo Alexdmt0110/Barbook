@@ -1,5 +1,33 @@
 # Checkpoint L5 — Design Review avant code
 
+## B5b serveur qualifié — PR33 en attente d'autorisation distincte
+
+HEAD de code qualifié `830c47d23fe5cb21b0962340560c2d47001dfd43`, base `dfe39a2bd0b2f91490b8c8cd97189ee3f8b3976f`. Six checks success et six logs relus :261backend/192frontend/187PG-HTTP/4Chromium54,9s, audits zéro. Runs Quality39779623242, Integration39779623354 et Security39779623270 liés au [Gate](reviews/l5-b5b-review-gate.md). Huit migrations et dix gardes verts sur DB Actions jetables ; quatre captures de classement/dossier desktop/mobile inspectées, digest de l'artefact vérifié. Aucune CI maquillée : observateur PG transitive corrigé et fixture Chromium effectue de vrais changements, assertions409/deux waiters/délais/quotas conservés.
+
+Journal, contrats, roadmap et six fiches L5 actualisés ;60autres fiches identiques à main. Ce checkpoint documentaire doit obtenir ses propres six checks avant ready. **PR33 n'est pas autorisée au merge.** Après accord explicite/main qualifié seulement, B5c réutilisation UI/drafts L4. Aucun déploiement, nouvelle migration B5b, base propriétaire, infra, CONTRACT ou purge.
+
+## Qualification B5b — correctifs de fixtures, code applicatif inchangé
+
+PR33 draft, base dfe39a2,45 fichiers/5commits initiaux ; vrais blobs et patches/fichiers lus, tous blobs concordent au clone, zéro commentaires/revues/inline, mergeable true. fa7b945 : quality261/192 et audits0 verts, natifs184/187, trois attentes de verrou non observées directement. Correctif6a7b3d2f8ee156274cc9af05d68ba371dfae7cd1 (arbre d032d944) : observer la chaîne transitive pg_blocking_pids, sans changer deux attentes/délai/assertions ; **187natifs/13suites passés**, deux nouvelles suites et rollback/races réels, logs lus job119825776212/run39779119429. Chromium2/4 révèle fixture no-op ; correctif830c47d23fe5cb21b0962340560c2d47001dfd43 (arbre5cb8fc12) effectue deux vraies modifications puis vérifie409 sur ancienne version. Typage e2e réussi, code produit inchangé, aucune assertion/limite affaiblie.
+
+Parents/arbres/messages/fichiers des deux correctifs publiés immédiatement et vérifiés ; revue **entière** contre main renouvelée ([Gate](reviews/l5-b5b-review-gate.md)). Six checks/quatreChromium du dernier HEAD attendus ; PR33 pas encore ready, aucun merge autorisé. Toutes19anciennes refs conservées (20avec brancheB5b), main dfe39a2 inchangé.
+
+## B5b développé — qualification native à observer
+
+Complément `3d5727dc7cdd5d59e000045de629625f1b259975` : cleanup borné des recettes synthétiques de chaque suite avant cascade workspace et FK legacy Restrict, typage/lint réussis ; revue de toute branche renouvelée. Aucun autre jeu de données concerné.
+
+Branche `feature/recipe-content-editing` depuis main dfe39a2 qualifié. Design407b0b06b3b23b262d91e78708b4f9a5e39763ad publié avant code ; bascule1e2bb394917c63be6632bfa8a02451c482494837 (arbre3a45130c) :30 fichiers cohérents API/Angular/tests. Contenu74999ee3d4153b7509891e7e337cd346a6b38626 (arbre5584f6f0) :7 fichiers, lecture/PUT transactionnel, modes ABV, snapshots et tests ; parents/arbres/messages/fichiers distants vérifiés. Aucun commit applicatif sur main.
+
+Locaux : `npm run verify` backend261/25 suites et frontend192/27 fichiers code0 ; `npx tsc --noEmit --incremental false` backend, `npm run typecheck` e2e, `npm run test:integration:safety`10 et `git diff --check` verts. PostgreSQL/HTTP/Chromium B5b non exécutés localement, attendus sur Actions jetables. Review Gate entière sans BLOCKER/P1 statique/local identifié avant PR de qualification ; aucun seuil/retry/quota/guard désactivé. Prochain pas : publier cette documentation, créer PR draft et lire vrai diff/checks/logs ; corriger puis reprendre Gate complète si nécessaire. Pas d'accord de merge B5b.
+
+## PR32 intégrée, main qualifié — 22 octobre 2026
+
+Autorisation explicite d'Alex limitée à PR32 exécutée par merge commit `dfe39a2bd0b2f91490b8c8cd97189ee3f8b3976f`, mergedAt `2026-10-22T11:53:03Z` (13:53:03 Paris). Parents exacts `94552a94a51fdb8e9ae9a0aa4b41e47ce0906894` et `29c090ae689e7847425fc019eb56d7b83e3fd829`, arbre `1a10f637f6cb88648d32b470f8409bd0e88c61ef`, identique au HEAD approuvé. Diff réel 15 fichiers/6 commits et tous blobs concordants ; aucune modification depuis Gate, zéro commentaire/revue/inline, mergeable clean avant fusion. Les 19 branches présentes avant fusion sont conservées.
+
+Six checks post-merge success et six journaux relus : 238 backend/23 suites, 191 frontend/27 fichiers, 160 PostgreSQL-HTTP/11 suites, 4 Chromium/50,6 s, audits backend/frontend complets et runtime zéro. Huit migrations initial/redeploy/status/drift et dix garde-fous réussis uniquement en Actions jetables. [Quality39773950009](https://github.com/Alexdmt0110/Barbook/actions/runs/39773950009), [Integration39773949852](https://github.com/Alexdmt0110/Barbook/actions/runs/39773949852), [Security39773950016](https://github.com/Alexdmt0110/Barbook/actions/runs/39773950016).
+
+B5b expressément autorisé après ce jalon. Branche `feature/recipe-content-editing` publiée depuis le merge qualifié avant rédaction ; [Design Review B5b](l5-b5b-design.md) avant code. Prochain bloc : bascule cohérente de tous writers de classement/API/Angular/tests, puis contenu atomique. Aucun autre merge autorisé. VM/infra aucun, aucune migration propriétaire, CONTRACT, purge ou L6–L8.
+
 ## L5 — autorisé le 22 octobre 2026, Design Review bloquée avant code
 
 D5 validée (corbeille30joursserveur, expiration≠effacement, identité/slug/liens valides conservés, pas de purge/archivage/média). L5 B5a–B5f autorisé dans le carnet personnel ; chaque merge distinct. Main94552a9/#31 et sixchecks recontrôlés, aucune PR ouverte initialement. Branche feature/recipe-lifecycle-contracts publiée immédiatement depuis ce main dans un worktree propre, ancien instantané L4 intact.

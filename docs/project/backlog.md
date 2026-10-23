@@ -1,8 +1,8 @@
 # Backlog d'exécution
 
-## État courant L5 — B5a qualifié, PR32 en attente de merge autorisé
+## État courant L5 — B5a intégré, B5b développé sur branche
 
-D5 et L5-COMPAT-01B validés ; blocageinitial levé. B5a prépare le modèle/contrats inactifs, PR32 depuis main94552a9. Codeb273dcf qualifié par sixchecksfd3e890 :238backend/191frontend/160PG-HTTP/4Chromium/audits0 ;19cas natifs nouveaux. [Contrat](../maintenance/recipe-lifecycle.md), [Gate](reviews/l5-b5a-review-gate.md). Aucun endpointédition/corbeille ou nouvelleadmissibilitélegacy actif. B5b commencera par basculecoordonnée API/Angular après accordmergeB5a et mainqualifié. Complémentdocumentaire du dernierHEAD à contrôler, aucunmergeautorisé. Les étatsbloqués ci-dessous sont historiques.
+PR32 fusionnée avec accord explicite, main `dfe39a2` qualifié par six checks post-merge (238/191/160/4, audits zéro). B5b sur `feature/recipe-content-editing`, PR33 : design407b0b0, bascule API/Angular1e2bb39 et contenu atomique/ABV74999ee ; fixtures corrigées6a7b3d2/830c47d sans changement produit. **Code830c47d qualifié : sixchecks et sixlogs261backend/192frontend/187PG-HTTP/4Chromium, audits0** ; captures desktop/mobile inspectées. Derniers documents/checkpoint doivent obtenir leurs sixchecks avant ready. [Design](l5-b5b-design.md), [contrat](../maintenance/recipe-lifecycle.md), [Gate](reviews/l5-b5b-review-gate.md). B5c–f restent à réaliser après accords de merge et main qualifié. Aucun merge33 autorisé ; aucun OPS/L6–L8. Les anciens états ci-dessous sont historiques.
 
 
 ## L5 — autorisé le 22 octobre 2026, Design Review bloquée avant code

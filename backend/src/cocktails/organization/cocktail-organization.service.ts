@@ -13,6 +13,10 @@ import {
   CocktailOrganizationTag,
 } from './cocktail-organization.types';
 import { UpdateCocktailOrganizationDto } from './dto/update-cocktail-organization.dto';
+import {
+  requireVersion,
+  requireVersionCapacity,
+} from './organization-preconditions';
 
 interface NormalizedTag {
   name: string;
@@ -59,11 +63,10 @@ export class CocktailOrganizationService {
     const isMultiple = dto.folderIds !== undefined;
     if (
       (isMultiple && dto.folderId !== undefined) ||
-      (!isMultiple && dto.folderId === undefined) ||
-      (isMultiple && dto.expectedVersion === undefined)
+      (!isMultiple && dto.folderId === undefined)
     ) {
       throw new BadRequestException(
-        'Provide folderIds with expectedVersion, or a legacy folderId.',
+        'Provide folderIds or a legacy folderId, not both.',
       );
     }
     const folderIds = [
@@ -88,19 +91,21 @@ export class CocktailOrganizationService {
           id: true,
           folderId: true,
           organizationVersion: true,
+          deletedAt: true,
+          folderMemberships: { select: { folderId: true } },
+          tags: {
+            select: { tag: { select: { id: true, name: true, slug: true } } },
+          },
           _count: { select: { folderMemberships: true } },
         },
       });
 
-      if (!cocktail) {
+      if (!cocktail || cocktail.deletedAt) {
         throw new NotFoundException('Cocktail not found.');
       }
 
-      if (
-        (dto.expectedVersion !== undefined &&
-          dto.expectedVersion !== cocktail.organizationVersion) ||
-        (!isMultiple && cocktail._count.folderMemberships > 1)
-      ) {
+      requireVersion(cocktail.organizationVersion, dto.expectedVersion);
+      if (!isMultiple && cocktail._count.folderMemberships > 1) {
         throw new ConflictException(
           'Organization has changed. Reload it before saving.',
         );
@@ -115,12 +120,37 @@ export class CocktailOrganizationService {
               select: { id: true, name: true },
             });
       if (folders.length !== folderIds.length) {
-        throw new BadRequestException('Folder is unavailable.');
+        throw new NotFoundException('Folder not found.');
       }
       const folder =
         folders.find((item) => item.id === cocktail.folderId) ??
         folders[0] ??
         null;
+
+      const sameFolders =
+        cocktail.folderMemberships.length === folderIds.length &&
+        cocktail.folderMemberships.every((link) =>
+          folderIds.includes(link.folderId),
+        );
+      const requestedSlugs = new Set(normalizedTags.map((tag) => tag.slug));
+      const sameTags =
+        cocktail.tags.length === requestedSlugs.size &&
+        cocktail.tags.every(({ tag }) => requestedSlugs.has(tag.slug));
+      if (sameFolders && sameTags) {
+        return {
+          folder,
+          folders,
+          organizationVersion: cocktail.organizationVersion,
+          tags: cocktail.tags
+            .map(({ tag }) => tag)
+            .sort(
+              (a, b) =>
+                a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }) ||
+                a.id.localeCompare(b.id),
+            ),
+        };
+      }
+      requireVersionCapacity(cocktail.organizationVersion);
 
       let tags: CocktailOrganizationTag[] = [];
 

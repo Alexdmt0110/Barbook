@@ -2,7 +2,23 @@
 
 ## État d’activation
 
-**B5a prépare le schéma ; aucun endpoint d’édition/corbeille ni nouvelle précondition de classement n’est actif dans ce bloc.** Les contrats L3 restent ceux du code jusqu’à leur bascule coordonnée API/Angular/tests dans le premier sous-blocB5b. Le présent document définit le contrat cible approuvé par l’arbitrageL5-COMPAT-01B ; pas une promesse de protection déjà livrée. Aucune purge/archivage/média/collaboration. D5 validée, [DesignReview](../project/l5-design.md).
+**Sur la branche B5b `feature/recipe-content-editing`, PR33**, la bascule coordonnée API/Angular des préconditions et les endpoints de contenu sont implémentés. Code830c47d qualifié : sixchecks/sixlogs261backend/192frontend/187PG-HTTP/4Chromium/audits0 ; [Gate et limites](../project/reviews/l5-b5b-review-gate.md). B5a est intégré sur main `dfe39a2` ; B5b attend les checks du dernier checkpoint documentaire puis un accord de merge distinct. Les endpoints corbeille/restauration et l'interface d'édition/brouillons restent B5c–e. Aucune purge/archivage/média/collaboration. D5 validée, [DesignReview B5b](../project/l5-b5b-design.md).
+
+## Contrat de contenu B5b
+
+GET `/api/cocktails/id/:id/content` renvoie `{id, slug, contentVersion, organizationVersion, content}` dans un snapshot RepeatableRead cohérent. `content` contient name/type/family/method/glass/ice/notes/mainAlcoholName, ingredients, garnishes et steps. PUT à la même URL reçoit ces champs de contenu et expectedContentVersion (jamais l'enveloppe de lecture). Les contraintes de création sont réutilisées ; id/workspaceId/slug/imageUrl/folderIds/tagNames/dates/contentVersion sont refusés. Main alcohol référence une ligne dont le degré effectif est positif.
+
+Chaque ingrédient contient ingredientName, ingredientDefaultAbv, amount, unit, specification, notes, **abvMode obligatoire INHERIT/OVERRIDE/UNKNOWN**, et abvOverride. OVERRIDE exige un nombre, y compris0 ou égal au catalogue ; les autres modes exigent l'absence/null d'override. ingredientDefaultAbv ne s'applique qu'à une nouvelle entrée du catalogue, jamais à une entrée existante ni à l'inférence d'un override. Lecture renvoie le défaut catalogue actuel et l'override brut. Le détail historique traite explicitement UNKNOWN comme degré absent ; aucune création existante n'accepte directement abvUnknown.
+
+PUT verrouille Workspace puis relit la recette active et compare contentVersion ; une transaction couvre résolution/création d'ingrédients, remplacement des lignes/garnitures/étapes et incrément de contenu seul. Aucune écriture de slug, workspace, dossiers, tags, image ou catalogue existant. Une saisie identique vérifie la version et conserve même les identifiants des lignes et updatedAt. Collision concurrente de catalogue :409 et rollback intégral, aucun replay automatique. Les versions sont bornées à l'entier PostgreSQL ; la capacité épuisée refuse la modification sans remise à zéro.
+
+Les lecteurs catalogue/détail utilisent un snapshot RepeatableRead et excluent les recettes supprimées ; les compteurs de dossiers ne comptent que les actives. Une ligne conservée en corbeille reste néanmoins incluse dans la précondition et la réparation d'un dossier supprimé. Le cycle serveur complet reste à implémenter et qualifier en B5d.
+
+## Aperçu de suppression de dossier B5b
+
+GET privé `/api/folders/:id/deletion-preview` renvoie id/name/version/expectedMembershipToken sous RepeatableRead. Le token est SHA-256 du JSON des paires `[id, organizationVersion]` triées par ID ASCII, pour l'union des liaisons CocktailFolder et du représentant legacy folderId, toutes lignes conservées incluses. DELETE requiert expectedVersion et expectedMembershipToken dans la query. Après verrou, toute différence refuse409 sans réparation ni cascade. L'UI charge cet aperçu puis demande confirmation avec le nom présenté ; cliquer à nouveau après conflit crée un nouvel aperçu explicite. Aucune collecte de toutes les recettes sur les pages browse.
+
+Les sélections Angular stockent la version observée avec chaque ID, y compris hors page. Un rafraîchissement de recherche ne remplace pas ces versions. Après409 ou réseau/5xx incertain, sélection conservée et renvoi bloqué jusqu'à abandon explicite de l'ancienne intention et nouvelle sélection. Aucun replay automatique, aucun force-save. Les réponses restent filtrées par les générations d'authentification L4.
 
 ## Versions indépendantes et cycle
 

@@ -18,3 +18,12 @@ export interface FolderQuery {
   page?: number;
   pageSize?: number;
 }
+
+export interface RecipePrecondition {
+  cocktailId: string;
+  expectedVersion: number;
+}
+export interface FolderDeletionPreview extends FolderReference {
+  version: number;
+  expectedMembershipToken: string;
+}

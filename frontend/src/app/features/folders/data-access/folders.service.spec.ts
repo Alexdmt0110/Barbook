@@ -26,8 +26,10 @@ describe('FoldersService HTTP serialization', () => {
     expect(rename.request.method).toBe('PATCH');
     expect(rename.request.body).toEqual({ name: 'Nouveau', expectedVersion: 3 });
     rename.flush({ id: 'a', name: 'Nouveau', version: 4, cocktailCount: 0 });
-    service.remove('a', 4).subscribe();
-    const remove = http.expectOne('/api/folders/a?expectedVersion=4');
+    service.remove('a', 4, 'observed-token').subscribe();
+    const remove = http.expectOne(
+      '/api/folders/a?expectedVersion=4&expectedMembershipToken=observed-token',
+    );
     expect(remove.request.method).toBe('DELETE');
     remove.flush({ deleted: true });
   });
@@ -41,13 +43,17 @@ describe('FoldersService HTTP serialization', () => {
     request.flush({ id: 'a', name: 'Créations' });
   });
   it('sends local memberships without a recipe or tag replacement payload', () => {
-    service.addCocktails('a', ['one', 'two']).subscribe();
+    const expectedVersions = [
+      { cocktailId: 'one', expectedVersion: 3 },
+      { cocktailId: 'two', expectedVersion: 7 },
+    ];
+    service.addCocktails('a', expectedVersions).subscribe();
     const add = http.expectOne('/api/folders/a/cocktails');
     expect(add.request.method).toBe('POST');
-    expect(add.request.body).toEqual({ cocktailIds: ['one', 'two'] });
+    expect(add.request.body).toEqual({ cocktailIds: ['one', 'two'], expectedVersions });
     add.flush({ added: 2 });
-    service.removeCocktail('a', 'one').subscribe();
-    const remove = http.expectOne('/api/folders/a/cocktails/one');
+    service.removeCocktail('a', 'one', 4).subscribe();
+    const remove = http.expectOne('/api/folders/a/cocktails/one?expectedVersion=4');
     expect(remove.request.method).toBe('DELETE');
     remove.flush({ removed: 1 });
   });

@@ -11,6 +11,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 import { finalize, Subscription } from 'rxjs';
 import { CocktailListResult, CocktailSummary } from '../../cocktails/data-access/cocktail.models';
 import { CocktailsService } from '../../cocktails/data-access/cocktails.service';
@@ -34,11 +35,12 @@ export class FolderCocktailPicker implements OnInit, OnChanges {
   readonly added = output<{ added: number }>();
   readonly busyChanged = output<boolean>();
   readonly result = signal<CocktailListResult | null>(null);
-  readonly selected = signal<{ id: string; name: string }[]>([]);
+  readonly selected = signal<{ id: string; name: string; organizationVersion: number }[]>([]);
   readonly searchTerm = signal('');
   readonly page = signal(1);
   readonly isLoading = signal(true);
   readonly isAdding = signal(false);
+  readonly needsReview = signal(false);
   readonly busy = computed(() => this.disabled() || this.isAdding());
   readonly loadError = signal<string | null>(null);
   readonly actionError = signal<string | null>(null);
@@ -98,13 +100,16 @@ export class FolderCocktailPicker implements OnInit, OnChanges {
       return;
     }
     if (!this.isSelected(item.id))
-      this.selected.update((items) => [...items, { id: item.id, name: item.name }]);
+      this.selected.update((items) => [
+        ...items,
+        { id: item.id, name: item.name, organizationVersion: item.organizationVersion },
+      ]);
   }
   unselect(id: string): void {
     this.selected.update((items) => items.filter((item) => item.id !== id));
   }
   add(): void {
-    if (this.busy() || this.selected().length === 0) return;
+    if (this.busy() || this.needsReview() || this.selected().length === 0) return;
     this.actionError.set(null);
     this.success.set(null);
     this.isAdding.set(true);
@@ -112,7 +117,10 @@ export class FolderCocktailPicker implements OnInit, OnChanges {
     this.folders
       .addCocktails(
         this.folderId(),
-        this.selected().map((item) => item.id),
+        this.selected().map((item) => ({
+          cocktailId: item.id,
+          expectedVersion: item.organizationVersion,
+        })),
       )
       .pipe(
         takeUntilDestroyed(this.destroyRef),
@@ -127,7 +135,26 @@ export class FolderCocktailPicker implements OnInit, OnChanges {
           this.success.set(`${result.added} cocktail(s) ajouté(s).`);
           this.added.emit(result);
         },
-        error: (error: unknown) => this.actionError.set(folderError(error)),
+        error: (error: unknown) => {
+          this.needsReview.set(
+            error instanceof HttpErrorResponse &&
+              [0, 409, 500, 502, 503, 504].includes(error.status),
+          );
+          this.actionError.set(folderError(error));
+        },
       });
+  }
+  reviewSelection(): void {
+    if (
+      this.busy() ||
+      !window.confirm(
+        'Vérifie les recettes déjà présentes avant de refaire ta sélection. Abandonner cette ancienne intention ?',
+      )
+    )
+      return;
+    this.selected.set([]);
+    this.needsReview.set(false);
+    this.actionError.set(null);
+    this.load();
   }
 }
