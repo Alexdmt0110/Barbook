@@ -35,8 +35,12 @@ import { FormDraft } from './form-draft';
     }
     @if (draft().conflict()) {
       <p role="alert">
-        Une version serveur plus récente existe. Le brouillon est conservé, mais son envoi est
-        bloqué.
+        {{
+          controlledResolution()
+            ? 'Un conflit a été détecté.'
+            : 'Une version serveur plus récente existe.'
+        }}
+        Le brouillon est conservé, mais son envoi est bloqué.
         {{
           controlledResolution()
             ? 'Compare explicitement la recette serveur avant de repartir de cette version.'
@@ -70,7 +74,9 @@ import { FormDraft } from './form-draft';
           Brouillon temporaire dans cet onglet, 24 heures maximum depuis la dernière saisie.
         </p>
       }
-      <button type="button" (click)="discard.emit()">Abandonner le brouillon</button>
+      @if (!controlledResolution() || (!draft().conflict() && !draft().uncertain())) {
+        <button type="button" (click)="discard.emit()">Abandonner le brouillon</button>
+      }
     }
   `,
   styles: [

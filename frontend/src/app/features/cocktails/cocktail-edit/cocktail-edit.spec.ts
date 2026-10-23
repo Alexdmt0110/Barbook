@@ -251,4 +251,24 @@ describe('Personal recipe editing UI and L4 drafts', () => {
     expect(c.form.controls.notes.value).toBe(completeContent().notes);
     expect(store.find(store.lease(), 'edit:recipe-a')).toBeNull();
   });
+  it('focuses a real invalid field and the main-alcohol selector instead of an unfocusable form group', () => {
+    const fixture = setup();
+    const c = fixture.componentInstance;
+    c.form.controls.name.setValue('');
+    fixture.detectChanges();
+    c.submit();
+    expect(document.activeElement).toBe(
+      (fixture.nativeElement as HTMLElement).querySelector('input[formControlName="name"]'),
+    );
+    c.form.controls.name.setValue('Valid');
+    c.form.controls.mainAlcoholName.setValue('Unknown');
+    fixture.detectChanges();
+    c.submit();
+    expect(document.activeElement).toBe(
+      (fixture.nativeElement as HTMLElement).querySelector(
+        'select[formControlName="mainAlcoholName"]',
+      ),
+    );
+    http.expectNone(path);
+  });
 });

@@ -224,7 +224,13 @@ export class CocktailEdit implements OnInit {
       this.error.set(
         'Vérifie les champs indiqués : informations requises, mesures, doublons et alcool principal.',
       );
-      document.querySelector<HTMLElement>('.cocktail-form .ng-invalid:not(form)')?.focus();
+      document
+        .querySelector<HTMLElement>(
+          this.form.hasError('mainAlcohol')
+            ? '.cocktail-form select[formControlName="mainAlcoholName"]'
+            : '.cocktail-form input.ng-invalid, .cocktail-form textarea.ng-invalid, .cocktail-form select.ng-invalid, .cocktail-form app-ingredient-autocomplete.ng-invalid input',
+        )
+        ?.focus();
       return;
     }
     if (!draft.begin(this.draftValue())) return;
