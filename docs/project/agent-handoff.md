@@ -1,4 +1,32 @@
-# Handoff canonique Barbook — B5b serveur qualifié, attente validation PR33
+# Handoff canonique Barbook — merge33 qualifié, B5c autorisé
+
+```yaml
+checkpoint_utc: "2026-10-23T11:55:30Z"
+source_of_truth: "https://github.com/Alexdmt0110/Barbook"
+phase: "B"
+work_owner: "WORK"
+handoff_status: "EN_COURS"
+feature: "L5 B5c interface d'édition et brouillons L4 réutilisés"
+branch: "feature/recipe-editing-ui"
+base_branch: "main"
+remote_head_sha: "58461d1cd3570a075cf38c23cee4327b660d03ff"
+local_head_sha: "58461d1cd3570a075cf38c23cee4327b660d03ff"
+worktree: "présents design/checkpoint/handoff à publier avant code"
+pr: "33 fusionnée ; aucune nouvelle PR"
+tests: "main58461d1 sixchecks/sixlogs success :261backend/192frontend/187PG-HTTP/4Chromium/audits0 ; aucune application B5c encore modifiée"
+migrations: "aucune nouvelle ;8 historiques seulement Actions jetables"
+changes_pushed: "merge33 58461d1 ; branche B5c publiée immédiatement au mêmeSHA"
+unpushed_changes: "présente documentation avant publication"
+decisions_validated: "D1/D2/D5/L5-COMPAT-01B ; merge33 explicite et poursuite B5c"
+decisions_pending: "accord distinct avant chaque nouveau merge"
+next_atomic_step: "publier design puis adaptateur formulaire/mapping/schéma de brouillon testé"
+risks_and_blockers: "aucun arbitrage nouveau bloquant ; revue et scénarios B5c à exécuter, pas encore livrés"
+production_effect: "aucun"
+```
+
+Photographie avant publication du présent commit : GitHub fait foi pour le SHA ultérieur. [Checkpoint merge33](checkpoint-l5.md) et [Design B5c](l5-b5c-design.md). Clone récupéré après maintenance de scratch, ancien worktree local non disponible ; tout le travail connu était publié. Aucun travail divergent recréé. Aucun déploiement, migration propriétaire, infra, CONTRACT, purge réelle ou L6–L8.
+
+## Historique B5b ci-dessous — remplacé par l'autorisation et le merge33 vérifiés
 
 ```yaml
 checkpoint_utc: "2026-10-22T12:42:01Z"
