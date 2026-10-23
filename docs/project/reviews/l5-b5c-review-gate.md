@@ -1,5 +1,15 @@
 # Review Gate L5 B5c — interface d'édition personnelle
 
+## Revue entière après première CI — 23 octobre 2026
+
+PR34 ouverte au HEAD27bc2e9,26fichiers/6commits, tousblobs comparés, zérocommentaire/revue/inline et aucun conflit. Cinq checks verts et journaux lus :261backend,218frontend,187PG-HTTP/13suites, huitmigrations fresh/redeploy/status/drift/smoke, dixgardes et auditscomplets/runtime0. Browser39952714736 :4/8 ; **pas de qualification native B5c à cette photographie**.
+
+Artefact12501746004 téléchargé, digest `1d78965cbdbacbc7cf22012aa98b50ffb221d11e0454aea9851f7cd4d2684673` vérifié, contextes et traces réseau lus. Deux échecs : nom accessible du degré contenait aussi toute l'aide, assertions exactes0/40 ne trouvaient pas le contrôle ; deux échecs de reconnexion mobile, dont ancien parcours inchangé, avec429 réellement observés dans les traces. Le nouveau trafic de login partageait le budget IP des tests historiques.
+
+Correction produit : aria-labelledby sur le texte visible et aria-describedby sur l'aide séparée, exactes assertions219unitaires frontend dont nouveau test de nom/aide/0. Correction de fixture : seules les nouvelles sessions de navigateur modélisent des clients distincts par en-tête X-Forwarded-For dans la topologie à un proxy déjà configurée. Aucun serveur/proxy/configuration modifié ; quota réel10inchangé, anciennes connexions et tests de rate limit conservés. Pas d'assertion abaissée, timeout/retry/guard modifié, chemin d'auth contourné ou version rajeunie. Typage e2e et verify219frontend réussis.
+
+Revue reprise sur toute main...branche : formulaires/contrats/modes/nulls/versions/drafts, guard/lease/epoch,500/409, scripts de fixture bornés, ancienne admission inchangée, paramètres et données préservés, a11y/styles, docs/OPS/dépendances et tests. Aucun BLOCKER/P1 statique/local restant identifié après ces corrections ; nouveaux huit Chromium et six checks du dernier HEAD à observer avant ready. Les paragraphes de qualification initiale ci-dessous sont historiques.
+
 23 octobre 2026. Revue entière de `main58461d1...feature/recipe-editing-ui`, code `c254f981c381851485814c92e1f4afc5ca8bd078`. Design5c2175b publié avant code, adaptateur00d4625, UIb184689, scénarios natifse943dee, correction focus/résolutionc254f98. Posture de reviewer reprise sur toute la branche après le correctif : **aucun BLOCKER/P1 statique/local restant identifié**. La qualification des nouveaux parcours Chromium reste à acquérir par CI ; ne pas confondre ce verdict avec un résultat natif ou une autorisation de merge.
 
 | Axe | Vérification et portée |

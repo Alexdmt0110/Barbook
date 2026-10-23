@@ -271,4 +271,16 @@ describe('Personal recipe editing UI and L4 drafts', () => {
     );
     http.expectNone(path);
   });
+  it('separates the accessible ABV name from help text and keeps explicit zero visible', () => {
+    const f = setup();
+    const root = f.nativeElement as HTMLElement;
+    const input = root.querySelector<HTMLInputElement>('input[formControlName="abvOverride"]')!;
+    expect(root.querySelector('#' + input.getAttribute('aria-labelledby'))?.textContent).toBe(
+      'Degré pour cette recette 2 (%)',
+    );
+    expect(root.querySelector('#' + input.getAttribute('aria-describedby'))?.textContent).toContain(
+      '0 % est une valeur explicite.',
+    );
+    expect(input.value).toBe('0');
+  });
 });

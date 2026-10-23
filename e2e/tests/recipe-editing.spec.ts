@@ -7,6 +7,14 @@ import type { CocktailContentSnapshot } from '../../frontend/src/app/features/co
 
 const backend = join(__dirname, '../../backend');
 const password = 'Synthetic editing fixture password 42!';
+// The existing topology trusts one proxy. Model independent clients in these new
+// journeys, instead of consuming the historical login journey's IP quota.
+// Server limits, historical tests, assertions and retries remain unchanged.
+test.beforeEach(async ({ context }, info) => {
+  const client =
+    (info.project.name === 'mobile' ? 20 : 10) + (info.title.startsWith('editing draft') ? 1 : 0);
+  await context.setExtraHTTPHeaders({ 'X-Forwarded-For': `192.0.2.${client}` });
+});
 interface Actor {
   user: { id: string; email: string };
   workspaceId: string;
@@ -30,17 +38,15 @@ const headers = (a: Actor) => ({
   'X-Barbook-Expected-Workspace': a.workspaceId,
 });
 async function useActor(page: Page, a: Actor) {
-  await page
-    .context()
-    .addCookies([
-      {
-        name: 'barbook-session-dev',
-        value: a.credential,
-        url: 'http://127.0.0.1',
-        httpOnly: true,
-        sameSite: 'Lax',
-      },
-    ]);
+  await page.context().addCookies([
+    {
+      name: 'barbook-session-dev',
+      value: a.credential,
+      url: 'http://127.0.0.1',
+      httpOnly: true,
+      sameSite: 'Lax',
+    },
+  ]);
 }
 async function fixture(page: Page) {
   acceptDraftNavigation(page);
