@@ -57,6 +57,15 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'cocktails/id/:id/edit',
+        canDeactivate: [draftExitGuard],
+        title: 'Modifier la recette · Barbook',
+        loadComponent: () =>
+          import('./features/cocktails/cocktail-edit/cocktail-edit').then(
+            (module) => module.CocktailEdit,
+          ),
+      },
+      {
         path: 'cocktails/:slug',
         canDeactivate: [draftExitGuard],
         title: 'Cocktail · Barbook',
