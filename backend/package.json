@@ -27,7 +27,7 @@
     "verify:db": "npm run verify && prisma migrate status",
     "db:seed": "prisma db seed --",
     "audit:security": "npm audit --package-lock-only --audit-level=moderate && npm audit --package-lock-only --omit=dev --audit-level=moderate",
-    "test:dependency-compatibility": "node --test test/dependency-compatibility.cjs"
+    "test:dependency-compatibility": "node --test test/dependency-compatibility.cjs test/http-parser-compatibility.cjs"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -74,6 +74,9 @@
     "typescript-eslint": "^8.20.0"
   },
   "overrides": {
+    "@nestjs/platform-express": {
+      "multer": "2.5.0"
+    },
     "@prisma/config": {
       "deepmerge-ts": "8.0.1"
     },
