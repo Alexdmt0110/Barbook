@@ -1,5 +1,11 @@
 # Roadmap autorisée
 
+## Priorité courante — Bêta Bar, 24 octobre 2026
+
+[Plan accéléré et critères de sortie](beta-bar-plan.md) : objectif 30 octobre, personnel +Bar privé Alex/Maël. Ordre BB0 sécurité/récupération L5 →BB1 collaboration →BB2 plans de batch et BB3 inventaire →BB4 production atomique →BB5 suggestions →BB6 qualification/mise en service après accord OPS distinct. OPS préparé dès maintenant, pas après la roadmap historique. Photos avancées/statistiques/marges/achats automatiques/esthétique/gouvernance complexe différés.
+
+#34 fusionnée en98b6658, deux parents/arbre/mergedAt vérifiés ; audits post-merge initialement rouges, correction prioritaire sur fix/beta-dependency-security. Aucun nouveau lot fonctionnel activé sur main non qualifié. D8 autorise les merges admissibles sans accord de routine, D3/D4 initiales validées ; [décisions](decisions.md). Les états datés ci-dessous sont historiques. L5 n'est pas clos ; le calendrier est un objectif révisable et ne vaut ni déploiement ni garantie.
+
 ## Qualification courante B5c — 23 octobre 2026
 
 Code0a89c05 sur feature/recipe-editing-ui, [PR34](https://github.com/Alexdmt0110/Barbook/pull/34) : sixchecks/sixlogs261backend/219frontend/187PG-HTTP/8Chromium, audits0, captures desktop/mobile inspectées et Gate entière sans BLOCKER/P1 restant B5c. Main58461d1 contientB5b ; B5c attend l'accord explicite de merge après qualification du dernier checkpoint. Prochaine tranche seulement après main qualifié : B5d serveur corbeille/D5, puisB5e/f. Aucun lot L5 clôturé prématurément, aucun OPS/L6–L8. États d'attente antérieurs ci-dessous historiques.

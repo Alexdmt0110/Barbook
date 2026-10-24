@@ -1,4 +1,18 @@
-# Handoff canonique Barbook — B5c qualifié, attente autorisation PR34
+# Handoff canonique Barbook — Bêta Bar et qualification de sécurité
+
+## Checkpoint courant — 24 octobre 2026
+
+Responsable WORK, EN_COURS. Mandat récent : objectif30octobre, D3/D4 initiaux validés, D8 merges conditionnels préautorisés dans L5/Bêta Bar. [Plan accéléré et design sécurité](beta-bar-plan.md). Aucun accord routine à redemander ; VPS/base propriétaire/déploiement/coût restent réservés. Le reste de ce fichier est historique.
+
+#34 fusionnée à2026-10-24T15:58:34Z en98b66589173513c089d78cc3cc29f1fd9681ffd5 ; parents58461d1/92b7e65 et arbre e2af031fadbb7fef021d2db624e544d36819eca2 vérifiés. Avant merge :27fichiers/8commits, tousblobs conformes, aucune discussion et sixchecks verts. Après : les audits120917795380/120917795557 échouent sur vulnérabilités nouvellement signalées ; ne pas annoncer main98b6658 entièrement qualifié.
+
+Branche fix/beta-dependency-security publiée depuis ce main pour correction, pas pour nouvelle fonction : design/mandat a46e0d356db8ce824f81a3962b7f738b40464c68 puis correctif c9fe70504d8c0b9af0a6206b1fea0ada15252cd1, immédiatement publiés. Code local/distant à ce dernier SHA avant présent checkpoint documentaire. Aucun modèle/migration/workflow/infra modifié. npm ci/verify backend261 etfrontend219, troiscompatbackend/deuxcompatfrontend et audits complets/runtime0 locaux ; CI native PR encore à acquérir. TestURI échoue avant patch et passe après ; smoke gzip ne reproduit pas l'ancien crash localement, ne pas le présenter comme preuve rouge/verte de la CVE.
+
+Prochain micro-bloc : publier documentation/Gate, ouvrir PR, vérifier sixchecks/journaux/diff/commentaires ; corriger si échec. Merge admis par D8 seulement après Gate effectif, puis mergedAt/parents/arbre/main/sixchecks réellement contrôlés. Après main qualifié : Design B5d et livraison verticale de récupération personnelle B5d/e, B5f sans embellissements avant BB1. Stock négatif à arbitrer avant sorties stock ; D7 avant exploitation, pas de blocage artificiel de L5/collaboration/plans. Aucun travail ne continue hors session sans exécution active.
+
+GitHub fait foi pour le HEAD du présent commit et sa CI, pas de SHA auto-référentiel inventé. Aucun changement non publié autre que le checkpoint documentaire au moment de rédaction. Branches historiques conservées. Tests PG/Chromium en Actions jetables seulement, aucune base propriétaire touchée. [Review Gate](reviews/beta-security-review-gate.md).
+
+## Historique B5c — remplacé par le mandat du 24 octobre
 
 ```yaml
 checkpoint_utc: "2026-10-23T12:35:37Z"

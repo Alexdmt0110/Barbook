@@ -1,5 +1,11 @@
 # Backlog d'exécution
 
+## Priorité courante — mandat Bêta Bar du 24 octobre 2026
+
+Les 66 IDs sont conservés. [Plan/acceptation/dépendances/arbitrages](beta-bar-plan.md) remplace l'ordre mécanique des anciens lots. MUST : F016 récupération personnelle minimale, F008–010 collaboration/copie, F011 attribution indispensable, F030 produits/conditionnements, F036–038 préparation/production minimale, F045/F046 inventaire fiable, F047 suggestions sans achats. F055/056/058 sont autorisés en préparation OPS seulement, pas en intervention réelle. F012 limité au retrait des membres ; gouvernance avancée exclue.
+
+Édition B5c intégrée via #34/98b6658 ; L5 encore partiel. Priorité immédiate : audits post-merge rouges à corriger puis main six checks avant B5d/e/f. Le statut approuvé ne signifie pas développé : aucun batch, ledger ou sélecteur partagé livré à ce checkpoint. Pas de fonctionnalité avancée d'une fiche implicitement autorisée par sa repriorisation.
+
 ## État courant L5 — B5a intégré, B5b développé sur branche
 
 PR32 fusionnée avec accord explicite, main `dfe39a2` qualifié par six checks post-merge (238/191/160/4, audits zéro). B5b sur `feature/recipe-content-editing`, PR33 : design407b0b0, bascule API/Angular1e2bb39 et contenu atomique/ABV74999ee ; fixtures corrigées6a7b3d2/830c47d sans changement produit. **Code830c47d qualifié : sixchecks et sixlogs261backend/192frontend/187PG-HTTP/4Chromium, audits0** ; captures desktop/mobile inspectées. Derniers documents/checkpoint doivent obtenir leurs sixchecks avant ready. [Design](l5-b5b-design.md), [contrat](../maintenance/recipe-lifecycle.md), [Gate](reviews/l5-b5b-review-gate.md). B5c–f restent à réaliser après accords de merge et main qualifié. Aucun merge33 autorisé ; aucun OPS/L6–L8. Les anciens états ci-dessous sont historiques.
