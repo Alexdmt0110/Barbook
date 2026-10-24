@@ -1,5 +1,13 @@
 # Handoff canonique Barbook — Bêta Bar et qualification de sécurité
 
+## Reprise B5d — 24 octobre 2026, après qualification #35
+
+WORK, EN_COURS, branche feature/personal-recipe-trash publiée depuis main959013cf34f120cc89281c02c358c65d2db5aeb2 réellement recontrôlé, aucune PR ouverte. #35 mergedAt2026-10-24T21:17:50Z, parents98b6658/f06f9f1, arbrecdcb5a400cc8566d61fe922af244379e34643f98 conforme. Six contrôles post-merge success/six journaux lus :261backend,219frontend,187PG/HTTP,8Chromium,audits0. Preuves et IDs des jobs dans le checkpoint de PR35. Branches historiques conservées.
+
+[Design B5d](l5-b5d-design.md) publié avant code : cycle serveur personnel, deux versions monotones, horlogePG après verrous,30joursUTC, routes sans collision de slug, aucun effacement. Prochain micro-bloc : relire migration additive exacte et fixtures natives, implémenter DTO/service/contrôleur avec tests PostgreSQL/HTTP de cycle et concurrence ; puis verify/Gate/PR/sixchecks et merge admissibleD8. À cette photographie aucun code B5d ni migration ajouté, aucun test nouveau annoncé passé. UI relèveB5e puis matriceB5f.
+
+BB-INVENTAIRE-01 reste prioritaire pour la suite : compteurs manuels non négatifs indépendants des recettes/batchs, aucun moteur de consommation. Pas d'accord routine de merge à redemander. D7/OPS réservés, aucune intervention propriétaire ou déploiement. Les états ci-dessous sont historiques ; HEAD du présent checkpoint à lire sur GitHub, pas de SHA auto-référentiel.
+
 ## Checkpoint courant — 24 octobre 2026
 
 Responsable WORK, EN_COURS. Mandat récent : objectif30octobre, D3/D4 initiaux validés, D8 merges conditionnels préautorisés dans L5/Bêta Bar. **Clarification BB-INVENTAIRE-01 : compteurs physiques manuels, jamais négatifs, aucune liaison recette/batch→stock, pas de moteur de consommation.** +/−/correction concurrentiels et historique simple ; suggestions stock≤seuil, max(0,cible−stock). [Plan accéléré et design sécurité](beta-bar-plan.md). Aucun accord routine à redemander ; VPS/base propriétaire/déploiement/coût restent réservés. Le reste de ce fichier est historique.
