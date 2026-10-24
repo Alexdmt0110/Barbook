@@ -35,22 +35,37 @@ import { FormDraft } from './form-draft';
     }
     @if (draft().conflict()) {
       <p role="alert">
-        Une version serveur plus récente existe. Le brouillon est conservé, mais son envoi est
-        bloqué. Recharge explicitement le classement pour le remplacer.
+        {{
+          controlledResolution()
+            ? 'Un conflit a été détecté.'
+            : 'Une version serveur plus récente existe.'
+        }}
+        Le brouillon est conservé, mais son envoi est bloqué.
+        {{
+          controlledResolution()
+            ? 'Compare explicitement la recette serveur avant de repartir de cette version.'
+            : 'Recharge explicitement le classement pour le remplacer.'
+        }}
       </p>
     }
     @if (draft().uncertain() && !draft().pending()) {
       <aside role="alert">
         <p>
-          Résultat de la dernière opération inconnu. Vérifie la bibliothèque ou recharge le
-          classement avant tout nouvel envoi.
+          Résultat de la dernière opération inconnu.
+          {{
+            controlledResolution()
+              ? 'Compare la recette serveur ; aucun renvoi de cette saisie ne sera automatique.'
+              : 'Vérifie la bibliothèque ou recharge le classement avant tout nouvel envoi.'
+          }}
         </p>
         <a routerLink="/cocktails" target="_blank" rel="noopener"
           >Vérifier ma bibliothèque dans un autre onglet</a
         >
-        <button type="button" (click)="draft().verifiedAbsent()">
-          J’ai vérifié : autoriser un nouvel envoi
-        </button>
+        @if (!controlledResolution()) {
+          <button type="button" (click)="draft().verifiedAbsent()">
+            J’ai vérifié : autoriser un nouvel envoi
+          </button>
+        }
       </aside>
     }
     @if (draft().dirty() && !draft().candidate() && !draft().pending()) {
@@ -59,7 +74,9 @@ import { FormDraft } from './form-draft';
           Brouillon temporaire dans cet onglet, 24 heures maximum depuis la dernière saisie.
         </p>
       }
-      <button type="button" (click)="discard.emit()">Abandonner le brouillon</button>
+      @if (!controlledResolution() || (!draft().conflict() && !draft().uncertain())) {
+        <button type="button" (click)="discard.emit()">Abandonner le brouillon</button>
+      }
     }
   `,
   styles: [
@@ -80,6 +97,7 @@ import { FormDraft } from './form-draft';
   ],
 })
 export class DraftNotice {
+  readonly controlledResolution = input(false);
   readonly draft = input.required<FormDraft>();
   readonly restore = output<void>();
   readonly discard = output<void>();

@@ -1,4 +1,14 @@
-# Brouillons temporaires — L4 B4d
+# Brouillons temporaires — L4 et extension L5 B5c
+
+## Extension édition sur branche B5c — 23 octobre 2026
+
+Qualification code0a89c05/PR34 :219tests frontend,261backend,187PG-HTTP,8Chromium desktop/mobile réellement réussis ; sixchecks/logs et audits0, [Gate courante](../project/reviews/l5-b5c-review-gate.md). Main58461d1 intègreB5b ; l'extension UI n'est pas intégrée tant que34 n'est pas mergée après accord. Les mentions d'attente de qualification ci-dessous sont historiques. Aucun moteur L4 réimplémenté, aucune corbeille/restauration B5d livrée ici.
+
+Le formulaire `/cocktails/id/:id/edit` réutilise exactement DraftStore/FormDraft, clé `edit:<ID stable>` et version de contenu originale ; valeur `{schema:1,form}` validée strictement. GET de recette active et identité confirmée avant proposition ; aucune réhydratation automatique. ML bruts/modes ABV conservés ; le brouillon conserve aussi les saisies invalides finies pour correction. Le candidat n'est pas écrasé par le chargement initial.
+
+409 ou restauration d'une ancienne version bloque l'envoi sans effacer la saisie. Réponse perdue/5xx reste incertaine, y compris après refresh : aucun retry. En édition, DraftNotice n'offre pas le bouton générique d'autorisation de renvoi. « Comparer avec le serveur » lit tous les champs en lecture seule sans changer la version/saisie ; « Abandonner la saisie et charger cette version serveur » requiert confirmation et retire l'ancienne intention. Une nouvelle modification doit être saisie explicitement ; une nouvelle course reste protégée côté serveur.
+
+Succès connu purge uniquement la cléédition, garde les autres brouillons et préremplit la réponse serveur. Annuler revient à la fiche avec le guard existant et conserve temporairement le brouillon ; abandon explicite est distinct. Expiration, identité, purge et stockage dégradé gardent toutes les règles L4 ci-dessous. Aucun deuxième moteur ni sauvegarde serveur. Tests locaux218frontend/261backend ; nouvelles preuves Chromium encore à acquérir au checkpoint initial, voir Gate/journal courants. [Design](../project/l5-b5c-design.md), [Gate](../project/reviews/l5-b5c-review-gate.md). Les exclusions historiques de L5 ci-dessous décrivent B4d à sa livraison, pas cette extension.
 
 Périmètre : création de recette et organisation de recette existantes. Pas de sauvegarde serveur, d'édition L5 ni de resoumission automatique. Le [design](../project/l4-b4d-design.md) et le [Review Gate](../project/reviews/l4-b4d-review-gate.md) décrivent les preuves et limites.
 

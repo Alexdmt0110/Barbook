@@ -1,4 +1,40 @@
-# Handoff canonique Barbook — B5b serveur qualifié, attente validation PR33
+# Handoff canonique Barbook — B5c qualifié, attente autorisation PR34
+
+```yaml
+checkpoint_utc: "2026-10-23T12:35:37Z"
+source_of_truth: "https://github.com/Alexdmt0110/Barbook"
+phase: "B"
+work_owner: "WORK"
+handoff_status: "EN_ATTENTE_VALIDATION"
+feature: "L5 B5c interface d'édition et brouillons L4 réutilisés"
+branch: "feature/recipe-editing-ui"
+base_branch: "main"
+remote_head_sha: "0a89c054bf67b17b580199d3cd47e1174f7152eb"
+local_head_sha: "0a89c054bf67b17b580199d3cd47e1174f7152eb"
+worktree: "code publié propre ; présent checkpoint de qualification à publier"
+pr: "https://github.com/Alexdmt0110/Barbook/pull/34 ; ready après six checks du présent checkpoint ; aucun accord de merge"
+tests: "Code0a89c05 sixchecks success/sixlogs :261backend/219frontend/187PG-HTTP/8Chromium/audits0 ; locaux verify/tsc/10gardes verts ; présent checkpoint doit obtenir ses sixchecks propres"
+migrations: "aucune nouvelle ;8 historiques seulement Actions jetables"
+changes_pushed: "merge33 58461d1 ;5c2175b design ;00d4625 adaptateur ;b184689 UI ;e943dee scénarios ;c254f98 focus ;27bc2e9 Gate ;0a89c05 noms ABV et clients de fixture, tous publiés/vérifiés"
+unpushed_changes: "présente documentation avant publication"
+decisions_validated: "D1/D2/D5/L5-COMPAT-01B ; merge33 explicite et poursuite B5c"
+decisions_pending: "accord distinct avant chaque nouveau merge"
+next_atomic_step: "qualifier sixchecks/logs du dernier checkpoint puis ready34 ; attendre accord explicite merge34 ; après merge autorisé/main qualifié seulement, Design Review B5d"
+risks_and_blockers: "aucun BLOCKER/P1 B5c restant identifié ; cycle B5d/e/f non livré ; aucun merge34, déploiement ou OPS autorisé"
+production_effect: "aucun"
+```
+
+Photographie avant publication du présent commit : GitHub fait foi pour le SHA ultérieur. [Checkpoint merge33](checkpoint-l5.md) et [Design B5c](l5-b5c-design.md). Clone récupéré après maintenance de scratch, ancien worktree local non disponible ; tout le travail connu était publié. Aucun travail divergent recréé. Aucun déploiement, migration propriétaire, infra, CONTRACT, purge réelle ou L6–L8.
+
+**Qualification native acquise sur0a89c05** : six contrôles completed/success et six journaux lus. [Quality39953809617](https://github.com/Alexdmt0110/Barbook/actions/runs/39953809617) :261backend/25suites,219frontend/30fichiers ; [Integration39953809782](https://github.com/Alexdmt0110/Barbook/actions/runs/39953809782) :187PG-HTTP/13suites et8Chromium desktop/mobile (1,4min), huitmigrations initial/redeploy/status/drift/smoke et10gardes ; [Security39953809836](https://github.com/Alexdmt0110/Barbook/actions/runs/39953809836) : auditscomplets/runtime0. Artefact12500893741 téléchargé, digest3030229f069a022a73f6a3e2b008c9f05597ebfbb17220c166e9cd75b1d926aa vérifié ; captures formulaire et comparaison desktop/mobile, stockage refusé mobile inspectées. Huitparcours réellement passés, dont quatrehistoriques inchangés. Les mentions d'attente ci-dessous sont historiques.
+
+Première CI27bc2e9 :4/8browser ; aide incluse dans noms accessibles des champsABV et429 de connexions partageant le quotaIP. Traces/contextes lus,0a89c05 corrige noms/aide sans changer assertions0/40 et isole uniquement les clients synthétiques des nouvelles fixtures avec X-Forwarded-For sous topologie existante àunproxy. Serveur/quota10/historiques/timeout/retry/guard/workflow inchangés. Revue entière renouvelée, aucun BLOCKER/P1 restant B5c identifié. Dernier commit documentaire doit être qualifié puis seuls métadonnéesPR à actualiser ; éviter une boucle infinie de commits de suivi.
+
+Code B5c : formulaire complet par IDstable, GET brut réversible et expectedContentVersion capturé, modes ABV explicites et unités préservées ; ordre clavier et guard de sortie. DraftStore/FormDraft inchangés, schéma strict edit:ID et contentVersionoriginal.409/incertain conserve saisie et bloque, comparaisonGET seule puis abandon confirmé pour repartir du serveur ; pas de rajeunissement ni replay. Contrats serveur L4/B5b inchangés. Nouveaux Chromium utilisent des comptes/sessions réels créés par CLI gardée loopback barbook_test_* ; politique d'admission de l'API non changée, aucun quota/timeout/retry affaibli. Les quatre parcours historiques sont conservés, huit parcours totaux attendus. [Gate entière](reviews/l5-b5c-review-gate.md) renouvelée après correction du focus d'erreur,218tests frontend passés.
+
+Locaux réellement exécutés : npmci frontend/backend/e2e, npmrunverify frontend218/30fichiers etbackend261/25suites (lint/build/Prisma/compat), tsc backend/e2e,10gardes et gitdiffcheck. PostgreSQL et Chromium non exécutés localement ; Actions PR doit acquérir les preuves. Aucun nouveau SQL/migration/dépendance/lock/workflow. Le catalogue conserve66IDs ; sixfichesL5 actualisées,60autres identiques àmain.
+
+## Historique B5b ci-dessous — remplacé par l'autorisation et le merge33 vérifiés
 
 ```yaml
 checkpoint_utc: "2026-10-22T12:42:01Z"

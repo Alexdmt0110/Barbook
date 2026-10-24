@@ -1,5 +1,13 @@
 # Roadmap autorisée
 
+## Qualification courante B5c — 23 octobre 2026
+
+Code0a89c05 sur feature/recipe-editing-ui, [PR34](https://github.com/Alexdmt0110/Barbook/pull/34) : sixchecks/sixlogs261backend/219frontend/187PG-HTTP/8Chromium, audits0, captures desktop/mobile inspectées et Gate entière sans BLOCKER/P1 restant B5c. Main58461d1 contientB5b ; B5c attend l'accord explicite de merge après qualification du dernier checkpoint. Prochaine tranche seulement après main qualifié : B5d serveur corbeille/D5, puisB5e/f. Aucun lot L5 clôturé prématurément, aucun OPS/L6–L8. États d'attente antérieurs ci-dessous historiques.
+
+## État courant — 23 octobre 2026, B5b intégré et B5c en qualification
+
+PR33 fusionnée après accord explicite : main `58461d1`, deux parents/arbre/mergedAt et six contrôles post-merge vérifiés,261/192/187/4 et audits0 ; branches historiques conservées. B5c sur `feature/recipe-editing-ui`, design avant code, formulaire complet/ABV bruts et moteur de brouillons L4 réutilisé. Code c254f98 :218tests frontend/261backend locaux, typage et gardes verts ; nouveaux Chromium à qualifier en CI. [Design](l5-b5c-design.md), [Gate](reviews/l5-b5c-review-gate.md), [checkpoint](checkpoint-l5.md). Nouvelle PR à soumettre, aucun accord de merge B5c. B5d/e/f restent à livrer après leurs merges autorisés ; aucune corbeille ou clôture L5 prétendue. Les états antérieurs sont historiques.
+
 ## État courant L5 — B5a intégré, B5b développé sur branche
 
 PR32 fusionnée avec accord explicite, main `dfe39a2` qualifié par six checks post-merge (238/191/160/4, audits zéro). B5b sur `feature/recipe-content-editing`, PR33 : design407b0b0, bascule API/Angular1e2bb39 et contenu atomique/ABV74999ee ; fixtures corrigées6a7b3d2/830c47d sans changement produit. **Code830c47d qualifié : sixchecks et sixlogs261backend/192frontend/187PG-HTTP/4Chromium, audits0** ; captures desktop/mobile inspectées. Derniers documents/checkpoint doivent obtenir leurs sixchecks avant ready. [Design](l5-b5b-design.md), [contrat](../maintenance/recipe-lifecycle.md), [Gate](reviews/l5-b5b-review-gate.md). B5c–f restent à réaliser après accords de merge et main qualifié. Aucun merge33 autorisé ; aucun OPS/L6–L8. Les anciens états ci-dessous sont historiques.
@@ -28,7 +36,7 @@ Phase A validée comme base. L0–L2 autorisés le 16 octobre ; merges #20–#24
 | L3 — Dossiers B3a–B3c | MERGE #24 ; main vert | merge commit d7ea95f autorisé/exécuté, six checks main success ; checkpoint documentaire #25 également intégré |
 | B3d — CONTRACT | NON_APPROUVE | retrait legacy seulement après inventaire des usages, bascule compatible, backup/restore et accord destructif distinct |
 | L4 — Sessions et saisie sûre | CLOTURE_TECHNIQUEMENT_SUR_MAIN ; #26–#30 MERGE | 18critères satisfaits dans leur portée ; six checks main0f63272 success ; bilan/limites et clôture documentaire en PR distincte |
-| L5 — Cycle recette | APPROUVE_B5a_B5f ; B5a_MERGE ; B5b_QUALIFICATION | D5 et optionB validés ; édition serveur/préconditions sur branche ; B5c–f et chaque merge distinct restent à qualifier/autoriser |
+| L5 — Cycle recette | APPROUVE_B5a_B5f ; B5a_B5b_MERGES ; B5c_QUALIFIE_PR34 | D5/optionB validés ; UI/drafts qualifiés sur branche, merge34 réservé à Alex ; cycle B5d/e/f et chaque merge distinct restent à qualifier/autoriser |
 | L6 — Photos privées | PROPOSE_NON_APPROUVE | D2/D6 ; contrôles fichier, accès privé, stockage/cleanup et sauvegardes |
 | L7 — Qualification V1 | PROPOSE_NON_APPROUVE | parcours, navigateurs/appareils, zoom/clavier, performances et docs exactes |
 | L8 — Release/OPS | PROPOSE_NON_APPROUVE | D7/D8 ; inventaire VPS/staging, images, restauration/rollback, production avec accord distinct |
