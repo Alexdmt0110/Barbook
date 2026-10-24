@@ -335,7 +335,7 @@
       "decisions": [],
       "documentation": "beta-bar-plan.md ; décisions du24octobre",
       "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
-      "autorisation": "BB1/3/4 attribution indispensable, sans journal générique"
+      "autorisation": "BB1/BB3 attribution minimale et historique simple, aucun ledger comptable"
     },
     {
       "id": "BB-F-012",
@@ -920,7 +920,7 @@
     },
     {
       "id": "BB-F-030",
-      "titre": "Produits, marques et substitutions",
+      "titre": "Produits physiques et conditionnements descriptifs",
       "statut_observe": "partielle — texte specification seulement.",
       "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
       "priorite": "MUST",
@@ -931,11 +931,11 @@
       "pr_actuelle": null,
       "commit_preuve": "3f9dfdbd3115380960296db3c7025715d48db55c",
       "valeur_parcours": "distinguer ingrédient générique et bouteille réellement utilisée, puis proposer un remplacement documenté.",
-      "regles_cas_limites": "Product référence Ingredient dans le même workspace ; degré/conditionnement propres au produit ; une substitution n'est pas une équivalence de goût/ABV/allergènes automatique ; marque libre et produit archivable.",
-      "donnees_api_droits": "Product, packaging, références facultatives des lignes ; version d'usage pour calculs historiques ; migration additive, anciens specification préservés en texte.",
+      "regles_cas_limites": "Produit distinct du catalogue Ingredient. Bouteille700mL décrit un conditionnement, pas un volume consommable suivi ; unité de comptage explicite. Aucune conversion depuis les recettes/batchs.",
+      "donnees_api_droits": "Produit scoped workspace, quantités entières et métadonnées de conditionnement. Droits OWNER/MEMBER sur inventaire selonD4 ; aucun prix ou fournisseur requis.",
       "tests_concurrence_ops": "produit supprimé/référencé, volume inconnu, variantes de bouteille, prix variable ; tests coût/ABV avec substitution ; pas de récupération web de marques non approuvée.",
-      "criteres_acceptation": "substituer un gin 40 par un 47 modifie l'estimation de l'essai choisi, pas toutes les recettes utilisant Gin ; produit étranger interdit.",
-      "dependances_exclusions": "F028/F029 ; prérequis aux coûts/stock ; pas de catalogue commercial externe par défaut.",
+      "criteres_acceptation": "Paddy Triple Distilled, bouteille700mL,6unités ; une bouteille entamée reste une unité jusqu'au retrait manuel.",
+      "dependances_exclusions": "F009 ; coûts/substitutions automatiques et déduction de consommation exclus.",
       "dependances_ids": [
         "BB-F-028",
         "BB-F-029"
@@ -943,7 +943,7 @@
       "decisions": [],
       "documentation": "beta-bar-plan.md ; décisions du24octobre",
       "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
-      "autorisation": "BB3 produits et conditionnements ; sans coûts"
+      "autorisation": "BB3 produits physiques et conditionnements descriptifs ; BB-INVENTAIRE-01"
     },
     {
       "id": "BB-F-031",
@@ -1143,7 +1143,7 @@
     },
     {
       "id": "BB-F-038",
-      "titre": "Mise en place, listes de préparation et lots produits",
+      "titre": "Déclaration de batch réellement préparé, indépendante du stock",
       "statut_observe": "absente.",
       "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
       "priorite": "MUST",
@@ -1154,20 +1154,19 @@
       "pr_actuelle": null,
       "commit_preuve": "3f9dfdbd3115380960296db3c7025715d48db55c",
       "valeur_parcours": "préparer un service, cocher les tâches, répartir des quantités et identifier les lots effectivement fabriqués.",
-      "regles_cas_limites": "plan prévu ≠ produit réellement enregistré ; validation finale, auteur/date/quantité/rendement réels ; ingrédients frais et assemblage séparés ; annulation ou correction par opération traçable. Dates d'utilisation saisies selon politique validée, aucune garantie de stabilité automatique.",
-      "donnees_api_droits": "PrepList, tasks, ProductionBatch, lignes réelles ; droits production distincts si nécessaire ; idempotency-key sur validation et mouvements stock associés.",
-      "tests_concurrence_ops": "deux personnes cochent, produit partiel, perte, rupture ingrédient, retour réseau après commit ; transaction et verrouillage stock testés ; impression/étiquettes et audit.",
-      "criteres_acceptation": "cocher une tâche ne déduit pas deux fois le stock ; enregistrer un rendement différent conserve prévu et réel sans réécrire le plan.",
-      "dependances_exclusions": "F009/F037/F045 ; pas de traçabilité réglementaire certifiée sans étude dédiée.",
+      "regles_cas_limites": "Prévu et réalisé distincts ; auteur/date/quantité réelle explicitement saisis. Aucune production déclarée, correction ou annulation ne crée de modification du compteur ni d'historique inventaire. Aucune stabilité sanitaire déduite.",
+      "donnees_api_droits": "Déclaration de production liée au plan/snapshot dans le workspace ; pas de FK ou service de consommation stock. Réponse perdue protégée contre doublon de déclaration.",
+      "tests_concurrence_ops": "Plan et réel différents, deux auteurs, réponse perdue, correction explicite ; compteurs et historique inventaire strictement inchangés avant/après toutes actions batch.",
+      "criteres_acceptation": "Déclarer un batch produit conserve le plan et les quantités réelles séparément ; tous les produits gardent exactement leur stock et leur historique.",
+      "dependances_exclusions": "F009/F037 seulement ; aucune dépendance F045 et aucun débit d'ingrédient, traçabilité réglementaire certifiée exclue.",
       "dependances_ids": [
         "BB-F-009",
-        "BB-F-037",
-        "BB-F-045"
+        "BB-F-037"
       ],
       "decisions": [],
       "documentation": "beta-bar-plan.md ; décisions du24octobre",
       "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
-      "autorisation": "BB4 production atomique, sans traçabilité certifiée"
+      "autorisation": "BB2 déclaration réelle distincte du plan ; aucun effet inventaire"
     },
     {
       "id": "BB-F-039",
@@ -1340,7 +1339,7 @@
     },
     {
       "id": "BB-F-045",
-      "titre": "Stock par produits et journal de mouvements",
+      "titre": "Inventaire manuel partagé par unités physiques",
       "statut_observe": "absente.",
       "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
       "priorite": "MUST",
@@ -1350,25 +1349,24 @@
       "branche_proposee": null,
       "pr_actuelle": null,
       "commit_preuve": "3f9dfdbd3115380960296db3c7025715d48db55c",
-      "valeur_parcours": "enregistrer réception, consommation et ajustement en expliquant l'origine de chaque quantité.",
-      "regles_cas_limites": "unité de stock par produit et conversions compatibles ; mouvements immuables, corrections par contre-mouvement ; pas de déduction sur simple consultation d'une recette. Politique de stock négatif explicite ; un retry ne produit jamais un deuxième mouvement.",
-      "donnees_api_droits": "StockItem, StockMovement avec raison, auteur, référence et idempotency-key unique dans le scope ; solde calculé ou matérialisé transactionnellement et réconciliable ; composite FK.",
-      "tests_concurrence_ops": "deux consommations simultanées, transaction échouée, bouteille entamée, mesure inconnue, import ; tests réels de verrouillage/soldes ; audit, sauvegardes et volumes à dimensionner.",
-      "criteres_acceptation": "pour 100 ML disponibles, deux consommations de 60 ne peuvent aboutir à un état non autorisé par la politique ; rejouer une réception identifiée conserve un seul mouvement.",
-      "dependances_exclusions": "F009/F030/F011 ; pas d'event sourcing générique ni de stock automatiquement déduit d'une vente inexistante.",
+      "valeur_parcours": "Alex et Maël comptent les bouteilles et modifient explicitement les quantités avec +/− ou une correction.",
+      "regles_cas_limites": "Unités entières≥0 ; bouteille entamée peut rester1. À0, retrait refusé. Aucune recette ni action batch/production ne modifie le stock. Concurrence atomique sans perte ; correction absolue préconditionnée ; aucune resoumission aveugle après réponse perdue.",
+      "donnees_api_droits": "Produit workspace avec compteur/version ; transaction compteur+historique simple auteur/date/ancienne/nouvelle quantité. Clé d'opération bornée pour doublons, pas de ledger comptable ni allocation d'ingrédients. MEMBER etOWNER modifient les compteurs ; paramètres sensiblesOWNER.",
+      "tests_concurrence_ops": "Deux+ depuis6→8 ; deux− depuis1→un succès/un refus, jamais−1 ; correction périmée409, doubleclic/réponse perdue une seule action ; rollback compteur/historique et refus étrangers. TestsPG/HTTP etChromium à deux comptes.",
+      "criteres_acceptation": "Paddy700mL,6bouteilles : +→7,−→6, correction→2 avec historique exact.0−1refusé sans effet. Toute action recette/batch laisse stock et historique identiques.",
+      "dependances_exclusions": "F009/F030 ; aucun mL restant, débit automatique/théorique, rapprochement de consommations, batch lié au stock, commande fournisseur.",
       "dependances_ids": [
         "BB-F-009",
-        "BB-F-030",
-        "BB-F-011"
+        "BB-F-030"
       ],
       "decisions": [],
       "documentation": "beta-bar-plan.md ; décisions du24octobre",
       "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
-      "autorisation": "BB3 ledger ; stock négatif à arbitrer"
+      "autorisation": "BB3 BB-INVENTAIRE-01 ; compteur manuel non négatif, aucun moteur de consommation"
     },
     {
       "id": "BB-F-046",
-      "titre": "Inventaires, pertes, seuils et ruptures",
+      "titre": "Seuils, cibles et historique simple d'inventaire manuel",
       "statut_observe": "absente.",
       "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
       "priorite": "MUST",
@@ -1378,23 +1376,23 @@
       "branche_proposee": null,
       "pr_actuelle": null,
       "commit_preuve": "3f9dfdbd3115380960296db3c7025715d48db55c",
-      "valeur_parcours": "compter les produits, rapprocher le théorique et le réel, expliquer casse/pertes et préparer un réassort.",
-      "regles_cas_limites": "session d'inventaire avec instant/périmètre ; prise en compte des mouvements survenus pendant comptage ; validation séparée d'un simple brouillon ; seuil par produit, alertes sans répétition infinie. Ne pas remplacer un solde sans mouvement explicatif.",
-      "donnees_api_droits": "InventorySession/Count et ajustements liés au ledger ; permissions validation ; version et date de mesure ; raison requise pour perte.",
-      "tests_concurrence_ops": "comptage partagé, mouvements en service, abandon, unité incompatible, correction après validation ; tests de rapprochement ; alertes et rétention approuvées.",
-      "criteres_acceptation": "valider deux fois le même inventaire ne crée pas deux ajustements ; un écart explique quantité mesurée, mouvement intermédiaire et correction finale.",
-      "dependances_exclusions": "F045 ; pas de valorisation comptable certifiée.",
+      "valeur_parcours": "Repérer les produits sous seuil et comprendre qui a modifié un compteur.",
+      "regles_cas_limites": "Seuil/cible entiers non négatifs, cible≥seuil. Alerte à stock≤seuil, y compris égalité. Corrections explicites gardent auteur/date/avant/après ; conflit version sans écrasement. Pas d'inventaire théorique calculé ni rapprochement des mouvements de service.",
+      "donnees_api_droits": "Seuil/cible sur produit, paramètres sensiblesOWNER ; compteur modifiableOWNER/MEMBER. Historique simple en lecture, aucune modification rétroactive ni moteur comptable.",
+      "tests_concurrence_ops": "Modification seuil/cible préconditionnée ; stock change pendant correction→409 ; droitsMEMBER/OWNER ; alerte disparaît au-dessus du seuil.",
+      "criteres_acceptation": "Stock2,seuil2,cible8→alerte ; stock3→pasd'alerte ; chaque changement manuel conserve auteur,date,avant/après.",
+      "dependances_exclusions": "F045 ; rapprochement théorique, alertes automatiques externes, valorisation et moteur complet de mouvements exclus.",
       "dependances_ids": [
         "BB-F-045"
       ],
       "decisions": [],
       "documentation": "beta-bar-plan.md ; décisions du24octobre",
       "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
-      "autorisation": "BB3 inventaire et BB5 seuils"
+      "autorisation": "BB3/4 BB-INVENTAIRE-01 ; seuil/cible et corrections manuelles seulement"
     },
     {
       "id": "BB-F-047",
-      "titre": "Fournisseurs, conditionnements et commandes",
+      "titre": "À recommander — suggestions à partir du stock manuel",
       "statut_observe": "absente.",
       "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
       "priorite": "MUST",
@@ -1404,22 +1402,20 @@
       "branche_proposee": null,
       "pr_actuelle": null,
       "commit_preuve": "3f9dfdbd3115380960296db3c7025715d48db55c",
-      "valeur_parcours": "préparer une commande depuis les ruptures, comparer les conditionnements et enregistrer une réception partielle.",
-      "regles_cas_limites": "brouillon → validée → envoyée/commandée → réception partielle/complète ; prix et taxes conservés selon contrat ; annulation ne supprime pas les réceptions déjà faites ; contacts fournisseurs privés. Aucun email/commande réelle envoyé automatiquement sans autorisation dédiée.",
-      "donnees_api_droits": "Supplier, Offer, PurchaseOrder, Receipt ; droits achat ; création des mouvements de réception idempotente et transactionnelle.",
-      "tests_concurrence_ops": "livraison partielle, produit de remplacement, prix changé, devises, double réception, litige ; tests ledger/permissions ; éventuel connecteur payant soumis à accord.",
-      "criteres_acceptation": "recevoir 6 unités sur 12 conserve 6 restantes ; rejouer la réception n'ajoute pas à nouveau le stock.",
-      "dependances_exclusions": "F030/F043/F045/F046 ; pas d'EDI ou achat automatique dans la V1/V1.1.",
+      "valeur_parcours": "Regrouper les produits au seuil ou en dessous avec le nombre d'unités physiques à racheter.",
+      "regles_cas_limites": "Si stock≤seuil, suggestion=max(0,cible−stock). Conditionnement descriptif ; aucune conversionmL, arrondi carton, prévision de batch, consommation théorique ou réception attendue. Aucun achat/envoi automatique.",
+      "donnees_api_droits": "Lecture des produits du workspace autorisé ; calcul pur à partir compteur/seuil/cible. Pas de modèle commande ni action fournisseur ; autorisations d'achat restentOWNER sans achat implémenté.",
+      "tests_concurrence_ops": "Seuil inclusif, zéro, stock/cible atteints, mise à jour concurrente et isolation ; affichage mobile/clavier et explication des termes.",
+      "criteres_acceptation": "Paddy700mL avec stock2/seuil2/cible8 affiche6bouteilles à recommander ; stock3 retire l'alerte ; aucune action suggestion ne modifie stock.",
+      "dependances_exclusions": "F045/F046 ; fournisseurs, commandes, engagements financiers, réceptions attendues et prévisions de consommation exclus.",
       "dependances_ids": [
-        "BB-F-030",
-        "BB-F-043",
         "BB-F-045",
         "BB-F-046"
       ],
       "decisions": [],
       "documentation": "beta-bar-plan.md ; décisions du24octobre",
       "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
-      "autorisation": "BB5 suggestions et réceptions confirmées ; aucun achat/envoi"
+      "autorisation": "BB4 BB-INVENTAIRE-01 ; suggestions uniquement, aucun fournisseur/commande/réception attendue"
     },
     {
       "id": "BB-F-048",

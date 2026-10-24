@@ -2,7 +2,7 @@
 
 ## Priorité courante — Bêta Bar, 24 octobre 2026
 
-[Plan accéléré et critères de sortie](beta-bar-plan.md) : objectif 30 octobre, personnel +Bar privé Alex/Maël. Ordre BB0 sécurité/récupération L5 →BB1 collaboration →BB2 plans de batch et BB3 inventaire →BB4 production atomique →BB5 suggestions →BB6 qualification/mise en service après accord OPS distinct. OPS préparé dès maintenant, pas après la roadmap historique. Photos avancées/statistiques/marges/achats automatiques/esthétique/gouvernance complexe différés.
+[Plan accéléré et critères de sortie](beta-bar-plan.md) : objectif30octobre, personnel +Bar privé Alex/Maël. Ordre BB0 sécurité/récupération L5 →BB1 collaboration →BB2 batchs indépendants et BB3 inventaire manuel →BB4 suggestions simples →BB5 qualification/mise en service après accord OPS distinct. BB-INVENTAIRE-01 remplace la consommation planifiée : aucune action recette/batch/production ne débite le stock ; compteurs physiques manuels non négatifs, historique simple et seuil/cible. Les batchs ne dépendent pas de l'inventaire. OPS préparé dès maintenant. Photos avancées/statistiques/marges/achats/esthétique/gouvernance complexe différés.
 
 #34 fusionnée en98b6658, deux parents/arbre/mergedAt vérifiés ; audits post-merge initialement rouges, correction prioritaire sur fix/beta-dependency-security. Aucun nouveau lot fonctionnel activé sur main non qualifié. D8 autorise les merges admissibles sans accord de routine, D3/D4 initiales validées ; [décisions](decisions.md). Les états datés ci-dessous sont historiques. L5 n'est pas clos ; le calendrier est un objectif révisable et ne vaut ni déploiement ni garantie.
 

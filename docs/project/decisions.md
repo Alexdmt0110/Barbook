@@ -8,7 +8,9 @@ D3/D4 initiales validées : personnel isolé, Bar partagé, copie explicite ind�
 
 D8 validée : prochains merges L5/Bêta Bar non destructifs préautorisés sous toutes les conditions du plan (Design, Review Gate complet sans BLOCKER/P1, tests réels, six checks dernier HEAD, revue GitHub, merge commit et post-merge qualifié, branches conservées, checkpoint). Ne plus attendre d'accord de routine ; une CI verte seule ne suffit pas. Correction autonome si échec dans le mandat ; accord pour tout arbitrage majeur/hors mandat.
 
-OPS autorisé seulement en analyse/planification ; accord spécifique avant VPS ou base non jetable. D7/RPO/RTO et politique stock négatif encore à décider ; recommandations explicites dans le plan. Aucune autorisation de coût, achat automatique, infrastructure, déploiement, purge ou CONTRACT. D1/D2/D5/L5-COMPAT-01B maintenus. Les mentions antérieures « chaque merge explicite » sont historiques.
+**BB-INVENTAIRE-01 validée ensuite le même jour :** inventaire manuel indépendant des recettes/batchs, unités physiques entières, conditionnement descriptif, +/−/correction, historique simple auteur/date/avant/après. Alex et Maël consultent et modifient les compteurs ; stock non négatif, retrait à0 refusé, concurrence sans perte. Aucune action recette/batch/production ne modifie le stock. Une bouteille entamée reste une unité jusqu'au retrait manuel. Aucun moteur de consommation, mL restants, rapprochement théorique, prévision, réception attendue ou commande fournisseur. À recommander si stock≤seuil, quantité=max(0,cible−stock), exemple2/2/8→6. Cette clarification remplace le premier cadrage Bêta Bar ; aucun arbitrage stock négatif ne reste ouvert.
+
+OPS autorisé seulement en analyse/planification ; accord spécifique avant VPS ou base non jetable. D7/RPO/RTO restent à décider. Aucune autorisation de coût, achat automatique, infrastructure, déploiement, purge ou CONTRACT. D1/D2/D5/L5-COMPAT-01B maintenus. Les mentions antérieures « chaque merge explicite » sont historiques.
 
 ## Autorisations établies le 16 octobre 2026
 

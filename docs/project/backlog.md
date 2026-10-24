@@ -2,7 +2,7 @@
 
 ## Priorité courante — mandat Bêta Bar du 24 octobre 2026
 
-Les 66 IDs sont conservés. [Plan/acceptation/dépendances/arbitrages](beta-bar-plan.md) remplace l'ordre mécanique des anciens lots. MUST : F016 récupération personnelle minimale, F008–010 collaboration/copie, F011 attribution indispensable, F030 produits/conditionnements, F036–038 préparation/production minimale, F045/F046 inventaire fiable, F047 suggestions sans achats. F055/056/058 sont autorisés en préparation OPS seulement, pas en intervention réelle. F012 limité au retrait des membres ; gouvernance avancée exclue.
+Les66IDs sont conservés. [Plan/acceptation/dépendances/arbitrages](beta-bar-plan.md) remplace l'ordre historique. MUST : F016 récupération personnelle, F008–010 collaboration/copie, F011 attribution indispensable, F030 produits/conditionnements, F036–038 batchs indépendants du stock, F045/F046 compteurs manuels+historique simple+seuil/cible, F047 section À recommander uniquement. BB-INVENTAIRE-01 exclut consommation automatique/théorique, débit batch, mL restants, ledger comptable, réception attendue et commandes. Stock non négatif,0−1refusé ; si stock≤seuil suggestion=max(0,cible−stock). F055/056/058 : préparation OPS seulement ; F012 : retrait membre seulement.
 
 Édition B5c intégrée via #34/98b6658 ; L5 encore partiel. Priorité immédiate : audits post-merge rouges à corriger puis main six checks avant B5d/e/f. Le statut approuvé ne signifie pas développé : aucun batch, ledger ou sélecteur partagé livré à ce checkpoint. Pas de fonctionnalité avancée d'une fiche implicitement autorisée par sa repriorisation.
 
