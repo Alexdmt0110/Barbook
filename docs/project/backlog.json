@@ -9,11 +9,13 @@
       "L2",
       "L3_B3a_B3c",
       "L4",
-      "L5_B5a_B5f_PERSONNEL"
+      "L5_B5a_B5f_PERSONNEL",
+      "BETA_BAR_MINIMAL",
+      "OPS_ANALYSE_PLANS_SEULEMENT"
     ],
-    "merges": "PR20_A_PR33_EXECUTES_APRES_ACCORDS_DISTINCTS ; PR34_NON_AUTORISEE_AU_MERGE",
+    "merges": "PR20_A_PR34_MERGEES ; D8_MERGES_L5_BETA_BAR_PREAUTORISES_SOUS_CONDITIONS_DU_24_OCTOBRE",
     "production": false,
-    "decisions_D1_D8": "D1_D2_D5_ET_L5_COMPAT_01B_VALIDES ; D3_D4_D6_D7_D8_NON_VALIDES_SAUF_GARDE_FOUS_EXPLICITES"
+    "decisions_D1_D8": "D1_D2_D5_L5_COMPAT_01B_VALIDES ; D3_D4_INITIALES_BETA_ET_D8_CONDITIONNELLE_VALIDES ; D6_D7_NON_VALIDES"
   },
   "sources": "audit/03-Vision-et-catalogue.md ; roadmap.md ; backlog.md",
   "features": [
@@ -220,9 +222,9 @@
       "id": "BB-F-008",
       "titre": "Contexte personnel et sélection d'espace",
       "statut_observe": "partielle — modèle PERSONAL/SHARED, API personnelle seulement.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
-      "priorite": "SHOULD",
-      "horizon": "V2",
+      "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
+      "priorite": "MUST",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "M.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -242,17 +244,17 @@
         "D3",
         "D4"
       ],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "BB1 sélection personnel/Bar"
     },
     {
       "id": "BB-F-009",
       "titre": "Espaces d'équipe, invitations et permissions",
       "statut_observe": "prévue uniquement par les modèles OWNER/MEMBER.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
-      "priorite": "SHOULD",
-      "horizon": "V2",
+      "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
+      "priorite": "MUST",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "XL.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -273,17 +275,17 @@
       "decisions": [
         "D4"
       ],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "BB1 membres OWNER/MEMBER ; sans gouvernance avancée"
     },
     {
       "id": "BB-F-010",
       "titre": "Copie personnelle vers un espace partagé",
       "statut_observe": "absente ; règle envisagée à valider D3.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
-      "priorite": "SHOULD",
-      "horizon": "V2",
+      "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
+      "priorite": "MUST",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "L.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -303,17 +305,17 @@
       "decisions": [
         "D3"
       ],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "BB1 copie personnelle vers Bar explicite et indépendante"
     },
     {
       "id": "BB-F-011",
       "titre": "Attribution des contributions et journal métier",
       "statut_observe": "absente — timestamps seuls sur plusieurs entités.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
-      "priorite": "SHOULD",
-      "horizon": "V2",
+      "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
+      "priorite": "MUST",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "M.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -331,17 +333,17 @@
         "BB-F-055"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "BB1/3/4 attribution indispensable, sans journal générique"
     },
     {
       "id": "BB-F-012",
       "titre": "Départ, transfert et fermeture d'espace partagé",
       "statut_observe": "absente.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
+      "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
       "priorite": "MUST",
-      "horizon": "V2",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "L.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -364,9 +366,9 @@
         "D4",
         "D5"
       ],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "BB1 retrait membre seulement ; transfert/fermeture exclus"
     },
     {
       "id": "BB-F-013",
@@ -431,14 +433,14 @@
       "id": "BB-F-015",
       "titre": "Édition complète d'une recette",
       "statut_observe": "absente ; seul le classement est modifiable.",
-      "statut_execution": "L5_B5c_QUALIFIE_PR34_PARTIEL_LOT_L5",
+      "statut_execution": "B5c_INTEGRE_PR34_L5_PARTIEL",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
-      "branche_actuelle": "feature/recipe-editing-ui",
+      "branche_actuelle": "main",
       "branche_proposee": null,
-      "pr_actuelle": "#32 MERGE_dfe39a2 ; #33 MERGE_58461d1 ; #34 B5c_QUALIFIE_MERGE_NON_AUTORISE",
-      "commit_preuve": "0a89c054bf67b17b580199d3cd47e1174f7152eb",
+      "pr_actuelle": "#34 MERGEE ; qualification sécurité à rétablir",
+      "commit_preuve": "98b66589173513c089d78cc3cc29f1fd9681ffd5",
       "valeur_parcours": "corriger une dose, une étape ou un nom sans recréer la fiche.",
       "regles_cas_limites": "formulaire prérempli et même validation que création ; `id` immuable ; stratégie de slug stable explicitée ; remplacer les sous-ensembles atomiquement ; ne pas effacer image/dossiers/tags parce qu'ils sont hors formulaire. Version attendue obligatoire pour éviter l'écrasement entre onglets.",
       "donnees_api_droits": "GET/PUT /cocktails/id/:id/content personnel ; expectedContentVersion obligatoire409 si absente/obsolète ; contenu initial0 distinct du classement. Serveur intégré #33 ; UI B5c qualifiée en PR34, formulaire complet, ABV bruts et moteur L4 réutilisé. Slug/image/classement préservés ; aucun accord merge34.",
@@ -453,21 +455,21 @@
       ],
       "decisions": [],
       "documentation": "l5-design.md ; l5-b5c-design.md ; reviews/l5-b5c-review-gate.md ; decisions.md ; checkpoint-l5.md ; agent-handoff.md",
-      "prochain_bloc": "PR34/code0a89c05 sixchecks/sixlogs261backend/219frontend/187PG-HTTP/8Chromium/audits0 ; qualifier dernier checkpoint puis attendre accord explicite merge34 et main qualifié avant Design Review B5d. B5d/e/f restent à livrer, aucun OPS/effacement physique.",
+      "prochain_bloc": "BB0 correction audits puis récupération L5 minimale selon beta-bar-plan.md",
       "autorisation": "L5_B5a_B5f_APPROUVE_2026_10_22_PERSONNEL_SEULEMENT"
     },
     {
       "id": "BB-F-016",
       "titre": "Archivage, suppression et récupération",
       "statut_observe": "absente.",
-      "statut_execution": "L5_B5c_QUALIFIE_PR34_PARTIEL_LOT_L5",
+      "statut_execution": "L5_CYCLE_PERSONNEL_B5d_B5e_A_DEVELOPPER",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
-      "branche_actuelle": "feature/recipe-editing-ui",
+      "branche_actuelle": "main",
       "branche_proposee": null,
-      "pr_actuelle": "#32 MERGE_dfe39a2 ; #33 MERGE_58461d1 ; #34 B5c_QUALIFIE_MERGE_NON_AUTORISE",
-      "commit_preuve": "0a89c054bf67b17b580199d3cd47e1174f7152eb",
+      "pr_actuelle": "#34 MERGEE ; qualification sécurité à rétablir",
+      "commit_preuve": "98b66589173513c089d78cc3cc29f1fd9681ffd5",
       "valeur_parcours": "retirer une recette en sécurité, voir sa corbeille et la restaurer selon D5.",
       "regles_cas_limites": "distinguer archiver, mettre en corbeille et purger ; confirmation avec nom/conséquences ; suppression d'un dossier ne supprime jamais les recettes. Réapparition lors de restauration, conflit de slug et rétention des médias explicités. Version/précondition et droits vérifiés.",
       "donnees_api_droits": "D5 validée : corbeille30jours calendairesUTC contrôlée côté serveur ; délai expiré interdit restauration même si ligne présente, jamais preuve d'effacement physique. ID/workspace/slug et liens encore valides conservés, slug réservé. Aucun archivage, purge physique, média ou recréation de dossier/tag. Endpoints de cycle restent B5d.",
@@ -484,7 +486,7 @@
         "D5"
       ],
       "documentation": "l5-design.md ; l5-b5c-design.md ; reviews/l5-b5c-review-gate.md ; decisions.md ; checkpoint-l5.md ; agent-handoff.md",
-      "prochain_bloc": "PR34/code0a89c05 sixchecks/sixlogs261backend/219frontend/187PG-HTTP/8Chromium/audits0 ; qualifier dernier checkpoint puis attendre accord explicite merge34 et main qualifié avant Design Review B5d. B5d/e/f restent à livrer, aucun OPS/effacement physique.",
+      "prochain_bloc": "BB0 correction audits puis récupération L5 minimale selon beta-bar-plan.md",
       "autorisation": "L5_B5a_B5f_APPROUVE_2026_10_22_PERSONNEL_SEULEMENT"
     },
     {
@@ -545,14 +547,14 @@
       "id": "BB-F-019",
       "titre": "Composition structurée, étapes et garnitures",
       "statut_observe": "implémentée sans test suffisant — règles et CHECK présents.",
-      "statut_execution": "L5_B5c_QUALIFIE_PR34_PARTIEL_LOT_L5",
+      "statut_execution": "B5c_INTEGRE_PR34_L5_PARTIEL",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
-      "branche_actuelle": "feature/recipe-editing-ui",
+      "branche_actuelle": "main",
       "branche_proposee": null,
-      "pr_actuelle": "#32 MERGE_dfe39a2 ; #33 MERGE_58461d1 ; #34 B5c_QUALIFIE_MERGE_NON_AUTORISE",
-      "commit_preuve": "0a89c054bf67b17b580199d3cd47e1174f7152eb",
+      "pr_actuelle": "#34 MERGEE ; qualification sécurité à rétablir",
+      "commit_preuve": "98b66589173513c089d78cc3cc29f1fd9681ffd5",
       "valeur_parcours": "produire une fiche reproductible, avec ingrédients de préparation séparés de la finition.",
       "regles_cas_limites": "un ingrédient canonique par recette ; répartitions à différents moments décrites dans les étapes ; garniture quantité+unité ensemble ou aucune, jamais TOP_UP ; alcool principal facultatif, présent dans les lignes et ABV effectif >0. `specification` décrit marque/style et reste distincte de notes.",
       "donnees_api_droits": "tables actuelles et ordre stable ; contrôles SQL additionnels uniquement si besoin démontré, par migration nouvelle ; pas de logique de préparation dans le controller.",
@@ -565,21 +567,21 @@
       ],
       "decisions": [],
       "documentation": "l5-design.md ; l5-b5c-design.md ; reviews/l5-b5c-review-gate.md ; decisions.md ; checkpoint-l5.md ; agent-handoff.md",
-      "prochain_bloc": "PR34/code0a89c05 sixchecks/sixlogs261backend/219frontend/187PG-HTTP/8Chromium/audits0 ; qualifier dernier checkpoint puis attendre accord explicite merge34 et main qualifié avant Design Review B5d. B5d/e/f restent à livrer, aucun OPS/effacement physique.",
+      "prochain_bloc": "BB0 correction audits puis récupération L5 minimale selon beta-bar-plan.md",
       "autorisation": "L5_B5a_B5f_APPROUVE_2026_10_22_PERSONNEL_SEULEMENT"
     },
     {
       "id": "BB-F-020",
       "titre": "Degré alcoolique estimé et incertitudes",
       "statut_observe": "partielle — calcul avant dilution en ML ; présentation à clarifier.",
-      "statut_execution": "L5_B5c_QUALIFIE_PR34_PARTIEL_LOT_L5",
+      "statut_execution": "B5c_INTEGRE_PR34_L5_PARTIEL",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
-      "branche_actuelle": "feature/recipe-editing-ui",
+      "branche_actuelle": "main",
       "branche_proposee": null,
-      "pr_actuelle": "#32 MERGE_dfe39a2 ; #33 MERGE_58461d1 ; #34 B5c_QUALIFIE_MERGE_NON_AUTORISE",
-      "commit_preuve": "0a89c054bf67b17b580199d3cd47e1174f7152eb",
+      "pr_actuelle": "#34 MERGEE ; qualification sécurité à rétablir",
+      "commit_preuve": "98b66589173513c089d78cc3cc29f1fd9681ffd5",
       "valeur_parcours": "comprendre une estimation et ses limites, sans précision trompeuse.",
       "regles_cas_limites": "Σ(ML×ABV)/ΣML, garnitures exclues, `0` connu différent de null inconnu, TOP_UP inconnu → null ; aucune conversion inventée de DASH/cuillère ni dilution implicite. Choisir entre héritage catalogue et inconnu explicite pour une ligne F028.",
       "donnees_api_droits": "réponse estimée accompagnée de statut/reasons si évolution de contrat ; ne pas persister une valeur dérivée pouvant devenir périmée sans version/source.",
@@ -593,7 +595,7 @@
       ],
       "decisions": [],
       "documentation": "l5-design.md ; l5-b5c-design.md ; reviews/l5-b5c-review-gate.md ; decisions.md ; checkpoint-l5.md ; agent-handoff.md",
-      "prochain_bloc": "PR34/code0a89c05 sixchecks/sixlogs261backend/219frontend/187PG-HTTP/8Chromium/audits0 ; qualifier dernier checkpoint puis attendre accord explicite merge34 et main qualifié avant Design Review B5d. B5d/e/f restent à livrer, aucun OPS/effacement physique.",
+      "prochain_bloc": "BB0 correction audits puis récupération L5 minimale selon beta-bar-plan.md",
       "autorisation": "L5_B5a_B5f_APPROUVE_2026_10_22_PERSONNEL_SEULEMENT"
     },
     {
@@ -893,14 +895,14 @@
       "id": "BB-F-029",
       "titre": "Unités canoniques et conversions explicites",
       "statut_observe": "partielle — ML/G et mesures de bar, conversion cL et précision à corriger.",
-      "statut_execution": "L5_B5c_QUALIFIE_PR34_PARTIEL_LOT_L5",
+      "statut_execution": "B5c_INTEGRE_PR34_L5_PARTIEL",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
-      "branche_actuelle": "feature/recipe-editing-ui",
+      "branche_actuelle": "main",
       "branche_proposee": null,
-      "pr_actuelle": "#32 MERGE_dfe39a2 ; #33 MERGE_58461d1 ; #34 B5c_QUALIFIE_MERGE_NON_AUTORISE",
-      "commit_preuve": "0a89c054bf67b17b580199d3cd47e1174f7152eb",
+      "pr_actuelle": "#34 MERGEE ; qualification sécurité à rétablir",
+      "commit_preuve": "98b66589173513c089d78cc3cc29f1fd9681ffd5",
       "valeur_parcours": "saisir 4.5 cL et relire 45 mL sans perte ; garder les mesures de bar compréhensibles.",
       "regles_cas_limites": "ML canonique, Decimal(8,3), conversion cL×10 ; préserver précision à l'affichage, zéro interdit pour une quantité mesurée ; TOP_UP qualitatif, masse et volume non convertis sans densité sourcée. Cuillères/dashes dépendent d'un étalonnage explicite si conversion future.",
       "donnees_api_droits": "contrats existants en ML ; préférences d'affichage séparées ; toute nouvelle unité demande conversion déterministe et compatibilité des enums.",
@@ -913,16 +915,16 @@
       ],
       "decisions": [],
       "documentation": "l5-design.md ; l5-b5c-design.md ; reviews/l5-b5c-review-gate.md ; decisions.md ; checkpoint-l5.md ; agent-handoff.md",
-      "prochain_bloc": "PR34/code0a89c05 sixchecks/sixlogs261backend/219frontend/187PG-HTTP/8Chromium/audits0 ; qualifier dernier checkpoint puis attendre accord explicite merge34 et main qualifié avant Design Review B5d. B5d/e/f restent à livrer, aucun OPS/effacement physique.",
+      "prochain_bloc": "BB0 correction audits puis récupération L5 minimale selon beta-bar-plan.md",
       "autorisation": "L5_B5a_B5f_APPROUVE_2026_10_22_PERSONNEL_SEULEMENT"
     },
     {
       "id": "BB-F-030",
       "titre": "Produits, marques et substitutions",
       "statut_observe": "partielle — texte specification seulement.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
-      "priorite": "COULD",
-      "horizon": "V2",
+      "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
+      "priorite": "MUST",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "L.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -939,9 +941,9 @@
         "BB-F-029"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "BB3 produits et conditionnements ; sans coûts"
     },
     {
       "id": "BB-F-031",
@@ -1090,9 +1092,9 @@
       "id": "BB-F-036",
       "titre": "Calculateur de portions",
       "statut_observe": "absente.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
-      "priorite": "SHOULD",
-      "horizon": "V1.1",
+      "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
+      "priorite": "MUST",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "M.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -1108,17 +1110,17 @@
         "BB-F-029"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "BB2 portions"
     },
     {
       "id": "BB-F-037",
       "titre": "Batchs et prébatchs avec arrondis vérifiables",
       "statut_observe": "absente.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
-      "priorite": "SHOULD",
-      "horizon": "V1.1",
+      "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
+      "priorite": "MUST",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "L.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -1135,17 +1137,17 @@
         "BB-F-029"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "BB2 plans sans consommation"
     },
     {
       "id": "BB-F-038",
       "titre": "Mise en place, listes de préparation et lots produits",
       "statut_observe": "absente.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
-      "priorite": "SHOULD",
-      "horizon": "V2",
+      "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
+      "priorite": "MUST",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "L.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -1163,9 +1165,9 @@
         "BB-F-045"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "BB4 production atomique, sans traçabilité certifiée"
     },
     {
       "id": "BB-F-039",
@@ -1340,9 +1342,9 @@
       "id": "BB-F-045",
       "titre": "Stock par produits et journal de mouvements",
       "statut_observe": "absente.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
-      "priorite": "SHOULD",
-      "horizon": "V2",
+      "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
+      "priorite": "MUST",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "XL.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -1360,17 +1362,17 @@
         "BB-F-011"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "BB3 ledger ; stock négatif à arbitrer"
     },
     {
       "id": "BB-F-046",
       "titre": "Inventaires, pertes, seuils et ruptures",
       "statut_observe": "absente.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
-      "priorite": "SHOULD",
-      "horizon": "V2",
+      "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
+      "priorite": "MUST",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "L.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -1386,17 +1388,17 @@
         "BB-F-045"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "BB3 inventaire et BB5 seuils"
     },
     {
       "id": "BB-F-047",
       "titre": "Fournisseurs, conditionnements et commandes",
       "statut_observe": "absente.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
-      "priorite": "COULD",
-      "horizon": "V2",
+      "statut_execution": "APPROUVE_BETA_BAR_PERIMETRE_LIMITE_A_DEVELOPPER",
+      "priorite": "MUST",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "XL.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -1415,9 +1417,9 @@
         "BB-F-046"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "BB5 suggestions et réceptions confirmées ; aucun achat/envoi"
     },
     {
       "id": "BB-F-048",
@@ -1507,14 +1509,14 @@
       "id": "BB-F-051",
       "titre": "Saisie protégée, erreurs et récupération",
       "statut_observe": "partielle — erreurs/retry présents, pas de protection de brouillon.",
-      "statut_execution": "L5_B5c_QUALIFIE_PR34_PARTIEL_LOT_L5",
+      "statut_execution": "B5c_INTEGRE_PR34_L5_PARTIEL",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
-      "branche_actuelle": "feature/recipe-editing-ui",
+      "branche_actuelle": "main",
       "branche_proposee": null,
-      "pr_actuelle": "#32 MERGE_dfe39a2 ; #33 MERGE_58461d1 ; #34 B5c_QUALIFIE_MERGE_NON_AUTORISE",
-      "commit_preuve": "0a89c054bf67b17b580199d3cd47e1174f7152eb",
+      "pr_actuelle": "#34 MERGEE ; qualification sécurité à rétablir",
+      "commit_preuve": "98b66589173513c089d78cc3cc29f1fd9681ffd5",
       "valeur_parcours": "ne pas perdre une recette en changeant de route ou lors d'une reconnexion ; distinguer échec certain et résultat serveur inconnu.",
       "regles_cas_limites": "D2c : moteur L4 mémoire/sessionStorage24h réutilisé en édition B5c qualifiée PR34 ; utilisateur/workspace/recette/contentVersion stricts, restauration explicite, purge logout volontaire/changement de compte, stockage refusé honnête.409/incertain bloque ; GET de comparaison puis abandon confirmé, aucun replay automatique. Merge34 non autorisé.",
       "donnees_api_droits": "choix mémoire/local/serveur proportionné au besoin ; stockage de token et brouillon distincts ; identifiant de création rejouable si adopté ; déconnexion volontaire purge selon politique annoncée.",
@@ -1528,7 +1530,7 @@
       ],
       "decisions": [],
       "documentation": "l5-design.md ; l5-b5c-design.md ; reviews/l5-b5c-review-gate.md ; decisions.md ; checkpoint-l5.md ; agent-handoff.md",
-      "prochain_bloc": "PR34/code0a89c05 sixchecks/sixlogs261backend/219frontend/187PG-HTTP/8Chromium/audits0 ; qualifier dernier checkpoint puis attendre accord explicite merge34 et main qualifié avant Design Review B5d. B5d/e/f restent à livrer, aucun OPS/effacement physique.",
+      "prochain_bloc": "BB0 correction audits puis récupération L5 minimale selon beta-bar-plan.md",
       "autorisation": "L5_B5a_B5f_APPROUVE_2026_10_22_PERSONNEL_SEULEMENT"
     },
     {
@@ -1619,9 +1621,9 @@
       "id": "BB-F-055",
       "titre": "Santé, logs structurés et supervision",
       "statut_observe": "partielle — logs framework, Hello World, health PostgreSQL local.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
+      "statut_execution": "APPROUVE_PREPARATION_OPS_SEULEMENT",
       "priorite": "MUST",
-      "horizon": "V1",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "M.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -1638,17 +1640,17 @@
         "BB-F-059"
       ],
       "decisions": [],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "OPS analyse santé seulement"
     },
     {
       "id": "BB-F-056",
       "titre": "Sauvegardes, restauration et rétention",
       "statut_observe": "absente dans le dépôt ; VPS inconnu.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
+      "statut_execution": "APPROUVE_PREPARATION_OPS_SEULEMENT",
       "priorite": "MUST",
-      "horizon": "V1",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "L.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -1667,9 +1669,9 @@
       "decisions": [
         "D7"
       ],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "OPS plan sauvegarde/restauration seulement"
     },
     {
       "id": "BB-F-057",
@@ -1717,9 +1719,9 @@
       "id": "BB-F-058",
       "titre": "Releases, déploiement contrôlé et rollback",
       "statut_observe": "absente ; cible VPS/Nginx/Docker seulement documentée.",
-      "statut_execution": "PROPOSE_NON_VALIDE",
+      "statut_execution": "APPROUVE_PREPARATION_OPS_SEULEMENT",
       "priorite": "MUST",
-      "horizon": "V1",
+      "horizon": "BETA_BAR_2026_10_30_OBJECTIF",
       "effort": "XL.",
       "branche_actuelle": null,
       "branche_proposee": null,
@@ -1740,9 +1742,9 @@
         "D7",
         "D8"
       ],
-      "documentation": "Contrat, invariants et OPS de la fiche à mettre à jour dans la branche approuvée.",
-      "prochain_bloc": "Validation puis revue préventive et plan de tests ; les premiers micro-blocs détaillés figurent dans le chapitre 05.",
-      "autorisation": "PROPOSITION_NON_APPROUVEE"
+      "documentation": "beta-bar-plan.md ; décisions du24octobre",
+      "prochain_bloc": "Design Review selon beta-bar-plan.md ; aucune fonctionnalité annoncée livrée.",
+      "autorisation": "OPS plan staging/deploy/rollback seulement"
     },
     {
       "id": "BB-F-059",
@@ -1975,5 +1977,5 @@
       "autorisation": "PROPOSITION_NON_APPROUVEE"
     }
   ],
-  "date_suivi_execution": "2026-10-22"
+  "date_suivi_execution": "2026-10-24"
 }

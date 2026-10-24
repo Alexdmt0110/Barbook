@@ -2,6 +2,28 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
 const { createInterface } = require('node:readline');
+const { createServer } = require('node:http');
+const { once } = require('node:events');
+const { gzipSync } = require('node:zlib');
+
+test('Angular build Undici override preserves real HTTP gzip responses', async () => {
+  const { fetch, Agent } = require('undici');
+  const agent = new Agent();
+  const server = createServer((_request, response) => {
+    response.writeHead(200, { 'Content-Type': 'application/json', 'Content-Encoding': 'gzip' });
+    response.end(gzipSync(Buffer.from('{"healthy":true}')));
+  });
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  try {
+    const response = await fetch(`http://127.0.0.1:${server.address().port}`, { dispatcher: agent });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { healthy: true });
+  } finally {
+    await agent.close();
+    await new Promise(resolve => server.close(resolve));
+  }
+});
 
 test('Angular CLI can initialize and list its read-only local MCP tools with the patched SDK', { timeout: 15000 }, async () => {
   const child = spawn(process.execPath, ['node_modules/@angular/cli/bin/ng.js', 'mcp', '--read-only', '--local-only'], {

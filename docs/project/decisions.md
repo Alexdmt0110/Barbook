@@ -1,5 +1,15 @@
 # Décisions Barbook
 
+## Mandat courant — 24 octobre 2026 : Bêta Bar, D3/D4 et D8
+
+Le [plan Bêta Bar](beta-bar-plan.md) fait foi pour le mandat récent et remplace les restrictions historiques contradictoires ci-dessous. Objectif privé Alex/Maël au 30 octobre, sans promesse de livraison incomplète.
+
+D3/D4 initiales validées : personnel isolé, Bar partagé, copie explicite indépendante, recettes Bar conservées dans Bar. Alex OWNER ; Maël MEMBER consulte/crée/modifie recettes et batchs et effectue les mouvements ordinaires. OWNER seul pour membres, paramètres sensibles, autorisations d'achat. Retrait = droits réellement révoqués. Pas de partage de compte ni de synchronisation. Gouvernance avancée et droits de suppression partagée non présumés.
+
+D8 validée : prochains merges L5/Bêta Bar non destructifs préautorisés sous toutes les conditions du plan (Design, Review Gate complet sans BLOCKER/P1, tests réels, six checks dernier HEAD, revue GitHub, merge commit et post-merge qualifié, branches conservées, checkpoint). Ne plus attendre d'accord de routine ; une CI verte seule ne suffit pas. Correction autonome si échec dans le mandat ; accord pour tout arbitrage majeur/hors mandat.
+
+OPS autorisé seulement en analyse/planification ; accord spécifique avant VPS ou base non jetable. D7/RPO/RTO et politique stock négatif encore à décider ; recommandations explicites dans le plan. Aucune autorisation de coût, achat automatique, infrastructure, déploiement, purge ou CONTRACT. D1/D2/D5/L5-COMPAT-01B maintenus. Les mentions antérieures « chaque merge explicite » sont historiques.
+
 ## Autorisations établies le 16 octobre 2026
 
 - Phase A validée comme base, lots L0–L2 approuvés ; décisions techniques ordinaires, branches, commits atomiques, push et PR dans ce périmètre autorisés.
