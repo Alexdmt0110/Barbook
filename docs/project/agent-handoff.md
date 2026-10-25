@@ -1,5 +1,13 @@
 # Handoff canonique Barbook — Bêta Bar et qualification de sécurité
 
+## B5d — implémentation et qualification en cours, 25 octobre 2026
+
+Design 4cebcb0 confirmé par Alex. Base main959013c recontrôlée sur GitHub. DTO, service de cycle personnel et contrôleur dédiés implémentés ; pas de migration ni changement de dépendance. Verrou Workspace puis recette, deux préconditions, incréments monotones, horloge PostgreSQL après attente, restauration strictement avant échéance UTC30jours. État déjà atteint avec versions actuelles : no-op. Données retenues même après expiration.
+
+Tests ajoutés : validation, cycle HTTP, anciennes routes et intentions, concurrence observée dans les deux ordres, échéance franchie pendant attente et panne PostgreSQL injectée. Qualification réelle PG/Chromium via les jobs jetables existants encore à obtenir ; aucune déclaration de livraison/merge B5d à ce checkpoint. Tests unitaires historiques261 et compatibilité3 passés localement avant ajout des nouveaux tests DTO ; prochain passage complet et six CI requis. Review Gate final et merge D8 seulement après preuves réelles. Puis B5e/B5f et BB1 collaboration, batchs indépendants, inventaire manuel BB-INVENTAIRE-01. Aucun VPS/base propriétaire/déploiement/purge.
+
+OPS : la disponibilité d'un rollback binaire compatible avec les recettes en corbeille est une condition de mise en service ; un ancien binaire ignorant deletedAt ne constitue pas un retour arrière admissible. Vérifier restauration d'une sauvegarde sur base jetable avec versions, sessions et relations avant demande distincte d'exploitation. D7 et accès réels restent réservés ; aucun travail OPS exécuté sur infrastructure.
+
 ## Reprise B5d — 24 octobre 2026, après qualification #35
 
 WORK, EN_COURS, branche feature/personal-recipe-trash publiée depuis main959013cf34f120cc89281c02c358c65d2db5aeb2 réellement recontrôlé, aucune PR ouverte. #35 mergedAt2026-10-24T21:17:50Z, parents98b6658/f06f9f1, arbrecdcb5a400cc8566d61fe922af244379e34643f98 conforme. Six contrôles post-merge success/six journaux lus :261backend,219frontend,187PG/HTTP,8Chromium,audits0. Preuves et IDs des jobs dans le checkpoint de PR35. Branches historiques conservées.
