@@ -1,5 +1,9 @@
 # Checkpoint L5 — Design Review avant code
 
+## B5d en qualification — 25 octobre2026
+
+État prioritaire : B5a/b/c intégrés, main959013c qualifié après correctifs sécurité PR35. D8 remplace les demandes de merge de routine historiques. B5d PR36, branche feature/personal-recipe-trash, design4cebcb0 puis codeb21aa82 et testse306c6d immédiatement publiés/vérifiés. [Gate complet et conditions](reviews/l5-b5d-review-gate.md), [journal](agent-handoff.md). Qualification finale sixchecks en cours, aucun merge B5d ni UI corbeille encore déclaré. Après qualification/merge/main : B5e et B5f, puis BB1. Aucun déploiement/migration propriétaire/infrastructure/purge. Les sections suivantes sont historiques.
+
 ## B5b serveur qualifié — PR33 en attente d'autorisation distincte
 
 HEAD de code qualifié `830c47d23fe5cb21b0962340560c2d47001dfd43`, base `dfe39a2bd0b2f91490b8c8cd97189ee3f8b3976f`. Six checks success et six logs relus :261backend/192frontend/187PG-HTTP/4Chromium54,9s, audits zéro. Runs Quality39779623242, Integration39779623354 et Security39779623270 liés au [Gate](reviews/l5-b5b-review-gate.md). Huit migrations et dix gardes verts sur DB Actions jetables ; quatre captures de classement/dossier desktop/mobile inspectées, digest de l'artefact vérifié. Aucune CI maquillée : observateur PG transitive corrigé et fixture Chromium effectue de vrais changements, assertions409/deux waiters/délais/quotas conservés.
