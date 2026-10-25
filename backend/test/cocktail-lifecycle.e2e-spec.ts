@@ -9,6 +9,7 @@ import {
   browserHeaders,
   createActor,
   createApplicationFixture,
+  originHeaders,
   recipePayload,
 } from './helpers/application-fixture';
 import { requireTestDatabase } from './helpers/test-database';
@@ -186,7 +187,11 @@ describe('Personal trash lifecycle over PostgreSQL and HTTP', () => {
       await remove(id).expect(404);
       await restore(id).expect(404);
     }
-    await api().delete(path(own.id)).send(versions()).expect(401);
+    await api()
+      .delete(path(own.id))
+      .set(originHeaders())
+      .send(versions())
+      .expect(401);
     const headers = auth();
     delete headers['X-Barbook-CSRF'];
     await api().delete(path(own.id)).set(headers).send(versions()).expect(403);
@@ -288,6 +293,118 @@ describe('Personal trash lifecycle over PostgreSQL and HTTP', () => {
     );
     return { connection, pid };
   }
+  it('retains image, tags, surviving folders and every ABV representation without recreating child rows', async () => {
+    const r = await recipe();
+    const loaded = await content(r.id);
+    const folder = await prisma.folder.create({
+      data: { workspaceId: alice.workspaceId, name: `Keep ${randomUUID()}` },
+    });
+    await api()
+      .put(`/api/cocktails/${r.slug}/organization`)
+      .set(auth())
+      .send({
+        folderIds: [folder.id],
+        tagNames: ['Retained'],
+        expectedVersion: 0,
+      })
+      .expect(200);
+    await api()
+      .put(`${path(r.id)}/content`)
+      .set(auth())
+      .send({
+        ...loaded.content,
+        expectedContentVersion: 0,
+        ingredients: [
+          {
+            ...loaded.content.ingredients[0],
+            ingredientName: 'Gin',
+            abvMode: 'INHERIT',
+            abvOverride: null,
+          },
+          {
+            ...loaded.content.ingredients[0],
+            ingredientName: 'Zero',
+            abvMode: 'OVERRIDE',
+            abvOverride: 0,
+          },
+          {
+            ...loaded.content.ingredients[0],
+            ingredientName: 'Equal',
+            abvMode: 'OVERRIDE',
+            abvOverride: 40,
+          },
+          {
+            ...loaded.content.ingredients[0],
+            ingredientName: 'Unknown',
+            abvMode: 'UNKNOWN',
+            abvOverride: null,
+          },
+        ],
+      })
+      .expect(200);
+    await prisma.cocktail.update({
+      where: { id: r.id },
+      data: { imageUrl: '/retained-image.jpg' },
+    });
+    const before = await snapshot(r.id);
+    await remove(r.id, versions(1, 1)).expect(200);
+    const detail = await api()
+      .get(`/api/folders/${folder.id}`)
+      .set(auth())
+      .expect(200);
+    expect(detail.body).toMatchObject({ cocktailCount: 0 });
+    await restore(r.id, versions(2, 2)).expect(200);
+    const after = await snapshot(r.id);
+    expect(after).toEqual({
+      ...before,
+      contentVersion: 3,
+      organizationVersion: 3,
+      updatedAt: after.updatedAt,
+    });
+    await api()
+      .get(`/api/folders/${folder.id}`)
+      .set(auth())
+      .expect(200)
+      .expect((response) => {
+        expect(response.body).toMatchObject({ cocktailCount: 1 });
+      });
+  });
+
+  it('paginates only the caller trash, keeps an active trash slug reachable and accepts no missing-body mutation', async () => {
+    const foreign = await recipe(bob);
+    await api()
+      .delete(path(foreign.id))
+      .set(browserHeaders(bob))
+      .send(versions())
+      .expect(200);
+    const own = await recipe();
+    await api().delete(path(own.id)).set(auth()).expect(409);
+    await remove(own.id).expect(200);
+    const response = await api()
+      .get('/api/cocktails/trash/entries?pageSize=100')
+      .set(auth())
+      .expect(200);
+    const result = response.body as { items: { id: string }[]; total: number };
+    expect(result.items.some((item) => item.id === foreign.id)).toBe(false);
+    expect(result.items.some((item) => item.id === own.id)).toBe(true);
+    expect(result.items.length).toBe(result.total);
+    const second = await api()
+      .get('/api/cocktails/trash/entries?page=2&pageSize=1')
+      .set(auth())
+      .expect(200);
+    expect(second.body).toMatchObject({
+      items: [result.items[1]],
+      total: result.total,
+      page: 2,
+      pageSize: 1,
+    });
+    await api()
+      .post('/api/cocktails')
+      .set(auth())
+      .send(recipePayload({ name: 'Trash' }))
+      .expect(201);
+    await api().get('/api/cocktails/trash').set(auth()).expect(200);
+  });
   async function waiters(pid: number, count: number) {
     const deadline = Date.now() + 5000;
     while (Date.now() < deadline) {
