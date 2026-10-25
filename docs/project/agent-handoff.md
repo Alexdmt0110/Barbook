@@ -1,5 +1,23 @@
 # Handoff canonique Barbook — Bêta Bar et qualification de sécurité
 
+## B5d — implémentation et qualification en cours, 25 octobre 2026
+
+PR36, codee306c6d : PG220/14suites, backend273, frontend219 et audits0 réellement passés, cinq journaux lus (IDs dans Gate). Chromium encore en cours à cette photographie. Revue de toute la branche et contrats mis à jour dans [Gate B5d](reviews/l5-b5d-review-gate.md). Premier échec de fixture CSRF corrigé par en-têtes d'origine autorisés, assertion401 inchangée ; aucune protection affaiblie. Dernier HEAD documentaire doit lui aussi obtenir sixchecks ; vérifier diff/commentaires/mergeabilité et effectuer merge commit D8 uniquement après cette condition, puis requalifier main et enchaîner B5e. Le checkpoint de PR36 portera les preuves exactes du merge sans PR documentaire récursive.
+
+Design 4cebcb0 confirmé par Alex. Base main959013c recontrôlée sur GitHub. DTO, service de cycle personnel et contrôleur dédiés implémentés ; pas de migration ni changement de dépendance. Verrou Workspace puis recette, deux préconditions, incréments monotones, horloge PostgreSQL après attente, restauration strictement avant échéance UTC30jours. État déjà atteint avec versions actuelles : no-op. Données retenues même après expiration.
+
+Tests ajoutés : validation, cycle HTTP, anciennes routes et intentions, concurrence observée dans les deux ordres, échéance franchie pendant attente et panne PostgreSQL injectée. Qualification réelle PG/Chromium via les jobs jetables existants encore à obtenir ; aucune déclaration de livraison/merge B5d à ce checkpoint. Tests unitaires historiques261 et compatibilité3 passés localement avant ajout des nouveaux tests DTO ; prochain passage complet et six CI requis. Review Gate final et merge D8 seulement après preuves réelles. Puis B5e/B5f et BB1 collaboration, batchs indépendants, inventaire manuel BB-INVENTAIRE-01. Aucun VPS/base propriétaire/déploiement/purge.
+
+OPS : la disponibilité d'un rollback binaire compatible avec les recettes en corbeille est une condition de mise en service ; un ancien binaire ignorant deletedAt ne constitue pas un retour arrière admissible. Vérifier restauration d'une sauvegarde sur base jetable avec versions, sessions et relations avant demande distincte d'exploitation. D7 et accès réels restent réservés ; aucun travail OPS exécuté sur infrastructure.
+
+## Reprise B5d — 24 octobre 2026, après qualification #35
+
+WORK, EN_COURS, branche feature/personal-recipe-trash publiée depuis main959013cf34f120cc89281c02c358c65d2db5aeb2 réellement recontrôlé, aucune PR ouverte. #35 mergedAt2026-10-24T21:17:50Z, parents98b6658/f06f9f1, arbrecdcb5a400cc8566d61fe922af244379e34643f98 conforme. Six contrôles post-merge success/six journaux lus :261backend,219frontend,187PG/HTTP,8Chromium,audits0. Preuves et IDs des jobs dans le checkpoint de PR35. Branches historiques conservées.
+
+[Design B5d](l5-b5d-design.md) publié avant code : cycle serveur personnel, deux versions monotones, horlogePG après verrous,30joursUTC, routes sans collision de slug, aucun effacement. Prochain micro-bloc : relire migration additive exacte et fixtures natives, implémenter DTO/service/contrôleur avec tests PostgreSQL/HTTP de cycle et concurrence ; puis verify/Gate/PR/sixchecks et merge admissibleD8. À cette photographie aucun code B5d ni migration ajouté, aucun test nouveau annoncé passé. UI relèveB5e puis matriceB5f.
+
+BB-INVENTAIRE-01 reste prioritaire pour la suite : compteurs manuels non négatifs indépendants des recettes/batchs, aucun moteur de consommation. Pas d'accord routine de merge à redemander. D7/OPS réservés, aucune intervention propriétaire ou déploiement. Les états ci-dessous sont historiques ; HEAD du présent checkpoint à lire sur GitHub, pas de SHA auto-référentiel.
+
 ## Checkpoint courant — 24 octobre 2026
 
 Responsable WORK, EN_COURS. Mandat récent : objectif30octobre, D3/D4 initiaux validés, D8 merges conditionnels préautorisés dans L5/Bêta Bar. **Clarification BB-INVENTAIRE-01 : compteurs physiques manuels, jamais négatifs, aucune liaison recette/batch→stock, pas de moteur de consommation.** +/−/correction concurrentiels et historique simple ; suggestions stock≤seuil, max(0,cible−stock). [Plan accéléré et design sécurité](beta-bar-plan.md). Aucun accord routine à redemander ; VPS/base propriétaire/déploiement/coût restent réservés. Le reste de ce fichier est historique.
