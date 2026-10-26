@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { WorkspacesModule } from './workspaces/workspaces.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -23,6 +24,7 @@ import { IngredientsModule } from './ingredients/ingredients.module';
     AuthModule,
     CocktailsModule,
     IngredientsModule,
+    WorkspacesModule,
   ],
 
   controllers: [AppController],

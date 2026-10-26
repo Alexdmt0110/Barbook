@@ -86,6 +86,7 @@ model Workspace {
   name            String
   kind            WorkspaceKind
   personalOwnerId String?       @unique
+  accessVersion   Int           @default(0)
 
   personalOwner User? @relation("PersonalWorkspaceOwner", fields: [personalOwnerId], references: [id], onDelete: Cascade)
 
@@ -108,6 +109,7 @@ model WorkspaceMember {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   joinedAt DateTime @default(now())
+  revokedAt DateTime? @db.Timestamptz(3)
 
   @@id([workspaceId, userId])
   @@index([userId])

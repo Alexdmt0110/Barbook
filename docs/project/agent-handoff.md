@@ -1,5 +1,13 @@
 # Handoff canonique Barbook — Bêta Bar et qualification de sécurité
 
+## Reprise BB1a — 26 octobre 2026
+
+L5/BB0 CLOTURE_TECHNIQUEMENT_SUR_MAIN : PR38 fusionnée f4a905e3f0a2ad74b31c062353fb60ddbdccb09c à13:04:21Z, parents7a9464bf/5d13304e, arbre1acdaae8 conforme ; six post-merge et six journaux273/229/226/12, audits0, dix critères revalidés. Checkpoint exact dans PR38. Toutes branches conservées.
+
+BB1a sur feature/bar-workspace-access, design337637c publié avant code : [conception](bb1-design.md). Socle serveur, routes de contexte et gestion des membres OWNER, migration additive accessVersion/revokedAt, tests HTTP/PG de révocation/réadmission/concurrence/rollback et migration écrits. Aucun accès partagé aux recettes ni sélecteur livré à ce stade. Typage réussi ; lint a relevé uniquement des types explicites manquants dans les nouveaux tests, corrigés sans désactivation. Vérification complète locale puis qualification native six jobs et Gate complet restent à confirmer avant merge D8. Ne pas déclarer BB1 terminé.
+
+Prochaine action : lire verify local et CI du dernier HEAD, corriger/requalifier, Gate/diff/discussions ; merge seulement sous D8 puis main6/6. BB1b/c contexte/API/UI coordonnées et copie indépendante ensuite. Bar réel/OWNER initial à provisionner uniquement lors d'OPS séparément autorisé. Aucun VPS/base propriétaire/déploiement/coût/purge. Les états suivants sont historiques.
+
 ## Reprise courante — B5f, 26 octobre 2026
 
 #37 fusionnée à 2026-10-26T12:49:31Z : main7a9464bfdb68fddaa6d070687404fe9b8bafda96, parents adc6551d/c3a3e4e8, arbre1848e24a identique. Six contrôles post-merge et six journaux vérifiés :273 backend,229 frontend,220 PostgreSQL/HTTP,12 Chromium, audits complets/runtime zéro. Preuves détaillées dans PR37 ; toutes branches conservées.
