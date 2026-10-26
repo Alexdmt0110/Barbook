@@ -240,6 +240,43 @@ describe('Shared workspace authorization over PostgreSQL/HTTP', () => {
       }
     },
   );
+  it('allows one concurrent membership command, preserves fresh no-ops and rejects exhausted capacity', async () => {
+    const w = await space();
+    const results = await Promise.all([
+      revoke(w.id).then((r) => r.status),
+      revoke(w.id).then((r) => r.status),
+    ]);
+    expect(results.sort()).toEqual([200, 409]);
+    await revoke(w.id, 1).expect(200);
+    await api()
+      .post(`/api/workspaces/${w.id}/members`)
+      .set(browserHeaders(owner))
+      .send({ email: member.user.email, expectedAccessVersion: 1 })
+      .expect(200);
+    await api()
+      .post(`/api/workspaces/${w.id}/members`)
+      .set(browserHeaders(owner))
+      .send({ email: member.user.email, expectedAccessVersion: 2 })
+      .expect(200)
+      .expect((r) =>
+        expect((r.body as { accessVersion: number }).accessVersion).toBe(2),
+      );
+    await prisma.workspace.update({
+      where: { id: w.id },
+      data: { accessVersion: 2147483647 },
+    });
+    await revoke(w.id, 2147483647).expect(409);
+    expect(
+      (
+        await prisma.workspaceMember.findUniqueOrThrow({
+          where: {
+            workspaceId_userId: { workspaceId: w.id, userId: member.user.id },
+          },
+        })
+      ).revokedAt,
+    ).toBeNull();
+  });
+
   it('rolls back membership when the version update fails', async () => {
     const w = await space();
     const name = `access_${randomUUID().replaceAll('-', '')}`;
