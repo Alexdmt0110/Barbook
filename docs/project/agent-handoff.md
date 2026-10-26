@@ -1,5 +1,13 @@
 # Handoff canonique Barbook — Bêta Bar et qualification de sécurité
 
+## B5e — reprise du 26 octobre2026
+
+PR37 au code80e0725 : sixchecks et sixlogs réellement verts273backend/229frontend/220PG-HTTP/12Chromium/audits0. Captures relues et digest artefact vérifié. Correction mobile de navigation après revue visuelle et assertion ciblée ajoutée : qualifier ce dernier HEAD intégralement, puis Gate/diff/discussions/mergecommit D8 et main6/6. Voir Gate B5e et checkpoint PR37. Pas de clôtureBB0 avant B5f.
+
+B5d PR36 réellement fusionnée le25octobre08:17:30Z en adc6551df1592cc0ce97af7346a1f0703288c51f ; parents959013c/48070e9, arbre2117c93 identique au HEAD, sixchecks post-merge/sixlogs qualifiés273backend/219frontend/220PG-HTTP/8Chromium/audits0. Recontrôle GitHub du26octobre : main inchangé et sixsuccess ; branche feature/personal-trash-ui créée à cette base, design préventif407f33f publié/vérifié avant code. Toutes branches conservées.
+
+Interface B5e implémentée : liste/trash paginée, confirmation séparée parID, deux versions capturées, erreur409/réponse perdue bloque l'intention, relecture explicite sans replay ; leases DraftStore et interception L4 réutilisées sans moteur ni stockage de commande. Locaux : verifyfrontend229/31fichiers et compatibilité2 ; quatre nouveaux parcours Chromium prévus desktop/mobile, exécution native encore à acquérir, aucun résultat navigateur B5e revendiqué. Sixchecks/Gate/PR et qualificationmain requis avant clôture B5e. B5f matrice10 puis collaborationBB1 prioritaire ; aucune opération VPS/base propriétaire/déploiement/purge. Design : [B5e](l5-b5e-design.md).
+
 ## B5d — implémentation et qualification en cours, 25 octobre 2026
 
 PR36, codee306c6d : PG220/14suites, backend273, frontend219 et audits0 réellement passés, cinq journaux lus (IDs dans Gate). Chromium encore en cours à cette photographie. Revue de toute la branche et contrats mis à jour dans [Gate B5d](reviews/l5-b5d-review-gate.md). Premier échec de fixture CSRF corrigé par en-têtes d'origine autorisés, assertion401 inchangée ; aucune protection affaiblie. Dernier HEAD documentaire doit lui aussi obtenir sixchecks ; vérifier diff/commentaires/mergeabilité et effectuer merge commit D8 uniquement après cette condition, puis requalifier main et enchaîner B5e. Le checkpoint de PR36 portera les preuves exactes du merge sans PR documentaire récursive.

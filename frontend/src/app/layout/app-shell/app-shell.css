@@ -55,6 +55,7 @@
 
 .main-navigation {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   min-width: 0;
   gap: 6px;
@@ -145,13 +146,6 @@
     grid-column: 1 / -1;
     grid-row: 2;
     width: 100%;
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
-    scrollbar-width: none;
-  }
-
-  .main-navigation::-webkit-scrollbar {
-    display: none;
   }
 }
 
