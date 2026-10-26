@@ -1,5 +1,13 @@
 # Handoff canonique Barbook — Bêta Bar et qualification de sécurité
 
+## Reprise courante — B5f, 26 octobre 2026
+
+#37 fusionnée à 2026-10-26T12:49:31Z : main7a9464bfdb68fddaa6d070687404fe9b8bafda96, parents adc6551d/c3a3e4e8, arbre1848e24a identique. Six contrôles post-merge et six journaux vérifiés :273 backend,229 frontend,220 PostgreSQL/HTTP,12 Chromium, audits complets/runtime zéro. Preuves détaillées dans PR37 ; toutes branches conservées.
+
+B5f sur test/l5-final-qualification, PR38 draft. Design51de36a avant tests, code df5bf4b publié immédiatement et blob vérifié ; six courses restauration contre édition/classement/dossier dans les deux ordres. Typage/lint ciblés réussis ; code df5bf4b : PostgreSQL226/14 (job121583891571), backend273/frontend229/audits0 confirmés, Chromium et dernier HEAD documentaire restent à qualifier. [Matrice et bilan](l5-closure.md). Ne pas déclarer BB0 clos avant Gate complet, six contrôles du dernier HEAD, merge D8 et six contrôles post-merge. Prochaine action : examiner résultats natifs, corriger si besoin, terminer Gate/diff/discussions, fusionner si admissible puis BB1 prioritaire. Aucun accord de routine à redemander ; OPS réel/D7 restent réservés.
+
+Git : changements sur branche, commits immédiatement publiés. SQL : tests jetables seulement, aucune migration nouvelle. VM/infra : aucune opération. Les sections suivantes sont historiques et ne remplacent pas ce checkpoint.
+
 ## B5e — reprise du 26 octobre2026
 
 PR37 au code80e0725 : sixchecks et sixlogs réellement verts273backend/229frontend/220PG-HTTP/12Chromium/audits0. Captures relues et digest artefact vérifié. Correction mobile de navigation après revue visuelle et assertion ciblée ajoutée : qualifier ce dernier HEAD intégralement, puis Gate/diff/discussions/mergecommit D8 et main6/6. Voir Gate B5e et checkpoint PR37. Pas de clôtureBB0 avant B5f.

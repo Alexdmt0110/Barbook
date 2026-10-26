@@ -1,5 +1,9 @@
 # Roadmap autorisée
 
+## État courant — 26 octobre 2026
+
+B5a–B5e intégrés ; sécurité #35 qualifiée, corbeille serveur #36 et UI #37 intégrées. Main7a9464bf : six contrôles post-merge réussis273/229/220/12, audits0. B5f/PR38 en qualification finale, [matrice et limites](l5-closure.md). BB0 reste ouvert jusqu'à qualification du merge B5f ; ensuite BB1 collaboration Alex/Maël prioritaire, puis batchs indépendants et inventaire manuel. Cible30octobre, aucune mise en service prétendue ni OPS réel autorisé. Les sections datées ci-dessous sont historiques.
+
 ## Priorité courante — Bêta Bar, 24 octobre 2026
 
 [Plan accéléré et critères de sortie](beta-bar-plan.md) : objectif30octobre, personnel +Bar privé Alex/Maël. Ordre BB0 sécurité/récupération L5 →BB1 collaboration →BB2 batchs indépendants et BB3 inventaire manuel →BB4 suggestions simples →BB5 qualification/mise en service après accord OPS distinct. BB-INVENTAIRE-01 remplace la consommation planifiée : aucune action recette/batch/production ne débite le stock ; compteurs physiques manuels non négatifs, historique simple et seuil/cible. Les batchs ne dépendent pas de l'inventaire. OPS préparé dès maintenant. Photos avancées/statistiques/marges/achats/esthétique/gouvernance complexe différés.

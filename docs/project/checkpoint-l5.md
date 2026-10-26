@@ -1,5 +1,10 @@
 # Checkpoint L5 — Design Review avant code
 
+## B5e intégré et B5f en qualification — 26 octobre 2026
+
+PR37 : merge7a9464bf, mergedAt2026-10-26T12:49:31Z, parents adc6551d/c3a3e4e8 et arbre1848e24a vérifiés. Six post-merge réussis, journaux lus273/229/220/12 et audits0 ; IDs et preuves durables dans PR37. B5f design51de36a puis testsdf5bf4b sur test/l5-final-qualification, PR38 draft. Matrice [l5-closure.md](l5-closure.md) ; qualification native et Gate final requis avant clôture BB0. Ensuite BB1, sans OPS réel ni purge. Tous les états ci-dessous sont historiques.
+
+
 ## B5d en qualification — 25 octobre2026
 
 État prioritaire : B5a/b/c intégrés, main959013c qualifié après correctifs sécurité PR35. D8 remplace les demandes de merge de routine historiques. B5d PR36, branche feature/personal-recipe-trash, design4cebcb0 puis codeb21aa82 et testse306c6d immédiatement publiés/vérifiés. [Gate complet et conditions](reviews/l5-b5d-review-gate.md), [journal](agent-handoff.md). Qualification finale sixchecks en cours, aucun merge B5d ni UI corbeille encore déclaré. Après qualification/merge/main : B5e et B5f, puis BB1. Aucun déploiement/migration propriétaire/infrastructure/purge. Les sections suivantes sont historiques.

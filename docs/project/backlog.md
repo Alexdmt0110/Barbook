@@ -1,5 +1,10 @@
 # Backlog d'exécution
 
+## Suivi L5 — 26 octobre 2026
+
+Édition, brouillons d'édition et cycle personnel intégrés jusqu'à #37/main7a9464bf qualifié six contrôles. B5f/PR38 vérifie les dix critères et complète les courses de restauration ; BB0 non encore clos à ce checkpoint. Voir [matrice](l5-closure.md). F016 reste partielle au sens du catalogue : archivage et purge exclus. Prochain incrément prioritaire après qualification : BB1. Les observations d'audit du16octobre restent historiques ; les statuts d'exécution JSON reflètent la progression.
+
+
 ## Priorité courante — mandat Bêta Bar du 24 octobre 2026
 
 Les66IDs sont conservés. [Plan/acceptation/dépendances/arbitrages](beta-bar-plan.md) remplace l'ordre historique. MUST : F016 récupération personnelle, F008–010 collaboration/copie, F011 attribution indispensable, F030 produits/conditionnements, F036–038 batchs indépendants du stock, F045/F046 compteurs manuels+historique simple+seuil/cible, F047 section À recommander uniquement. BB-INVENTAIRE-01 exclut consommation automatique/théorique, débit batch, mL restants, ledger comptable, réception attendue et commandes. Stock non négatif,0−1refusé ; si stock≤seuil suggestion=max(0,cible−stock). F055/056/058 : préparation OPS seulement ; F012 : retrait membre seulement.
