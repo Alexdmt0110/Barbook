@@ -20,6 +20,20 @@ export const routes: Routes = [
     loadComponent: () => import('./layout/app-shell/app-shell').then((module) => module.AppShell),
     children: [
       {
+        path: 'trash',
+        title: 'Corbeille · Barbook',
+        loadComponent: () =>
+          import('./features/cocktails/cocktail-trash/cocktail-trash').then((m) => m.CocktailTrash),
+      },
+      {
+        path: 'cocktails/id/:id/delete',
+        title: 'Mettre en corbeille · Barbook',
+        loadComponent: () =>
+          import('./features/cocktails/cocktail-trash/cocktail-delete').then(
+            (m) => m.CocktailDelete,
+          ),
+      },
+      {
         path: '',
         pathMatch: 'full',
         title: 'Accueil · Barbook',
