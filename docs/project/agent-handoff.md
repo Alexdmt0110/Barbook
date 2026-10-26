@@ -1,5 +1,13 @@
 # Handoff canonique Barbook — Bêta Bar et qualification de sécurité
 
+## Reprise BB1b — 27 octobre 2026
+
+PR39 fusionnée d55288582d896adfb3b7dba24115698e2208f495 à2026-10-26T23:29:38Z ; parents f4a905e3/0cbe7a19, arbrede1286d0 identique. Six post-merge et six journaux273/229/240/12, audits0, preuves complètes dans PR39. BB1a clos, toutes branches conservées. Aucun carnet partagé complet encore livré.
+
+Branche feature/bar-recipe-workspace publiée depuis ce main qualifié ; [Design BB1b](bb1b-design.md) publié avant code. Prochain bloc : extraction transactionnelle des opérations recettes, routes scoped et contexte API/Angular coordonnés ; tests d'isolation/révocation/drafts avant Gate et D8. BB1c copie explicite ensuite. Aucun arbitrage bloquant identifié, aucun accord routine attendu. Risque30octobre : collaboration et lots métier/OPS restent à livrer, priorité exclusive aux parcours essentiels.
+
+Git : branche dédiée, publication immédiate et checkpoint. SQL : aucune migration propriétaire ; tests jetables seulement. OPS réel/provisionnement/VPS/déploiement interdits sans accord distinct. Les sections suivantes sont historiques.
+
 ## Reprise BB1a — 26 octobre 2026
 
 L5/BB0 CLOTURE_TECHNIQUEMENT_SUR_MAIN : PR38 fusionnée f4a905e3f0a2ad74b31c062353fb60ddbdccb09c à13:04:21Z, parents7a9464bf/5d13304e, arbre1acdaae8 conforme ; six post-merge et six journaux273/229/226/12, audits0, dix critères revalidés. Checkpoint exact dans PR38. Toutes branches conservées.
