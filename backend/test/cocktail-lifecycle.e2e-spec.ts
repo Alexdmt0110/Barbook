@@ -542,6 +542,109 @@ describe('Personal trash lifecycle over PostgreSQL and HTTP', () => {
     },
   );
 
+  it.each([
+    ['edit', false],
+    ['edit', true],
+    ['organize', false],
+    ['organize', true],
+    ['folder', false],
+    ['folder', true],
+  ] as const)(
+    'serializes %s against restoration in both lock orders (restore first=%s)',
+    async (operation, restoreFirst) => {
+      const r = await recipe();
+      const loaded = await content(r.id);
+      const folder = await prisma.folder.create({
+        data: {
+          workspaceId: alice.workspaceId,
+          name: `Restore ${randomUUID()}`,
+        },
+      });
+      if (operation === 'folder')
+        await api()
+          .put(`/api/folders/${folder.id}/cocktails/${r.id}?expectedVersion=0`)
+          .set(auth())
+          .expect(200);
+      const organization = operation === 'folder' ? 2 : 1;
+      await remove(r.id, versions(0, organization - 1)).expect(200);
+      const before = await snapshot(r.id);
+      const preview = await api()
+        .get(`/api/folders/${folder.id}/deletion-preview`)
+        .set(auth())
+        .expect(200);
+      const token = preview.body as {
+        version: number;
+        expectedMembershipToken: string;
+      };
+      const competitor = () =>
+        operation === 'edit'
+          ? api()
+              .put(`${path(r.id)}/content`)
+              .set(auth())
+              .send({
+                ...loaded.content,
+                name: 'Obsolete rename',
+                expectedContentVersion: 0,
+              })
+          : operation === 'organize'
+            ? api()
+                .put(`/api/cocktails/${r.slug}/organization`)
+                .set(auth())
+                .send({
+                  folderIds: [folder.id],
+                  tagNames: [],
+                  expectedVersion: 0,
+                })
+            : api()
+                .delete(`/api/folders/${folder.id}`)
+                .query({
+                  expectedVersion: token.version,
+                  expectedMembershipToken: token.expectedMembershipToken,
+                })
+                .set(auth());
+      const recovery = () => restore(r.id, versions(1, organization));
+      const held = await hold();
+      const pending: Promise<request.Response>[] = [];
+      try {
+        pending.push(
+          (restoreFirst ? recovery() : competitor()).then((res) => res),
+        );
+        await waiters(held.pid, 1);
+        pending.push(
+          (restoreFirst ? competitor() : recovery()).then((res) => res),
+        );
+        await waiters(held.pid, 2);
+        await held.connection.query('COMMIT');
+        const results = await Promise.all(pending);
+        const recoveryResult = results[restoreFirst ? 0 : 1];
+        const competingResult = results[restoreFirst ? 1 : 0];
+        const folderWon = operation === 'folder' && !restoreFirst;
+        expect(recoveryResult.status).toBe(folderWon ? 409 : 200);
+        expect(competingResult.status).toBe(
+          restoreFirst ? 409 : operation === 'folder' ? 200 : 404,
+        );
+        const after = await snapshot(r.id);
+        expect(after).toEqual({
+          ...before,
+          deletedAt: folderWon ? before.deletedAt : null,
+          restoreUntil: folderWon ? before.restoreUntil : null,
+          contentVersion: folderWon ? 1 : 2,
+          organizationVersion: organization + 1,
+          folderId: folderWon ? null : before.folderId,
+          folderMemberships: folderWon ? [] : before.folderMemberships,
+          updatedAt: after.updatedAt,
+        });
+        expect(await prisma.folder.count({ where: { id: folder.id } })).toBe(
+          folderWon ? 0 : 1,
+        );
+      } finally {
+        await held.connection.query('ROLLBACK');
+        held.connection.release();
+        await Promise.allSettled(pending);
+      }
+    },
+  );
+
   it('restores immediately before the deadline, rejects equal/past deadlines, and never deletes retained rows', async () => {
     for (const offset of [60000, 0, -1]) {
       const r = await recipe();
