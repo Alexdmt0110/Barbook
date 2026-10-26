@@ -51,6 +51,8 @@ test('trash lifecycle after editing preserves content and original URL with expl
   await page.getByRole('link', { name: 'Ouvrir la corbeille', exact: true }).click();
   const card = page.getByRole('article').filter({ has: page.getByRole('heading', { name: renamed, exact: true }) });
   await expect(card).toBeVisible();
+  const navigation = page.getByRole('navigation', { name: 'Navigation principale' });
+  expect(await navigation.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
   await page.screenshot({ path: info.outputPath('personal-trash.png'), animations: 'disabled' });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await card.getByRole('button', { name: 'Restaurer', exact: true }).click();
