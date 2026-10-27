@@ -1,9 +1,12 @@
 # Backlog d'exécution
 
-## Suivi L5 — 26 octobre 2026
+## État courant — 27 octobre 2026
 
-Édition, brouillons d'édition et cycle personnel intégrés jusqu'à #37/main7a9464bf qualifié six contrôles. B5f/PR38 vérifie les dix critères et complète les courses de restauration ; BB0 non encore clos à ce checkpoint. Voir [matrice](l5-closure.md). F016 reste partielle au sens du catalogue : archivage et purge exclus. Prochain incrément prioritaire après qualification : BB1. Les observations d'audit du16octobre restent historiques ; les statuts d'exécution JSON reflètent la progression.
+L5/BB0 est clos techniquement sur main depuis PR38 ; les dix critères personnels ont été qualifiés. BB1a serveur (membres/révocation) est intégré depuis PR39. La passe UX prioritaire A/B/C/D est intégrée par PR41–44 ; main76d96822ce97ce3720b4214c678138f18037677f a ses six contrôles post-merge et journaux vérifiés :273backend/234frontend/240PostgreSQL-HTTP/16Chromium, audits0. UX-E et carrousel restent exclus.
 
+Priorité active : BB1b/PR40, encore draft. Ses routes partagées de contenu déjà écrites sont conservées ; sélection Personnel/Bar, liste/détail/création/autocomplete/édition cohérents, membres et brouillons doivent encore être terminés puis qualifiés à deux comptes. Aucun carnet partagé complet n’est annoncé livré. BB1c indispensable ensuite ; copie personnelle→Bar uniquement explicite/indépendante, report éventuel à soumettre s’il devient nécessaire. Après collaboration : inventaire manuel partagé et suggestions simples prioritaires ; batchs autonomes indépendants du stock. Aucune déduction automatique recette/batch.
+
+La cible du30octobre est à risque. Les instances CI sont jetables ; développement qualifié ne prouve ni staging permanent ni disponibilité pour Alex/Maël. D7 et informations d’exploitation restent nécessaires ; [demande OPS distincte](beta-bar-ops-authorization.md) préparée sur brancheBB1b, aucune opération VPS/base propriétaire/compte réel/déploiement autorisée. Les sections datées ci-dessous sont historiques.
 
 ## Priorité courante — mandat Bêta Bar du 24 octobre 2026
 

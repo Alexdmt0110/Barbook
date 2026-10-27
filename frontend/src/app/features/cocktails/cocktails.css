@@ -5,7 +5,7 @@
 
 .cocktails-page {
   width: 100%;
-  max-width: 1180px;
+  max-width: none;
   margin: 0 auto;
   padding: 76px 24px 90px;
 }
@@ -37,7 +37,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
+  min-height: 44px;
   padding: 0 16px;
   border-radius: var(--radius-pill);
   color: var(--color-on-accent);
@@ -189,8 +189,8 @@
 .cocktail-grid {
   display: grid;
   grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-  gap: 24px;
+    repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: var(--grid-gap);
 }
 
 .cocktail-card {
@@ -389,7 +389,7 @@
 }
 
 .pagination button {
-  min-height: 42px;
+  min-height: 44px;
   padding: 0 16px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
@@ -526,3 +526,5 @@
     flex: 1 1 0;
   }
 }
+
+.cocktails-page { padding-inline: var(--page-gutter); }

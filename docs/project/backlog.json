@@ -13,7 +13,7 @@
       "BETA_BAR_MINIMAL",
       "OPS_ANALYSE_PLANS_SEULEMENT"
     ],
-    "merges": "PR20_A_PR37_MERGEES ; D8_MERGES_L5_BETA_BAR_PREAUTORISES_SOUS_CONDITIONS",
+    "merges": "PR20_A_PR39_ET_PR41_A_PR44_MERGEES ; PR40_DRAFT_BB1b_INCOMPLET ; D8_MERGES_L5_BETA_BAR_PREAUTORISES_SOUS_CONDITIONS",
     "production": false,
     "decisions_D1_D8": "D1_D2_D5_L5_COMPAT_01B_VALIDES ; D3_D4_INITIALES_BETA_ET_D8_CONDITIONNELLE_VALIDES ; D6_D7_NON_VALIDES"
   },
@@ -433,7 +433,7 @@
       "id": "BB-F-015",
       "titre": "Édition complète d'une recette",
       "statut_observe": "absente ; seul le classement est modifiable.",
-      "statut_execution": "PERSONNEL_INTEGRE_B5e_B5f_QUALIFICATION_PR38",
+      "statut_execution": "PERSONNEL_CLOTURE_TECHNIQUEMENT_L5_BB0_SUR_MAIN_PR38",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "L.",
@@ -547,7 +547,7 @@
       "id": "BB-F-019",
       "titre": "Composition structurée, étapes et garnitures",
       "statut_observe": "implémentée sans test suffisant — règles et CHECK présents.",
-      "statut_execution": "PERSONNEL_INTEGRE_B5e_B5f_QUALIFICATION_PR38",
+      "statut_execution": "PERSONNEL_CLOTURE_TECHNIQUEMENT_L5_BB0_SUR_MAIN_PR38",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
@@ -574,7 +574,7 @@
       "id": "BB-F-020",
       "titre": "Degré alcoolique estimé et incertitudes",
       "statut_observe": "partielle — calcul avant dilution en ML ; présentation à clarifier.",
-      "statut_execution": "PERSONNEL_INTEGRE_B5e_B5f_QUALIFICATION_PR38",
+      "statut_execution": "PERSONNEL_CLOTURE_TECHNIQUEMENT_L5_BB0_SUR_MAIN_PR38",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
@@ -895,7 +895,7 @@
       "id": "BB-F-029",
       "titre": "Unités canoniques et conversions explicites",
       "statut_observe": "partielle — ML/G et mesures de bar, conversion cL et précision à corriger.",
-      "statut_execution": "PERSONNEL_INTEGRE_B5e_B5f_QUALIFICATION_PR38",
+      "statut_execution": "PERSONNEL_CLOTURE_TECHNIQUEMENT_L5_BB0_SUR_MAIN_PR38",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
@@ -1505,7 +1505,7 @@
       "id": "BB-F-051",
       "titre": "Saisie protégée, erreurs et récupération",
       "statut_observe": "partielle — erreurs/retry présents, pas de protection de brouillon.",
-      "statut_execution": "PERSONNEL_INTEGRE_B5e_B5f_QUALIFICATION_PR38",
+      "statut_execution": "PERSONNEL_CLOTURE_TECHNIQUEMENT_L5_BB0_SUR_MAIN_PR38",
       "priorite": "MUST",
       "horizon": "V1",
       "effort": "M.",
@@ -1973,5 +1973,23 @@
       "autorisation": "PROPOSITION_NON_APPROUVEE"
     }
   ],
-  "date_suivi_execution": "2026-10-26"
+  "date_suivi_execution": "2026-10-26",
+  "checkpoint_execution": {
+    "date": "2026-10-27",
+    "main_qualifie": "76d96822ce97ce3720b4214c678138f18037677f",
+    "L5_BB0": "CLOTURE_TECHNIQUEMENT",
+    "BB1a": "SERVEUR_INTEGRE_QUALIFIE",
+    "BB1b": "PR40_DRAFT_IMPLEMENTATION_ET_QUALIFICATION_A_TERMINER",
+    "UX": "A_B_C_D_PRIORITAIRE_INTEGRES_QUALIFIES_PAS_AUDIT_EXHAUSTIF",
+    "ci_main": {
+      "backend": 273,
+      "frontend": 234,
+      "postgresql_http": 240,
+      "chromium": 16,
+      "audits_vulnerabilites": 0
+    },
+    "disponibilite_reelle": false,
+    "OPS_reels_autorises": false,
+    "D7": "NON_VALIDE"
+  }
 }
