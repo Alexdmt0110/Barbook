@@ -43,8 +43,7 @@ export class CocktailContentService {
   async get(userId: string, cocktailId: string) {
     const workspaceId = await this.workspaceId(userId);
     return this.prisma.$transaction(
-      async (tx) =>
-        this.project(await this.requireRecipe(tx, workspaceId, cocktailId)),
+      async (tx) => this.getInWorkspace(tx, workspaceId, cocktailId),
       {
         isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead,
       },
@@ -57,6 +56,28 @@ export class CocktailContentService {
     dto: ReplaceCocktailContentDto,
   ) {
     const workspaceId = await this.workspaceId(userId);
+    return this.prisma.$transaction(async (tx) => {
+      await lockOrganizationWorkspace(tx, workspaceId);
+      return this.replaceInWorkspace(tx, workspaceId, cocktailId, dto);
+    });
+  }
+
+  /** Caller owns the transaction and must authorize/lock the workspace first. */
+  async getInWorkspace(
+    tx: Prisma.TransactionClient,
+    workspaceId: string,
+    cocktailId: string,
+  ) {
+    return this.project(await this.requireRecipe(tx, workspaceId, cocktailId));
+  }
+
+  /** Same implementation for personal and authorized shared transactions. */
+  async replaceInWorkspace(
+    tx: Prisma.TransactionClient,
+    workspaceId: string,
+    cocktailId: string,
+    dto: ReplaceCocktailContentDto,
+  ) {
     try {
       validateRecipeIngredients(dto.ingredients);
       validateGarnishes(dto.garnishes ?? []);
@@ -71,139 +92,135 @@ export class CocktailContentService {
             'An ABV override is required only in OVERRIDE mode.',
           );
       }
-      return await this.prisma.$transaction(async (tx) => {
-        await lockOrganizationWorkspace(tx, workspaceId);
-        const current = await this.requireRecipe(tx, workspaceId, cocktailId);
-        requireVersion(current.contentVersion, dto.expectedContentVersion);
 
-        const catalog = new Map<
-          string,
-          { id: string; defaultAbv: number | null }
-        >();
-        const resolve = async (name: string, defaultAbv?: number | null) => {
-          const slug = requireCocktailCreationSlug(name, 'Ingredient name');
-          const cached = catalog.get(slug);
-          if (cached) return cached;
-          const ingredient = await tx.ingredient.upsert({
-            where: { workspaceId_slug: { workspaceId, slug } },
-            update: {},
-            create: { workspaceId, name, slug, defaultAbv: defaultAbv ?? null },
-            select: { id: true, defaultAbv: true },
-          });
-          const resolved = {
-            id: ingredient.id,
-            defaultAbv: numeric(ingredient.defaultAbv),
-          };
-          catalog.set(slug, resolved);
-          return resolved;
-        };
-        const ingredients = [];
-        for (const line of dto.ingredients) {
-          const ingredient = await resolve(
-            line.ingredientName,
-            line.ingredientDefaultAbv,
-          );
-          ingredients.push({
-            ingredientId: ingredient.id,
-            amount: line.amount ?? null,
-            unit: line.unit,
-            specification: line.specification ?? null,
-            abvOverride:
-              line.abvMode === RecipeAbvMode.OVERRIDE
-                ? line.abvOverride!
-                : null,
-            abvUnknown: line.abvMode === RecipeAbvMode.UNKNOWN,
-            notes: line.notes ?? null,
-          });
-        }
-        let mainAlcoholId: string | null = null;
-        if (dto.mainAlcoholName) {
-          const slug = requireCocktailCreationSlug(
-            dto.mainAlcoholName,
-            'Main alcohol name',
-          );
-          const reference = catalog.get(slug);
-          const line = ingredients.find(
-            (item) => item.ingredientId === reference?.id,
-          );
-          const degree = line?.abvUnknown
-            ? null
-            : (line?.abvOverride ?? reference?.defaultAbv);
-          if (!line || degree == null || degree <= 0)
-            throw new BadRequestException(
-              'Main alcohol must reference an alcoholic recipe ingredient.',
-            );
-          mainAlcoholId = line.ingredientId;
-        }
-        const garnishes = [];
-        for (const line of dto.garnishes ?? []) {
-          const ingredient = await resolve(line.ingredientName);
-          garnishes.push({
-            ingredientId: ingredient.id,
-            amount: line.amount ?? null,
-            unit: line.unit ?? null,
-            specification: line.specification ?? null,
-            usage: line.usage,
-          });
-        }
-        const scalars = {
-          name: dto.name,
-          type: dto.type,
-          family: dto.family ?? null,
-          method: dto.method,
-          glass: dto.glass,
-          ice: dto.ice ?? null,
-          notes: dto.notes ?? null,
-          mainAlcoholId,
-        };
-        const proposed = {
-          ...scalars,
-          ingredients,
-          garnishes,
-          steps: dto.steps,
-        };
-        if (JSON.stringify(proposed) === JSON.stringify(this.snapshot(current)))
-          return this.project(current);
-        requireVersionCapacity(current.contentVersion);
-        await tx.cocktailIngredient.deleteMany({
-          where: { workspaceId, cocktailId },
+      const current = await this.requireRecipe(tx, workspaceId, cocktailId);
+      requireVersion(current.contentVersion, dto.expectedContentVersion);
+
+      const catalog = new Map<
+        string,
+        { id: string; defaultAbv: number | null }
+      >();
+      const resolve = async (name: string, defaultAbv?: number | null) => {
+        const slug = requireCocktailCreationSlug(name, 'Ingredient name');
+        const cached = catalog.get(slug);
+        if (cached) return cached;
+        const ingredient = await tx.ingredient.upsert({
+          where: { workspaceId_slug: { workspaceId, slug } },
+          update: {},
+          create: { workspaceId, name, slug, defaultAbv: defaultAbv ?? null },
+          select: { id: true, defaultAbv: true },
         });
-        await tx.garnishIngredient.deleteMany({
-          where: { workspaceId, cocktailId },
+        const resolved = {
+          id: ingredient.id,
+          defaultAbv: numeric(ingredient.defaultAbv),
+        };
+        catalog.set(slug, resolved);
+        return resolved;
+      };
+      const ingredients = [];
+      for (const line of dto.ingredients) {
+        const ingredient = await resolve(
+          line.ingredientName,
+          line.ingredientDefaultAbv,
+        );
+        ingredients.push({
+          ingredientId: ingredient.id,
+          amount: line.amount ?? null,
+          unit: line.unit,
+          specification: line.specification ?? null,
+          abvOverride:
+            line.abvMode === RecipeAbvMode.OVERRIDE ? line.abvOverride! : null,
+          abvUnknown: line.abvMode === RecipeAbvMode.UNKNOWN,
+          notes: line.notes ?? null,
         });
-        await tx.preparationStep.deleteMany({ where: { cocktailId } });
-        await tx.cocktail.update({
-          where: { workspaceId_id: { workspaceId, id: cocktailId } },
-          data: { ...scalars, contentVersion: { increment: 1 } },
+      }
+      let mainAlcoholId: string | null = null;
+      if (dto.mainAlcoholName) {
+        const slug = requireCocktailCreationSlug(
+          dto.mainAlcoholName,
+          'Main alcohol name',
+        );
+        const reference = catalog.get(slug);
+        const line = ingredients.find(
+          (item) => item.ingredientId === reference?.id,
+        );
+        const degree = line?.abvUnknown
+          ? null
+          : (line?.abvOverride ?? reference?.defaultAbv);
+        if (!line || degree == null || degree <= 0)
+          throw new BadRequestException(
+            'Main alcohol must reference an alcoholic recipe ingredient.',
+          );
+        mainAlcoholId = line.ingredientId;
+      }
+      const garnishes = [];
+      for (const line of dto.garnishes ?? []) {
+        const ingredient = await resolve(line.ingredientName);
+        garnishes.push({
+          ingredientId: ingredient.id,
+          amount: line.amount ?? null,
+          unit: line.unit ?? null,
+          specification: line.specification ?? null,
+          usage: line.usage,
         });
-        await tx.cocktailIngredient.createMany({
-          data: ingredients.map((line, index) => ({
+      }
+      const scalars = {
+        name: dto.name,
+        type: dto.type,
+        family: dto.family ?? null,
+        method: dto.method,
+        glass: dto.glass,
+        ice: dto.ice ?? null,
+        notes: dto.notes ?? null,
+        mainAlcoholId,
+      };
+      const proposed = {
+        ...scalars,
+        ingredients,
+        garnishes,
+        steps: dto.steps,
+      };
+      if (JSON.stringify(proposed) === JSON.stringify(this.snapshot(current)))
+        return this.project(current);
+      requireVersionCapacity(current.contentVersion);
+      await tx.cocktailIngredient.deleteMany({
+        where: { workspaceId, cocktailId },
+      });
+      await tx.garnishIngredient.deleteMany({
+        where: { workspaceId, cocktailId },
+      });
+      await tx.preparationStep.deleteMany({ where: { cocktailId } });
+      await tx.cocktail.update({
+        where: { workspaceId_id: { workspaceId, id: cocktailId } },
+        data: { ...scalars, contentVersion: { increment: 1 } },
+      });
+      await tx.cocktailIngredient.createMany({
+        data: ingredients.map((line, index) => ({
+          ...line,
+          workspaceId,
+          cocktailId,
+          sortOrder: index + 1,
+        })),
+      });
+      if (garnishes.length)
+        await tx.garnishIngredient.createMany({
+          data: garnishes.map((line, index) => ({
             ...line,
             workspaceId,
             cocktailId,
             sortOrder: index + 1,
           })),
         });
-        if (garnishes.length)
-          await tx.garnishIngredient.createMany({
-            data: garnishes.map((line, index) => ({
-              ...line,
-              workspaceId,
-              cocktailId,
-              sortOrder: index + 1,
-            })),
-          });
-        await tx.preparationStep.createMany({
-          data: dto.steps.map((content, index) => ({
-            cocktailId,
-            content,
-            sortOrder: index + 1,
-          })),
-        });
-        return this.project(
-          await this.requireRecipe(tx, workspaceId, cocktailId),
-        );
+      await tx.preparationStep.createMany({
+        data: dto.steps.map((content, index) => ({
+          cocktailId,
+          content,
+          sortOrder: index + 1,
+        })),
       });
+      return this.project(
+        await this.requireRecipe(tx, workspaceId, cocktailId),
+      );
     } catch (error: unknown) {
       if (error instanceof CocktailCreationValidationError)
         throw new BadRequestException(error.message);
