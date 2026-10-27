@@ -124,3 +124,20 @@
 }
 
 .home-page { padding-inline: var(--page-gutter); }
+
+@media (min-width: 1440px) {
+  .home-page {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2rem, 5vw, 8rem);
+    align-items: center;
+  }
+  .hero { justify-self: center; width: 100%; }
+  .home-panel {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 56rem;
+    margin-top: 0;
+    gap: var(--space-6);
+    justify-self: center;
+  }
+}

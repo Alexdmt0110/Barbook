@@ -251,3 +251,7 @@ a {
 }
 
 .folders-page { padding-inline: var(--page-gutter); }
+
+/* Collection tracks are fluid; short forms keep a comfortable input length. */
+.folders-page > [aria-labelledby='create-folder-title'],
+.folders-page > .search-form { max-inline-size: 64rem; }
