@@ -1,5 +1,27 @@
 # Handoff canonique Barbook — Bêta Bar et qualification de sécurité
 
+## Priorité UX — 27 octobre 2026
+
+Nouveau mandat UX/UI prioritaire lu dans Texte collé.txt. Main d552885 et PR40 draft8f77909/sixchecks success recontrôlés ; worktree BB1b propre, aucun travail perdu. BB1b préservé et suspendu pour corrections UX prioritaires ; pas de merge40 ni nouvelle fonction métier. Branche feature/ux-foundations publiée depuis main, un seul écrivain. [Design transversale](ux-design.md) : inventaire statique, anomaliesP1/P2, stratégie containers/tokens, découpageUX-A→E et matrice visuelle. Captures annotées non accessibles dans la pièce texte ; aucune inspection prétendue. Produire avant/après réels en CI/navigateur avant Gate.
+
+Prochain bloc : UX-A fondations et grilles avec baseline visuelle puis qualification ; UX-B sécurité/profil et UX-C lecture seule ; P1UX-D avant repriseBB1b. Carrousel étude seulement, P3différés. Intégrer main qualifié dans BB1b par merge non destructif après UX, jamais recopier son backend. BB2/3/4 attendent les défauts bloquants qualifiés. Risque30octobre explicitement signalé : livraison complète non garantie ; OPS documentaire seulement, aucun accès réel.
+
+## BB1b — implémentation serveur en cours, 27 octobre 2026
+
+Base main d552885 recontrôlée, design f85d7dd validé. Code a021af6 publié : lecture/remplacement de contenu dans la transaction autorisée, routes GET/PUT Bar avec appartenance/accessVersion et contentVersion. Aucun faux utilisateur ou transaction imbriquée, contrats personnels conservés. Verify local backend273/26, typage/lint/Prisma/compatibilité réussis ; deux nouveaux tests HTTP/PG écrits à qualifier en CI native. Aucun BB1b complet ni merge annoncé.
+
+Prochain bloc : qualifier ces tests puis liste/détail/création/autocomplete scoped et contexte Angular/drafts coordonnés. UI Bar, BB1c et qualification à deux comptes restent à livrer avant Gate final et D8. Priorité ensuite inventaire manuel indépendant/suggestions ; batchs indépendants. Risque30octobre signalé.
+
+[Demande OPS distincte](beta-bar-ops-authorization.md) préparée : cible historique non confirmée, D7/RPO/RTO/sauvegardes à décider. Inventaire réel en lecture seule à autoriser séparément ; aucune action VPS/base propriétaire/compte réel/déploiement. Proposition de socle réduit Personnel/Bar sûr ; copie à reporter seulement après décision explicite.
+
+## Reprise BB1b — 27 octobre 2026
+
+PR39 fusionnée d55288582d896adfb3b7dba24115698e2208f495 à2026-10-26T23:29:38Z ; parents f4a905e3/0cbe7a19, arbrede1286d0 identique. Six post-merge et six journaux273/229/240/12, audits0, preuves complètes dans PR39. BB1a clos, toutes branches conservées. Aucun carnet partagé complet encore livré.
+
+Branche feature/bar-recipe-workspace publiée depuis ce main qualifié ; [Design BB1b](bb1b-design.md) publié avant code. Prochain bloc : extraction transactionnelle des opérations recettes, routes scoped et contexte API/Angular coordonnés ; tests d'isolation/révocation/drafts avant Gate et D8. BB1c copie explicite ensuite. Aucun arbitrage bloquant identifié, aucun accord routine attendu. Risque30octobre : collaboration et lots métier/OPS restent à livrer, priorité exclusive aux parcours essentiels.
+
+Git : branche dédiée, publication immédiate et checkpoint. SQL : aucune migration propriétaire ; tests jetables seulement. OPS réel/provisionnement/VPS/déploiement interdits sans accord distinct. Les sections suivantes sont historiques.
+
 ## Reprise BB1a — 26 octobre 2026
 
 L5/BB0 CLOTURE_TECHNIQUEMENT_SUR_MAIN : PR38 fusionnée f4a905e3f0a2ad74b31c062353fb60ddbdccb09c à13:04:21Z, parents7a9464bf/5d13304e, arbre1acdaae8 conforme ; six post-merge et six journaux273/229/226/12, audits0, dix critères revalidés. Checkpoint exact dans PR38. Toutes branches conservées.
