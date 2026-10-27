@@ -1,5 +1,13 @@
 # Handoff canonique Barbook — Bêta Bar et qualification de sécurité
 
+## BB1b — implémentation serveur en cours, 27 octobre 2026
+
+Base main d552885 recontrôlée, design f85d7dd validé. Code a021af6 publié : lecture/remplacement de contenu dans la transaction autorisée, routes GET/PUT Bar avec appartenance/accessVersion et contentVersion. Aucun faux utilisateur ou transaction imbriquée, contrats personnels conservés. Verify local backend273/26, typage/lint/Prisma/compatibilité réussis ; deux nouveaux tests HTTP/PG écrits à qualifier en CI native. Aucun BB1b complet ni merge annoncé.
+
+Prochain bloc : qualifier ces tests puis liste/détail/création/autocomplete scoped et contexte Angular/drafts coordonnés. UI Bar, BB1c et qualification à deux comptes restent à livrer avant Gate final et D8. Priorité ensuite inventaire manuel indépendant/suggestions ; batchs indépendants. Risque30octobre signalé.
+
+[Demande OPS distincte](beta-bar-ops-authorization.md) préparée : cible historique non confirmée, D7/RPO/RTO/sauvegardes à décider. Inventaire réel en lecture seule à autoriser séparément ; aucune action VPS/base propriétaire/compte réel/déploiement. Proposition de socle réduit Personnel/Bar sûr ; copie à reporter seulement après décision explicite.
+
 ## Reprise BB1b — 27 octobre 2026
 
 PR39 fusionnée d55288582d896adfb3b7dba24115698e2208f495 à2026-10-26T23:29:38Z ; parents f4a905e3/0cbe7a19, arbrede1286d0 identique. Six post-merge et six journaux273/229/240/12, audits0, preuves complètes dans PR39. BB1a clos, toutes branches conservées. Aucun carnet partagé complet encore livré.
