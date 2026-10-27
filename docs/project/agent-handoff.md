@@ -1,5 +1,13 @@
 # Handoff canonique Barbook — Bêta Bar et qualification de sécurité
 
+## UX-A intégré ; UX-B implémenté — 27 octobre2026
+
+PR41 fusionnée e9dd29afbb3fba62dd602035bd36b33ba13dcd5b à12:09:32Z, parentsd552885/792fe122, arbre dde6113360c0d4d217c49f7313be64ade5427e0f identique. Six post-merge/sixjournaux273backend/229frontend/240PG/16Chromium, audits0. Artefact final12725484834 SHA256b170a3f3b61c39a5ab7a72c5bb66f476879bd2e7c2ce74bbb3360445e0687ff7 vérifié ; accueil2560/3440 et formulaires dossiers clair/sombre/mobile inspectés. Gate et checkpoint exacts dans PR41.
+
+Branche feature/account-security-panel publiée depuis main qualifié ; design39129d8 avant code. Ajustement UX-B : panneau non modal pour ne pas quitter/détruire le formulaire en cours ; GlobalLogout monté une fois, affiché uniquement panneau ouvert ou résultat global incertain. Aucun AuthService/backend modifié. Fermeture/Escape revient au déclencheur et efface la confirmation sensible via cancel existant, sauf résultat incertain. Tests ciblés ouverture/focus/incertitude ; verify frontend231/32 avant dernier ajout de réinitialisation, nouvelle vérification complète en cours. Typage e2e passé. Parcours réel déconnexion globale conserve assertions et ouvre désormais le panneau ; captures panneau prévues dans matrice existante. CI native/inspection visuelle/Gate encore requis, aucun UX-B qualifié ni merge annoncé.
+
+Prochain pas : lire vérification locale et CI du dernierHEAD, vérifier captures panneau clair/sombre/mobile/granddesktop et scénarios sécurité, corriger puis Gate/D8/main. UX-C ensuite, crayon principal et lecture seule, puis UX-Dprioritaire. PR40 et BB1b inchangés, réintégration ultérieure par merge non destructif. UX-E/carrousel exclus. Aucune opération OPS réelle, compte réel, migration propriétaire ou infrastructure. Développement qualifié≠disponibilité pour Alex/Maël ; risque30octobre maintenu.
+
 ## Priorité UX — 27 octobre 2026
 
 Nouveau mandat UX/UI prioritaire lu dans Texte collé.txt. Main d552885 et PR40 draft8f77909/sixchecks success recontrôlés ; worktree BB1b propre, aucun travail perdu. BB1b préservé et suspendu pour corrections UX prioritaires ; pas de merge40 ni nouvelle fonction métier. Branche feature/ux-foundations publiée depuis main, un seul écrivain. [Design transversale](ux-design.md) : inventaire statique, anomaliesP1/P2, stratégie containers/tokens, découpageUX-A→E et matrice visuelle. Captures annotées non accessibles dans la pièce texte ; aucune inspection prétendue. Produire avant/après réels en CI/navigateur avant Gate.

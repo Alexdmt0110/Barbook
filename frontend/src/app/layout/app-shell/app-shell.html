@@ -1,52 +1,30 @@
 <div class="app-shell">
   <header class="app-header">
     <div class="header-content">
-      <a
-        class="brand"
-        routerLink="/"
-      >
-        <span class="brand-mark">
-          B
-        </span>
+      <a class="brand" routerLink="/">
+        <span class="brand-mark"> B </span>
 
-        <span>
-          Barbook
-        </span>
+        <span> Barbook </span>
       </a>
 
-      <nav
-        class="main-navigation"
-        aria-label="Navigation principale"
-      >
+      <nav class="main-navigation" aria-label="Navigation principale">
         <a
           routerLink="/"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{
-            exact: true
+            exact: true,
           }"
         >
           Accueil
         </a>
 
-        <a
-          routerLink="/cocktails"
-          routerLinkActive="active"
-        >
-          Mes cocktails
-        </a>
+        <a routerLink="/cocktails" routerLinkActive="active"> Mes cocktails </a>
         <a routerLink="/folders" routerLinkActive="active">Dossiers</a>
         <a routerLink="/trash" routerLinkActive="active">Corbeille</a>
       </nav>
 
       <div class="user-actions">
-        @if (
-          authService.currentUser();
-          as user
-          ) {
-          <span class="user-name">
-            {{ user.displayName }}
-          </span>
-        }
+        <app-account-panel />
 
         <button
           type="button"
@@ -63,11 +41,15 @@
   </header>
 
   <main class="app-content">
-    <app-global-logout />
     @if (authService.logoutUncertain()) {
-      <p role="alert">Déconnexion non confirmée. Si le réseau est indisponible, réessaie avant de quitter cet appareil.</p>
+      <p role="alert">
+        Déconnexion non confirmée. Si le réseau est indisponible, réessaie avant de quitter cet
+        appareil.
+      </p>
       @if (!authService.globalLogoutUncertain()) {
-        <button type="button" [disabled]="authService.logoutPending()" (click)="logout()">Réessayer la déconnexion</button>
+        <button type="button" [disabled]="authService.logoutPending()" (click)="logout()">
+          Réessayer la déconnexion
+        </button>
       }
     } @else if (authService.isAuthenticated()) {
       <router-outlet />
@@ -75,4 +57,6 @@
   </main>
 </div>
 
-@if (resume.checking()) { <p role="status">Vérification de la session…</p> }
+@if (resume.checking()) {
+  <p role="status">Vérification de la session…</p>
+}
