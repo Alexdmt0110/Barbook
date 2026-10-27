@@ -90,8 +90,8 @@
         <div class="selected-tags" aria-label="Dossiers sélectionnés">
           @for (selected of selectedFolders(); track selected.id) {
             <span class="selected-tag"
-              >{{ selected.name
-              }}<button
+              ><span class="selected-tag-label">{{ selected.name }}</span
+              ><button
                 type="button"
                 [attr.aria-label]="'Retirer le dossier ' + selected.name"
                 [disabled]="busy()"
@@ -185,7 +185,7 @@
           <div class="selected-tags" aria-label="Tags sélectionnés">
             @for (tagName of selectedTagNames(); track tagName) {
               <span class="selected-tag">
-                {{ tagName }}
+                <span class="selected-tag-label">{{ tagName }}</span>
 
                 <button
                   type="button"

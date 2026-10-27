@@ -1,3 +1,4 @@
+import { captureControlThemes } from '../fixtures/control-theme-captures';
 import { globalLogoutJourney } from '../fixtures/global-logout-journey';
 import { exerciseDraftQuota, acceptDraftNavigation, loseCreationResponse, restoreConflictedOrganization, restoreCreationAfterRefresh } from '../fixtures/draft-journeys';
 import { expect, Page, test } from '@playwright/test';
@@ -93,6 +94,11 @@ test('register, create, classify, manage folders and log back in', async ({ page
 
   await fillRecipeForm(page, name);
   await restoreCreationAfterRefresh(page, name);
+  const abandonDraft = page.getByRole('button', { name: 'Abandonner le brouillon', exact: true });
+  expect((await abandonDraft.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  await captureControlThemes(page, testInfo, 'creation-draft-controls');
+  await abandonDraft.focus();
+  await page.screenshot({path: testInfo.outputPath('creation-draft-controls.png'), fullPage: true, animations: 'disabled'});
   const createdResponse = page.waitForResponse(
     (response) =>
       response.request().method() === 'POST' &&
@@ -114,7 +120,7 @@ test('register, create, classify, manage folders and log back in', async ({ page
   await expect(page).toHaveURL(`http://127.0.0.1:4200/cocktails/id/${created.id}/edit`);
   await page.getByRole('button', { name: 'Modifier les dossiers et tags', exact: true }).click();
 
-  const folderNames = [`E2E dossier ${suffix}`, `E2E autre <i>${suffix}</i>`];
+  const folderNames = [`E2E dossier ${suffix}`, `E2E autre <i>${suffix}</i> ${'x'.repeat(35)}`];
   const folders: { id: string; name: string }[] = [];
   for (const folderName of folderNames) {
     await page.getByLabel('Nom du nouveau dossier', { exact: true }).fill(folderName);
@@ -134,6 +140,20 @@ test('register, create, classify, manage folders and log back in', async ({ page
   );
   await page.getByLabel('Nom du nouveau tag', { exact: true }).fill(tagName);
   await page.getByRole('button', { name: 'Ajouter', exact: true }).click();
+  const removals = page.locator('app-cocktail-organization-editor').getByRole('button', {name: /^Retirer le (dossier|tag) /});
+  await expect(removals).toHaveCount(3);
+  for (const button of await removals.all()) {
+    const box = (await button.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await captureControlThemes(page, testInfo, 'classification-controls');
+  await removals.first().focus();
+  await page.keyboard.press('Tab');
+  await expect(removals.nth(1)).toBeFocused();
+  await page.screenshot({path: testInfo.outputPath('classification-control-focus.png'), fullPage: true, animations: 'disabled'});
+
   const savedResponse = page.waitForResponse(
     (response) =>
       response.request().method() === 'PUT' &&

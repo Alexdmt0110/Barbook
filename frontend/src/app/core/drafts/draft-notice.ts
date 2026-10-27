@@ -12,8 +12,12 @@ import { FormDraft } from './form-draft';
           Un brouillon de moins de 24 heures est disponible pour ce compte et cet espace. Il ne sera
           envoyé qu’après ton action explicite.
         </p>
-        <button type="button" (click)="restore.emit()">Restaurer le brouillon</button>
-        <button type="button" (click)="discard.emit()">Abandonner le brouillon</button>
+        <button class="bb-button bb-button--primary" type="button" (click)="restore.emit()">
+          Restaurer le brouillon
+        </button>
+        <button class="bb-button bb-button--danger" type="button" (click)="discard.emit()">
+          Abandonner le brouillon
+        </button>
       </aside>
     }
     @if (draft().invalid()) {
@@ -58,11 +62,11 @@ import { FormDraft } from './form-draft';
               : 'Vérifie la bibliothèque ou recharge le classement avant tout nouvel envoi.'
           }}
         </p>
-        <a routerLink="/cocktails" target="_blank" rel="noopener"
+        <a class="bb-button bb-button--ghost" routerLink="/cocktails" target="_blank" rel="noopener"
           >Vérifier ma bibliothèque dans un autre onglet</a
         >
         @if (!controlledResolution()) {
-          <button type="button" (click)="draft().verifiedAbsent()">
+          <button class="bb-button" type="button" (click)="draft().verifiedAbsent()">
             J’ai vérifié : autoriser un nouvel envoi
           </button>
         }
@@ -75,7 +79,9 @@ import { FormDraft } from './form-draft';
         </p>
       }
       @if (!controlledResolution() || (!draft().conflict() && !draft().uncertain())) {
-        <button type="button" (click)="discard.emit()">Abandonner le brouillon</button>
+        <button class="bb-button bb-button--danger" type="button" (click)="discard.emit()">
+          Abandonner le brouillon
+        </button>
       }
     }
   `,
@@ -85,13 +91,20 @@ import { FormDraft } from './form-draft';
         display: block;
       }
       aside {
-        padding: 1rem;
-        border: 1px solid currentColor;
-        margin-block: 1rem;
+        padding: var(--space-4);
+        border: 1px solid var(--color-border-strong);
+        border-radius: var(--radius-field);
+        background: var(--color-surface);
+        margin-block: var(--space-4);
+      }
+      p {
+        max-width: 70ch;
+        line-height: 1.65;
       }
       button,
       a {
-        margin: 0.25rem;
+        margin: var(--space-1);
+        max-width: calc(100% - 0.5rem);
       }
     `,
   ],
