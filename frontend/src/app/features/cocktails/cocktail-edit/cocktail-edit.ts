@@ -1,5 +1,13 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, HostListener, OnInit, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  HostListener,
+  OnInit,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormArray, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -30,6 +38,8 @@ import {
 } from './cocktail-edit.form';
 import { isEditDraft } from './cocktail-edit.draft';
 import { CocktailContentPreview } from './cocktail-content-preview';
+import { CocktailDetail, CocktailOrganizationResult } from '../data-access/cocktail.models';
+import { CocktailOrganizationEditor } from '../cocktail-detail/cocktail-organization-editor/cocktail-organization-editor';
 
 @Component({
   selector: 'app-cocktail-edit',
@@ -39,11 +49,16 @@ import { CocktailContentPreview } from './cocktail-content-preview';
     IngredientAutocomplete,
     DraftNotice,
     CocktailContentPreview,
+    CocktailOrganizationEditor,
   ],
   templateUrl: './cocktail-edit.html',
   styleUrls: ['../cocktail-create/cocktail-create.css', './cocktail-edit.css'],
 })
 export class CocktailEdit implements OnInit {
+  private readonly organizationEditor = viewChild(CocktailOrganizationEditor);
+  readonly organization = signal<CocktailDetail | null>(null);
+  readonly organizationLoading = signal(false);
+  readonly organizationError = signal<string | null>(null);
   private readonly fb = inject(FormBuilder);
   private readonly store = inject(DraftStore);
   private readonly api = inject(CocktailsService);
@@ -86,6 +101,9 @@ export class CocktailEdit implements OnInit {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       this.routeReset.next();
       this.loaded.set(null);
+      this.organization.set(null);
+      this.organizationError.set(null);
+      this.organizationLoading.set(false);
       this.catalog.clear();
       this.comparison.set(null);
       this.draft.set(null);
@@ -273,8 +291,39 @@ export class CocktailEdit implements OnInit {
         this.loaded() ? ['/cocktails', this.loaded()!.slug] : ['/cocktails'],
       );
   }
+  loadOrganization(): void {
+    const loaded = this.loaded();
+    if (!this.current() || !loaded || this.organization() || this.organizationLoading()) return;
+    this.organizationLoading.set(true);
+    this.organizationError.set(null);
+    this.api
+      .getPersonalCocktail(loaded.slug)
+      .pipe(
+        takeUntil(this.routeReset),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.organizationLoading.set(false)),
+      )
+      .subscribe({
+        next: (recipe) => {
+          if (!this.current()) return;
+          if (recipe.id !== loaded.id || recipe.slug !== loaded.slug) {
+            this.organizationError.set(
+              'La recette reçue ne correspond pas. Recharge explicitement la page.',
+            );
+            return;
+          }
+          this.organization.set(recipe);
+        },
+        error: (error) => {
+          if (this.current()) this.organizationError.set(this.message(error));
+        },
+      });
+  }
+  onOrganizationUpdated(result: CocktailOrganizationResult): void {
+    this.organization.update((recipe) => (recipe ? { ...recipe, ...result } : null));
+  }
   canLeave(): boolean {
-    return this.draft()?.canLeave() ?? true;
+    return (this.draft()?.canLeave() ?? true) && (this.organizationEditor()?.canLeave() ?? true);
   }
   @HostListener('window:beforeunload', ['$event'])
   beforeUnload(event: BeforeUnloadEvent): void {

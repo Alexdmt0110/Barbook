@@ -1,28 +1,22 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, OnInit, signal, viewChild } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import {
   CocktailDetail as CocktailDetailModel,
-  CocktailOrganizationResult,
   CocktailType,
   MeasurementUnit,
   RecipeMethod,
 } from '../data-access/cocktail.models';
 import { CocktailsService } from '../data-access/cocktails.service';
-import { CocktailOrganizationEditor } from './cocktail-organization-editor/cocktail-organization-editor';
 
 @Component({
   selector: 'app-cocktail-detail',
-  imports: [RouterLink, CocktailOrganizationEditor],
+  imports: [RouterLink],
   templateUrl: './cocktail-detail.html',
   styleUrl: './cocktail-detail.css',
 })
 export class CocktailDetail implements OnInit {
-  private readonly editor = viewChild(CocktailOrganizationEditor);
-  canLeave(): boolean {
-    return this.editor()?.canLeave() ?? true;
-  }
   private readonly route = inject(ActivatedRoute);
 
   private readonly cocktailsService = inject(CocktailsService);
@@ -72,22 +66,6 @@ export class CocktailDetail implements OnInit {
           this.resolveError(error);
         },
       });
-  }
-
-  onOrganizationUpdated(organization: CocktailOrganizationResult): void {
-    this.cocktail.update((cocktail) => {
-      if (!cocktail) {
-        return null;
-      }
-
-      return {
-        ...cocktail,
-        folder: organization.folder,
-        folders: organization.folders,
-        organizationVersion: organization.organizationVersion,
-        tags: organization.tags,
-      };
-    });
   }
 
   typeLabel(type: CocktailType): string {

@@ -33,6 +33,7 @@ export async function restoreCreationAfterRefresh(page: Page, name: string): Pro
 
 export async function restoreConflictedOrganization(page: Page): Promise<void> {
   await page.reload();
+  await page.getByRole('button', { name: 'Modifier les dossiers et tags', exact: true }).click();
   await page.getByRole('button', { name: 'Restaurer le brouillon', exact: true }).click();
   await expect(
     page.getByRole('button', { name: 'Retirer le tag Draft', exact: true }),

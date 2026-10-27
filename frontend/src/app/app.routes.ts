@@ -81,7 +81,6 @@ export const routes: Routes = [
       },
       {
         path: 'cocktails/:slug',
-        canDeactivate: [draftExitGuard],
         title: 'Cocktail · Barbook',
         loadComponent: () =>
           import('./features/cocktails/cocktail-detail/cocktail-detail').then(

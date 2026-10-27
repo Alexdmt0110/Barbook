@@ -1,5 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { By } from '@angular/platform-browser';
+import { CocktailOrganizationEditor } from '../cocktail-detail/cocktail-organization-editor/cocktail-organization-editor';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
@@ -54,6 +56,70 @@ describe('Personal recipe editing UI and L4 drafts', () => {
     fixture.detectChanges();
     return fixture;
   }
+  it('loads organization only on explicit request, preserves its draft on content save and guards both forms', () => {
+    const f = setup();
+    const c = f.componentInstance;
+    http.expectNone('/api/cocktails/original-url');
+    c.loadOrganization();
+    c.loadOrganization();
+    http
+      .expectOne('/api/cocktails/original-url')
+      .flush({
+        id: 'recipe-a',
+        slug: 'original-url',
+        folders: [],
+        tags: [],
+        organizationVersion: 4,
+      });
+    f.detectChanges();
+    http.expectOne((r) => r.url === '/api/folders/browse').flush({ items: [], totalPages: 0 });
+    http.expectOne('/api/tags').flush([]);
+    f.detectChanges();
+    const editor = f.debugElement.query(By.directive(CocktailOrganizationEditor))
+      .componentInstance as CocktailOrganizationEditor;
+    editor.newTagName.set('Classement en cours');
+    editor.addTag();
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    expect(c.canLeave()).toBe(false);
+    c.submit();
+    http.expectOne(path).flush(snapshot());
+    f.detectChanges();
+    expect(editor.selectedTagNames()).toEqual(['Classement en cours']);
+    expect(c.canLeave()).toBe(false);
+    expect(confirm).toHaveBeenCalled();
+    expect(store.find(store.lease(), 'organization:recipe-a')).not.toBeNull();
+    http.expectNone((r) => r.method === 'PUT' && r.url.endsWith('/organization'));
+  });
+  it('keeps organization loading errors explicit and retries only after another action', () => {
+    const c = setup().componentInstance;
+    c.loadOrganization();
+    http
+      .expectOne('/api/cocktails/original-url')
+      .flush({}, { status: 404, statusText: 'Not found' });
+    expect(c.organizationError()).toContain('plus disponible');
+    http.expectNone('/api/cocktails/original-url');
+    c.loadOrganization();
+    http.expectOne('/api/cocktails/original-url').flush({ id: 'foreign', slug: 'original-url' });
+    expect(c.organization()).toBeNull();
+    expect(c.organizationError()).toContain('ne correspond pas');
+  });
+  it('ignores late organization data after identity change', () => {
+    const c = setup().componentInstance;
+    c.loadOrganization();
+    const req = http.expectOne('/api/cocktails/original-url');
+    store.purge();
+    store.confirmIdentity({ userId: 'bob', workspaceId: 'personal-b' });
+    req.flush({
+      id: 'recipe-a',
+      slug: 'original-url',
+      folders: [],
+      tags: [],
+      organizationVersion: 4,
+    });
+    expect(c.organization()).toBeNull();
+    c.loadOrganization();
+    http.expectNone('/api/cocktails/original-url');
+  });
   it('prefills every field, all sources and order, without capturing a draft or sending a PUT', () => {
     const f = setup();
     const c = f.componentInstance;
