@@ -31,6 +31,20 @@ for (const theme of ['light', 'dark']) {
           const content = page.locator('.home-page, .cocktails-page, .folders-page, .detail-page');
           expect((await content.boundingBox())!.width).toBeGreaterThan(width * 0.9);
         }
+        if (label === 'home') {
+          const trigger = page.getByRole('button', {name:'Compte et sécurité',exact:true});
+          await trigger.focus(); await page.keyboard.press('Enter');
+          const panel = page.getByRole('region', {name:'Compte et sécurité',exact:true});
+          await expect(panel).toBeVisible();
+          const bounds = (await panel.boundingBox())!;
+          expect(bounds.x).toBeGreaterThanOrEqual(0);
+          expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+          expect(bounds.y + bounds.height).toBeLessThanOrEqual(900);
+          await page.screenshot({path:info.outputPath(`account-${theme}-${width}.png`),animations:'disabled'});
+          await page.keyboard.press('Escape');
+          await expect(trigger).toBeFocused();
+          await expect(page.getByRole('button', {name:'Déconnecter tous les appareils',exact:true})).toBeHidden();
+        }
         await page.screenshot({path:info.outputPath(`${label}-${theme}-${width}.png`),fullPage:true,animations:'disabled'});
       }
     }

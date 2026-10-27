@@ -1,4 +1,20 @@
+## UX-B — correction visuelle tablette avant Gate
+8726bcc : six contrôles verts,273/231/240/16, audits0 ; parcours historique desktop20,4s/mobile20,1s. Artefact12734603912 SHA256bd2900a4a162393108ca55a63836f15f1f335d23b0395ef55ec9f8f2ef90385e vérifié. Inspection réelle clair360/3440 et sombre390/768 : panneau768 déborde à gauche malgré assertions globales vertes. Correction : ancrage fixe borné au viewport et initiale compacte jusqu’à1100px ; ajout des assertions exactes des trois limites du panneau. Ce correctif exige six nouveaux contrôles et nouvelles captures avant Gate ; aucun merge prématuré.
+
+## UX-B — diagnostic Chromium du 27 octobre 2026
+PR42 HEAD39727c2 : cinq contrôles verts, navigateur15/16. Artefact12732979324 du run40502691211 téléchargé, SHA256 dbc32cf9a06695d94464fb2cd18cae7ebf470409e6e27352bdcfa3bd2ef229dc vérifié. Trace, capture d’échec et image vidéo finale inspectées : après Annuler, isVisible() instantané du bouton enfant renvoie false pendant le rendu Angular ; le déclencheur porte encore aria-expanded=true. Le test clique alors le déclencheur et ferme le panneau, puis attend le bouton masqué jusqu’au timeout60s. page.unroute est une conséquence du teardown, pas la cause.
+Correction de synchronisation : ouverture fondée sur aria-expanded, attente explicite de la disparition du formulaire et du retour du bouton après Annuler. Assertions de saisie, révocation, mot de passe refusé, BFCache et réponse perdue conservées ; aucun timeout/retry modifié. Requalification complète du nouveau HEAD obligatoire avant Gate/merge.
+Cohérence compte : seules identité en lecture seule et sécurité existante sont présentées, aucun paramètre fictif. Regroupement thème/déconnexion évalué : conserver pour cette tranche les accès directs existants évite de modifier les parcours de déconnexion et garde le thème immédiatement accessible ; panneau dédié explicitement à Compte et sécurité. Pas de nouveau moteur de sécurité. PR40 préservée ; UX-C puis UX-D prioritaires, aucun UX-E/carrousel ni OPS réel.
+
 # Handoff canonique Barbook — Bêta Bar et qualification de sécurité
+
+## UX-A intégré ; UX-B implémenté — 27 octobre2026
+
+PR41 fusionnée e9dd29afbb3fba62dd602035bd36b33ba13dcd5b à12:09:32Z, parentsd552885/792fe122, arbre dde6113360c0d4d217c49f7313be64ade5427e0f identique. Six post-merge/sixjournaux273backend/229frontend/240PG/16Chromium, audits0. Artefact final12725484834 SHA256b170a3f3b61c39a5ab7a72c5bb66f476879bd2e7c2ce74bbb3360445e0687ff7 vérifié ; accueil2560/3440 et formulaires dossiers clair/sombre/mobile inspectés. Gate et checkpoint exacts dans PR41.
+
+Branche feature/account-security-panel publiée depuis main qualifié ; design39129d8 avant code. Ajustement UX-B : panneau non modal pour ne pas quitter/détruire le formulaire en cours ; GlobalLogout monté une fois, affiché uniquement panneau ouvert ou résultat global incertain. Aucun AuthService/backend modifié. Fermeture/Escape revient au déclencheur et efface la confirmation sensible via cancel existant, sauf résultat incertain. Tests ciblés ouverture/focus/incertitude ; verify frontend231/32 avant dernier ajout de réinitialisation, nouvelle vérification complète en cours. Typage e2e passé. Parcours réel déconnexion globale conserve assertions et ouvre désormais le panneau ; captures panneau prévues dans matrice existante. CI native/inspection visuelle/Gate encore requis, aucun UX-B qualifié ni merge annoncé.
+
+Prochain pas : lire vérification locale et CI du dernierHEAD, vérifier captures panneau clair/sombre/mobile/granddesktop et scénarios sécurité, corriger puis Gate/D8/main. UX-C ensuite, crayon principal et lecture seule, puis UX-Dprioritaire. PR40 et BB1b inchangés, réintégration ultérieure par merge non destructif. UX-E/carrousel exclus. Aucune opération OPS réelle, compte réel, migration propriétaire ou infrastructure. Développement qualifié≠disponibilité pour Alex/Maël ; risque30octobre maintenu.
 
 ## Priorité UX — 27 octobre 2026
 
