@@ -5,7 +5,7 @@
 
 .home-page {
   width: 100%;
-  max-width: 1180px;
+  max-width: none;
   margin: 0 auto;
   padding: 110px 24px 80px;
 }
@@ -122,3 +122,5 @@
     gap: 24px;
   }
 }
+
+.home-page { padding-inline: var(--page-gutter); }

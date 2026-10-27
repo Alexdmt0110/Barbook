@@ -5,7 +5,7 @@
 
 .detail-page {
   width: 100%;
-  max-width: 1180px;
+  max-width: none;
   margin: 0 auto;
   padding: 54px 24px 96px;
 }
@@ -494,4 +494,13 @@
   max-width: 100%;
   overflow-wrap: anywhere;
   color: var(--color-accent);
+}
+
+.detail-page { padding-inline: var(--page-gutter); }
+
+/* Readable recipe prose even when the surrounding presentation is fluid. */
+.detail-page p { max-inline-size: 70ch; }
+@media (min-width: 1440px) {
+  .detail-hero { grid-template-columns: minmax(280px, 36rem) minmax(0, 1fr); }
+  .hero-content { padding: var(--space-12); gap: var(--section-gap); }
 }
