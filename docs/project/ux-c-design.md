@@ -1,0 +1,15 @@
+# UX-C — Design Review préventive
+27 octobre 2026. Base main vérifiée :0a803e9194d2754d603bac78b06ea1b6a5f83d89, mergeUX-B du27octobre12:55:23Z. Design seule publiée pendant attente du sixième contrôle post-merge ; aucune modification applicative avant qualification complète. Périmètre personnel existant uniquement ; BB1b/PR40 conservé, aucun backend ni activation de corbeille partagée.
+
+## Consultation et point d’entrée
+La fiche est en lecture seule : supprimer son éditeur d’organisation et ses chargements de catalogues. Garder tags et liens dossiers comme données consultables. Un groupe d’actions en haut à droite du hero présente crayon et corbeille, liens natifs avec SVG décoratif, nom accessible et title explicites ; cibles44px. Le crayon ouvre l’unique page Modifier la recette ; corbeille ouvre uniquement la confirmation D5 existante.
+
+## Édition cohérente, sauvegardes distinctes
+Réutiliser CocktailEdit pour le contenu et CocktailOrganizationEditor/FormDraft pour les dossiers/tags. Sur la même page, section Dossiers et tags avec chargement explicite de l’état serveur, puis éditeur existant. Message explicite : contenu et organisation se sauvegardent séparément ; chaque bouton nomme son périmètre. Aucun Save All, aucune promesse atomique entre deux requêtes.
+Charger le classement seulement à la demande via GET personnel du slug obtenu du snapshot de contenu, vérifier même ID et bail DraftStore avant rendu ; interdire double chargement, annuler à changement de route/destruction, gérer échec et reprise explicite. Ne pas réinitialiser un brouillon de classement à chaque sauvegarde du contenu. Le guard de sortie consulte les deux FormDraft ; beforeunload existants conservés. Changer la page ou l’identité ne peut appliquer de réponse tardive. Aucun changement de version côté client pour contourner un409, aucune resoumission.
+
+## Espacement et lisibilité
+Utiliser les tokens existants pour marges/gaps de fiche et groupe d’actions. Titre borné et interligne lisible y compris nom long mobile. La dernière cellule impaire de service prend les deux colonnes sur desktop, supprimant la zone de fond vide ; une colonne sur mobile. Préserver ordre de lecture, contraste, retours à la ligne et largeur de prose. Pas d’image nouvelle, carrousel, animation ou refonte backend.
+
+## Qualification
+Unitaires : fiche sans inputs/editor ni chargement catalogues, liens accessibles ; ouverture explicite de classement sur édition, erreur/retry, identité tardive, guard des deux brouillons. Adapter les parcours historiques au nouveau point d’entrée sans supprimer leurs assertions de versions/conflits/brouillons. HTTP/PG existants conservés240 ; Chromium réel : consultation readonly, crayon clavier, classement sauvegardé et retour readonly, contenu inchangé, D5 confirmation ; captures clair/sombre360/390/768/1440/2560/3440. Revoir les images réelles avant Gate. Aucun seuil/timeout/retry/quota diminué. SixCI au dernierHEAD, diff complet et discussions, Gate D8 puis merge commit et qualification main.
