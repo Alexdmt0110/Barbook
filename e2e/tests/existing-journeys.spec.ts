@@ -1,3 +1,4 @@
+import { captureControlThemes } from '../fixtures/control-theme-captures';
 import { globalLogoutJourney } from '../fixtures/global-logout-journey';
 import { exerciseDraftQuota, acceptDraftNavigation, loseCreationResponse, restoreConflictedOrganization, restoreCreationAfterRefresh } from '../fixtures/draft-journeys';
 import { expect, Page, test } from '@playwright/test';
@@ -95,6 +96,7 @@ test('register, create, classify, manage folders and log back in', async ({ page
   await restoreCreationAfterRefresh(page, name);
   const abandonDraft = page.getByRole('button', { name: 'Abandonner le brouillon', exact: true });
   expect((await abandonDraft.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  await captureControlThemes(page, testInfo, 'creation-draft-controls');
   await abandonDraft.focus();
   await page.screenshot({path: testInfo.outputPath('creation-draft-controls.png'), fullPage: true, animations: 'disabled'});
   const createdResponse = page.waitForResponse(
@@ -146,7 +148,10 @@ test('register, create, classify, manage folders and log back in', async ({ page
     expect(box.height).toBeGreaterThanOrEqual(44);
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await captureControlThemes(page, testInfo, 'classification-controls');
   await removals.first().focus();
+  await page.keyboard.press('Tab');
+  await expect(removals.nth(1)).toBeFocused();
   await page.screenshot({path: testInfo.outputPath('classification-control-focus.png'), fullPage: true, animations: 'disabled'});
 
   const savedResponse = page.waitForResponse(
