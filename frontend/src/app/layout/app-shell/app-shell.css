@@ -24,7 +24,7 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   width: 100%;
-  max-width: 1180px;
+  max-width: none;
   min-height: 82px;
   margin: 0 auto;
   padding: 0 24px;
@@ -176,3 +176,5 @@
     font-size: 0.82rem;
   }
 }
+
+.header-content { padding-inline: var(--page-gutter); }

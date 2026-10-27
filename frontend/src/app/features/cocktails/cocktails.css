@@ -5,7 +5,7 @@
 
 .cocktails-page {
   width: 100%;
-  max-width: 1180px;
+  max-width: none;
   margin: 0 auto;
   padding: 76px 24px 90px;
 }
@@ -189,8 +189,8 @@
 .cocktail-grid {
   display: grid;
   grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-  gap: 24px;
+    repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: var(--grid-gap);
 }
 
 .cocktail-card {
@@ -526,3 +526,5 @@
     flex: 1 1 0;
   }
 }
+
+.cocktails-page { padding-inline: var(--page-gutter); }

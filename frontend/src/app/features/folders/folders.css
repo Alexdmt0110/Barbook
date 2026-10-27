@@ -3,7 +3,7 @@
   min-width: 0;
 }
 .folders-page {
-  max-width: 1180px;
+  max-width: none;
   margin: 0 auto;
   padding: 36px 24px 56px;
   min-width: 0;
@@ -53,8 +53,8 @@ p {
 }
 .folder-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: var(--grid-gap);
 }
 .folder-card {
   display: flex;
@@ -249,3 +249,9 @@ a {
     width: 100%;
   }
 }
+
+.folders-page { padding-inline: var(--page-gutter); }
+
+/* Collection tracks are fluid; short forms keep a comfortable input length. */
+.folders-page > [aria-labelledby='create-folder-title'],
+.folders-page > .search-form { max-inline-size: 64rem; }
