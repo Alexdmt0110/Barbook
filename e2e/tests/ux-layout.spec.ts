@@ -26,6 +26,11 @@ for (const theme of ['light', 'dark']) {
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
         if (label === 'library') await expect(page.getByRole('heading', {name, exact:true})).toBeVisible();
         if (label === 'detail') await expect(page.getByRole('heading', {name, exact:true})).toBeVisible();
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+        if (width >= 1440) {
+          const content = page.locator('.home-page, .cocktails-page, .folders-page, .detail-page');
+          expect((await content.boundingBox())!.width).toBeGreaterThan(width * 0.9);
+        }
         await page.screenshot({path:info.outputPath(`${label}-${theme}-${width}.png`),fullPage:true,animations:'disabled'});
       }
     }
