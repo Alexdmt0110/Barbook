@@ -2,6 +2,9 @@
 
 Objectif : usage privé réel par Alex et Maël le vendredi 30 octobre 2026, Europe/Paris. Cible de livraison, pas promesse ni dispense de sécurité. La clarification d'inventaire reçue le24octobre remplace le premier cadrage de consommation : **compteurs manuels d'unités physiques, aucune liaison de stock avec recettes ou batchs**. Aucun moteur de stock n'a été développé avant cette clarification.
 
+## Évolution autorisée du27octobre — espaces depuis le profil
+[Design BB-ESPACES-UX-01](bb1-workspace-ux-design.md) : BB1b place le sélecteur Personnel/Bars dans le panneau de compte et conserve sécurité/brouillons/isolation. Incrément BB1d : création utilisateur d’un Bar nommé/coloré, OWNER transactionnel, sans création de compte ; remplace le provisionnement manuel obligatoire. Les réglages ultérieurs d’identité peuvent suivre la première bêta ; BB2/BB3 ne les attendent pas. Le calendrier historique ci-dessous est dépassé : carnet partagé encore incomplet au27octobre et cible30octobre à risque. Premier usage sans provisionnement manuel exige aussi la création minimale de Bar ; aucune fonction absente ni instance CI n’est présentée comme prête au service. Aucun OPS réel autorisé.
+
 ## Mandat et décisions applicables
 
 - D8 : merges L5/Bêta Bar non destructifs préautorisés uniquement après Design Review, périmètre approuvé, Review Gate complet sans BLOCKER/P1, tests pertinents réellement exécutés, six checks réussis du dernier HEAD, revue diff/historique/dépendances/compatibilité/commentaires, merge commit propre, vérification effective du merge et qualification post-merge main. Toutes branches historiques conservées ; checkpoint/journal/docs actualisés. Green seul ne suffit jamais.

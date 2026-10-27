@@ -1,5 +1,11 @@
 # Décisions Barbook
 
+## BB-ESPACES-UX-01 — validée le 27 octobre 2026
+Le mandat utilisateur place Personnel/Bar dans le panneau ouvert par nom/initiales. Personnel reste privé ; catalogue des seuls Bars membres, action « Créer un bar » ou « Créer mon premier bar » après état vide confirmé ; Compte et sécurité reste accessible. Bascule explicite, contexte serveur, isolation/sessions/garanties D2 conservés.
+Tout utilisateur authentifié/admis peut créer explicitement un Bar nommé et choisir sa couleur dans une palette. Transaction serveur : nouveau SHARED et créateur OWNER local uniquement. Ajout ultérieur de membres déjà inscrits ; aucune inscription publique, attribution OWNER d’un Bar existant ou création automatique. Cette décision remplace l’obligation antérieure de provisionnement OPS pour créer le Bar, pas les restrictions sur les opérations réelles.
+Chaque Bar persiste sa clé de palette, partagée entre membres après contexte confirmé. Le mode clair/sombre reste utilisateur ; accents pertinents seulement, états de sécurité inchangés ; retour Personnel restaure les accents habituels. OWNER seul modifie l’identité. [Design et phasage](bb1-workspace-ux-design.md) : BB1b prioritaire puis incrément court de création/identité, réglage ultérieur différable pour ne pas bloquer batchs/inventaire. Palette technique à qualifier, aucune fonction annoncée livrée.
+D8, D1/D2/D5 et L5-COMPAT-01B maintenus. Aucun VPS, déploiement, compte réel, migration propriétaire, coût ou CONTRACT autorisé ; D7 reste ouvert. Les mandats antérieurs ci-dessous sont historiques lorsqu’ils contredisent cette décision.
+
 ## Mandat courant — 24 octobre 2026 : Bêta Bar, D3/D4 et D8
 
 Le [plan Bêta Bar](beta-bar-plan.md) fait foi pour le mandat récent et remplace les restrictions historiques contradictoires ci-dessous. Objectif privé Alex/Maël au 30 octobre, sans promesse de livraison incomplète.

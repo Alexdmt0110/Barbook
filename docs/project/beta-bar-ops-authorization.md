@@ -28,7 +28,7 @@ Release exacte identifiée par SHA/digests et six contrôles verts, Gate sans BL
 
 Recenser les migrations réellement appliquées. BB1a ajoute20261026131500_workspace_access_revocation aux huit historiques ; ne pas supposer que la base cible est à ce niveau. BB1b n'a pas de migration nouvelle à ce checkpoint. Toute migration propriétaire exige une autorisation distincte avec backup vérifié et comparaison du schéma. Jamais migrate reset, down destructif, purge ou écrasement.
 
-Comptes : Alex et Maël identifiés par leurs adresses confirmées, allowlist exacte, pas de wildcard. Inscription et mots de passe par leurs titulaires via HTTPS, aucun mot de passe commun ou secret publié. Création contrôlée du Bar et de l'appartenance OWNER d'Alex, puis MEMBER Maël ; script/commande idempotent et périmètre relus avant autorisation. Aucune route publique d'auto-attribution OWNER. Tester retrait/réadmission avec acteurs synthétiques, pas retirer un compte réel sans accord.
+Comptes : Alex et Maël identifiés par leurs adresses confirmées, allowlist exacte, pas de wildcard. Inscription et mots de passe par leurs titulaires via HTTPS, aucun mot de passe commun ou secret publié. Le mandat BB-ESPACES-UX-01 du27octobre autorise le développement d’une création utilisateur explicite de Bar : nom/palette et créateur OWNER transactionnels, puis ajout d’un compte existant comme MEMBER. Il remplace le script OPS obligatoire de création Bar/OWNER. Le parcours sera utilisé seulement après mise en service et comptes réels séparément autorisés ; aucune création réelle effectuée ici. Aucune route publique d’inscription ou d’auto-attribution OWNER dans un Bar existant. Tester retrait/réadmission avec acteurs synthétiques, pas retirer un compte réel sans accord.
 
 ## Sauvegarde et restauration à prouver
 
@@ -48,3 +48,6 @@ Après inventaire et exercice : fournir cible/chemins exacts, données à prése
 2. Après inventaire et préparation vérifiable, examiner la demande finale avec commandes/cible/sauvegarde/restauration/rollback précis ; autoriser séparément staging, migrations, provisionnement et déploiement souhaités.
 
 Aucune de ces autorisations n'est présumée par le mandat de développement ou une CI verte. L'absence d'accord OPS ne bloque pas le développement et la qualification des parcours indépendants.
+
+## Delta prévu après BB-ESPACES-UX-01
+La capacité de création utilisateur et la palette persistée nécessitent un delta additif encore à concevoir/implémenter et qualifier sur tests jetables. Il n’existe pas encore dans les neuf migrations de ce checkpoint. Refaire l’inventaire exact de release/migrations avant toute future demande propriétaire ; aucune application de migration, sauvegarde propriétaire ou restauration réelle présumée. D7 et les deux étapes d’autorisation OPS ci-dessus restent requises.
