@@ -479,6 +479,11 @@ test('register, create, classify, manage folders and log back in', async ({ page
     ).status(),
   ).toBe(200);
   await page.goto(`/cocktails/${created.slug}`);
+  await expect(page.locator('main input, main select, main textarea')).toHaveCount(0);
+  for (const folderName of folderNames)
+    await expect(page.getByRole('link', { name: folderName, exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Modifier la recette', exact: true }).click();
+  await page.getByRole('button', { name: 'Modifier les dossiers et tags', exact: true }).click();
   for (const folderName of folderNames)
     await expect(page.getByRole('checkbox', { name: folderName, exact: true })).toBeChecked();
   await page.goto(`/folders/${randomUUID()}`);
