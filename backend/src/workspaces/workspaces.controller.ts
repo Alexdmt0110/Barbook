@@ -15,6 +15,7 @@ import { WorkspaceMembershipService } from './workspace-membership.service';
 import {
   AddWorkspaceMemberDto,
   BrowseWorkspacesDto,
+  BrowseWorkspaceCatalogDto,
   WorkspaceVersionDto,
 } from './workspace.dto';
 
@@ -24,7 +25,10 @@ export class WorkspacesController {
   constructor(private readonly memberships: WorkspaceMembershipService) {}
 
   @Get()
-  list(@CurrentUserId() userId: string, @Query() query: BrowseWorkspacesDto) {
+  list(
+    @CurrentUserId() userId: string,
+    @Query() query: BrowseWorkspaceCatalogDto,
+  ) {
     return this.memberships.list(userId, query);
   }
 

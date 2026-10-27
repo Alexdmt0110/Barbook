@@ -1,6 +1,8 @@
 import { Transform, Type } from 'class-transformer';
+import { WorkspaceKind } from '../generated/prisma/client';
 import {
   IsEmail,
+  IsEnum,
   IsInt,
   IsOptional,
   Max,
@@ -23,6 +25,13 @@ export class BrowseWorkspacesDto {
   @Min(1)
   @Max(100)
   pageSize = 25;
+}
+
+/** Catalog-only filter; membership-management query contracts stay unchanged. */
+export class BrowseWorkspaceCatalogDto extends BrowseWorkspacesDto {
+  @IsOptional()
+  @IsEnum(WorkspaceKind)
+  kind?: WorkspaceKind;
 }
 
 export class WorkspaceVersionDto {

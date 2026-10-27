@@ -10,6 +10,7 @@ import { WorkspaceAccessService } from './workspace-access.service';
 import {
   AddWorkspaceMemberDto,
   BrowseWorkspacesDto,
+  BrowseWorkspaceCatalogDto,
   WorkspaceVersionDto,
 } from './workspace.dto';
 
@@ -20,8 +21,9 @@ export class WorkspaceMembershipService {
     private readonly access: WorkspaceAccessService,
   ) {}
 
-  async list(userId: string, query: BrowseWorkspacesDto) {
+  async list(userId: string, query: BrowseWorkspaceCatalogDto) {
     const where: Prisma.WorkspaceWhereInput = {
+      ...(query.kind ? { kind: query.kind } : {}),
       OR: [
         { kind: 'PERSONAL', personalOwnerId: userId },
         { kind: 'SHARED', members: { some: { userId, revokedAt: null } } },
