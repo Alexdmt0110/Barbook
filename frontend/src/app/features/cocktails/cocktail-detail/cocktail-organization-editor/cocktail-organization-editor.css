@@ -55,8 +55,7 @@
 
 .organization-grid {
   display: grid;
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
 
@@ -125,8 +124,7 @@ button:disabled {
 
 .creation-row {
   display: grid;
-  grid-template-columns:
-    minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
   margin-top: 12px;
 }
@@ -185,7 +183,7 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 34px;
+  min-height: 44px;
   padding: 0 11px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
@@ -203,6 +201,16 @@ button:disabled {
 
 .tag-option input {
   margin: 0;
+  flex: 0 0 auto;
+}
+.tag-option {
+  min-width: 0;
+  max-width: 100%;
+}
+.tag-option span,
+.selected-tag-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .selected-tags {
@@ -217,21 +225,19 @@ button:disabled {
   align-items: center;
   gap: 5px;
   max-width: 100%;
-  min-height: 31px;
+  min-height: 44px;
   padding: 0 6px 0 11px;
-  overflow: hidden;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
   color: var(--color-text);
   background: var(--color-surface);
   font-size: 0.76rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .selected-tag button {
-  width: 25px;
-  height: 25px;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
   padding: 0;
   border: 0;
   border-radius: 50%;
