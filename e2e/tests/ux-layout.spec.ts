@@ -25,7 +25,16 @@ for (const theme of ['light', 'dark']) {
         await expect(page.locator('main h1')).toBeVisible();
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
         if (label === 'library') await expect(page.getByRole('heading', {name, exact:true})).toBeVisible();
-        if (label === 'detail') await expect(page.getByRole('heading', {name, exact:true})).toBeVisible();
+        if (label === 'detail') {
+          await expect(page.getByRole('heading', {name, exact:true})).toBeVisible();
+          await expect(page.locator('main input, main select, main textarea')).toHaveCount(0);
+          const actions = page.getByRole('navigation', {name:'Actions de la recette',exact:true});
+          await expect(actions.getByRole('link', {name:'Modifier la recette',exact:true})).toBeVisible();
+          await expect(actions.getByRole('link', {name:'Mettre en corbeille',exact:true})).toBeVisible();
+          const bounds = (await actions.boundingBox())!;
+          expect(bounds.x).toBeGreaterThanOrEqual(0);
+          expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+        }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
         if (width >= 1440) {
           const content = page.locator('.home-page, .cocktails-page, .folders-page, .detail-page');

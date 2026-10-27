@@ -4,7 +4,6 @@ import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/route
 import { Observable, of, throwError } from 'rxjs';
 import {
   CocktailDetail as CocktailDetailModel,
-  CocktailOrganizationResult,
   CocktailSummaryFolder,
   CocktailSummaryTag,
 } from '../data-access/cocktail.models';
@@ -178,55 +177,28 @@ describe('CocktailDetail', () => {
 
     expect(compiled.textContent).toContain('Fine rondelle de citron vert.');
 
-    expect(compiled.querySelector('app-cocktail-organization-editor')).not.toBeNull();
+    expect(compiled.querySelector('app-cocktail-organization-editor')).toBeNull();
+    expect(compiled.querySelector('input, select, textarea')).toBeNull();
+    expect(
+      compiled.querySelector('a[aria-label="Modifier la recette"]')?.getAttribute('href'),
+    ).toBe('/cocktails/id/cocktail-daiquiri/edit');
+    expect(
+      compiled.querySelector('a[aria-label="Mettre en corbeille"]')?.getAttribute('href'),
+    ).toBe('/cocktails/id/cocktail-daiquiri/delete');
   });
 
-  it('updates displayed organization after the editor saves', () => {
-    const fixture = TestBed.createComponent(CocktailDetail);
-
-    fixture.detectChanges();
-
-    const organization: CocktailOrganizationResult = {
-      organizationVersion: 1,
-      folder: {
-        id: 'folder-favorites',
-        name: 'Favoris',
-      },
-      folders: [
-        {
-          id: 'folder-favorites',
-          name: 'Favoris',
-        },
-      ],
-      tags: [
-        {
-          id: 'tag-tropical',
-          name: 'Tropical',
-          slug: 'tropical',
-        },
-      ],
-    };
-
-    fixture.componentInstance.onOrganizationUpdated(organization);
-
-    fixture.detectChanges();
-
-    expect(fixture.componentInstance.cocktail()?.folder).toEqual({
-      id: 'folder-favorites',
-      name: 'Favoris',
+  it('shows folders and tags as read-only links and text, without loading editor catalogs', () => {
+    cocktailsService.response = of({
+      ...buildCocktail(),
+      folders: [{ id: 'folder-favorites', name: 'Favoris' }],
     });
-
-    expect(fixture.componentInstance.cocktail()?.tags).toEqual([
-      {
-        id: 'tag-tropical',
-        name: 'Tropical',
-        slug: 'tropical',
-      },
-    ]);
-
-    expect(fixture.nativeElement.textContent).toContain('Favoris');
-
-    expect(fixture.nativeElement.textContent).toContain('Tropical');
+    const fixture = TestBed.createComponent(CocktailDetail);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain('Favoris');
+    expect(compiled.textContent).toContain('Classique');
+    expect(compiled.querySelector('a[href="/folders/folder-favorites"]')).not.toBeNull();
+    expect(compiled.querySelector('button, input, select, textarea')).toBeNull();
   });
 
   it('formats canonical millilitres as centilitres', () => {

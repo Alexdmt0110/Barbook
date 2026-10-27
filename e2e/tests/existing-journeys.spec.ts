@@ -107,6 +107,13 @@ test('register, create, classify, manage folders and log back in', async ({ page
   await expect(title).toBeVisible();
   await expect(title.locator('b')).toHaveCount(0);
 
+  await expect(page.locator('main input, main select, main textarea')).toHaveCount(0);
+  const pencil = page.getByRole('link', { name: 'Modifier la recette', exact: true });
+  await pencil.focus();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(`http://127.0.0.1:4200/cocktails/id/${created.id}/edit`);
+  await page.getByRole('button', { name: 'Modifier les dossiers et tags', exact: true }).click();
+
   const folderNames = [`E2E dossier ${suffix}`, `E2E autre <i>${suffix}</i>`];
   const folders: { id: string; name: string }[] = [];
   for (const folderName of folderNames) {
@@ -141,6 +148,7 @@ test('register, create, classify, manage folders and log back in', async ({ page
       new URL(response.url()).pathname === `/api/cocktails/${created.slug}`,
   );
   await page.reload();
+  await page.getByRole('button', { name: 'Modifier les dossiers et tags', exact: true }).click();
   const detail = (await (await reloadedResponse).json()) as {
     ingredients: { amount: number }[];
     folder: { id: string };

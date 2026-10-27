@@ -3,8 +3,15 @@
   <header class="page-header">
     <p class="eyebrow">Carnet personnel</p>
     <h1>Modifier la recette</h1>
-    <p>Corrige ta recette. Son adresse, son image, ses dossiers et ses tags sont conservés.</p>
+    <p>
+      Corrige le contenu et, dans la section dédiée, ses dossiers et tags. Son adresse et son image
+      sont conservées.
+    </p>
   </header>
+  <p class="save-policy">
+    Le contenu et le classement se sauvegardent séparément. « Enregistrer la recette » ne sauvegarde
+    pas les dossiers et tags.
+  </p>
   @if (loading()) {
     <p role="status" aria-busy="true">Chargement de la recette…</p>
   }
@@ -424,6 +431,37 @@
           </button>
         </div>
       </form>
+      <section class="organization-section" aria-labelledby="edit-organization-title">
+        <h2 id="edit-organization-title">Dossiers et tags</h2>
+        <p>
+          Cette section possède son propre brouillon et son bouton « Enregistrer l’organisation ».
+          Elle ne modifie pas le contenu de la recette.
+        </p>
+        @if (organization(); as recipe) {
+          <app-cocktail-organization-editor
+            [slug]="recipe.slug"
+            [cocktailId]="recipe.id"
+            [folders]="recipe.folders"
+            [organizationVersion]="recipe.organizationVersion"
+            [tags]="recipe.tags"
+            (organizationUpdated)="onOrganizationUpdated($event)"
+          />
+        } @else {
+          <button
+            type="button"
+            class="cancel-action"
+            [disabled]="organizationLoading()"
+            (click)="loadOrganization()"
+          >
+            {{
+              organizationLoading() ? 'Chargement du classement…' : 'Modifier les dossiers et tags'
+            }}
+          </button>
+        }
+        @if (organizationError()) {
+          <p role="alert">{{ organizationError() }}</p>
+        }
+      </section>
     }
   }
 </section>
