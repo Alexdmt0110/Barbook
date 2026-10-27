@@ -112,7 +112,7 @@ import { GlobalLogout } from '../../core/auth/global-logout';
       margin: var(--space-1) 0 0;
       overflow-wrap: anywhere;
     }
-    @media (max-width: 760px) {
+    @media (max-width: 1100px) {
       .account-name {
         display: none;
       }

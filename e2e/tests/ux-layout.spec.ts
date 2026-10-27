@@ -34,7 +34,12 @@ for (const theme of ['light', 'dark']) {
         if (label === 'home') {
           const trigger = page.getByRole('button', {name:'Compte et sécurité',exact:true});
           await trigger.focus(); await page.keyboard.press('Enter');
-          await expect(page.getByRole('region', {name:'Compte et sécurité',exact:true})).toBeVisible();
+          const panel = page.getByRole('region', {name:'Compte et sécurité',exact:true});
+          await expect(panel).toBeVisible();
+          const bounds = (await panel.boundingBox())!;
+          expect(bounds.x).toBeGreaterThanOrEqual(0);
+          expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+          expect(bounds.y + bounds.height).toBeLessThanOrEqual(900);
           await page.screenshot({path:info.outputPath(`account-${theme}-${width}.png`),animations:'disabled'});
           await page.keyboard.press('Escape');
           await expect(trigger).toBeFocused();
