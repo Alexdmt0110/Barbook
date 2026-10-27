@@ -1,3 +1,8 @@
+## UX-B — diagnostic Chromium du 27 octobre 2026
+PR42 HEAD39727c2 : cinq contrôles verts, navigateur15/16. Artefact12732979324 du run40502691211 téléchargé, SHA256 dbc32cf9a06695d94464fb2cd18cae7ebf470409e6e27352bdcfa3bd2ef229dc vérifié. Trace, capture d’échec et image vidéo finale inspectées : après Annuler, isVisible() instantané du bouton enfant renvoie false pendant le rendu Angular ; le déclencheur porte encore aria-expanded=true. Le test clique alors le déclencheur et ferme le panneau, puis attend le bouton masqué jusqu’au timeout60s. page.unroute est une conséquence du teardown, pas la cause.
+Correction de synchronisation : ouverture fondée sur aria-expanded, attente explicite de la disparition du formulaire et du retour du bouton après Annuler. Assertions de saisie, révocation, mot de passe refusé, BFCache et réponse perdue conservées ; aucun timeout/retry modifié. Requalification complète du nouveau HEAD obligatoire avant Gate/merge.
+Cohérence compte : seules identité en lecture seule et sécurité existante sont présentées, aucun paramètre fictif. Regroupement thème/déconnexion évalué : conserver pour cette tranche les accès directs existants évite de modifier les parcours de déconnexion et garde le thème immédiatement accessible ; panneau dédié explicitement à Compte et sécurité. Pas de nouveau moteur de sécurité. PR40 préservée ; UX-C puis UX-D prioritaires, aucun UX-E/carrousel ni OPS réel.
+
 # Handoff canonique Barbook — Bêta Bar et qualification de sécurité
 
 ## UX-A intégré ; UX-B implémenté — 27 octobre2026

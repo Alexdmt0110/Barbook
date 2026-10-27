@@ -43,9 +43,14 @@ export async function globalLogoutJourney(
     )!;
     expect(remoteCookie.value).not.toBe(localCookie.value);
     await page.getByRole('textbox', { name: /^Nom \*/ }).fill('Draft before global intent');
-    if (!(await page.getByRole('button', { name: 'Déconnecter tous les appareils', exact: true }).isVisible())) {
-      await page.getByRole('button', { name: 'Compte et sécurité', exact: true }).click();
+    const accountTrigger = page.getByRole('button', { name: 'Compte et sécurité', exact: true });
+    if ((await accountTrigger.getAttribute('aria-expanded')) === 'false') {
+      await accountTrigger.click();
     }
+    await expect(accountTrigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(
+      page.getByRole('button', { name: 'Déconnecter tous les appareils', exact: true }),
+    ).toBeVisible();
     await page.getByRole('button', { name: 'Déconnecter tous les appareils', exact: true }).click();
     const form = page.getByRole('form', { name: 'Confirmer la déconnexion globale' });
     await expect(form).toBeVisible();
@@ -57,9 +62,13 @@ export async function globalLogoutJourney(
     await expect(page.getByRole('textbox', { name: /^Nom \*/ })).toHaveValue(
       'Draft before global intent',
     );
-    if (!(await page.getByRole('button', { name: 'Déconnecter tous les appareils', exact: true }).isVisible())) {
-      await page.getByRole('button', { name: 'Compte et sécurité', exact: true }).click();
-    }
+    // Cancellation updates the child view asynchronously; absence of its button
+    // does not mean the account panel is closed. Never toggle an already open panel.
+    await expect(form).toBeHidden();
+    await expect(accountTrigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(
+      page.getByRole('button', { name: 'Déconnecter tous les appareils', exact: true }),
+    ).toBeVisible();
     await page.getByRole('button', { name: 'Déconnecter tous les appareils', exact: true }).click();
     const input = form.getByLabel('Mot de passe pour déconnexion globale', { exact: true });
     await input.fill('incorrect password');
