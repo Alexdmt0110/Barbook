@@ -200,11 +200,12 @@ describe('Shared notebook reads, catalogue and atomic creation over HTTP/Postgre
     expect(results.map((r) => r.status).sort()).toEqual([201, 409]);
     const id = (results.find((r) => r.status === 201)!.body as { id: string })
       .id;
+    const deletedAt = new Date();
     await prisma.cocktail.update({
       where: { id },
       data: {
-        deletedAt: new Date(),
-        restoreUntil: new Date(Date.now() + 86400000),
+        deletedAt,
+        restoreUntil: new Date(deletedAt.getTime() + 30 * 86400000),
         contentVersion: 1,
         organizationVersion: 1,
       },
