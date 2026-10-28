@@ -1,7 +1,10 @@
 import { Transform, Type } from 'class-transformer';
-import { WorkspaceKind } from '../generated/prisma/client';
+import { BarAccent, WorkspaceKind } from '../generated/prisma/client';
 import {
   IsEmail,
+  IsUUID,
+  IsString,
+  Length,
   IsEnum,
   IsInt,
   IsOptional,
@@ -49,4 +52,19 @@ export class AddWorkspaceMemberDto extends WorkspaceVersionDto {
   @IsEmail()
   @MaxLength(254)
   email!: string;
+}
+
+export class CreateBarDto {
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
+  @IsString()
+  @Length(1, 80)
+  name!: string;
+
+  @IsEnum(BarAccent)
+  accentKey!: BarAccent;
+
+  @IsUUID('4')
+  creationRequestId!: string;
 }

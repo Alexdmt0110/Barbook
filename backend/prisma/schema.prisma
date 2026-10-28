@@ -18,6 +18,13 @@ enum WorkspaceRole {
   MEMBER
 }
 
+enum BarAccent {
+  AMBER
+  RED
+  TEAL
+  BLUE
+}
+
 enum CocktailType {
   CLASSIC
   PERSONAL_CREATION
@@ -56,6 +63,7 @@ model User {
   personalWorkspace Workspace?        @relation("PersonalWorkspaceOwner")
   memberships       WorkspaceMember[]
   sessions          Session[]
+  createdBars       Workspace[] @relation("WorkspaceCreator")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -87,6 +95,13 @@ model Workspace {
   kind            WorkspaceKind
   personalOwnerId String?       @unique
   accessVersion   Int           @default(0)
+  accentKey       BarAccent?
+  creationActorId String?
+  creationRequestId String? @db.Uuid
+  creationFingerprint String? @db.Char(64)
+
+  creationActor User? @relation("WorkspaceCreator", fields: [creationActorId], references: [id], onDelete: Restrict)
+
 
   personalOwner User? @relation("PersonalWorkspaceOwner", fields: [personalOwnerId], references: [id], onDelete: Cascade)
 
@@ -95,6 +110,8 @@ model Workspace {
   ingredients Ingredient[]
   tags        Tag[]
   folders     Folder[]
+
+  @@unique([creationActorId, creationRequestId])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
