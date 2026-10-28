@@ -116,7 +116,7 @@ export class WorkspaceContext {
       const accepted =
         !this.drafts.hasDrafts() ||
         window.confirm(
-          'Changer d’espace supprimera les brouillons de cet onglet, y compris ceux des formulaires fermés. Continuer ?',
+          'Changer d’espace supprimera les brouillons de cet onglet, y compris ceux des formulaires fermés. Une action déjà envoyée peut être enregistrée ; changer d’espace ne l’annule pas. Continuer ?',
         );
       if (!accepted) {
         this.transitioning.set(false);

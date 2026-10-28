@@ -1,3 +1,15 @@
+# Reprise sécurisée après perte de l’environnement — 28 octobre 2026
+
+Environnement d’exécution devenu indisponible pendant le checkpoint, avant toute publication du dernier correctif. GitHub directement revérifié : main76d96822, PR40 toujours draft au b2b4ce5b, aucune fusion. Les huit fichiers du correctif ont été reconstruits depuis les blobs GitHub de ce HEAD avec contextes de remplacement strictement contrôlés ; ils doivent être relus et requalifiés par la CI native avant Gate. Aucune qualification de working tree local n’est présumée après la coupure.
+
+Dernier correctif : la sortie SPA d’un formulaire pendant son POST désabonne HttpClient ; WorkspaceContext libère déjà son suivi, mais DraftStore pouvait garder son marqueur pending après destruction et bloquer durablement le sélecteur. FormDraft.requestEnded libère seulement ce marqueur, sans effacer uncertain ni sa version ; finalizers création/édition/classement/création dossier l’appellent aussi sur désabonnement. La confirmation de bascule explique qu’une action envoyée peut rester enregistrée. Deux tests de destruction réelle vérifient PUT annulé/Subject désabonné, marqueur libéré, version/saisie/incertitude conservées et aucun renvoi.
+
+Le verify local avait effectivement réussi263tests/36suites, lint/build/compat2 avant déconnexion. La reproduction publiée n’est pas présentée comme requalifiée à l’identique par son seul souvenir : attendre les263tests natifs et les6CI du nouveau HEAD. Les interfaces du correctif sont sans changement visuel, mais la qualification finale exige encore l’artefact du dernier HEAD et ses captures. L’environnement local indisponible bloque leur extraction/inspection locale et le développement suivant tant qu’aucune voie sûre n’est disponible. Ne pas fermer artificiellement le Gate ni fusionner seulement pour six voyants verts.
+
+PR40 : carnet partagé et gestion OWNER implémentés, dernier Gate en cours. BB1d minimal reste à démarrer après BB1b/main qualifiés ; aucun nom/couleur/OWNER créé réellement. OPS demeure documentaire ; D7/cible/sauvegarde restaurée/rollback non qualifiés, mise en service complète au30octobre non considérée réaliste. Aucun VPS, migration propriétaire, compte réel, coût, suppression physique ou CONTRACT.
+
+---
+
 # Dernier défaut de contexte relevé en Review Gate BB1b — 28 octobre
 
 0372e100 : six CI réussis et tous journaux lus,273backend/259frontend/250PG-HTTP/24Chromium (run40658048443). Artefact12802577511 téléchargé/intégrité SHA2567bdb1ed58554ddf1ed203246249dc0bc89e6f17baa50aa17425bd43778c64cf6 vérifiée ; profil mobile clair à nom long, formulaire OWNER sombre mobile/clair desktop et brouillon partagé bloqué réellement vus. Les commandes restent accessibles par défilement du panneau ; capture finale du pied du formulaire ajoutée pour voir aussi son bouton.

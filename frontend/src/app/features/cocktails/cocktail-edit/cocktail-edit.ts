@@ -278,7 +278,10 @@ export class CocktailEdit implements OnInit {
       .pipe(
         takeUntil(this.routeReset),
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.submitting.set(false)),
+        finalize(() => {
+          draft.requestEnded();
+          this.submitting.set(false);
+        }),
       )
       .subscribe({
         next: (saved) => {

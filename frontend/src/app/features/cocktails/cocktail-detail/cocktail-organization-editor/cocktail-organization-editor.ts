@@ -196,13 +196,17 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
       this.actionErrorMessage.set('La sauvegarde complète accepte au plus 1000 dossiers.');
       return;
     }
-    if (!this.draft.begin(this.draftValue())) return;
+    const draft = this.draft;
+    if (!draft.begin(this.draftValue())) return;
     this.isCreatingFolder.set(true);
     this.foldersService
       .create(name)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.isCreatingFolder.set(false)),
+        finalize(() => {
+          draft.requestEnded();
+          this.isCreatingFolder.set(false);
+        }),
       )
       .subscribe({
         next: (folder) => {
@@ -281,7 +285,8 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
       );
       return;
     }
-    if (!this.draft.begin(this.draftValue())) return;
+    const draft = this.draft;
+    if (!draft.begin(this.draftValue())) return;
     this.isSaving.set(true);
     this.cocktailsService
       .updatePersonalCocktailOrganization(this.slug(), {
@@ -291,7 +296,10 @@ export class CocktailOrganizationEditor implements OnInit, OnChanges {
       })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.isSaving.set(false)),
+        finalize(() => {
+          draft.requestEnded();
+          this.isSaving.set(false);
+        }),
       )
       .subscribe({
         next: (result) => {

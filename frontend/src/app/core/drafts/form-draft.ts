@@ -86,6 +86,11 @@ export class FormDraft {
       this.store.setUncertain(this.lease, this.key, false);
     }
   }
+  /** Client transport ended, including unsubscription; a remote commit can still be uncertain. */
+  requestEnded(): void {
+    this.store.mutationFinished(this.lease, this.key);
+    this.pending.set(false);
+  }
   verifiedAbsent(): void {
     if (this.pending()) return;
     // User must explicitly inspect the library/server state first. Never sends a request.

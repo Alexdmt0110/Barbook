@@ -349,6 +349,7 @@ export class CocktailCreate {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
+          this.draft.requestEnded();
           this.isSubmitting.set(false);
         }),
       )

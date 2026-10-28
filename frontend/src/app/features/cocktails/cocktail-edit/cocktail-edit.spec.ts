@@ -360,4 +360,20 @@ describe('Personal recipe editing UI and L4 drafts', () => {
     );
     expect(input.value).toBe('0');
   });
+  it('releases the pending transport on destruction but preserves uncertainty and the captured version', () => {
+    const f = setup();
+    f.componentInstance.form.controls.notes.setValue('Pending edit');
+    f.componentInstance.submit();
+    const pending = http.expectOne(path);
+    expect(store.hasPendingMutation()).toBe(true);
+    expect(pending.request.body.expectedContentVersion).toBe(7);
+    f.destroy();
+    expect(pending.cancelled).toBe(true);
+    expect(store.hasPendingMutation()).toBe(false);
+    expect(store.find(store.lease(), 'edit:recipe-a')).toMatchObject({
+      version: 7,
+      uncertain: true,
+    });
+  });
+
 });
