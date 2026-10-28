@@ -41,6 +41,11 @@
 
         <app-theme-switcher />
       </div>
+      @if (workspace.current(); as space) {
+        <p class="workspace-status" aria-label="Espace actif">
+          {{ space.name }} · {{ space.kind === 'PERSONAL' ? 'privé' : space.role }}
+        </p>
+      }
     </div>
   </header>
 

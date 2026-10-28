@@ -1,5 +1,4 @@
 import { WorkspaceSwitcher } from '../../core/workspaces/workspace-switcher';
-import { WorkspaceContext } from '../../core/workspaces/workspace-context';
 import { Component, ElementRef, HostListener, ViewChild, inject, signal } from '@angular/core';
 import { AuthService } from '../../core/auth/auth.service';
 import { GlobalLogout } from '../../core/auth/global-logout';
@@ -22,11 +21,6 @@ import { GlobalLogout } from '../../core/auth/global-logout';
         auth.currentUser()?.displayName?.charAt(0) || 'B'
       }}</span>
     </button>
-    @if (workspace.current(); as space) {
-      <span class="active-space"
-        >{{ space.name }} · {{ space.kind === 'PERSONAL' ? 'privé' : space.role }}</span
-      >
-    }
     <section
       id="account-panel"
       class="account-panel"
@@ -53,7 +47,7 @@ import { GlobalLogout } from '../../core/auth/global-logout';
           <dd>{{ user.email }}</dd>
         </dl>
       }
-      <app-workspace-switcher [opened]="visible()" />
+      <app-workspace-switcher [opened]="visible()" (changed)="close()" />
       <app-global-logout />
     </section>
   `,
@@ -61,13 +55,6 @@ import { GlobalLogout } from '../../core/auth/global-logout';
     :host {
       position: relative;
       display: block;
-    }
-    .active-space {
-      display: block;
-      font-size: 0.75rem;
-      max-width: 12rem;
-      overflow-wrap: anywhere;
-      color: var(--color-text-muted);
     }
     .account-trigger {
       padding: 0.35rem 0.65rem;
@@ -141,7 +128,6 @@ import { GlobalLogout } from '../../core/auth/global-logout';
 })
 export class AccountPanel {
   readonly auth = inject(AuthService);
-  readonly workspace = inject(WorkspaceContext);
   readonly opened = signal(false);
   @ViewChild(GlobalLogout) security?: GlobalLogout;
   @ViewChild('trigger') trigger?: ElementRef<HTMLButtonElement>;
@@ -158,7 +144,7 @@ export class AccountPanel {
     this.opened.set(false);
     this.trigger?.nativeElement.focus();
   }
-  @HostListener('keydown.escape', ['$event']) escape(event: Event): void {
+  @HostListener('document:keydown.escape', ['$event']) escape(event: Event): void {
     if (!this.visible()) return;
     event.preventDefault();
     this.close();

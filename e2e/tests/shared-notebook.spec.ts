@@ -17,8 +17,11 @@ async function openBar(page: Page, bar: Fixture['bar']) {
   await trigger.click();
   await page.getByRole('button', { name: bar.name, exact: true }).click();
   await expect(page.getByRole('link', { name: 'Carnet Bar', exact: true })).toBeVisible();
-  await expect(page.getByRole('region', { name: 'Compte et sécurité', exact: true })).toContainText(bar.name);
-  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: 'Compte et sécurité', exact: true })).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.locator('[aria-label="Espace actif"]')).toContainText(bar.name);
+  const brand = (await page.locator('.brand').boundingBox())!;
+  const profile = (await trigger.boundingBox())!;
+  expect(brand.x + brand.width).toBeLessThanOrEqual(profile.x);
 }
 async function fill(page: Page, name: string) {
   await page.getByRole('textbox', { name: /^Nom \*/ }).fill(name);
@@ -32,7 +35,7 @@ async function fill(page: Page, name: string) {
 
 test('two accounts select Bar from profile, share create/edit and keep Personnel isolated', async ({ page, browser }, info) => {
   const f = fixture();
-  const second = await browser.newContext({ viewport: info.project.use.viewport, isMobile: info.project.name === 'mobile', hasTouch: info.project.name === 'mobile' });
+  const second = await browser.newContext({ viewport: info.project.use.viewport, isMobile: info.project.name === 'mobile', hasTouch: info.project.name === 'mobile', recordVideo: { dir: info.outputPath('member-video') } });
   const member = await second.newPage();
   try {
     await use(page, f.owner, info.project.name === 'mobile' ? 182 : 180);
@@ -103,4 +106,38 @@ test('Bar drafts survive refresh, keep original access intention and are purged 
   await page.goto('/cocktails/new');
   await expect(page.getByRole('button', { name: 'Restaurer le brouillon', exact: true })).toHaveCount(0);
   await expect(page.getByRole('textbox', { name: /^Nom \*/ })).toHaveValue('');
+});
+
+test('OWNER manages existing-account membership and revocation blocks a member with an open recipe draft', async ({ page, browser }, info) => {
+  const f = fixture();
+  const second = await browser.newContext({ viewport: info.project.use.viewport, isMobile: info.project.name === 'mobile', hasTouch: info.project.name === 'mobile', recordVideo: { dir: info.outputPath('member-video') } });
+  const member = await second.newPage();
+  try {
+    await use(page, f.owner, info.project.name === 'mobile' ? 188 : 186);
+    await use(member, f.member, info.project.name === 'mobile' ? 189 : 187);
+    await openBar(member, f.bar);
+    await member.getByRole('button', { name: 'Compte et sécurité', exact: true }).click();
+    await expect(member.getByRole('button', { name: 'Gérer les membres', exact: true })).toHaveCount(0);
+    await member.getByRole('button', { name: 'Fermer le panneau utilisateur', exact: true }).click();
+    await member.goto('/cocktails/new');
+    await fill(member, 'Intention du membre avant révocation');
+    await openBar(page, f.bar);
+    await page.getByRole('button', { name: 'Compte et sécurité', exact: true }).click();
+    await page.getByRole('button', { name: 'Gérer les membres', exact: true }).click();
+    await expect(page.getByText(f.member.user.email, { exact: false })).toBeVisible();
+    await page.screenshot({ path: info.outputPath('owner-members.png'), fullPage: true });
+    page.once('dialog', dialog => void dialog.accept());
+    await page.getByRole('button', { name: `Retirer ${f.member.user.email}`, exact: true }).click();
+    await expect(page.getByText('Action confirmée. Actualise les membres et les droits avant une autre action.', { exact: true })).toBeVisible();
+    await member.getByRole('button', { name: 'Créer le cocktail', exact: true }).click();
+    await expect(member.getByText('L’accès au Bar n’est plus confirmé. Choisis un espace autorisé.', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Vérifier les membres et les droits', exact: true }).click();
+    await expect(page.getByRole('button', { name: `Retirer ${f.member.user.email}`, exact: true })).toHaveCount(0);
+    await page.getByRole('textbox', { name: 'Email du membre existant', exact: true }).fill(f.member.user.email);
+    await page.getByRole('button', { name: 'Ajouter le membre', exact: true }).click();
+    await expect(page.getByText('Action confirmée. Actualise les membres et les droits avant une autre action.', { exact: true })).toBeVisible();
+    const list = await page.request.get(`http://127.0.0.1:3000/api/workspaces/${f.bar.id}/cocktails`, { headers: headers(f.owner) });
+    expect(list.status()).toBe(200);
+    expect((await list.json() as { total: number }).total).toBe(0);
+  } finally { await second.close(); }
 });

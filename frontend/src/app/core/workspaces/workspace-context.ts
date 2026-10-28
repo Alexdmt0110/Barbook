@@ -73,6 +73,12 @@ export class WorkspaceContext {
     }
   }
 
+  refreshAccess(): Observable<void> {
+    return this.auth
+      ? this.confirmSession(this.auth)
+      : throwError(() => new Error('Confirme d’abord ta session.'));
+  }
+
   confirmSession(auth: AuthResponse): Observable<void> {
     return defer(() => {
       const epoch = ++this.generation;

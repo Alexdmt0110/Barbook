@@ -1,3 +1,5 @@
+import { By } from '@angular/platform-browser';
+import { WorkspaceSwitcher } from '../../core/workspaces/workspace-switcher';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
@@ -63,5 +65,23 @@ describe('Account panel', () => {
       host.querySelector<HTMLButtonElement>('[aria-label="Fermer le panneau utilisateur"]')!
         .disabled,
     ).toBe(true);
+  });
+  it('closes after successful workspace navigation and handles Escape after focus leaves the panel', () => {
+    const f = TestBed.createComponent(AccountPanel);
+    f.detectChanges();
+    const c = f.componentInstance;
+    c.toggle();
+    f.detectChanges();
+    const selector = f.debugElement.query(By.directive(WorkspaceSwitcher))
+      .componentInstance as WorkspaceSwitcher;
+    selector.changed.emit();
+    f.detectChanges();
+    expect(c.visible()).toBe(false);
+    expect(document.activeElement).toBe(c.trigger?.nativeElement);
+    c.toggle();
+    f.detectChanges();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    f.detectChanges();
+    expect(c.visible()).toBe(false);
   });
 });

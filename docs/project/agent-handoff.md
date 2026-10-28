@@ -1,3 +1,15 @@
+# Reprise BB1b — 28 octobre : OWNER et correction du panneau après vraie CI navigateur
+
+Incrément précédent9b88c92c :5contrôles/6 réussis, backend273/frontend252/PG249 ; Chromium18passés/2échecs. Les16parcours historiques et2nouveaux parcours brouillons sont passés ; le parcours à deux comptes bloque sur fermeture de panneau desktop/mobile. Artefact12801140254/run40653505119 téléchargé, SHA256d54233ca1a3354f44d606ef6dd02f518666a70d2177a3c41604dc04097d620ee vérifié. Images d’échec réellement vues, actions de trace inspectées : panneau resté ouvert quand Escape part du body après navigation/revalidation, puis clic mobile intercepté ; desktop le toggle ferme un panneau supposé fermé. Deuxième défaut visuel constaté : nom du Bar dans le bloc profil élargit les actions et chevauche le logo mobile.
+
+Correctif produit : sortie explicite changed du sélecteur après navigation réussie → fermeture AccountPanel et retour focus, Escape au document toujours soumis à la protection de résultat global incertain. Identité active déplacée sur une ligne dédiée du header, sans élargir le bouton profil. Test unitaire de fermeture/navigation/Escape ajouté et assertion navigateur de fermeture réelle et non-chevauchement logo/profil. Aucun clic forcé, quota/timeout/retry/assertion réduit.
+
+Gestion des membres OWNER écrite dans le panneau : liste paginée, ajout de compte existant, retrait confirmé, expectedAccessVersion observé, pas d’inférence/rejeu ; après succès vérification explicite avant action suivante. Réponse perdue bloque la commande jusqu’à vérification explicite puis acquittement ; email conservé sur refus. Rôles et autorisation restent côté serveur. Lectures et erreurs tardives ne doivent pas requalifier un autre Bar ; refresh réutilise la confirmation du contexte et invalide les anciens leases en cas de version d’accès changée. Aucun OWNER transfert, invitation publique, compte réel ni nouveau droit.
+
+Verify frontend local réel258tests/35suites, lint/build/compat2 et typesChromium réussis. Cinq tests unitaires membres ajoutés. Nouveau troisième parcours Chromium×desktop/mobile : UI OWNER de retrait/réadmission, MEMBER sans commande de gestion, refus serveur d’une création depuis formulaire resté ouvert après retrait, zéro recette enregistrée. Les nouveaux22parcours attendus et les captures APRÈS correction doivent encore être exécutés/inspectés ; aucune qualification complète annoncée à ce checkpoint. PR40 reste draft ; aucun merge, main76d96822 inchangé. BB1d minimal reste à développer après qualification BB1b. Aucune action OPS réelle ni migration.
+
+---
+
 # Reprise BB1b — 28 octobre : raccordement Angular en qualification
 
 Serveur partagé publié7780a04f puis correction fixture D5bb4b78d6 : six CI et six journaux vérifiés,273 backend/234 frontend/249 PostgreSQL-HTTP18suites/16Chromium, audits0. La fixture de corbeille utilisait initialement1jour et a été refusée par la contrainte30jours ; corrigée avec instant commun+30jours, aucune assertion/contrainte affaiblie. Main reste76d96822.

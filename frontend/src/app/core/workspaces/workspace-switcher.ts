@@ -1,5 +1,6 @@
+import { WorkspaceMembers } from './workspace-members';
 import { HttpClient } from '@angular/common/http';
-import { Component, DestroyRef, effect, inject, input, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { finalize, timeout } from 'rxjs';
@@ -21,6 +22,7 @@ interface BarPage {
 
 @Component({
   selector: 'app-workspace-switcher',
+  imports: [WorkspaceMembers],
   template: `
     @if (auth.snapshot()) {
       <section aria-labelledby="workspace-heading">
@@ -89,6 +91,7 @@ interface BarPage {
         @if (workspace.transitioning()) {
           <p role="status">Vérification et ouverture de l’espace…</p>
         }
+        <app-workspace-members />
       </section>
     }
   `,
@@ -121,6 +124,7 @@ interface BarPage {
 })
 export class WorkspaceSwitcher {
   readonly opened = input(false);
+  readonly changed = output<void>();
   readonly auth = inject(AuthService);
   readonly workspace = inject(WorkspaceContext);
   private readonly http = inject(HttpClient);
@@ -189,6 +193,9 @@ export class WorkspaceSwitcher {
       })
       .pipe(takeUntilDestroyed(this.destroy))
       .subscribe({
+        next: (selected) => {
+          if (selected) this.changed.emit();
+        },
         error: (error) =>
           this.error.set(
             error instanceof Error
