@@ -402,7 +402,10 @@ export class CocktailEdit implements OnInit {
       return 'Réponse abandonnée ou indisponible. Vérifie ta session avant de poursuivre.';
     if (error.status === 409)
       return 'La recette ou le catalogue a changé. Ta saisie est conservée ; compare la version serveur avant toute nouvelle intention.';
-    if (error.status === 404) return 'Cette recette n’est plus disponible dans cet espace.';
+    if (error.status === 404)
+      return this.workspace.current()?.kind === 'SHARED'
+        ? 'Cette recette n’est plus disponible dans cet espace.'
+        : 'Cette recette n’est plus disponible dans ton carnet personnel.';
     if (error.status === 401 || error.status === 403)
       return 'La session ou son autorisation n’est plus valide. Reconnecte-toi avant de poursuivre.';
     if (error.status === 400)
