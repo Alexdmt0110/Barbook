@@ -1,10 +1,11 @@
+import { WorkspaceSwitcher } from '../../core/workspaces/workspace-switcher';
 import { Component, ElementRef, HostListener, ViewChild, inject, signal } from '@angular/core';
 import { AuthService } from '../../core/auth/auth.service';
 import { GlobalLogout } from '../../core/auth/global-logout';
 
 @Component({
   selector: 'app-account-panel',
-  imports: [GlobalLogout],
+  imports: [GlobalLogout, WorkspaceSwitcher],
   template: `
     <button
       #trigger
@@ -46,6 +47,7 @@ import { GlobalLogout } from '../../core/auth/global-logout';
           <dd>{{ user.email }}</dd>
         </dl>
       }
+      <app-workspace-switcher [opened]="visible()" (changed)="close()" />
       <app-global-logout />
     </section>
   `,
@@ -142,7 +144,7 @@ export class AccountPanel {
     this.opened.set(false);
     this.trigger?.nativeElement.focus();
   }
-  @HostListener('keydown.escape', ['$event']) escape(event: Event): void {
+  @HostListener('document:keydown.escape', ['$event']) escape(event: Event): void {
     if (!this.visible()) return;
     event.preventDefault();
     this.close();

@@ -1,3 +1,4 @@
+import { WorkspaceContext } from '../../../core/workspaces/workspace-context';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -14,6 +15,13 @@ describe('IngredientsService', () => {
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
 
+    TestBed.inject(WorkspaceContext)
+      .confirmSession({
+        user: { id: 'qa', email: 'qa@example.test', displayName: 'QA' },
+        workspaceId: 'personal-qa',
+        csrfToken: 'csrf',
+      })
+      .subscribe();
     service = TestBed.inject(IngredientsService);
 
     httpTestingController = TestBed.inject(HttpTestingController);

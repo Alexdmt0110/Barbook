@@ -127,6 +127,7 @@ export interface CreateCocktailGarnishRequest {
 }
 
 export interface CreateCocktailRequest {
+  expectedAccessVersion?: number;
   name: string;
   type: CocktailType;
   family?: string;

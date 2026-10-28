@@ -1,3 +1,5 @@
+import { firstValueFrom } from 'rxjs';
+import { WorkspaceContext } from '../workspaces/workspace-context';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -34,6 +36,7 @@ describe('AuthService cookie session', () => {
     http.verify();
     sessionStorage.clear();
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
   function establish(): void {
     service.login({ email: auth.user.email, password: 'password' }).subscribe();
@@ -265,6 +268,17 @@ describe('AuthService cookie session', () => {
     const tag = Array.from(new TextEncoder().encode(renewed.csrfToken), (value) =>
       value.toString(16).padStart(2, '0'),
     ).join('');
+    const barId = '00000000-0000-4000-8000-000000000001';
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const selection = firstValueFrom(
+      TestBed.inject(WorkspaceContext).select(barId, () => Promise.resolve(true)),
+    );
+    http
+      .expectOne(`/api/workspaces/${barId}`)
+      .flush({ id: barId, name: 'Bar', role: 'MEMBER', accessVersion: 0 });
+    await selection;
+    drafts.save(drafts.lease(), 'create:new', 1, 'Bar private');
+    expect(drafts.lease()?.owner.workspaceId).toBe(barId);
     service.expire();
     channels[0].onmessage?.({
       data: { kind: 'logout', owner: { userId: 'A', workspaceId: 'WA' }, tag },

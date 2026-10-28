@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { IngredientSuggestion } from './ingredient.types';
 
@@ -52,19 +53,37 @@ export class IngredientsService {
       );
     }
 
+    return this.searchInWorkspace(
+      this.prisma,
+      personalWorkspace.id,
+      normalizedQuery,
+    );
+  }
+
+  async searchInWorkspace(
+    tx: Prisma.TransactionClient,
+    workspaceId: string,
+    query: string,
+  ): Promise<IngredientSuggestion[]> {
+    const normalizedQuery = query.trim();
+    if (normalizedQuery.length < MIN_SEARCH_LENGTH) return [];
+    if (normalizedQuery.length > MAX_SEARCH_LENGTH)
+      throw new BadRequestException('Ingredient search query is too long.');
     const suggestions: IngredientSuggestion[] = [];
 
     const seenIngredientIds = new Set<string>();
 
     await this.appendExactMatches(
-      personalWorkspace.id,
+      tx,
+      workspaceId,
       normalizedQuery,
       suggestions,
       seenIngredientIds,
     );
 
     await this.appendPrefixMatches(
-      personalWorkspace.id,
+      tx,
+      workspaceId,
       normalizedQuery,
       suggestions,
       seenIngredientIds,
@@ -75,7 +94,8 @@ export class IngredientsService {
     }
 
     await this.appendWordStartMatches(
-      personalWorkspace.id,
+      tx,
+      workspaceId,
       normalizedQuery,
       suggestions,
       seenIngredientIds,
@@ -86,7 +106,8 @@ export class IngredientsService {
     }
 
     await this.appendContainsMatches(
-      personalWorkspace.id,
+      tx,
+      workspaceId,
       normalizedQuery,
       suggestions,
       seenIngredientIds,
@@ -96,12 +117,13 @@ export class IngredientsService {
   }
 
   private async appendExactMatches(
+    tx: Prisma.TransactionClient,
     workspaceId: string,
     query: string,
     suggestions: IngredientSuggestion[],
     seenIngredientIds: Set<string>,
   ): Promise<void> {
-    const ingredients = await this.prisma.ingredient.findMany({
+    const ingredients = await tx.ingredient.findMany({
       where: {
         workspaceId,
         name: {
@@ -130,6 +152,7 @@ export class IngredientsService {
   }
 
   private async appendPrefixMatches(
+    tx: Prisma.TransactionClient,
     workspaceId: string,
     query: string,
     suggestions: IngredientSuggestion[],
@@ -141,7 +164,7 @@ export class IngredientsService {
       return;
     }
 
-    const ingredients = await this.prisma.ingredient.findMany({
+    const ingredients = await tx.ingredient.findMany({
       where: {
         workspaceId,
         ...this.excludedIngredientsFilter(seenIngredientIds),
@@ -171,6 +194,7 @@ export class IngredientsService {
   }
 
   private async appendWordStartMatches(
+    tx: Prisma.TransactionClient,
     workspaceId: string,
     query: string,
     suggestions: IngredientSuggestion[],
@@ -182,7 +206,7 @@ export class IngredientsService {
       return;
     }
 
-    const ingredients = await this.prisma.ingredient.findMany({
+    const ingredients = await tx.ingredient.findMany({
       where: {
         workspaceId,
         ...this.excludedIngredientsFilter(seenIngredientIds),
@@ -228,6 +252,7 @@ export class IngredientsService {
   }
 
   private async appendContainsMatches(
+    tx: Prisma.TransactionClient,
     workspaceId: string,
     query: string,
     suggestions: IngredientSuggestion[],
@@ -239,7 +264,7 @@ export class IngredientsService {
       return;
     }
 
-    const ingredients = await this.prisma.ingredient.findMany({
+    const ingredients = await tx.ingredient.findMany({
       where: {
         workspaceId,
         ...this.excludedIngredientsFilter(seenIngredientIds),

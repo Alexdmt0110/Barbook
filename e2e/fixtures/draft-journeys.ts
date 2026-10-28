@@ -54,12 +54,13 @@ export async function loseCreationResponse(
   name: string,
   fill: (page: Page, name: string) => Promise<void>,
   headers: Record<string, string>,
+  apiRoot = '/api/cocktails',
 ): Promise<void> {
   await page.goto('/cocktails/new');
   await fill(page, name);
   let posts = 0;
   let committed: { slug: string } | undefined;
-  const pattern = '**/api/cocktails';
+  const pattern = `**${apiRoot}`;
   await page.route(pattern, async (route) => {
     if (route.request().method() !== 'POST') {
       await route.continue();
@@ -85,12 +86,23 @@ export async function loseCreationResponse(
       page.getByRole('button', { name: 'Créer le cocktail', exact: true }),
     ).toBeDisabled();
     const actual = await page.request.get(
-      `http://127.0.0.1:3000/api/cocktails/${committed!.slug}`,
+      `http://127.0.0.1:3000${apiRoot}/${committed!.slug}`,
       { headers },
     );
     expect(actual.status()).toBe(200);
     expect(((await actual.json()) as { name: string }).name).toBe(name);
     expect(posts).toBe(1);
+    if (apiRoot !== '/api/cocktails') {
+      const inspect = page.getByRole('link', { name: 'Vérifier la bibliothèque de cet espace', exact: true });
+      expect(await inspect.getAttribute('target')).toBeNull();
+      await inspect.click();
+      await expect(page).toHaveURL('http://127.0.0.1:4200/cocktails');
+      await expect(page.getByRole('heading', { name, exact: true })).toBeVisible();
+      await page.getByRole('link', { name: /Nouveau cocktail/ }).click();
+      await page.getByRole('button', { name: 'Restaurer le brouillon', exact: true }).click();
+      await expect(page.getByRole('button', { name: 'Créer le cocktail', exact: true })).toBeDisabled();
+      expect(posts).toBe(1);
+    }
     await page.getByRole('button', { name: 'Abandonner le brouillon', exact: true }).click();
   } finally {
     await page.unroute(pattern);
@@ -98,7 +110,7 @@ export async function loseCreationResponse(
 }
 
 /** Real browser quota exceptions at the storage boundary, without replacing any API. */
-export async function exerciseDraftQuota(page: Page): Promise<void> {
+export async function exerciseDraftQuota(page: Page, libraryName = 'Mes cocktails'): Promise<void> {
   await page.evaluate(() => {
     const original = Storage.prototype.setItem;
     Storage.prototype.setItem = function (key: string, value: string) {
@@ -117,7 +129,7 @@ export async function exerciseDraftQuota(page: Page): Promise<void> {
     ).toBeVisible();
     await page
       .getByRole('navigation', { name: 'Navigation principale' })
-      .getByRole('link', { name: 'Mes cocktails', exact: true })
+      .getByRole('link', { name: libraryName, exact: true })
       .click();
     await page.getByRole('link', { name: /Nouveau cocktail/ }).click();
     await page.getByRole('button', { name: 'Restaurer le brouillon', exact: true }).click();

@@ -63,6 +63,62 @@ describe('Shared workspace authorization over PostgreSQL/HTTP', () => {
       await pool?.end();
     }
   });
+  it('filters the catalog with an exact shared total while preserving personal, revoked and foreign isolation', async () => {
+    const active = await space();
+    const revoked = await space();
+    await revoke(revoked.id).expect(200);
+    const read = (actor: Actor, query = '') =>
+      api()
+        .get('/api/workspaces' + query)
+        .set(browserHeaders(actor));
+    type Page = {
+      items: { id: string; kind: string }[];
+      total: number;
+      page: number;
+      pageSize: number;
+    };
+    const empty = (await read(stranger, '?kind=SHARED').expect(200))
+      .body as Page;
+    expect(empty.items).toEqual([]);
+    expect(empty.total).toBe(0);
+    const foreign = await prisma.workspace.create({
+      data: {
+        name: 'Foreign Bar',
+        kind: 'SHARED',
+        members: { create: { userId: stranger.user.id, role: 'OWNER' } },
+      },
+    });
+    spaces.push(foreign.id);
+    const shared = (await read(member, '?kind=SHARED&pageSize=1').expect(200))
+      .body as Page;
+    expect(shared).toMatchObject({ total: 1, page: 1, pageSize: 1 });
+    expect(shared.items.map((w) => [w.id, w.kind])).toEqual([
+      [active.id, 'SHARED'],
+    ]);
+    const later = (
+      await read(member, '?kind=SHARED&pageSize=1&page=2').expect(200)
+    ).body as Page;
+    expect(later.items).toEqual([]);
+    expect(later.total).toBe(1); // Empty page is not evidence of no Bar membership.
+    const personal = (await read(member, '?kind=PERSONAL').expect(200))
+      .body as Page;
+    expect(personal.items.map((w) => w.id)).toEqual([member.workspaceId]);
+    expect(personal.total).toBe(1);
+    const all = (await read(member).expect(200)).body as Page;
+    expect(all.total).toBe(2);
+    expect(all.items.map((w) => w.id).sort()).toEqual(
+      [active.id, member.workspaceId].sort(),
+    );
+    const theirBars = (await read(stranger, '?kind=SHARED').expect(200))
+      .body as Page;
+    expect(theirBars.items.map((w) => w.id)).toEqual([foreign.id]);
+    await read(member, '?kind=UNKNOWN').expect(400);
+    await api().get('/api/workspaces?kind=SHARED').expect(401);
+    await api()
+      .get(`/api/workspaces/${revoked.id}`)
+      .set(browserHeaders(member))
+      .expect(404);
+  });
   it('isolates lists and contexts, reserves membership management for OWNER and preserves personal APIs', async () => {
     const w = await space();
     await api()

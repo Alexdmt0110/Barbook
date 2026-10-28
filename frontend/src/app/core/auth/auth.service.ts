@@ -1,3 +1,4 @@
+import { WorkspaceContext } from '../workspaces/workspace-context';
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { DestroyRef, computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
@@ -23,6 +24,7 @@ export class AuthService {
   private readonly router = inject(Router);
   private readonly storage = inject(BrowserStorageService);
   private readonly drafts = inject(DraftStore);
+  private readonly workspace = inject(WorkspaceContext);
   private readonly session = signal<AuthResponse | null>(null);
   private generation = 0;
   private bootstrap?: Observable<AuthResponse>;
@@ -79,7 +81,10 @@ export class AuthService {
             this.expire();
             throw new Error('Le compte ou l’espace a changé. Reconnecte-toi.');
           }
-          this.drafts.confirmIdentity(this.draftOwner(auth));
+        }),
+        switchMap((auth) => this.workspace.confirmSession(auth).pipe(map(() => auth))),
+        tap((auth) => {
+          if (epoch !== this.generation) throw new Error('La session a changé.');
           this.lastConfirmed = auth;
           this.session.set(auth);
         }),
@@ -101,6 +106,7 @@ export class AuthService {
 
   /** Involuntary expiry never revokes remotely or removes draft storage. */
   expire(revoked = false): void {
+    this.workspace.suspend(revoked);
     if (revoked) this.drafts.purge();
     const wasAuthenticated = this.session() !== null;
     this.drafts.suspend();
@@ -131,6 +137,7 @@ export class AuthService {
         throw new Error('Reconnecte-toi avant de confirmer une déconnexion globale.');
       this.logoutPending.set(true);
       this.globalLogoutUncertain.set(global);
+      this.workspace.suspend(true);
       this.drafts.purge();
       if (snapshot) this.notify('logout', snapshot);
       this.drafts.suspend();
@@ -161,6 +168,7 @@ export class AuthService {
   private signIn(url: string, request: LoginRequest | RegisterRequest): Observable<AuthResponse> {
     return defer(() => {
       const previous = this.session() ?? this.lastConfirmed;
+      this.workspace.suspend();
       this.drafts.suspend();
       this.generation++;
       this.session.set(null);
@@ -196,8 +204,9 @@ export class AuthService {
             // The UI must not offer an automatic replay of that POST.
           ),
         ),
+        switchMap((auth) => this.workspace.confirmSession(auth).pipe(map(() => auth))),
         tap((auth) => {
-          this.drafts.confirmIdentity(this.draftOwner(auth));
+          if (epoch !== this.generation) throw new Error('La session a changé.');
           this.lastConfirmed = auth;
           this.session.set(auth);
           if (previous) this.notify('identity', previous, auth);
@@ -252,12 +261,15 @@ export class AuthService {
       epoch !== this.generation ||
       !tag ||
       tag !== message.tag ||
-      !this.drafts.belongsTo(message.owner)
+      message.owner.userId !== current.user.id ||
+      message.owner.workspaceId !== current.workspaceId
     )
       return;
     if (
       message.kind === 'logout' ||
-      (message.nextOwner && !this.drafts.belongsTo(message.nextOwner))
+      (message.nextOwner &&
+        (message.nextOwner.userId !== current.user.id ||
+          message.nextOwner.workspaceId !== current.workspaceId))
     )
       this.drafts.purge();
     this.expire();

@@ -1,3 +1,4 @@
+import { provideHttpClient } from '@angular/common/http';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
@@ -125,6 +126,7 @@ describe('CocktailDetail', () => {
     await TestBed.configureTestingModule({
       imports: [CocktailDetail],
       providers: [
+        provideHttpClient(),
         {
           provide: FoldersService,
           useValue: {

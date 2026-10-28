@@ -18,9 +18,13 @@
           Accueil
         </a>
 
-        <a routerLink="/cocktails" routerLinkActive="active"> Mes cocktails </a>
-        <a routerLink="/folders" routerLinkActive="active">Dossiers</a>
-        <a routerLink="/trash" routerLinkActive="active">Corbeille</a>
+        <a routerLink="/cocktails" routerLinkActive="active">
+          {{ workspace.current()?.kind === 'SHARED' ? 'Carnet Bar' : 'Mes cocktails' }}
+        </a>
+        @if (workspace.current()?.kind === 'PERSONAL') {
+          <a routerLink="/folders" routerLinkActive="active">Dossiers</a>
+          <a routerLink="/trash" routerLinkActive="active">Corbeille</a>
+        }
       </nav>
 
       <div class="user-actions">
@@ -37,10 +41,24 @@
 
         <app-theme-switcher />
       </div>
+      @if (workspace.current(); as space) {
+        <p class="workspace-status" aria-label="Espace actif">
+          {{ space.name }} · {{ space.kind === 'PERSONAL' ? 'privé' : space.role }}
+        </p>
+      }
     </div>
   </header>
 
-  <main class="app-content">
+  <main class="app-content" [attr.inert]="workspace.transitioning() ? '' : null">
+    @if (workspace.error()) {
+      <p role="alert">{{ workspace.error() }}</p>
+    }
+    @if (workspace.current()?.kind === 'SHARED') {
+      <p role="status">
+        Carnet partagé : {{ workspace.current()?.name }}. Dossiers, tags et corbeille ne sont pas
+        disponibles dans ce carnet.
+      </p>
+    }
     @if (authService.logoutUncertain()) {
       <p role="alert">
         Déconnexion non confirmée. Si le réseau est indisponible, réessaie avant de quitter cet
@@ -51,7 +69,9 @@
           Réessayer la déconnexion
         </button>
       }
-    } @else if (authService.isAuthenticated()) {
+    } @else if (
+      authService.isAuthenticated() && workspace.current() && !workspace.transitioning()
+    ) {
       <router-outlet />
     }
   </main>

@@ -1,3 +1,4 @@
+import { WorkspaceContext } from '../../../core/workspaces/workspace-context';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -9,6 +10,13 @@ describe('Personal content HTTP transport', () => {
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
+    TestBed.inject(WorkspaceContext)
+      .confirmSession({
+        user: { id: 'qa', email: 'qa@example.test', displayName: 'QA' },
+        workspaceId: 'personal-qa',
+        csrfToken: 'csrf',
+      })
+      .subscribe();
     const service = TestBed.inject(CocktailsService);
     const http = TestBed.inject(HttpTestingController);
     service.getPersonalCocktailContent('id/test').subscribe();

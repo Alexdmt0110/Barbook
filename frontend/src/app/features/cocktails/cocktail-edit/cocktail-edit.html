@@ -1,17 +1,25 @@
 <section class="create-page">
   <a class="back-link" routerLink="/cocktails">Mes cocktails</a>
   <header class="page-header">
-    <p class="eyebrow">Carnet personnel</p>
+    <p class="eyebrow">
+      {{ workspace.current()?.kind === 'SHARED' ? workspace.current()?.name : 'Carnet personnel' }}
+    </p>
     <h1>Modifier la recette</h1>
     <p>
-      Corrige le contenu et, dans la section dédiée, ses dossiers et tags. Son adresse et son image
-      sont conservées.
+      @if (workspace.current()?.kind === 'SHARED') {
+        Modifie le contenu de cette recette partagée. Son adresse et son image sont conservées.
+      } @else {
+        Corrige le contenu et, dans la section dédiée, ses dossiers et tags. Son adresse et son
+        image sont conservées.
+      }
     </p>
   </header>
-  <p class="save-policy">
-    Le contenu et le classement se sauvegardent séparément. « Enregistrer la recette » ne sauvegarde
-    pas les dossiers et tags.
-  </p>
+  @if (workspace.current()?.kind !== 'SHARED') {
+    <p class="save-policy">
+      Le contenu et le classement se sauvegardent séparément. « Enregistrer la recette » ne
+      sauvegarde pas les dossiers et tags.
+    </p>
+  }
   @if (loading()) {
     <p role="status" aria-busy="true">Chargement de la recette…</p>
   }
@@ -29,6 +37,7 @@
   @if (loaded(); as snapshot) {
     @if (draft(); as d) {
       <app-draft-notice
+        [libraryInSameTab]="workspace.current()?.kind === 'SHARED'"
         [draft]="d"
         [controlledResolution]="true"
         (restore)="restoreDraft()"
@@ -431,37 +440,41 @@
           </button>
         </div>
       </form>
-      <section class="organization-section" aria-labelledby="edit-organization-title">
-        <h2 id="edit-organization-title">Dossiers et tags</h2>
-        <p>
-          Cette section possède son propre brouillon et son bouton « Enregistrer l’organisation ».
-          Elle ne modifie pas le contenu de la recette.
-        </p>
-        @if (organization(); as recipe) {
-          <app-cocktail-organization-editor
-            [slug]="recipe.slug"
-            [cocktailId]="recipe.id"
-            [folders]="recipe.folders"
-            [organizationVersion]="recipe.organizationVersion"
-            [tags]="recipe.tags"
-            (organizationUpdated)="onOrganizationUpdated($event)"
-          />
-        } @else {
-          <button
-            type="button"
-            class="cancel-action"
-            [disabled]="organizationLoading()"
-            (click)="loadOrganization()"
-          >
-            {{
-              organizationLoading() ? 'Chargement du classement…' : 'Modifier les dossiers et tags'
-            }}
-          </button>
-        }
-        @if (organizationError()) {
-          <p role="alert">{{ organizationError() }}</p>
-        }
-      </section>
+      @if (workspace.current()?.kind !== 'SHARED') {
+        <section class="organization-section" aria-labelledby="edit-organization-title">
+          <h2 id="edit-organization-title">Dossiers et tags</h2>
+          <p>
+            Cette section possède son propre brouillon et son bouton « Enregistrer l’organisation ».
+            Elle ne modifie pas le contenu de la recette.
+          </p>
+          @if (organization(); as recipe) {
+            <app-cocktail-organization-editor
+              [slug]="recipe.slug"
+              [cocktailId]="recipe.id"
+              [folders]="recipe.folders"
+              [organizationVersion]="recipe.organizationVersion"
+              [tags]="recipe.tags"
+              (organizationUpdated)="onOrganizationUpdated($event)"
+            />
+          } @else {
+            <button
+              type="button"
+              class="cancel-action"
+              [disabled]="organizationLoading()"
+              (click)="loadOrganization()"
+            >
+              {{
+                organizationLoading()
+                  ? 'Chargement du classement…'
+                  : 'Modifier les dossiers et tags'
+              }}
+            </button>
+          }
+          @if (organizationError()) {
+            <p role="alert">{{ organizationError() }}</p>
+          }
+        </section>
+      }
     }
   }
 </section>

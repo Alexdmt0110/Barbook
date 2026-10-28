@@ -58,31 +58,7 @@ export class CocktailCreationService {
 
     const workspaceId = personalWorkspace.id;
 
-    const slug = this.evaluateRule(() => createCocktailSlug(dto.name));
-
-    const recipeIngredientSlugs = this.evaluateRule(() =>
-      validateRecipeIngredients(dto.ingredients),
-    );
-
-    this.evaluateRule(() => validateGarnishes(dto.garnishes ?? []));
-
-    const mainAlcoholName = dto.mainAlcoholName;
-
-    const mainAlcoholSlug =
-      mainAlcoholName !== undefined && mainAlcoholName !== null
-        ? this.evaluateRule(() =>
-            requireCocktailCreationSlug(mainAlcoholName, 'Main alcohol name'),
-          )
-        : null;
-
-    if (
-      mainAlcoholSlug !== null &&
-      !recipeIngredientSlugs.has(mainAlcoholSlug)
-    ) {
-      throw new BadRequestException(
-        'Main alcohol must reference a recipe ingredient.',
-      );
-    }
+    const { slug, mainAlcoholSlug } = this.prepareCreation(dto);
 
     const existingCocktail = await this.prisma.cocktail.findUnique({
       where: {
@@ -101,135 +77,15 @@ export class CocktailCreationService {
     }
 
     const persistRecipe = () =>
-      this.prisma.$transaction(async (transaction) => {
-        const ingredientsBySlug = new Map<string, ResolvedCatalogIngredient>();
-
-        const resolvedRecipeIngredients: ResolvedRecipeIngredient[] = [];
-
-        for (const ingredient of dto.ingredients) {
-          const ingredientSlug = this.evaluateRule(() =>
-            requireCocktailCreationSlug(
-              ingredient.ingredientName,
-              'Ingredient name',
-            ),
-          );
-
-          const resolvedIngredient = await this.resolveIngredient(
-            transaction,
-            workspaceId,
-            ingredientsBySlug,
-            ingredient.ingredientName,
-            ingredientSlug,
-            ingredient.ingredientDefaultAbv,
-          );
-
-          const abvOverride = resolveRecipeAbvOverride(
-            ingredient.ingredientDefaultAbv,
-            ingredient.abvOverride,
-            resolvedIngredient.defaultAbv,
-          );
-
-          resolvedRecipeIngredients.push({
-            ingredientId: resolvedIngredient.id,
-            ingredientSlug,
-            defaultAbv: resolvedIngredient.defaultAbv,
-            abvOverride,
-            ingredient,
-          });
-        }
-
-        const mainAlcoholId = this.evaluateRule(() =>
-          resolveMainAlcoholId(
-            mainAlcoholSlug,
-            ingredientsBySlug,
-            resolvedRecipeIngredients,
-          ),
-        );
-
-        const resolvedGarnishes: ResolvedGarnish[] = [];
-
-        for (const garnish of dto.garnishes ?? []) {
-          const garnishSlug = this.evaluateRule(() =>
-            requireCocktailCreationSlug(
-              garnish.ingredientName,
-              'Garnish ingredient name',
-            ),
-          );
-
-          const resolvedIngredient = await this.resolveIngredient(
-            transaction,
-            workspaceId,
-            ingredientsBySlug,
-            garnish.ingredientName,
-            garnishSlug,
-          );
-
-          resolvedGarnishes.push({
-            ingredientId: resolvedIngredient.id,
-            garnish,
-          });
-        }
-
-        const cocktail = await transaction.cocktail.create({
-          data: {
-            workspaceId,
-            slug,
-            name: dto.name,
-            type: dto.type,
-            family: dto.family ?? null,
-            method: dto.method,
-            glass: dto.glass,
-            ice: dto.ice ?? null,
-            notes: dto.notes ?? null,
-            mainAlcoholId,
-          },
-          select: {
-            id: true,
-            slug: true,
-          },
-        });
-
-        await transaction.cocktailIngredient.createMany({
-          data: resolvedRecipeIngredients.map(
-            ({ ingredientId, abvOverride, ingredient }, index) => ({
-              workspaceId,
-              cocktailId: cocktail.id,
-              ingredientId,
-              amount: ingredient.amount ?? null,
-              unit: ingredient.unit,
-              specification: ingredient.specification ?? null,
-              abvOverride,
-              notes: ingredient.notes ?? null,
-              sortOrder: index + 1,
-            }),
-          ),
-        });
-
-        if (resolvedGarnishes.length > 0) {
-          await transaction.garnishIngredient.createMany({
-            data: resolvedGarnishes.map(({ ingredientId, garnish }, index) => ({
-              workspaceId,
-              cocktailId: cocktail.id,
-              ingredientId,
-              amount: garnish.amount ?? null,
-              unit: garnish.unit ?? null,
-              specification: garnish.specification ?? null,
-              usage: garnish.usage,
-              sortOrder: index + 1,
-            })),
-          });
-        }
-
-        await transaction.preparationStep.createMany({
-          data: dto.steps.map((content, index) => ({
-            cocktailId: cocktail.id,
-            content,
-            sortOrder: index + 1,
-          })),
-        });
-
-        return cocktail;
-      });
+      this.prisma.$transaction((transaction) =>
+        this.persistInWorkspace(
+          transaction,
+          workspaceId,
+          dto,
+          slug,
+          mainAlcoholSlug,
+        ),
+      );
     let catalogRetries = 0;
     for (;;) {
       try {
@@ -257,6 +113,206 @@ export class CocktailCreationService {
         throw error;
       }
     }
+  }
+
+  /** Caller owns the membership lock and transaction, including catalogue writes. */
+  async createInWorkspace(
+    transaction: Prisma.TransactionClient,
+    workspaceId: string,
+    dto: CreateCocktailDto,
+  ): Promise<CreateCocktailResult> {
+    const { slug, mainAlcoholSlug } = this.prepareCreation(dto);
+    const existing = await transaction.cocktail.findUnique({
+      where: { workspaceId_slug: { workspaceId, slug } },
+      select: { id: true },
+    });
+    if (existing)
+      throw new ConflictException('A cocktail with this name already exists.');
+    try {
+      return await this.persistInWorkspace(
+        transaction,
+        workspaceId,
+        dto,
+        slug,
+        mainAlcoholSlug,
+      );
+    } catch (error: unknown) {
+      // Do not retry an aborted transaction or replay a potentially committed HTTP command.
+      if (isPrismaKnownRequestError(error, 'P2002'))
+        throw new ConflictException(
+          'Recipe or ingredient changed concurrently. Reload before retrying.',
+        );
+      throw error;
+    }
+  }
+
+  private prepareCreation(dto: CreateCocktailDto): {
+    slug: string;
+    mainAlcoholSlug: string | null;
+  } {
+    const slug = this.evaluateRule(() => createCocktailSlug(dto.name));
+
+    const recipeIngredientSlugs = this.evaluateRule(() =>
+      validateRecipeIngredients(dto.ingredients),
+    );
+
+    this.evaluateRule(() => validateGarnishes(dto.garnishes ?? []));
+
+    const mainAlcoholName = dto.mainAlcoholName;
+
+    const mainAlcoholSlug =
+      mainAlcoholName !== undefined && mainAlcoholName !== null
+        ? this.evaluateRule(() =>
+            requireCocktailCreationSlug(mainAlcoholName, 'Main alcohol name'),
+          )
+        : null;
+
+    if (
+      mainAlcoholSlug !== null &&
+      !recipeIngredientSlugs.has(mainAlcoholSlug)
+    ) {
+      throw new BadRequestException(
+        'Main alcohol must reference a recipe ingredient.',
+      );
+    }
+
+    return { slug, mainAlcoholSlug };
+  }
+
+  private async persistInWorkspace(
+    transaction: Prisma.TransactionClient,
+    workspaceId: string,
+    dto: CreateCocktailDto,
+    slug: string,
+    mainAlcoholSlug: string | null,
+  ): Promise<CreateCocktailResult> {
+    const ingredientsBySlug = new Map<string, ResolvedCatalogIngredient>();
+
+    const resolvedRecipeIngredients: ResolvedRecipeIngredient[] = [];
+
+    for (const ingredient of dto.ingredients) {
+      const ingredientSlug = this.evaluateRule(() =>
+        requireCocktailCreationSlug(
+          ingredient.ingredientName,
+          'Ingredient name',
+        ),
+      );
+
+      const resolvedIngredient = await this.resolveIngredient(
+        transaction,
+        workspaceId,
+        ingredientsBySlug,
+        ingredient.ingredientName,
+        ingredientSlug,
+        ingredient.ingredientDefaultAbv,
+      );
+
+      const abvOverride = resolveRecipeAbvOverride(
+        ingredient.ingredientDefaultAbv,
+        ingredient.abvOverride,
+        resolvedIngredient.defaultAbv,
+      );
+
+      resolvedRecipeIngredients.push({
+        ingredientId: resolvedIngredient.id,
+        ingredientSlug,
+        defaultAbv: resolvedIngredient.defaultAbv,
+        abvOverride,
+        ingredient,
+      });
+    }
+
+    const mainAlcoholId = this.evaluateRule(() =>
+      resolveMainAlcoholId(
+        mainAlcoholSlug,
+        ingredientsBySlug,
+        resolvedRecipeIngredients,
+      ),
+    );
+
+    const resolvedGarnishes: ResolvedGarnish[] = [];
+
+    for (const garnish of dto.garnishes ?? []) {
+      const garnishSlug = this.evaluateRule(() =>
+        requireCocktailCreationSlug(
+          garnish.ingredientName,
+          'Garnish ingredient name',
+        ),
+      );
+
+      const resolvedIngredient = await this.resolveIngredient(
+        transaction,
+        workspaceId,
+        ingredientsBySlug,
+        garnish.ingredientName,
+        garnishSlug,
+      );
+
+      resolvedGarnishes.push({
+        ingredientId: resolvedIngredient.id,
+        garnish,
+      });
+    }
+
+    const cocktail = await transaction.cocktail.create({
+      data: {
+        workspaceId,
+        slug,
+        name: dto.name,
+        type: dto.type,
+        family: dto.family ?? null,
+        method: dto.method,
+        glass: dto.glass,
+        ice: dto.ice ?? null,
+        notes: dto.notes ?? null,
+        mainAlcoholId,
+      },
+      select: {
+        id: true,
+        slug: true,
+      },
+    });
+
+    await transaction.cocktailIngredient.createMany({
+      data: resolvedRecipeIngredients.map(
+        ({ ingredientId, abvOverride, ingredient }, index) => ({
+          workspaceId,
+          cocktailId: cocktail.id,
+          ingredientId,
+          amount: ingredient.amount ?? null,
+          unit: ingredient.unit,
+          specification: ingredient.specification ?? null,
+          abvOverride,
+          notes: ingredient.notes ?? null,
+          sortOrder: index + 1,
+        }),
+      ),
+    });
+
+    if (resolvedGarnishes.length > 0) {
+      await transaction.garnishIngredient.createMany({
+        data: resolvedGarnishes.map(({ ingredientId, garnish }, index) => ({
+          workspaceId,
+          cocktailId: cocktail.id,
+          ingredientId,
+          amount: garnish.amount ?? null,
+          unit: garnish.unit ?? null,
+          specification: garnish.specification ?? null,
+          usage: garnish.usage,
+          sortOrder: index + 1,
+        })),
+      });
+    }
+
+    await transaction.preparationStep.createMany({
+      data: dto.steps.map((content, index) => ({
+        cocktailId: cocktail.id,
+        content,
+        sortOrder: index + 1,
+      })),
+    });
+
+    return cocktail;
   }
 
   private async resolveIngredient(

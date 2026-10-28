@@ -1,3 +1,4 @@
+import { WorkspaceContext } from '../../../core/workspaces/workspace-context';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, HostListener, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -47,6 +48,11 @@ import {
   styleUrl: './cocktail-create.css',
 })
 export class CocktailCreate {
+  readonly workspace = inject(WorkspaceContext);
+  private accessVersion =
+    this.workspace.current()?.kind === 'SHARED'
+      ? this.workspace.current()?.accessVersion
+      : undefined;
   readonly draft = new FormDraft(
     inject(DraftStore),
     'create:new',
@@ -123,6 +129,7 @@ export class CocktailCreate {
 
   private draftValue() {
     return {
+      ...(this.accessVersion !== undefined ? { accessVersion: this.accessVersion } : {}),
       form: this.form.getRawValue(),
       selected: this.ingredients.controls.map(
         (group) => this.selectedIngredients.get(group) ?? null,
@@ -135,6 +142,12 @@ export class CocktailCreate {
   restoreDraft(): void {
     const value = this.draft.restore();
     if (!isCreationDraft(value)) return;
+    this.accessVersion = value.accessVersion;
+    if (
+      this.workspace.current()?.kind === 'SHARED' &&
+      this.accessVersion !== this.workspace.current()?.accessVersion
+    )
+      this.draft.conflict.set(true);
     this.restoring = true;
     this.ingredients.clear();
     this.garnishes.clear();
@@ -162,6 +175,10 @@ export class CocktailCreate {
   }
   discardDraft(): void {
     this.draft.discard();
+    this.accessVersion =
+      this.workspace.current()?.kind === 'SHARED'
+        ? this.workspace.current()?.accessVersion
+        : undefined;
     this.restoring = true;
     this.ingredients.clear();
     this.ingredients.push(this.createIngredientGroup());
@@ -325,10 +342,14 @@ export class CocktailCreate {
     const request = buildCreateCocktailRequest(this.form.getRawValue(), selectedIngredients);
 
     this.cocktailsService
-      .createPersonalCocktail(request)
+      .createPersonalCocktail({
+        ...request,
+        ...(this.accessVersion !== undefined ? { expectedAccessVersion: this.accessVersion } : {}),
+      })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
+          this.draft.requestEnded();
           this.isSubmitting.set(false);
         }),
       )
@@ -428,6 +449,8 @@ export class CocktailCreate {
     }
 
     if (error.status === 409) {
+      if (this.workspace.current()?.kind === 'SHARED')
+        return 'Conflit de création dans ce Bar. Vérifie ses droits et sa bibliothèque avant une nouvelle action. Ta saisie est conservée.';
       return 'Un cocktail portant ce nom existe déjà dans ton Barbook.';
     }
 

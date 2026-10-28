@@ -20,7 +20,7 @@
     </p>
   </header>
 
-  <app-draft-notice [draft]="draft" (restore)="restoreDraft()" (discard)="discardDraft()" />
+  <app-draft-notice [libraryInSameTab]="workspace.current()?.kind === 'SHARED'" [conflictAdvice]="workspace.current()?.kind === 'SHARED' ? 'Les droits du Bar ont changé. Conserve ta saisie pour la recopier, ou abandonne explicitement ce brouillon avant de repartir d’un formulaire autorisé.' : null" [draft]="draft" (restore)="restoreDraft()" (discard)="discardDraft()" />
   <form [attr.inert]="draft.candidate() || isSubmitting() ? '' : null"
     class="cocktail-form"
     [formGroup]="form"
@@ -818,7 +818,7 @@
       <button
         class="submit-action"
         type="submit"
-        [disabled]="isSubmitting() || !!draft.candidate() || draft.uncertain()"
+        [disabled]="isSubmitting() || !!draft.candidate() || draft.uncertain() || draft.conflict()"
       >
         @if (isSubmitting()) {
           Création…

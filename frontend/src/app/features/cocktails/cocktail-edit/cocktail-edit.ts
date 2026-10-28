@@ -1,3 +1,4 @@
+import { WorkspaceContext } from '../../../core/workspaces/workspace-context';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
@@ -55,6 +56,8 @@ import { CocktailOrganizationEditor } from '../cocktail-detail/cocktail-organiza
   styleUrls: ['../cocktail-create/cocktail-create.css', './cocktail-edit.css'],
 })
 export class CocktailEdit implements OnInit {
+  readonly workspace = inject(WorkspaceContext);
+  private accessVersion: number | undefined;
   private readonly organizationEditor = viewChild(CocktailOrganizationEditor);
   readonly organization = signal<CocktailDetail | null>(null);
   readonly organizationLoading = signal(false);
@@ -115,7 +118,11 @@ export class CocktailEdit implements OnInit {
     return this.store.valid(this.lease);
   }
   private draftValue() {
-    return { schema: 1 as const, form: this.form.getRawValue() };
+    return {
+      schema: 1 as const,
+      ...(this.accessVersion !== undefined ? { accessVersion: this.accessVersion } : {}),
+      form: this.form.getRawValue(),
+    };
   }
   private apply(snapshot: CocktailContentSnapshot): void {
     this.applying = true;
@@ -124,6 +131,7 @@ export class CocktailEdit implements OnInit {
     );
     fillEditForm(this.form, this.fb, snapshot.content);
     this.version = snapshot.contentVersion;
+    this.accessVersion = snapshot.accessVersion;
     this.loaded.set(snapshot);
     this.applying = false;
   }
@@ -164,6 +172,12 @@ export class CocktailEdit implements OnInit {
     this.applying = true;
     fillEditDraft(this.form, this.fb, value.form);
     this.version = version;
+    this.accessVersion = value.accessVersion;
+    if (
+      this.workspace.current()?.kind === 'SHARED' &&
+      this.accessVersion !== this.loaded()?.accessVersion
+    )
+      draft.conflict.set(true);
     this.applying = false;
   }
   discardDraft(): void {
@@ -259,11 +273,15 @@ export class CocktailEdit implements OnInit {
       .replacePersonalCocktailContent(loaded.id, {
         ...editContent(this.form.getRawValue()),
         expectedContentVersion: this.version,
+        ...(this.accessVersion !== undefined ? { expectedAccessVersion: this.accessVersion } : {}),
       })
       .pipe(
         takeUntil(this.routeReset),
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.submitting.set(false)),
+        finalize(() => {
+          draft.requestEnded();
+          this.submitting.set(false);
+        }),
       )
       .subscribe({
         next: (saved) => {
@@ -292,6 +310,7 @@ export class CocktailEdit implements OnInit {
       );
   }
   loadOrganization(): void {
+    if (this.workspace.current()?.kind === 'SHARED') return;
     const loaded = this.loaded();
     if (!this.current() || !loaded || this.organization() || this.organizationLoading()) return;
     this.organizationLoading.set(true);
@@ -387,7 +406,9 @@ export class CocktailEdit implements OnInit {
     if (error.status === 409)
       return 'La recette ou le catalogue a changé. Ta saisie est conservée ; compare la version serveur avant toute nouvelle intention.';
     if (error.status === 404)
-      return 'Cette recette n’est plus disponible dans ton carnet personnel.';
+      return this.workspace.current()?.kind === 'SHARED'
+        ? 'Cette recette n’est plus disponible dans cet espace.'
+        : 'Cette recette n’est plus disponible dans ton carnet personnel.';
     if (error.status === 401 || error.status === 403)
       return 'La session ou son autorisation n’est plus valide. Reconnecte-toi avant de poursuivre.';
     if (error.status === 400)

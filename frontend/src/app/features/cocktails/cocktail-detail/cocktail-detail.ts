@@ -1,3 +1,4 @@
+import { WorkspaceContext } from '../../../core/workspaces/workspace-context';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -17,6 +18,7 @@ import { CocktailsService } from '../data-access/cocktails.service';
   styleUrl: './cocktail-detail.css',
 })
 export class CocktailDetail implements OnInit {
+  readonly workspace = inject(WorkspaceContext);
   private readonly route = inject(ActivatedRoute);
 
   private readonly cocktailsService = inject(CocktailsService);

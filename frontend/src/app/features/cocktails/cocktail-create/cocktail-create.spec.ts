@@ -1,9 +1,10 @@
+import { provideHttpClient } from '@angular/common/http';
 import { BrowserStorageService } from '../../../core/storage/browser-storage.service';
 import { DraftStore } from '../../../core/drafts/draft-store.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, Subject, of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { IngredientSuggestion } from '../../ingredients/data-access/ingredient.models';
 import { IngredientsService } from '../../ingredients/data-access/ingredients.service';
@@ -50,6 +51,7 @@ describe('CocktailCreate', () => {
     await TestBed.configureTestingModule({
       imports: [CocktailCreate],
       providers: [
+        provideHttpClient(),
         provideRouter([]),
         {
           provide: CocktailsService,
@@ -536,4 +538,26 @@ describe('CocktailCreate', () => {
     abandon!.click();
     expect(fixture.componentInstance.form.controls.name.value).toBe('');
   });
+  it('does not leave an orphaned pending command after navigation destroys the creation form', () => {
+    const store = TestBed.inject(DraftStore);
+    store.confirmIdentity({ userId: 'test-user', workspaceId: 'test-workspace' });
+    const pending = new Subject<{ id: string; slug: string }>();
+    cocktailsService.response = pending;
+    const f = TestBed.createComponent(CocktailCreate);
+    const c = f.componentInstance;
+    fillRequiredFields(c);
+    c.ingredients.at(0).controls.ingredientName.setValue('Gin');
+    c.ingredients.at(0).controls.ingredientDefaultAbv.setValue(40);
+    c.ingredients.at(0).controls.amount.setValue(5);
+    c.submit();
+    expect(cocktailsService.requests).toHaveLength(1);
+    expect(store.hasPendingMutation()).toBe(true);
+    f.destroy();
+    expect(pending.observed).toBe(false);
+    expect(store.hasPendingMutation()).toBe(false);
+    expect(store.find(store.lease(), 'create:new')?.uncertain).toBe(true);
+    c.submit();
+    expect(cocktailsService.requests).toHaveLength(1);
+  });
+
 });
