@@ -210,7 +210,11 @@ describe('Explicit Bar creation and private creation receipts over PostgreSQL/HT
     await api().post('/api/workspaces').send(body).expect(403);
     const { Cookie: _cookie, ...withoutCookie } = browserHeaders(owner);
     void _cookie;
-    await api().post('/api/workspaces').set(withoutCookie).send(body).expect(401);
+    await api()
+      .post('/api/workspaces')
+      .set(withoutCookie)
+      .send(body)
+      .expect(401);
     await api()
       .post('/api/workspaces')
       .set({ ...browserHeaders(owner), 'X-Barbook-CSRF': 'invalid' })
