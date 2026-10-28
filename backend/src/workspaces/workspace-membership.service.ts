@@ -31,13 +31,26 @@ export class WorkspaceMembershipService {
     };
     return this.prisma.$transaction(
       async (tx) => ({
-        items: await tx.workspace.findMany({
-          where,
-          select: { id: true, name: true, kind: true, accessVersion: true },
-          orderBy: [{ name: 'asc' }, { id: 'asc' }],
-          skip: (query.page - 1) * query.pageSize,
-          take: query.pageSize,
-        }),
+        items: await tx.workspace
+          .findMany({
+            where,
+            select: {
+              id: true,
+              name: true,
+              kind: true,
+              accessVersion: true,
+              accentKey: true,
+            },
+            orderBy: [{ name: 'asc' }, { id: 'asc' }],
+            skip: (query.page - 1) * query.pageSize,
+            take: query.pageSize,
+          })
+          .then((rows) =>
+            rows.map(({ accentKey, ...workspace }) => ({
+              ...workspace,
+              ...(accentKey ? { accentKey } : {}),
+            })),
+          ),
         total: await tx.workspace.count({ where }),
         page: query.page,
         pageSize: query.pageSize,

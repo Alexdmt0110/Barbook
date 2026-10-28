@@ -1,3 +1,5 @@
+import { WorkspaceCreationService } from './workspace-creation.service';
+import { CreateBarDto } from './workspace.dto';
 import {
   Body,
   Controller,
@@ -22,7 +24,23 @@ import {
 @Controller('workspaces')
 @UseGuards(SessionGuard)
 export class WorkspacesController {
-  constructor(private readonly memberships: WorkspaceMembershipService) {}
+  constructor(
+    private readonly memberships: WorkspaceMembershipService,
+    private readonly creation: WorkspaceCreationService,
+  ) {}
+
+  @Post()
+  create(@CurrentUserId() userId: string, @Body() dto: CreateBarDto) {
+    return this.creation.create(userId, dto);
+  }
+
+  @Get('creation-intents/:requestId')
+  receipt(
+    @CurrentUserId() userId: string,
+    @Param('requestId', ParseUUIDPipe) requestId: string,
+  ) {
+    return this.creation.receipt(userId, requestId);
+  }
 
   @Get()
   list(

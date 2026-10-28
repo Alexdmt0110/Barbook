@@ -1,3 +1,4 @@
+import { WorkspaceCreationService } from './workspace-creation.service';
 import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '../database/prisma.module';
@@ -7,7 +8,11 @@ import { WorkspacesController } from './workspaces.controller';
 
 @Module({
   imports: [AuthModule, PrismaModule],
-  providers: [WorkspaceAccessService, WorkspaceMembershipService],
+  providers: [
+    WorkspaceAccessService,
+    WorkspaceMembershipService,
+    WorkspaceCreationService,
+  ],
   controllers: [WorkspacesController],
   exports: [WorkspaceAccessService],
 })

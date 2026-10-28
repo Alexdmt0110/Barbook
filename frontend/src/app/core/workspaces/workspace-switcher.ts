@@ -1,3 +1,4 @@
+import { BarCreate } from './bar-create';
 import { WorkspaceMembers } from './workspace-members';
 import { HttpClient } from '@angular/common/http';
 import { Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
@@ -22,7 +23,7 @@ interface BarPage {
 
 @Component({
   selector: 'app-workspace-switcher',
-  imports: [WorkspaceMembers],
+  imports: [WorkspaceMembers, BarCreate],
   template: `
     @if (auth.snapshot()) {
       <section aria-labelledby="workspace-heading">
@@ -91,6 +92,13 @@ interface BarPage {
         @if (workspace.transitioning()) {
           <p role="status">Vérification et ouverture de l’espace…</p>
         }
+        <app-bar-create
+          #barCreation
+          [hidden]="loading() || !!error()"
+          [first]="total() === 0"
+          (created)="load(true)"
+          (open)="select($event, barCreation)"
+        />
         <app-workspace-members />
       </section>
     }
@@ -184,7 +192,7 @@ export class WorkspaceSwitcher {
         },
       });
   }
-  select(id: string): void {
+  select(id: string, creation?: BarCreate): void {
     this.error.set(null);
     this.workspace
       .select(id, async () => {
@@ -194,7 +202,10 @@ export class WorkspaceSwitcher {
       .pipe(takeUntilDestroyed(this.destroy))
       .subscribe({
         next: (selected) => {
-          if (selected) this.changed.emit();
+          if (selected) {
+            creation?.cancel();
+            this.changed.emit();
+          }
         },
         error: (error) =>
           this.error.set(
