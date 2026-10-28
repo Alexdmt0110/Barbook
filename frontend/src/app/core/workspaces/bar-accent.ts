@@ -11,9 +11,6 @@ export const barAccentNames: Record<BarAccent, string> = {
   TEAL: 'Sarcelle',
   BLUE: 'Bleu',
 };
-export function isBarAccent(value: unknown): value is BarAccent {
-  return typeof value === 'string' && (barAccents as readonly string[]).includes(value);
-}
 export function accentTokens(accent: BarAccent | undefined, theme: Theme) {
   if (!accent || theme === Theme.HighContrast) return null;
   const dark = theme === Theme.Dark;

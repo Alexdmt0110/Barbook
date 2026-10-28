@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { finalize, timeout } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { WorkspaceContext } from './workspace-context';
-import { BarAccent, barAccents, barAccentNames } from './bar-accent';
+import { BarAccent, barAccents, barAccentNames, accentTokens } from './bar-accent';
 interface CreatedBar {
   id: string;
   name: string;
@@ -51,9 +51,12 @@ interface Intent {
               <legend>Couleur initiale</legend>
               @for (key of accents; track key) {
                 <label class="palette-option"
-                  ><input type="radio" name="barAccent" [value]="key" [(ngModel)]="accent" />{{
-                    names[key]
-                  }}</label
+                  ><input type="radio" name="barAccent" [value]="key" [(ngModel)]="accent" /><span
+                    class="swatch"
+                    aria-hidden="true"
+                    [style.background-color]="preview(key)"
+                  ></span
+                  >{{ names[key] }}</label
                 >
               }
             </fieldset>
@@ -151,6 +154,13 @@ interface Intent {
       flex-wrap: wrap;
       gap: var(--space-3);
     }
+    .swatch {
+      display: inline-block;
+      flex: 0 0 1rem;
+      height: 1rem;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+    }
     .palette-option,
     .confirmation {
       display: flex;
@@ -194,6 +204,9 @@ export class BarCreate {
         this.clear();
       }
     });
+  }
+  preview(key: BarAccent): string {
+    return accentTokens(key, 'dark')!.color;
   }
   start(): void {
     this.editing.set(true);

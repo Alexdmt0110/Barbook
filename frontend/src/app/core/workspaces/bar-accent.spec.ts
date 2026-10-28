@@ -54,7 +54,25 @@ describe('Confirmed Bar accent scope', () => {
       expect(accentTokens(key, Theme.Dark)?.color).toMatch(/^#[0-9a-f]{6}$/);
       expect(accentTokens(key, Theme.Light)?.on).toBe('#fffaf7');
       expect(accentTokens(key, Theme.HighContrast)).toBe(null);
+      for (const mode of [Theme.Dark, Theme.Light]) {
+        const tokens = accentTokens(key, mode)!;
+        expect(contrast(tokens.color, tokens.on)).toBeGreaterThanOrEqual(4.5);
+      }
     }
     expect(accentTokens(undefined, Theme.Dark)).toBe(null);
   });
 });
+
+function contrast(a: string, b: string): number {
+  const luminance = (hex: string) => {
+    const c = hex
+      .slice(1)
+      .match(/../g)!
+      .map((n) => parseInt(n, 16) / 255)
+      .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  };
+  const x = luminance(a),
+    y = luminance(b);
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}

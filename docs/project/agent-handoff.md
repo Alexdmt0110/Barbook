@@ -12,6 +12,8 @@ BB1d/PR45 en draft : interface profil nom/palette/confirmation et résolution ex
 
 Incident de publication détecté avant fusion : 8a7da3dc avait été construit sans base d’arbre après perte d’un état temporaire, donc arbre incomplet sur la seule branche draft. Corrigé sans réécriture par c53e525d, arbre complet e2842677652fbf0c0d08f94a1ed4599561069051 égal à l’index local avant publication, diff net depuis73aa552d limité à la mise en forme du test. Main38149070 intact. Désormais vérifier explicitement base non vide et égalité complète index/arbre avant chaque mise à jour distante ; conserver les deux commits pour traçabilité.
 
+BB1d40778c9f : six contrôles réussis,267PG/HTTP et30Chromium réellement exécutés (273backend/269frontend, audits0). Qualification visuelle finale encore à effectuer après publication des pastilles de palette et du test de contraste4palettes/2modes ; aucune fusion45 à ce stade. Roadmap/backlog/OPS actualisés : BB1b intégré, dixième migration BB1d en test, D7/cible/restauration encore ouverts.
+
 ---
 
 # Reprise sécurisée après perte de l’environnement — 28 octobre 2026
