@@ -1,3 +1,4 @@
+import { BarCreate } from './bar-create';
 import { WorkspaceMembers } from './workspace-members';
 import { HttpClient } from '@angular/common/http';
 import { Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
@@ -22,7 +23,7 @@ interface BarPage {
 
 @Component({
   selector: 'app-workspace-switcher',
-  imports: [WorkspaceMembers],
+  imports: [WorkspaceMembers, BarCreate],
   template: `
     @if (auth.snapshot()) {
       <section aria-labelledby="workspace-heading">
@@ -91,6 +92,12 @@ interface BarPage {
         @if (workspace.transitioning()) {
           <p role="status">Vérification et ouverture de l’espace…</p>
         }
+        <app-bar-create
+          [hidden]="loading() || !!error()"
+          [first]="total() === 0"
+          (created)="load(true)"
+          (open)="select($event)"
+        />
         <app-workspace-members />
       </section>
     }

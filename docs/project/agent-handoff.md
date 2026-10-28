@@ -8,6 +8,10 @@ Nouvelle branche feature/bar-self-service créée depuis ce main exactement. Des
 
 Git : commits/push atomiques, branches conservées. VM : aucun déploiement. SQL : aucune base propriétaire ; futur delta uniquement test jetable gardé. Infra : aucun changement. OPS reste documentaire, D7 et cible/sauvegarde restaurée/rollback non qualifiés. Inventaire manuel/suggestions puis batchs autonomes suivent ; pas de consommation automatique ni copie implicite. Mise en service complète et sûre au30octobre non considérée réaliste à ce stade.
 
+BB1d/PR45 en draft : interface profil nom/palette/confirmation et résolution explicite de reçu implémentée ; création sans bascule, ouverture distincte avec garde des brouillons. Palette limitée à quatre tokens sur le shell confirmé, aucun changement de préférence de mode ni de sécurité. Verify frontend local269tests/38suites + lint/build/compat2 réussi, types navigateur/backend réussis. Trois nouveaux parcours Chromium (deux comptes, réponse réellement commitée puis perdue, ouverture annulée/confirmée avec brouillon Personnel) attendent leur exécution native et captures. Aucun Gate final.
+
+Incident de publication détecté avant fusion : 8a7da3dc avait été construit sans base d’arbre après perte d’un état temporaire, donc arbre incomplet sur la seule branche draft. Corrigé sans réécriture par c53e525d, arbre complet e2842677652fbf0c0d08f94a1ed4599561069051 égal à l’index local avant publication, diff net depuis73aa552d limité à la mise en forme du test. Main38149070 intact. Désormais vérifier explicitement base non vide et égalité complète index/arbre avant chaque mise à jour distante ; conserver les deux commits pour traçabilité.
+
 ---
 
 # Reprise sécurisée après perte de l’environnement — 28 octobre 2026

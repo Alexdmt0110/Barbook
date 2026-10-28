@@ -1,3 +1,4 @@
+import { BarAccentDirective } from '../../core/workspaces/bar-accent';
 import { WorkspaceContext } from '../../core/workspaces/workspace-context';
 import { SessionResume } from '../../core/auth/session-resume';
 import { Component, inject } from '@angular/core';
@@ -8,7 +9,14 @@ import { ThemeSwitcher } from '../../shared/ui/theme-switcher/theme-switcher';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, ThemeSwitcher, AccountPanel],
+  imports: [
+    BarAccentDirective,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+    ThemeSwitcher,
+    AccountPanel,
+  ],
   templateUrl: './app-shell.html',
   styleUrl: './app-shell.css',
 })

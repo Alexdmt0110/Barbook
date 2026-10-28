@@ -1,3 +1,4 @@
+import type { BarAccent } from './bar-accent';
 import { HttpClient, HttpContext, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import {
@@ -23,12 +24,14 @@ export interface BusinessWorkspace {
   kind: 'PERSONAL' | 'SHARED';
   role: 'OWNER' | 'MEMBER';
   accessVersion: number;
+  accentKey?: BarAccent;
 }
 interface SharedContext {
   id: string;
   name: string;
   role: 'OWNER' | 'MEMBER';
   accessVersion: number;
+  accentKey?: BarAccent;
 }
 const SELECTION_KEY = 'barbook.workspace.v1';
 
@@ -234,7 +237,9 @@ export class WorkspaceContext {
             shared.id !== id ||
             !Number.isSafeInteger(shared.accessVersion) ||
             shared.accessVersion < 0 ||
-            !['OWNER', 'MEMBER'].includes(shared.role)
+            !['OWNER', 'MEMBER'].includes(shared.role) ||
+            (shared.accentKey !== undefined &&
+              !['AMBER', 'RED', 'TEAL', 'BLUE'].includes(shared.accentKey))
           )
             throw new Error('Contexte Bar invalide.');
           return { ...shared, userId: auth.user.id, kind: 'SHARED' as const };
