@@ -1,3 +1,4 @@
+import { SharedCocktailsController } from './shared-cocktails.controller';
 import { Module } from '@nestjs/common';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { SharedCocktailContentController } from './shared-cocktail-content.controller';
@@ -17,6 +18,7 @@ import { CocktailOrganizationService } from './organization/cocktail-organizatio
 @Module({
   imports: [AuthModule, PrismaModule, WorkspacesModule],
   controllers: [
+    SharedCocktailsController,
     SharedCocktailContentController,
     CocktailLifecycleController,
     CocktailsController,

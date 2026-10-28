@@ -16,7 +16,11 @@ type FindManyMock = jest.Mock<Promise<unknown[]>, [Record<string, unknown>]>;
 
 type CountMock = jest.Mock<Promise<number>, [Record<string, unknown>]>;
 
-type TransactionMock = jest.Mock<Promise<unknown[]>, [Promise<unknown>[]]>;
+type ReadClient = Pick<PrismaService, 'cocktail'>;
+type TransactionMock = jest.Mock<
+  Promise<unknown>,
+  [(tx: ReadClient) => Promise<unknown>]
+>;
 
 function decimal(value: number): {
   toString(): string;
@@ -128,8 +132,14 @@ describe('CocktailsService', () => {
     cocktailCount = jest.fn<Promise<number>, [Record<string, unknown>]>();
 
     transaction = jest.fn(
-      async (operations: Promise<unknown>[]): Promise<unknown[]> =>
-        Promise.all(operations),
+      async (operation: (tx: ReadClient) => Promise<unknown>) =>
+        operation({
+          cocktail: {
+            findUnique: cocktailFindUnique,
+            findMany: cocktailFindMany,
+            count: cocktailCount,
+          },
+        } as unknown as ReadClient),
     );
 
     const prismaService = {
