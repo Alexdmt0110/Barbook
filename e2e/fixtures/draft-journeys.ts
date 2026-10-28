@@ -54,12 +54,13 @@ export async function loseCreationResponse(
   name: string,
   fill: (page: Page, name: string) => Promise<void>,
   headers: Record<string, string>,
+  apiRoot = '/api/cocktails',
 ): Promise<void> {
   await page.goto('/cocktails/new');
   await fill(page, name);
   let posts = 0;
   let committed: { slug: string } | undefined;
-  const pattern = '**/api/cocktails';
+  const pattern = `**${apiRoot}`;
   await page.route(pattern, async (route) => {
     if (route.request().method() !== 'POST') {
       await route.continue();
@@ -85,7 +86,7 @@ export async function loseCreationResponse(
       page.getByRole('button', { name: 'Créer le cocktail', exact: true }),
     ).toBeDisabled();
     const actual = await page.request.get(
-      `http://127.0.0.1:3000/api/cocktails/${committed!.slug}`,
+      `http://127.0.0.1:3000${apiRoot}/${committed!.slug}`,
       { headers },
     );
     expect(actual.status()).toBe(200);

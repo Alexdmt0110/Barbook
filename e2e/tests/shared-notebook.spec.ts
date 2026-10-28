@@ -1,3 +1,4 @@
+import { acceptDraftNavigation, loseCreationResponse } from '../fixtures/draft-journeys';
 import { expect, Page, test } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
@@ -100,6 +101,7 @@ test('Bar drafts survive refresh, keep original access intention and are purged 
   await page.getByRole('button', { name: 'Restaurer le brouillon', exact: true }).click();
   await expect(page.getByText('Le brouillon est conservé, mais son envoi est bloqué.', { exact: false })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Créer le cocktail', exact: true })).toBeDisabled();
+  await page.screenshot({ path: info.outputPath('bar-conflicted-draft.png'), fullPage: true });
   await page.getByRole('button', { name: 'Compte et sécurité', exact: true }).click();
   await page.getByRole('button', { name: 'Personnel · privé', exact: true }).click();
   await page.keyboard.press('Escape');
@@ -140,4 +142,13 @@ test('OWNER manages existing-account membership and revocation blocks a member w
     expect(list.status()).toBe(200);
     expect((await list.json() as { total: number }).total).toBe(0);
   } finally { await second.close(); }
+});
+
+
+test('shared creation committed before a lost HTTP response is never blindly replayed', async ({ page }, info) => {
+  const f = fixture();
+  await use(page, f.member, info.project.name === 'mobile' ? 191 : 190);
+  await openBar(page, f.bar);
+  acceptDraftNavigation(page);
+  await loseCreationResponse(page, `Réponse Bar perdue ${randomUUID().slice(0, 8)}`, fill, headers(f.member), `/api/workspaces/${f.bar.id}/cocktails`);
 });

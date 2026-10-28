@@ -34,7 +34,7 @@ async function create(): Promise<void> {
     }
     const bar = await prisma.workspace.create({
       data: {
-        name: `Bar de test ${randomUUID().slice(0, 8)}`,
+        name: `Bar ${randomUUID().slice(0, 8)} — carnet partagé au nom long pour vérifier la lisibilité mobile`,
         kind: 'SHARED',
         members: {
           create: actors.map((actor, index) => ({

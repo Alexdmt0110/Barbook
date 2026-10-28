@@ -156,4 +156,52 @@ describe('Shared content endpoints preserve personal isolation', () => {
       await prisma.cocktail.findUniqueOrThrow({ where: { id: recipeId } }),
     ).toEqual(before);
   });
+  it('orders two real editors after readmission and never revives an old access intention', async () => {
+    await api()
+      .post(`/api/workspaces/${workspaceId}/members`)
+      .set(browserHeaders(owner))
+      .send({ email: member.user.email, expectedAccessVersion: 1 })
+      .expect(200);
+    const responses = await Promise.all(
+      [owner, member].map((actor, index) =>
+        api()
+          .put(url())
+          .set(browserHeaders(actor))
+          .send({
+            ...loaded.content,
+            name: `Concurrent editor ${index}`,
+            expectedContentVersion: 1,
+            expectedAccessVersion: 2,
+          }),
+      ),
+    );
+    expect(responses.map((r) => r.status).sort()).toEqual([200, 409]);
+    const winner = responses.findIndex((r) => r.status === 200);
+    const current = await api()
+      .get(url())
+      .set(browserHeaders(member))
+      .expect(200);
+    expect(current.body).toMatchObject({
+      contentVersion: 2,
+      organizationVersion: 0,
+      accessVersion: 2,
+      content: { name: `Concurrent editor ${winner}` },
+    });
+    await api()
+      .put(url())
+      .set(browserHeaders(member))
+      .send({
+        ...loaded.content,
+        expectedContentVersion: 2,
+        expectedAccessVersion: 0,
+      })
+      .expect(409);
+    const after = await api().get(url()).set(browserHeaders(owner)).expect(200);
+    expect(after.body).toEqual(current.body);
+    const personal = await api()
+      .get(`/api/cocktails/id/${personalId}/content`)
+      .set(browserHeaders(owner))
+      .expect(200);
+    expect(personal.body).toEqual(loaded);
+  });
 });

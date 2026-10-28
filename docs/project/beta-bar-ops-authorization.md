@@ -1,12 +1,12 @@
 # Demande OPS distincte — Bêta Bar
 
-27 octobre 2026. **Préparée, aucune opération autorisée ni exécutée.** Ce dossier ne constitue pas une demande de déploiement immédiatement exécutable : la cible et les sauvegardes réelles restent inconnues. Le code qualifié et les tests CI ne prouvent pas une instance accessible à Alex et Maël.
+28 octobre 2026. **Préparée, aucune opération autorisée ni exécutée.** Ce dossier ne constitue pas une demande de déploiement immédiatement exécutable : la cible et les sauvegardes réelles restent inconnues. Le code qualifié et les tests CI ne prouvent pas une instance accessible à Alex et Maël.
 
 ## État et périmètre minimal proposé
 
 Développé et qualifié sur main : L4/L5 personnel et BB1a (droits serveur des membres). BB1b en développement ; aucun carnet partagé complet qualifié. Les instances CI sont jetables, avec comptes synthétiques ; elles ne sont ni un staging permanent ni une instance prête pour Alex/Maël.
 
-La livraison complète du30octobre est à risque. Le plus petit périmètre de mise en service proposé est : deux comptes distincts admis explicitement, carnet personnel isolé, un Bar avec Alex OWNER/Maël MEMBER, sélection visible, consultation/création/édition, révocation effective, conflits sans écrasement et brouillons protégés. La copie personnelle→Bar peut être reportée si elle retarde ce socle, après décision explicite ; aucune copie improvisée via SQL, aucun partage implicite. Inventaire manuel et suggestions constituent la livraison utilisable suivante. Batchs indépendants ensuite ou en parallèle, sans consommation automatique. Aucune fonction absente n'est annoncée livrée.
+Au28octobre, une mise en service complète et sûre le30octobre ne peut plus être considérée comme un engagement réaliste : BB1b est en qualification et BB1d reste à développer, sans cible ni restauration réelles qualifiées. Le plus petit périmètre de mise en service proposé est : deux comptes distincts admis explicitement, carnet personnel isolé, un Bar avec Alex OWNER/Maël MEMBER, sélection visible, consultation/création/édition, révocation effective, conflits sans écrasement et brouillons protégés. La copie personnelle→Bar peut être reportée si elle retarde ce socle, après décision explicite ; aucune copie improvisée via SQL, aucun partage implicite. Inventaire manuel et suggestions constituent la livraison utilisable suivante. Batchs indépendants ensuite ou en parallèle, sans consommation automatique. Aucune fonction absente n'est annoncée livrée.
 
 ## Première autorisation proposée : inventaire de la cible en lecture seule
 
