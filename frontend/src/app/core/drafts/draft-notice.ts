@@ -62,8 +62,16 @@ import { FormDraft } from './form-draft';
               : 'Vérifie la bibliothèque ou recharge le classement avant tout nouvel envoi.'
           }}
         </p>
-        <a class="bb-button bb-button--ghost" routerLink="/cocktails" target="_blank" rel="noopener"
-          >Vérifier ma bibliothèque dans un autre onglet</a
+        <a
+          class="bb-button bb-button--ghost"
+          routerLink="/cocktails"
+          [target]="libraryInSameTab() ? undefined : '_blank'"
+          rel="noopener"
+          >{{
+            libraryInSameTab()
+              ? 'Vérifier la bibliothèque de cet espace'
+              : 'Vérifier ma bibliothèque dans un autre onglet'
+          }}</a
         >
         @if (!controlledResolution()) {
           <button class="bb-button" type="button" (click)="draft().verifiedAbsent()">
@@ -112,6 +120,7 @@ import { FormDraft } from './form-draft';
 export class DraftNotice {
   readonly controlledResolution = input(false);
   readonly conflictAdvice = input<string | null>(null);
+  readonly libraryInSameTab = input(false);
   readonly draft = input.required<FormDraft>();
   readonly restore = output<void>();
   readonly discard = output<void>();

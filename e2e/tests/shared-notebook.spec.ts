@@ -158,7 +158,7 @@ test('OWNER manages existing-account membership and revocation blocks a member w
     for (const theme of ['light', 'dark']) {
       await page.getByRole('button', { name: /^Thème d’affichage :/ }).click();
       await page.getByRole('button', { name: theme === 'light' ? /^Clair/ : /^Sombre/ }).click();
-      await email.scrollIntoViewIfNeeded();
+      await page.getByRole('button', { name: 'Ajouter le membre', exact: true }).scrollIntoViewIfNeeded();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.screenshot({ path: info.outputPath(`owner-form-${theme}.png`), fullPage: true });
     }

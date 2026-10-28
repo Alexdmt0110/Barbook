@@ -37,6 +37,7 @@
   @if (loaded(); as snapshot) {
     @if (draft(); as d) {
       <app-draft-notice
+        [libraryInSameTab]="workspace.current()?.kind === 'SHARED'"
         [draft]="d"
         [controlledResolution]="true"
         (restore)="restoreDraft()"

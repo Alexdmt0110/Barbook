@@ -1,3 +1,13 @@
+# Dernier défaut de contexte relevé en Review Gate BB1b — 28 octobre
+
+0372e100 : six CI réussis et tous journaux lus,273backend/259frontend/250PG-HTTP/24Chromium (run40658048443). Artefact12802577511 téléchargé/intégrité SHA2567bdb1ed58554ddf1ed203246249dc0bc89e6f17baa50aa17425bd43778c64cf6 vérifiée ; profil mobile clair à nom long, formulaire OWNER sombre mobile/clair desktop et brouillon partagé bloqué réellement vus. Les commandes restent accessibles par défilement du panneau ; capture finale du pied du formulaire ajoutée pour voir aussi son bouton.
+
+Review Gate n’a PAS été fermé : lien historique DraftNotice « vérifier dans un autre onglet » ouvre une nouvelle sessionStorage et peut montrer Personnel alors qu’il s’agit d’un résultat Bar incertain. Correction ciblée : entrée libraryInSameTab sur le composant existant, activée seulement pour création/édition Bar ; navigation même onglet/contexte et garde de conservation habituelle, comportement personnel inchangé. Le parcours de réponse perdue vérifie désormais le lien sans target, la vraie présence de la recette commitée dans la bibliothèque Bar et le maintien du brouillon bloqué au retour, compteur POST toujours1. Aucun second moteur ni renvoi automatique. Verify frontend local261tests/36suites, lint/build/compat2 et typesChromium réussis ; les2tests de lien vérifient aussi l’entrée target de RouterLink (pas seulement l’attribut DOM) pour conserver le nouvel onglet personnel. Requalifier ce nouveau HEAD avant toute fusion, PR40 encore draft.
+
+Limite actuelle des URLs frontend : elles restent relatives au contexte de l’onglet ; aucun permalink Bar autonome n’est annoncé. Un nouvel onglet ouvert manuellement doit confirmer son espace via le profil. Le lien applicatif de résolution d’incertitude ne doit pas dépendre de la copie d’un contexte entre onglets.
+
+---
+
 # Qualification BB1b — 28 octobre, suite finale
 
 7d525f53 :PG250réels (nouvelle concurrence OWNER/MEMBER passée), backend273/frontend259 et audits verts. Chromium22passés/2échecs : tous8nouveaux parcours Bar passent ; deux assertions historiques d’édition personnelle attendent le texte exact « Cette recette n’est plus disponible dans ton carnet personnel. ». L’adaptation de libellé avait modifié aussi le contexte personnel ; correction du code pour conserver ce défaut personnel et utiliser « cet espace » uniquement en Bar, sans modifier ces assertions.

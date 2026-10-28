@@ -92,6 +92,17 @@ export async function loseCreationResponse(
     expect(actual.status()).toBe(200);
     expect(((await actual.json()) as { name: string }).name).toBe(name);
     expect(posts).toBe(1);
+    if (apiRoot !== '/api/cocktails') {
+      const inspect = page.getByRole('link', { name: 'Vérifier la bibliothèque de cet espace', exact: true });
+      expect(await inspect.getAttribute('target')).toBeNull();
+      await inspect.click();
+      await expect(page).toHaveURL('http://127.0.0.1:4200/cocktails');
+      await expect(page.getByRole('heading', { name, exact: true })).toBeVisible();
+      await page.getByRole('link', { name: /Nouveau cocktail/ }).click();
+      await page.getByRole('button', { name: 'Restaurer le brouillon', exact: true }).click();
+      await expect(page.getByRole('button', { name: 'Créer le cocktail', exact: true })).toBeDisabled();
+      expect(posts).toBe(1);
+    }
     await page.getByRole('button', { name: 'Abandonner le brouillon', exact: true }).click();
   } finally {
     await page.unroute(pattern);
