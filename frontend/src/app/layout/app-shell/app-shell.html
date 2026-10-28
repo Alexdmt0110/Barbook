@@ -1,0 +1,82 @@
+<div class="app-shell">
+  <header class="app-header">
+    <div class="header-content">
+      <a class="brand" routerLink="/">
+        <span class="brand-mark"> B </span>
+
+        <span> Barbook </span>
+      </a>
+
+      <nav class="main-navigation" aria-label="Navigation principale">
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{
+            exact: true,
+          }"
+        >
+          Accueil
+        </a>
+
+        <a routerLink="/cocktails" routerLinkActive="active">
+          {{ workspace.current()?.kind === 'SHARED' ? 'Carnet Bar' : 'Mes cocktails' }}
+        </a>
+        @if (workspace.current()?.kind === 'PERSONAL') {
+          <a routerLink="/folders" routerLinkActive="active">Dossiers</a>
+          <a routerLink="/trash" routerLinkActive="active">Corbeille</a>
+        }
+      </nav>
+
+      <div class="user-actions">
+        <app-account-panel />
+
+        <button
+          type="button"
+          class="logout-button"
+          (click)="logout()"
+          [disabled]="authService.logoutPending() || authService.globalLogoutUncertain()"
+        >
+          Déconnexion
+        </button>
+
+        <app-theme-switcher />
+      </div>
+      @if (workspace.current(); as space) {
+        <p class="workspace-status" aria-label="Espace actif">
+          {{ space.name }} · {{ space.kind === 'PERSONAL' ? 'privé' : space.role }}
+        </p>
+      }
+    </div>
+  </header>
+
+  <main class="app-content" [attr.inert]="workspace.transitioning() ? '' : null">
+    @if (workspace.error()) {
+      <p role="alert">{{ workspace.error() }}</p>
+    }
+    @if (workspace.current()?.kind === 'SHARED') {
+      <p role="status">
+        Carnet partagé : {{ workspace.current()?.name }}. Dossiers, tags et corbeille ne sont pas
+        disponibles dans ce carnet.
+      </p>
+    }
+    @if (authService.logoutUncertain()) {
+      <p role="alert">
+        Déconnexion non confirmée. Si le réseau est indisponible, réessaie avant de quitter cet
+        appareil.
+      </p>
+      @if (!authService.globalLogoutUncertain()) {
+        <button type="button" [disabled]="authService.logoutPending()" (click)="logout()">
+          Réessayer la déconnexion
+        </button>
+      }
+    } @else if (
+      authService.isAuthenticated() && workspace.current() && !workspace.transitioning()
+    ) {
+      <router-outlet />
+    }
+  </main>
+</div>
+
+@if (resume.checking()) {
+  <p role="status">Vérification de la session…</p>
+}

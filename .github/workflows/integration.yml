@@ -1,0 +1,152 @@
+name: Integration
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, test/critical-integration-flows, feature/cocktail-folder-management, feature/secure-web-sessions, feature/web-session-cutover, feature/private-beta-admission, feature/session-drafts, feature/global-session-revocation]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: integration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  postgres-integration:
+    name: PostgreSQL Integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+        env:
+          POSTGRES_USER: barbook_ci
+          POSTGRES_PASSWORD: ci_only_disposable_password
+          POSTGRES_DB: barbook_test_integration
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U barbook_ci -d barbook_test_integration"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      CI: true
+      NODE_ENV: test
+      BARBOOK_INTEGRATION_TESTS: '1'
+      POSTGRES_USER: barbook_ci
+      POSTGRES_PASSWORD: ci_only_disposable_password
+      POSTGRES_DB: barbook_test_integration
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: '5432'
+      FRONTEND_ORIGIN: http://127.0.0.1:4200
+      PORT: '3000'
+      NODE_OPTIONS: --trace-deprecation
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Verify backend and fixture safety
+        run: npm run verify && npm run test:integration:safety && npx tsc --noEmit --incremental false
+      - name: Apply and reapply migrations, check status and schema drift
+        run: npm run test:integration:prepare
+      - name: Run real PostgreSQL and HTTP integration tests
+        run: npm run test:e2e
+      - name: Smoke test compiled production entry point
+        shell: bash
+        run: |
+          setsid npm run start:prod > "$RUNNER_TEMP/barbook-api-smoke.log" 2>&1 &
+          barbook_api_pid=$!
+          trap 'kill -- "-$barbook_api_pid" 2>/dev/null || true' EXIT
+          node --input-type=module <<'JS'
+          const deadline = Date.now() + 20000;
+          while (Date.now() < deadline) {
+            try {
+              const result = await fetch('http://127.0.0.1:3000/api', { signal: AbortSignal.timeout(1000) });
+              if (result.ok && await result.text() === 'Hello World!') process.exit(0);
+            } catch {}
+            await new Promise(resolve => setTimeout(resolve, 250));
+          }
+          throw new Error('Compiled production entry point did not serve /api');
+          JS
+
+  browser-integration:
+    name: Browser Integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+        env:
+          POSTGRES_USER: barbook_ci
+          POSTGRES_PASSWORD: ci_only_disposable_password
+          POSTGRES_DB: barbook_test_browser
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U barbook_ci -d barbook_test_browser"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: e2e
+    env:
+      CI: true
+      NODE_ENV: test
+      BARBOOK_INTEGRATION_TESTS: '1'
+      POSTGRES_USER: barbook_ci
+      POSTGRES_PASSWORD: ci_only_disposable_password
+      POSTGRES_DB: barbook_test_browser
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: '5432'
+      FRONTEND_ORIGIN: http://127.0.0.1:4200
+      PORT: '3000'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+            e2e/package-lock.json
+      - name: Install application and browser-test dependencies
+        run: npm ci --prefix ../backend && npm ci --prefix ../frontend && npm ci
+      - name: Check browser test types and dependency security
+        run: npm run typecheck && npm run audit:security
+      - name: Build API and prepare disposable browser database
+        run: npm run build --prefix ../backend && npm run test:integration:prepare --prefix ../backend
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run desktop and mobile journeys against real API and PostgreSQL
+        run: npm test
+      - name: Preserve browser results and failure traces
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: browser-results-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 7
+          if-no-files-found: warn

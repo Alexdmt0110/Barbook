@@ -1,0 +1,85 @@
+<section class="folders-page">
+  <header class="page-heading">
+    <p class="eyebrow">Mon Barbook</p>
+    <h1>Dossiers</h1>
+    <p>
+      Rassemble tes recettes par envie ou par occasion. Un cocktail peut appartenir à plusieurs
+      dossiers, sans être copié.
+    </p>
+  </header>
+  <section class="panel" aria-labelledby="create-folder-title">
+    <h2 id="create-folder-title">Créer un dossier</h2>
+    <form class="inline-form" (submit)="$event.preventDefault(); create()">
+      <div class="field">
+        <label for="folder-create-name">Nom du dossier</label
+        ><input
+          #name
+          id="folder-create-name"
+          type="text"
+          maxlength="80"
+          required
+          [value]="newName()"
+          (input)="newName.set(name.value)"
+          [disabled]="isCreating()"
+          aria-describedby="folder-name-policy"
+        />
+      </div>
+      <button type="submit" class="primary" [disabled]="isCreating()">
+        {{ isCreating() ? 'Création…' : 'Créer le dossier' }}
+      </button>
+    </form>
+    <p id="folder-name-policy" class="hint">
+      1 à 80 caractères. Les noms distinguent les majuscules et les minuscules.
+    </p>
+    @if (actionError()) {
+      <p role="alert" class="feedback error">{{ actionError() }}</p>
+    }
+  </section>
+  <form class="inline-form search-form" (submit)="$event.preventDefault(); search()">
+    <div class="field">
+      <label for="folders-search">Rechercher un dossier</label
+      ><input
+        #query
+        id="folders-search"
+        type="search"
+        maxlength="120"
+        [value]="searchTerm()"
+        (input)="searchTerm.set(query.value)"
+      />
+    </div>
+    <button type="submit">Rechercher</button>
+  </form>
+  @if (isLoading()) {
+    <p role="status" aria-busy="true" class="panel">Chargement des dossiers…</p>
+  } @else if (loadError()) {
+    <section class="panel" role="alert">
+      <p>{{ loadError() }}</p>
+      <button type="button" (click)="load()">Réessayer</button>
+    </section>
+  } @else if (result(); as catalog) {
+    <p class="hint" aria-live="polite">{{ catalog.total }} dossier(s)</p>
+    <section class="folder-grid" aria-label="Mes dossiers">
+      @for (folder of catalog.items; track folder.id) {
+        <a class="folder-card panel" [routerLink]="['/folders', folder.id]"
+          ><span class="eyebrow">Dossier</span>
+          <h2>{{ folder.name }}</h2>
+          <span class="hint">{{ folder.cocktailCount }} cocktail(s)</span></a
+        >
+      } @empty {
+        <section class="panel">
+          <h2>Aucun dossier à afficher</h2>
+          <p>Crée ton premier dossier ci-dessus ou essaie une autre recherche.</p>
+        </section>
+      }
+    </section>
+    @if (catalog.totalPages > 1) {
+      <nav class="pagination" aria-label="Pagination des dossiers">
+        <button type="button" [disabled]="page() <= 1" (click)="load(page() - 1)">Précédent</button
+        ><span>Page {{ page() }} sur {{ catalog.totalPages }}</span
+        ><button type="button" [disabled]="page() >= catalog.totalPages" (click)="load(page() + 1)">
+          Suivant
+        </button>
+      </nav>
+    }
+  }
+</section>

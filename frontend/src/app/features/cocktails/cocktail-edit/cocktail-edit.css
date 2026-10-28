@@ -1,0 +1,71 @@
+fieldset {
+  display: grid;
+  gap: 20px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  button {
+    min-height: 44px;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-field);
+    color: var(--color-text);
+    background: var(--color-surface);
+    cursor: pointer;
+  }
+  button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+.dynamic-card-header {
+  flex-wrap: wrap;
+}
+.resolution {
+  margin-block: 1rem;
+  overflow-wrap: anywhere;
+}
+.field input.ng-invalid.ng-touched,
+.field textarea.ng-invalid.ng-touched {
+  border-color: var(--color-danger);
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.save-policy {
+  max-width: 70ch;
+  margin-block: var(--space-6);
+  line-height: 1.65;
+}
+.organization-section {
+  margin-top: var(--section-gap);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+.organization-section > p {
+  max-width: 70ch;
+  line-height: 1.65;
+}

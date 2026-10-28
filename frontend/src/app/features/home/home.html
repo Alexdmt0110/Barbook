@@ -1,0 +1,36 @@
+<div class="home-page">
+  <section class="hero">
+    <p class="eyebrow">Mon Barbook</p>
+
+    @if (authService.currentUser(); as user) {
+      <h1>Bienvenue, {{ user.displayName }}.</h1>
+    } @else {
+      <h1>Bienvenue dans Barbook.</h1>
+    }
+
+    <p class="hero-copy">
+      Conserve les cocktails qui comptent, organise tes classiques et garde
+      tes créations personnelles dans un carnet construit autour de tes
+      recettes.
+    </p>
+
+    <a class="primary-link bb-button bb-button--primary" routerLink="/cocktails">
+      Voir mes cocktails
+      <span aria-hidden="true">→</span>
+    </a>
+  </section>
+
+  <section class="home-panel">
+    <div>
+      <p class="section-label">Ta bibliothèque</p>
+
+      <h2>Un carnet qui peut évoluer avec toi.</h2>
+    </div>
+
+    <p>
+      Classiques, créations personnelles et variations auront leur propre
+      place dans Barbook. La bibliothèque constitue maintenant le point
+      d’entrée vers tes recettes.
+    </p>
+  </section>
+</div>

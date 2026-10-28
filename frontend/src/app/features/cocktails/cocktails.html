@@ -1,0 +1,530 @@
+<section class="cocktails-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">
+        Mon Barbook
+      </p>
+
+      <h1>Mes cocktails</h1>
+
+      <p class="page-introduction">
+        Retrouve les classiques, variations et
+        créations que tu veux garder sous la main.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      @if (
+        !isLoading() &&
+        !errorMessage()
+        ) {
+        <div class="cocktail-count">
+          {{ cocktailCountLabel() }}
+        </div>
+      }
+
+      <a
+        class="create-link bb-button bb-button--primary"
+        routerLink="/cocktails/new"
+      >
+        + Nouveau cocktail
+      </a>
+    </div>
+  </header>
+
+  @if (showLibraryTools()) {
+    <section
+      class="library-tools"
+      aria-label="Recherche et filtres"
+    >
+      <div class="search-control">
+        <label for="cocktail-search">
+          Rechercher
+        </label>
+
+        <input
+          #searchInput
+          id="cocktail-search"
+          type="search"
+          maxlength="120"
+          autocomplete="off"
+          placeholder="Nom du cocktail…"
+          [value]="searchTerm()"
+          (input)="
+            onSearchInput(
+              searchInput.value
+            )
+          "
+        />
+      </div>
+
+      <div class="filter-control">
+        <label for="cocktail-type-filter">
+          Type
+        </label>
+
+        <select
+          #typeSelect
+          id="cocktail-type-filter"
+          [value]="selectedType()"
+          (change)="
+            onTypeChange(
+              typeSelect.value
+            )
+          "
+        >
+          <option value="">
+            Tous les types
+          </option>
+
+          @for (
+            option of typeOptions;
+            track option.value
+            ) {
+            <option
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-control">
+        <label for="cocktail-method-filter">
+          Méthode
+        </label>
+
+        <select
+          #methodSelect
+          id="cocktail-method-filter"
+          [value]="selectedMethod()"
+          (change)="
+            onMethodChange(
+              methodSelect.value
+            )
+          "
+        >
+          <option value="">
+            Toutes les méthodes
+          </option>
+
+          @for (
+            option of methodOptions;
+            track option.value
+            ) {
+            <option
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-control">
+        <label for="cocktail-folder-filter">
+          Dossier
+        </label>
+
+        <select
+          #folderSelect
+          id="cocktail-folder-filter"
+          [value]="selectedFolderId()"
+          [disabled]="
+            isLoadingOrganizationFilters() ||
+            organizationFiltersErrorMessage() !== null
+          "
+          (change)="
+            onFolderChange(
+              folderSelect.value
+            )
+          "
+        >
+          @if (isLoadingOrganizationFilters()) {
+            <option value="">
+              Chargement…
+            </option>
+          } @else if (
+            organizationFiltersErrorMessage()
+            ) {
+            <option value="">
+              Dossiers indisponibles
+            </option>
+          } @else {
+            <option value="">
+              Tous les dossiers
+            </option>
+
+            @for (
+              folder of availableFolders();
+              track folder.id
+              ) {
+              <option
+                [value]="folder.id"
+              >
+                {{ folder.name }}
+              </option>
+            }
+          }
+        </select>
+      </div>
+
+      <div class="filter-control">
+        <label for="cocktail-tag-filter">
+          Tag
+        </label>
+
+        <select
+          #tagSelect
+          id="cocktail-tag-filter"
+          [value]="selectedTagId()"
+          [disabled]="
+            isLoadingOrganizationFilters() ||
+            organizationFiltersErrorMessage() !== null
+          "
+          (change)="
+            onTagChange(
+              tagSelect.value
+            )
+          "
+        >
+          @if (isLoadingOrganizationFilters()) {
+            <option value="">
+              Chargement…
+            </option>
+          } @else if (
+            organizationFiltersErrorMessage()
+            ) {
+            <option value="">
+              Tags indisponibles
+            </option>
+          } @else {
+            <option value="">
+              Tous les tags
+            </option>
+
+            @for (
+              tag of availableTags();
+              track tag.id
+              ) {
+              <option
+                [value]="tag.id"
+              >
+                {{ tag.name }}
+              </option>
+            }
+          }
+        </select>
+      </div>
+
+      @if (hasActiveFilters()) {
+        <button
+          class="clear-filters"
+          type="button"
+          (click)="clearFilters()"
+        >
+          Réinitialiser
+        </button>
+      }
+
+      @if (
+        organizationFiltersErrorMessage()
+        ) {
+        <button
+          class="clear-filters"
+          type="button"
+          [title]="
+            organizationFiltersErrorMessage() ||
+            ''
+          "
+          (click)="
+            loadOrganizationFilters()
+          "
+        >
+          Réessayer dossiers / tags
+        </button>
+      }
+    </section>
+  }
+
+  @if (isLoading()) {
+    <section
+      class="cocktail-grid"
+      aria-label="Chargement des cocktails"
+      aria-busy="true"
+    >
+      @for (
+        placeholder of loadingPlaceholders;
+        track placeholder
+        ) {
+        <article
+          class="cocktail-card skeleton-card"
+        >
+          <div class="skeleton-image"></div>
+
+          <div class="cocktail-card-content">
+            <div
+              class="
+                skeleton-line
+                skeleton-line-small
+              "
+            ></div>
+
+            <div
+              class="
+                skeleton-line
+                skeleton-line-title
+              "
+            ></div>
+
+            <div
+              class="skeleton-line"
+            ></div>
+          </div>
+        </article>
+      }
+    </section>
+  } @else if (errorMessage()) {
+    <section
+      class="state-card error-state"
+      role="alert"
+    >
+      <p class="state-eyebrow">
+        Chargement impossible
+      </p>
+
+      <h2>
+        Quelque chose a empêché l’ouverture
+        de ta bibliothèque.
+      </h2>
+
+      <p>{{ errorMessage() }}</p>
+
+      <button
+        type="button"
+        (click)="loadCocktails()"
+      >
+        Réessayer
+      </button>
+    </section>
+  } @else if (
+    cocktails().length === 0 &&
+    hasActiveFilters()
+    ) {
+    <section
+      class="state-card no-results-state"
+    >
+      <p class="state-eyebrow">
+        Aucun résultat
+      </p>
+
+      <h2>
+        Aucun cocktail ne correspond
+        à ta recherche.
+      </h2>
+
+      <p>
+        Essaie un autre nom ou retire
+        certains filtres.
+      </p>
+
+      <button
+        type="button"
+        (click)="clearFilters()"
+      >
+        Réinitialiser les filtres
+      </button>
+    </section>
+  } @else if (
+    cocktails().length === 0
+    ) {
+    <section
+      class="state-card empty-state"
+    >
+      <p class="state-eyebrow">
+        Bibliothèque vide
+      </p>
+
+      <h2>
+        Ton premier cocktail attend
+        sa place.
+      </h2>
+
+      <p>
+        Commence ton Barbook en enregistrant
+        ta première recette.
+      </p>
+
+      <a
+        class="empty-create-link bb-button bb-button--primary"
+        routerLink="/cocktails/new"
+      >
+        Créer mon premier cocktail
+      </a>
+    </section>
+  } @else {
+    <section
+      class="cocktail-grid"
+      aria-label="Mes cocktails"
+    >
+      @for (
+        cocktail of cocktails();
+        track cocktail.id
+        ) {
+        <a
+          class="
+            cocktail-card
+            cocktail-card-link
+          "
+          [routerLink]="[
+            '/cocktails',
+            cocktail.slug
+          ]"
+          [attr.aria-label]="
+            'Ouvrir la recette ' +
+            cocktail.name
+          "
+        >
+          <div class="cocktail-image-wrapper">
+            <img
+              class="cocktail-image"
+              [src]="
+                cocktail.imageUrl ||
+                '/placeholder-cocktail.png'
+              "
+              [alt]="cocktail.name"
+              loading="lazy"
+            />
+
+            <span class="cocktail-type">
+              {{
+                typeLabel(
+                  cocktail.type
+                )
+              }}
+            </span>
+          </div>
+
+          <div class="cocktail-card-content">
+            <div class="cocktail-heading">
+              <div>
+                <p class="cocktail-family">
+                  {{
+                    cocktail.family ||
+                    'Sans famille'
+                  }}
+                </p>
+
+                <h2>
+                  {{ cocktail.name }}
+                </h2>
+              </div>
+
+              @if (
+                cocktail.mainAlcohol;
+                as mainAlcohol
+                ) {
+                <span class="main-alcohol">
+                  {{ mainAlcohol.name }}
+                </span>
+              }
+            </div>
+
+            <div class="cocktail-metadata">
+              <span>
+                {{
+                  methodLabel(
+                    cocktail.method
+                  )
+                }}
+              </span>
+
+              <span aria-hidden="true">
+                ·
+              </span>
+
+              <span>
+                {{ cocktail.glass }}
+              </span>
+            </div>
+
+            @if (cocktail.folders.length > 0) {
+              <div class="cocktail-tags" [attr.aria-label]="'Dossiers de ' + cocktail.name">
+                @for (folder of cocktail.folders.slice(0, 3); track folder.id) {
+                  <span>{{ folder.name }}</span>
+                }
+                @if (cocktail.folders.length > 3) {
+                  <span>+ {{ cocktail.folders.length - 3 }} dossiers</span>
+                }
+              </div>
+            }
+            @if (
+              cocktail.tags.length > 0
+              ) {
+              <div
+                class="cocktail-tags"
+                [attr.aria-label]="
+                  'Tags de ' +
+                  cocktail.name
+                "
+              >
+                @for (
+                  tag of cocktail.tags;
+                  track tag.id
+                  ) {
+                  <span>
+                    {{ tag.name }}
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        </a>
+      }
+    </section>
+
+    @if (totalPages() > 1) {
+      <nav
+        class="pagination"
+        aria-label="Pagination des cocktails"
+      >
+        <button
+          type="button"
+          [disabled]="!canGoPrevious()"
+          (click)="
+            goToPage(
+              currentPage() - 1
+            )
+          "
+        >
+          ← Précédent
+        </button>
+
+        <p aria-live="polite">
+          Page
+          <strong>
+            {{ currentPage() }}
+          </strong>
+          sur
+          <strong>
+            {{ totalPages() }}
+          </strong>
+        </p>
+
+        <button
+          class="pagination-next"
+          type="button"
+          [disabled]="!canGoNext()"
+          (click)="
+            goToPage(
+              currentPage() + 1
+            )
+          "
+        >
+          Suivant →
+        </button>
+      </nav>
+    }
+  }
+</section>
