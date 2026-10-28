@@ -99,7 +99,7 @@ export async function loseCreationResponse(
 }
 
 /** Real browser quota exceptions at the storage boundary, without replacing any API. */
-export async function exerciseDraftQuota(page: Page): Promise<void> {
+export async function exerciseDraftQuota(page: Page, libraryName = 'Mes cocktails'): Promise<void> {
   await page.evaluate(() => {
     const original = Storage.prototype.setItem;
     Storage.prototype.setItem = function (key: string, value: string) {
@@ -118,7 +118,7 @@ export async function exerciseDraftQuota(page: Page): Promise<void> {
     ).toBeVisible();
     await page
       .getByRole('navigation', { name: 'Navigation principale' })
-      .getByRole('link', { name: 'Mes cocktails', exact: true })
+      .getByRole('link', { name: libraryName, exact: true })
       .click();
     await page.getByRole('link', { name: /Nouveau cocktail/ }).click();
     await page.getByRole('button', { name: 'Restaurer le brouillon', exact: true }).click();

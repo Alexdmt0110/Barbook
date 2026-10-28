@@ -1,3 +1,13 @@
+# Qualification BB1b — 28 octobre, suite finale
+
+7d525f53 :PG250réels (nouvelle concurrence OWNER/MEMBER passée), backend273/frontend259 et audits verts. Chromium22passés/2échecs : tous8nouveaux parcours Bar passent ; deux assertions historiques d’édition personnelle attendent le texte exact « Cette recette n’est plus disponible dans ton carnet personnel. ». L’adaptation de libellé avait modifié aussi le contexte personnel ; correction du code pour conserver ce défaut personnel et utiliser « cet espace » uniquement en Bar, sans modifier ces assertions.
+
+Les captures23e2146d ont été réellement inspectées : profil clair/sombre mobile lisible, header corrigé sans chevauchement, gestion OWNER desktop accessible par défilement. La capture claire partait encore pendant le chargement catalogue : ajout d’attentes explicites catalogue stable et captures du formulaire OWNER dans les deux thèmes avant Gate final.
+
+Qualification Bar renforcée avant Gate : le parcours brouillon provoque désormais une expiration réelle de la Session PostgreSQL via le helper jetable existant, reconnexion UI avec le même compte, retour au Bar confirmé et restauration explicite ; compteur assert0lecture personnelle pendant la reprise. Le parcours réponse perdue réutilise aussi le test réel de stockage saturé dans Bar. Helpers existants paramétrés avec défauts personnels inchangés, aucun mécanisme parallèle ni hausse de délai/retry. TypesChromium et verify frontend à contrôler sur ce dernier correctif, puis attendre les6CI et24parcours du nouveau HEAD. Pas de merge tant que ce nouveau HEAD et les captures ne sont pas qualifiés.
+
+---
+
 # Reprise BB1b — 28 octobre : parcours complet22/22 avant la dernière qualification
 
 HEAD23e2146d : six contrôles réussis, Chromium22/22 terminé08:20:38Z (run40655423160), PG249/backend273/frontend259, audits à relire pour Gate final. Les6nouveaux parcours Bar desktop/mobile passent : visibilité création/édition deux comptes, Personnel isolé, sélection profil qui se ferme réellement, brouillons conservés/refus après réadmission, gestion OWNER réelle retrait/réadmission et formulaire MEMBER refusé après retrait. Les16historiques restent actifs/passés. Petit correctif23e2146d distingue une enveloppe vide après sauvegarde d’un véritable brouillon retenu, test unitaire dédié.

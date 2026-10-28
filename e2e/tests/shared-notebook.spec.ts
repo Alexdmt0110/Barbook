@@ -1,4 +1,4 @@
-import { acceptDraftNavigation, loseCreationResponse } from '../fixtures/draft-journeys';
+import { acceptDraftNavigation, exerciseDraftQuota, loseCreationResponse } from '../fixtures/draft-journeys';
 import { expect, Page, test } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
@@ -67,6 +67,8 @@ test('two accounts select Bar from profile, share create/edit and keep Personnel
       await themeButton.click();
       await page.getByRole('button', { name: theme === 'light' ? /^Clair/ : /^Sombre/ }).click();
       await page.getByRole('button', { name: 'Compte et sécurité', exact: true }).click();
+      await expect(page.getByRole('button', { name: f.bar.name, exact: true })).toBeVisible();
+      await expect(page.getByText('Chargement des Bars…', { exact: true })).toHaveCount(0);
       await expect(page.getByRole('button', { name: 'Déconnecter tous les appareils', exact: true })).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.screenshot({ path: info.outputPath(`bar-profile-${theme}.png`), fullPage: true });
@@ -93,6 +95,22 @@ test('Bar drafts survive refresh, keep original access intention and are purged 
   await page.reload();
   await page.getByRole('button', { name: 'Restaurer le brouillon', exact: true }).click();
   await expect(page.getByRole('textbox', { name: /^Nom \*/ })).toHaveValue('Brouillon partagé conservé');
+  execFileSync(process.execPath, ['--import', 'tsx', 'test/expire-browser-session.ts', f.member.user.id], { cwd: join(__dirname, '../../backend'), stdio: 'pipe' });
+  let personalReads = 0;
+  const observe = (request: { url(): string }) => { if (new URL(request.url()).pathname === '/api/cocktails') personalReads++; };
+  page.on('request', observe);
+  await page.goto('/cocktails');
+  await expect(page).toHaveURL('http://127.0.0.1:4200/login?returnUrl=%2Fcocktails');
+  await page.getByLabel('Adresse email', { exact: true }).fill(f.member.user.email);
+  await page.getByLabel('Mot de passe', { exact: true }).fill('Synthetic Bar fixture password 42!');
+  await page.getByRole('button', { name: 'Se connecter', exact: true }).click();
+  await expect(page).toHaveURL('http://127.0.0.1:4200/cocktails');
+  await expect(page.locator('[aria-label="Espace actif"]')).toContainText(f.bar.name);
+  await page.getByRole('link', { name: /Nouveau cocktail/ }).click();
+  await page.getByRole('button', { name: 'Restaurer le brouillon', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: /^Nom \*/ })).toHaveValue('Brouillon partagé conservé');
+  expect(personalReads).toBe(0);
+  page.off('request', observe);
   const revoke = await page.request.post(`http://127.0.0.1:3000/api/workspaces/${f.bar.id}/members/${f.member.user.id}/revoke`, { headers: { ...headers(f.owner), Cookie: `barbook-session-dev=${f.owner.credential}` }, data: { expectedAccessVersion: 0 } });
   expect(revoke.status()).toBe(200);
   const readd = await page.request.post(`http://127.0.0.1:3000/api/workspaces/${f.bar.id}/members`, { headers: { ...headers(f.owner), Cookie: `barbook-session-dev=${f.owner.credential}` }, data: { email: f.member.user.email, expectedAccessVersion: 1 } });
@@ -135,7 +153,15 @@ test('OWNER manages existing-account membership and revocation blocks a member w
     await expect(member.getByText('L’accès au Bar n’est plus confirmé. Choisis un espace autorisé.', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Vérifier les membres et les droits', exact: true }).click();
     await expect(page.getByRole('button', { name: `Retirer ${f.member.user.email}`, exact: true })).toHaveCount(0);
-    await page.getByRole('textbox', { name: 'Email du membre existant', exact: true }).fill(f.member.user.email);
+    const email = page.getByRole('textbox', { name: 'Email du membre existant', exact: true });
+    await email.fill(f.member.user.email);
+    for (const theme of ['light', 'dark']) {
+      await page.getByRole('button', { name: /^Thème d’affichage :/ }).click();
+      await page.getByRole('button', { name: theme === 'light' ? /^Clair/ : /^Sombre/ }).click();
+      await email.scrollIntoViewIfNeeded();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await page.screenshot({ path: info.outputPath(`owner-form-${theme}.png`), fullPage: true });
+    }
     await page.getByRole('button', { name: 'Ajouter le membre', exact: true }).click();
     await expect(page.getByText('Action confirmée. Actualise les membres et les droits avant une autre action.', { exact: true })).toBeVisible();
     const list = await page.request.get(`http://127.0.0.1:3000/api/workspaces/${f.bar.id}/cocktails`, { headers: headers(f.owner) });
@@ -151,4 +177,5 @@ test('shared creation committed before a lost HTTP response is never blindly rep
   await openBar(page, f.bar);
   acceptDraftNavigation(page);
   await loseCreationResponse(page, `Réponse Bar perdue ${randomUUID().slice(0, 8)}`, fill, headers(f.member), `/api/workspaces/${f.bar.id}/cocktails`);
+  await exerciseDraftQuota(page, 'Carnet Bar');
 });
