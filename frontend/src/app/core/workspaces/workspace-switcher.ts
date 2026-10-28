@@ -93,10 +93,11 @@ interface BarPage {
           <p role="status">Vérification et ouverture de l’espace…</p>
         }
         <app-bar-create
+          #barCreation
           [hidden]="loading() || !!error()"
           [first]="total() === 0"
           (created)="load(true)"
-          (open)="select($event)"
+          (open)="select($event, barCreation)"
         />
         <app-workspace-members />
       </section>
@@ -191,7 +192,7 @@ export class WorkspaceSwitcher {
         },
       });
   }
-  select(id: string): void {
+  select(id: string, creation?: BarCreate): void {
     this.error.set(null);
     this.workspace
       .select(id, async () => {
@@ -201,7 +202,10 @@ export class WorkspaceSwitcher {
       .pipe(takeUntilDestroyed(this.destroy))
       .subscribe({
         next: (selected) => {
-          if (selected) this.changed.emit();
+          if (selected) {
+            creation?.cancel();
+            this.changed.emit();
+          }
         },
         error: (error) =>
           this.error.set(

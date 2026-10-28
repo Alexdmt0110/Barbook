@@ -14,6 +14,8 @@ Incident de publication détecté avant fusion : 8a7da3dc avait été construit 
 
 BB1d40778c9f : six contrôles réussis,267PG/HTTP et30Chromium réellement exécutés (273backend/269frontend, audits0). Qualification visuelle finale encore à effectuer après publication des pastilles de palette et du test de contraste4palettes/2modes ; aucune fusion45 à ce stade. Roadmap/backlog/OPS actualisés : BB1b intégré, dixième migration BB1d en test, D7/cible/restauration encore ouverts.
 
+Inspection réelle de l’artefact40778c9f12818506290 : SHA25645c5e9c9290db3024ef7a4a66d05eac7547e56aca3453fcdcbd92372527802ea, captures mobile création sombre et desktop Bar clair vues. Le contrôle visuel a conduit à deux corrections avant Gate : champ nom hauteur44px/contrôles palette accessibles et fermeture du reçu après ouverture effective, sans effacement si bascule refusée. Les tests Chromium exigent hauteur44px, disparition du reçu après ouverture et capture du bas du panneau. Verify frontend269tests/38suites/lint/build/compat2 et types navigateur réussis. Attendre sixCI et captures de ce nouveau HEAD ; pas de fusion prématurée.
+
 ---
 
 # Reprise sécurisée après perte de l’environnement — 28 octobre 2026

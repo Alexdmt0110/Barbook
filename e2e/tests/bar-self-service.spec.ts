@@ -52,7 +52,10 @@ test('create Bar in profile, explicitly open it, share with another account and 
     await mode(page,'Sombre'); const personal=await tokens(page);
     await prepare(page,name);
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    await expect(page.getByRole('textbox',{name:'Nom du bar',exact:true})).toHaveCSS('min-height','44px');
     await page.screenshot({path:info.outputPath('create-bar-dark.png'),fullPage:true});
+    await page.locator('#account-panel').evaluate(el => { el.scrollTop = el.scrollHeight; });
+    await page.screenshot({path:info.outputPath('create-bar-dark-bottom.png'),fullPage:true});
     const response=page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/api/workspaces');
     await page.getByRole('button',{name:'Confirmer la création du Bar',exact:true}).click();
     const created=await response; expect(created.status()).toBe(201); const bar=await created.json() as Bar;
@@ -61,6 +64,8 @@ test('create Bar in profile, explicitly open it, share with another account and 
     await expect(page.getByRole('link',{name:'Mes cocktails',exact:true})).toBeVisible();
     await page.getByRole('button',{name:'Ouvrir le Bar créé',exact:true}).click();
     await expect(page.locator('[aria-label="Espace actif"]')).toContainText(name);
+    await profile(page); await expect(page.getByRole('button',{name:'Ouvrir le Bar créé',exact:true})).toHaveCount(0);
+    await page.keyboard.press('Escape');
     for (const [label,key,color] of [['Sombre','dark','#ff9198'],['Clair','light','#981b28']]) {
       await mode(page,label); const current=await tokens(page);
       expect(current['--color-accent']).toBe(color);

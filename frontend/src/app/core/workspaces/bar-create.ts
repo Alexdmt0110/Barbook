@@ -147,6 +147,13 @@ interface Intent {
       width: 100%;
       min-width: 0;
       box-sizing: border-box;
+      min-height: 44px;
+      padding: var(--space-2);
+      border: 1px solid var(--color-border-strong);
+      border-radius: var(--radius-control);
+      background: var(--color-surface-solid);
+      color: var(--color-text);
+      font: inherit;
     }
     fieldset {
       min-width: 0;
@@ -164,7 +171,9 @@ interface Intent {
     .palette-option,
     .confirmation {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
+      min-height: 44px;
+      cursor: pointer;
       gap: var(--space-2);
     }
     button {
