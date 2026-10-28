@@ -32,6 +32,7 @@ export interface CocktailContent {
   steps: string[];
 }
 export interface CocktailContentSnapshot {
+  accessVersion?: number;
   id: string;
   slug: string;
   contentVersion: number;
@@ -40,4 +41,5 @@ export interface CocktailContentSnapshot {
 }
 export interface ReplaceCocktailContentRequest extends CocktailContent {
   expectedContentVersion: number;
+  expectedAccessVersion?: number;
 }

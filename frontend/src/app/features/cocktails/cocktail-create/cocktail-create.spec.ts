@@ -1,3 +1,4 @@
+import { provideHttpClient } from '@angular/common/http';
 import { BrowserStorageService } from '../../../core/storage/browser-storage.service';
 import { DraftStore } from '../../../core/drafts/draft-store.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -50,6 +51,7 @@ describe('CocktailCreate', () => {
     await TestBed.configureTestingModule({
       imports: [CocktailCreate],
       providers: [
+        provideHttpClient(),
         provideRouter([]),
         {
           provide: CocktailsService,

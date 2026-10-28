@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
@@ -12,10 +14,14 @@ describe('Account panel', () => {
     TestBed.configureTestingModule({
       imports: [AccountPanel],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         provideRouter([]),
         {
           provide: AuthService,
           useValue: {
+            snapshot: () => null,
+            isAuthenticated: signal(false),
             currentUser: signal({ displayName: 'Alex', email: 'alex@example.test' }),
             globalLogoutUncertain: uncertain,
           },

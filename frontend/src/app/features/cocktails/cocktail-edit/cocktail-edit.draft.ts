@@ -13,6 +13,7 @@ import {
 import { EditValue } from './cocktail-edit.form';
 
 export interface EditDraft {
+  accessVersion?: number;
   schema: 1;
   form: EditValue;
 }
@@ -20,7 +21,13 @@ export interface EditDraft {
 export function isEditDraft(value: unknown): value is EditDraft {
   if (
     !draftObject(value) ||
-    !draftKeys(value, ['schema', 'form']) ||
+    !(
+      draftKeys(value, ['schema', 'form']) ||
+      (draftKeys(value, [...['schema', 'form'], 'accessVersion']) &&
+        Number.isInteger(value['accessVersion']) &&
+        (value['accessVersion'] as number) >= 0 &&
+        (value['accessVersion'] as number) <= 2147483647)
+    ) ||
     value['schema'] !== 1 ||
     !draftObject(value['form'])
   )

@@ -1,3 +1,4 @@
+import { personalSpaceGuard } from './core/workspaces/personal-space.guard';
 import { Routes } from '@angular/router';
 import { draftExitGuard } from './core/drafts/draft-exit.guard';
 import { authGuard } from './core/auth/auth.guard';
@@ -21,12 +22,14 @@ export const routes: Routes = [
     children: [
       {
         path: 'trash',
+        canActivate: [personalSpaceGuard],
         title: 'Corbeille · Barbook',
         loadComponent: () =>
           import('./features/cocktails/cocktail-trash/cocktail-trash').then((m) => m.CocktailTrash),
       },
       {
         path: 'cocktails/id/:id/delete',
+        canActivate: [personalSpaceGuard],
         title: 'Mettre en corbeille · Barbook',
         loadComponent: () =>
           import('./features/cocktails/cocktail-trash/cocktail-delete').then(
@@ -41,6 +44,7 @@ export const routes: Routes = [
       },
       {
         path: 'folders',
+        canActivate: [personalSpaceGuard],
         title: 'Dossiers · Barbook',
         loadComponent: () =>
           import('./features/folders/folder-index/folder-index').then(
@@ -49,6 +53,7 @@ export const routes: Routes = [
       },
       {
         path: 'folders/:id',
+        canActivate: [personalSpaceGuard],
         title: 'Dossier · Barbook',
         loadComponent: () =>
           import('./features/folders/folder-detail/folder-detail').then(

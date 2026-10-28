@@ -818,7 +818,7 @@
       <button
         class="submit-action"
         type="submit"
-        [disabled]="isSubmitting() || !!draft.candidate() || draft.uncertain()"
+        [disabled]="isSubmitting() || !!draft.candidate() || draft.uncertain() || draft.conflict()"
       >
         @if (isSubmitting()) {
           Création…

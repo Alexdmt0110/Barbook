@@ -13,13 +13,20 @@ import {
   RECIPE_METHOD_OPTIONS,
 } from './cocktail-create.options';
 export interface CreationDraft {
+  accessVersion?: number;
   form: CocktailCreateFormValue;
   selected: (IngredientSuggestion | null)[];
 }
 export function isCreationDraft(value: unknown): value is CreationDraft {
   if (
     !draftObject(value) ||
-    !draftKeys(value, ['form', 'selected']) ||
+    !(
+      draftKeys(value, ['form', 'selected']) ||
+      (draftKeys(value, [...['form', 'selected'], 'accessVersion']) &&
+        Number.isInteger(value['accessVersion']) &&
+        (value['accessVersion'] as number) >= 0 &&
+        (value['accessVersion'] as number) <= 2147483647)
+    ) ||
     !draftObject(value['form']) ||
     !Array.isArray(value['selected'])
   )

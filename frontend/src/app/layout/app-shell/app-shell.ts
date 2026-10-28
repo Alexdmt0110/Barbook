@@ -1,3 +1,4 @@
+import { WorkspaceContext } from '../../core/workspaces/workspace-context';
 import { SessionResume } from '../../core/auth/session-resume';
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -13,6 +14,7 @@ import { ThemeSwitcher } from '../../shared/ui/theme-switcher/theme-switcher';
 })
 export class AppShell {
   readonly authService = inject(AuthService);
+  readonly workspace = inject(WorkspaceContext);
   readonly resume = inject(SessionResume);
 
   private readonly router = inject(Router);

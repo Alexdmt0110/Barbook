@@ -50,6 +50,7 @@ export class FormDraft {
     return structuredClone(entry.value);
   }
   discard(): void {
+    this.store.mutationFinished(this.lease, this.key);
     this.store.remove(this.lease, this.key);
     this.candidate.set(null);
     this.pending.set(false);
@@ -58,7 +59,13 @@ export class FormDraft {
     this.conflict.set(false);
   }
   begin(value: unknown): boolean {
-    if (!this.store.valid(this.lease) || this.candidate() || this.uncertain() || this.conflict())
+    if (
+      !this.store.valid(this.lease) ||
+      this.pending() ||
+      this.candidate() ||
+      this.uncertain() ||
+      this.conflict()
+    )
       return false;
     this.capture(value);
     if (!this.store.prepareMutation(this.lease, this.key, this.version, value)) {
@@ -66,11 +73,13 @@ export class FormDraft {
       return false;
     }
     this.submissionBlocked.set(false);
+    this.store.mutationStarted(this.lease, this.key);
     this.pending.set(true);
     this.uncertain.set(true);
     return true;
   }
   rejected(error: unknown): void {
+    this.store.mutationFinished(this.lease, this.key);
     this.pending.set(false);
     if (error instanceof HttpErrorResponse && [400, 401, 403, 404, 409].includes(error.status)) {
       this.uncertain.set(false);
@@ -84,6 +93,7 @@ export class FormDraft {
     this.store.setUncertain(this.lease, this.key, false);
   }
   folderSucceeded(): void {
+    this.store.mutationFinished(this.lease, this.key);
     this.pending.set(false);
     this.verifiedAbsent();
   }

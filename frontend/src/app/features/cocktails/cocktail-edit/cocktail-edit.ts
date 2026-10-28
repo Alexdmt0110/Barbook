@@ -1,3 +1,4 @@
+import { WorkspaceContext } from '../../../core/workspaces/workspace-context';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
@@ -55,6 +56,8 @@ import { CocktailOrganizationEditor } from '../cocktail-detail/cocktail-organiza
   styleUrls: ['../cocktail-create/cocktail-create.css', './cocktail-edit.css'],
 })
 export class CocktailEdit implements OnInit {
+  readonly workspace = inject(WorkspaceContext);
+  private accessVersion: number | undefined;
   private readonly organizationEditor = viewChild(CocktailOrganizationEditor);
   readonly organization = signal<CocktailDetail | null>(null);
   readonly organizationLoading = signal(false);
@@ -115,7 +118,11 @@ export class CocktailEdit implements OnInit {
     return this.store.valid(this.lease);
   }
   private draftValue() {
-    return { schema: 1 as const, form: this.form.getRawValue() };
+    return {
+      schema: 1 as const,
+      ...(this.accessVersion !== undefined ? { accessVersion: this.accessVersion } : {}),
+      form: this.form.getRawValue(),
+    };
   }
   private apply(snapshot: CocktailContentSnapshot): void {
     this.applying = true;
@@ -124,6 +131,7 @@ export class CocktailEdit implements OnInit {
     );
     fillEditForm(this.form, this.fb, snapshot.content);
     this.version = snapshot.contentVersion;
+    this.accessVersion = snapshot.accessVersion;
     this.loaded.set(snapshot);
     this.applying = false;
   }
@@ -164,6 +172,12 @@ export class CocktailEdit implements OnInit {
     this.applying = true;
     fillEditDraft(this.form, this.fb, value.form);
     this.version = version;
+    this.accessVersion = value.accessVersion;
+    if (
+      this.workspace.current()?.kind === 'SHARED' &&
+      this.accessVersion !== this.loaded()?.accessVersion
+    )
+      draft.conflict.set(true);
     this.applying = false;
   }
   discardDraft(): void {
@@ -259,6 +273,7 @@ export class CocktailEdit implements OnInit {
       .replacePersonalCocktailContent(loaded.id, {
         ...editContent(this.form.getRawValue()),
         expectedContentVersion: this.version,
+        ...(this.accessVersion !== undefined ? { expectedAccessVersion: this.accessVersion } : {}),
       })
       .pipe(
         takeUntil(this.routeReset),
@@ -292,6 +307,7 @@ export class CocktailEdit implements OnInit {
       );
   }
   loadOrganization(): void {
+    if (this.workspace.current()?.kind === 'SHARED') return;
     const loaded = this.loaded();
     if (!this.current() || !loaded || this.organization() || this.organizationLoading()) return;
     this.organizationLoading.set(true);

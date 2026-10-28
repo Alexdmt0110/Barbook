@@ -40,6 +40,7 @@ export class DraftStore {
   private generation = 0;
   private entries: DraftRecord[] = [];
   private purgePending = false;
+  private readonly pending = new Set<string>();
   readonly memoryOnly = signal(false);
   readonly purgeFailed = signal(false);
 
@@ -59,6 +60,7 @@ export class DraftStore {
   suspend(): void {
     this.generation++;
     this.active = false;
+    this.pending.clear();
   }
   lease(): DraftLease | null {
     return this.active && this.owner
@@ -75,6 +77,22 @@ export class DraftStore {
   }
   belongsTo(owner: DraftOwner): boolean {
     return sameOwner(this.owner, owner);
+  }
+
+  hasDrafts(): boolean {
+    this.prune();
+    // Suspended drafts still require explicit confirmation before a voluntary switch.
+    const stored = this.storage.read('session', DRAFT_KEY);
+    return this.entries.length > 0 || !!stored;
+  }
+  hasPendingMutation(): boolean {
+    return this.pending.size > 0;
+  }
+  mutationStarted(lease: DraftLease | null, key: string): void {
+    if (this.valid(lease)) this.pending.add(key);
+  }
+  mutationFinished(lease: DraftLease | null, key: string): void {
+    if (this.valid(lease)) this.pending.delete(key);
   }
 
   find(lease: DraftLease | null, key: string): DraftRecord | null {
@@ -153,6 +171,7 @@ export class DraftStore {
     this.active = false;
     this.owner = null;
     this.entries = [];
+    this.pending.clear();
     this.eraseStorage();
   }
 

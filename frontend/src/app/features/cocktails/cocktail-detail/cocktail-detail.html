@@ -59,22 +59,24 @@
             <path d="m14 5 5 5" />
           </svg>
         </a>
-        <a
-          class="bb-button bb-button--ghost icon-action"
-          [routerLink]="['/cocktails/id', recipe.id, 'delete']"
-          aria-label="Mettre en corbeille"
-          title="Mettre en corbeille"
-        >
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
+        @if (workspace.current()?.kind !== 'SHARED') {
+          <a
+            class="bb-button bb-button--ghost icon-action"
+            [routerLink]="['/cocktails/id', recipe.id, 'delete']"
+            aria-label="Mettre en corbeille"
+            title="Mettre en corbeille"
           >
-            <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
-          </svg>
-        </a>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
+            </svg>
+          </a>
+        }
       </nav>
       <div class="cocktail-visual">
         <img [src]="recipe.imageUrl || '/placeholder-cocktail.png'" [alt]="recipe.name" />
@@ -144,9 +146,13 @@
               <dt>Dossiers</dt>
               <dd class="folder-links" aria-label="Dossiers de la recette">
                 @for (folder of recipe.folders; track folder.id) {
-                  <a class="folder-badge" [routerLink]="['/folders', folder.id]">{{
-                    folder.name
-                  }}</a>
+                  @if (workspace.current()?.kind === 'SHARED') {
+                    <span class="folder-badge">{{ folder.name }}</span>
+                  } @else {
+                    <a class="folder-badge" [routerLink]="['/folders', folder.id]">{{
+                      folder.name
+                    }}</a>
+                  }
                 }
               </dd>
             </div>

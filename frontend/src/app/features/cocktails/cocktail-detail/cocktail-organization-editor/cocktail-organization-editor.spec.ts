@@ -1,3 +1,4 @@
+import { WorkspaceContext } from '../../../../core/workspaces/workspace-context';
 import { provideRouter } from '@angular/router';
 import { DraftStore } from '../../../../core/drafts/draft-store.service';
 import { provideHttpClient } from '@angular/common/http';
@@ -19,6 +20,13 @@ describe('CocktailOrganizationEditor', () => {
       providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     });
     http = TestBed.inject(HttpTestingController);
+    TestBed.inject(WorkspaceContext)
+      .confirmSession({
+        user: { id: 'test-user', email: 'qa@example.test', displayName: 'QA' },
+        workspaceId: 'test-workspace',
+        csrfToken: 'csrf',
+      })
+      .subscribe();
   });
   afterEach(() => http.verify());
   function catalog(items = [a, b], pages = 1) {

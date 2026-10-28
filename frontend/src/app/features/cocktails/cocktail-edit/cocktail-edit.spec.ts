@@ -1,3 +1,4 @@
+import { WorkspaceContext } from '../../../core/workspaces/workspace-context';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
@@ -43,7 +44,13 @@ describe('Personal recipe editing UI and L4 drafts', () => {
     });
     http = TestBed.inject(HttpTestingController);
     store = TestBed.inject(DraftStore);
-    store.confirmIdentity({ userId: 'alice', workspaceId: 'personal-a' });
+    TestBed.inject(WorkspaceContext)
+      .confirmSession({
+        user: { id: 'alice', email: 'qa@example.test', displayName: 'QA' },
+        workspaceId: 'personal-a',
+        csrfToken: 'csrf',
+      })
+      .subscribe();
   });
   afterEach(() => {
     http.verify({ ignoreCancelled: true });
@@ -62,15 +69,13 @@ describe('Personal recipe editing UI and L4 drafts', () => {
     http.expectNone('/api/cocktails/original-url');
     c.loadOrganization();
     c.loadOrganization();
-    http
-      .expectOne('/api/cocktails/original-url')
-      .flush({
-        id: 'recipe-a',
-        slug: 'original-url',
-        folders: [],
-        tags: [],
-        organizationVersion: 4,
-      });
+    http.expectOne('/api/cocktails/original-url').flush({
+      id: 'recipe-a',
+      slug: 'original-url',
+      folders: [],
+      tags: [],
+      organizationVersion: 4,
+    });
     f.detectChanges();
     http.expectOne((r) => r.url === '/api/folders/browse').flush({ items: [], totalPages: 0 });
     http.expectOne('/api/tags').flush([]);
@@ -233,7 +238,13 @@ describe('Personal recipe editing UI and L4 drafts', () => {
     first.componentInstance.submit();
     http.expectNone(path);
     first.destroy();
-    store.confirmIdentity({ userId: 'alice', workspaceId: 'personal-a' });
+    TestBed.inject(WorkspaceContext)
+      .confirmSession({
+        user: { id: 'alice', email: 'qa@example.test', displayName: 'QA' },
+        workspaceId: 'personal-a',
+        csrfToken: 'csrf',
+      })
+      .subscribe();
     const resumed = setup();
     resumed.componentInstance.restoreDraft();
     expect(resumed.componentInstance.form.controls.notes.value).toBe('Privé');

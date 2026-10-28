@@ -1,3 +1,17 @@
+# Reprise BB1b — 28 octobre : raccordement Angular en qualification
+
+Serveur partagé publié7780a04f puis correction fixture D5bb4b78d6 : six CI et six journaux vérifiés,273 backend/234 frontend/249 PostgreSQL-HTTP18suites/16Chromium, audits0. La fixture de corbeille utilisait initialement1jour et a été refusée par la contrainte30jours ; corrigée avec instant commun+30jours, aucune assertion/contrainte affaiblie. Main reste76d96822.
+
+Incrément Angular coordonné : WorkspaceContext distinct de la session personnelle, confirmation serveur de Bar après /me, sélection candidate par onglet jamais autorité, générations de réponses, ancienne intention accessVersion obligatoire et jamais inférée d’une version courante, blocage des commandes en cours. AuthService réutilise ce contexte avant de confirmer les brouillons ; notifications de déconnexion identifient la session personnelle, donc atteignent aussi un onglet Bar. DraftStore/FormDraft existants étendus, sans second moteur : garde explicite de purge D2 incluant brouillons de formulaires fermés, maintien24h après expiration, leases invalidées si droits changés, accessVersion original conservé dans les brouillons partagés de création/édition.
+
+Sélecteur réel dans AccountPanel nom/initiales, Personnel épinglé, catalogue Bar paginé avec états chargement/échec/vide distincts et contexte actif nommé panneau fermé ; sécurité globale conservée une seule fois. Clients liste/détail/création/contenu/autocomplete vers routes explicites du contexte confirmé ; anciennes routes demeurent personnelles. Routes frontend de dossiers/corbeille personnelles gardées et liens/actions non proposés dans Bar ; aucune bascule silencieuse ni repli sur le personnel. Surfaces de classement partagées explicitement différées. Le changement volontaire recharge la navigation et masque l’ancien contenu pendant confirmation/navigation ; perte de navigation ferme le contexte.
+
+Verify frontend local réel :252tests/34suites, lint/build/compat2 réussis ;18nouveaux tests de contexte/catalogue et scénario notification renforcé sur un onglet Bar. Types Chromium réussis. Deux nouveaux parcours×desktop/mobile écrits : deux comptes, création membre/lecture/édition partagée, Personnel isolé, captures deux thèmes, brouillon partagé restauré, retrait/réadmission et ancienne intention refusée, purge volontaire. Ils ne sont PAS encore déclarés exécutés ; attendre la CI du nouveau HEAD et inspecter réellement les captures. Fixture synthetic CLI protégée requireTestDatabase, aucun compte/Bar réel ni route produit de création de Bar.
+
+PR40 reste draft et ne doit pas être fusionnée : qualification navigateur/visuelle et revue globale à terminer ; UI gestion OWNER des membres encore à livrer pour le périmètre annoncé. BB1d nom/couleur initiale/OWNER puis palette réelle reste à développer après BB1b ; pas de bouton factice ni création automatique. Aucun modèle/migration ajouté à cet incrément. Risque30octobre très élevé ; disponibilité réelle dépend toujours d’OPS et de la restauration vérifiée. Aucun VPS, base propriétaire, déploiement, compte réel ou coût.
+
+---
+
 # Reprise BB1b — 28 octobre 2026 : routes du carnet partagé
 
 Mandat utilisateur confirmé : terminer BB1b puis BB1d minimal (création Bar nom/couleur initiale, OWNER), palette dès ouverture, qualification deux comptes. Réglages ultérieurs différés. PR40 reste draft tant que tout BB1b annoncé n’est pas livré et qualifié ; aucun merge à ce checkpoint. Base main distante vérifiée76d96822, branche précédemment43fe4a35.
