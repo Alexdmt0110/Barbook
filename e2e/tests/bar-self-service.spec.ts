@@ -15,7 +15,12 @@ async function use(page: Page, a: Actor, ip: number) {
 async function profile(page: Page) {
   const button = page.getByRole('button',{name:'Compte et sécurité',exact:true});
   if (await button.getAttribute('aria-expanded') !== 'true') await button.click();
+  await expect(button).toHaveAttribute('aria-expanded','true');
   await expect(page.getByText('Chargement des Bars…',{exact:true})).toHaveCount(0);
+}
+async function closed(page: Page) {
+  // A visible Bar link precedes completion of selection/navigation and panel closure.
+  await expect(page.getByRole('button',{name:'Compte et sécurité',exact:true})).toHaveAttribute('aria-expanded','false');
 }
 async function prepare(page: Page, name: string) {
   await profile(page);
@@ -28,6 +33,7 @@ async function mode(page: Page, label: string) {
   await page.keyboard.press('Escape');
   await page.getByRole('button',{name:/^Thème d’affichage :/}).click();
   await page.getByRole('button',{name:new RegExp(`^${label}`)}).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', ({Sombre:'dark',Clair:'light','Contraste élevé':'high-contrast'} as Record<string,string>)[label]);
 }
 async function tokens(page: Page) {
   return page.locator('.app-shell').evaluate(el => {
@@ -63,11 +69,14 @@ test('create Bar in profile, explicitly open it, share with another account and 
     expect(await tokens(page)).toEqual(personal);
     await expect(page.getByRole('link',{name:'Mes cocktails',exact:true})).toBeVisible();
     await page.getByRole('button',{name:'Ouvrir le Bar créé',exact:true}).click();
+    await closed(page);
     await expect(page.locator('[aria-label="Espace actif"]')).toContainText(name);
     await profile(page); await expect(page.getByRole('button',{name:'Ouvrir le Bar créé',exact:true})).toHaveCount(0);
     await page.keyboard.press('Escape');
     for (const [label,key,color] of [['Sombre','dark','#ff9198'],['Clair','light','#981b28']]) {
-      await mode(page,label); const current=await tokens(page);
+      await mode(page,label);
+      await expect(page.locator('.app-shell')).toHaveCSS('--color-accent',color);
+      const current=await tokens(page);
       expect(current['--color-accent']).toBe(color);
       expect(contrast(current['--color-accent'],current['--color-on-accent'])).toBeGreaterThanOrEqual(4.5);
       expect(await page.locator('html').getAttribute('data-theme')).toBe(key);
@@ -75,9 +84,13 @@ test('create Bar in profile, explicitly open it, share with another account and 
       expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
       await page.screenshot({path:info.outputPath(`created-bar-${key}.png`),fullPage:true});
     }
-    await mode(page,'Sombre'); const red=await tokens(page);
+    await mode(page,'Sombre');
+    await expect(page.locator('.app-shell')).toHaveCSS('--color-accent','#ff9198');
+    const red=await tokens(page);
     for (const k of ['--color-danger','--color-danger-border','--color-focus-ring','--color-text','--color-surface-solid']) expect(red[k]).toBe(personal[k]);
-    await mode(page,'Contraste élevé'); expect((await tokens(page))['--color-accent']).toBe('#ffd600');
+    await mode(page,'Contraste élevé');
+    await expect(page.locator('.app-shell')).toHaveCSS('--color-accent','#ffd600');
+    expect((await tokens(page))['--color-accent']).toBe('#ffd600');
     await mode(page,'Sombre'); await profile(page);
     await page.getByRole('button',{name:'Gérer les membres',exact:true}).click();
     await page.getByRole('textbox',{name:'Email du membre existant',exact:true}).fill(member.user.email);
@@ -98,12 +111,15 @@ test('create Bar in profile, explicitly open it, share with another account and 
     await expect(page.getByRole('heading',{name:recipe,exact:true})).toBeVisible();
     await use(other,member,info.project.name==='mobile'?213:212);
     await profile(other); await other.getByRole('button',{name,exact:true}).click();
+    await closed(other);
     await expect(other.getByRole('heading',{name:recipe,exact:true})).toBeVisible();
     expect((await tokens(other))['--color-accent']).toBe('#ff9198');
     await profile(other); await expect(other.getByRole('button',{name:'Gérer les membres',exact:true})).toHaveCount(0);
     await other.getByRole('button',{name:'Personnel · privé',exact:true}).click();
+    await closed(other);
     await expect(other.getByRole('heading',{name:recipe,exact:true})).toHaveCount(0);
     await profile(page); await page.getByRole('button',{name:'Personnel · privé',exact:true}).click();
+    await closed(page);
     expect(await tokens(page)).toEqual(personal);
     await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
     expect(bar.id).toBeTruthy();
@@ -126,6 +142,7 @@ test('lost committed Bar creation response resolves explicitly without another P
   await expect(page.getByRole('button',{name:'Ouvrir le Bar créé',exact:true})).toBeVisible();
   expect(posts).toBe(1); expect(bar?.id).toBeTruthy();
   await page.getByRole('button',{name:'Ouvrir le Bar créé',exact:true}).click();
+  await closed(page);
   await expect(page.locator('[aria-label="Espace actif"]')).toContainText(bar!.name);
   expect(posts).toBe(1);
 });
@@ -141,8 +158,10 @@ test('creation preserves personal draft until explicit opening and accepted work
   await expect(page.getByRole('textbox',{name:/^Nom \*/})).toHaveValue('Brouillon personnel à protéger');
   await expect(page.getByRole('link',{name:'Mes cocktails',exact:true})).toBeVisible();
   page.once('dialog',d=>void d.accept()); await open.click();
+  await closed(page);
   await expect(page.getByRole('link',{name:'Carnet Bar',exact:true})).toBeVisible();
   await profile(page); await page.getByRole('button',{name:'Personnel · privé',exact:true}).click();
+  await closed(page);
   await page.goto('/cocktails/new');
   await expect(page.getByRole('button',{name:'Restaurer le brouillon',exact:true})).toHaveCount(0);
   await expect(page.getByRole('textbox',{name:/^Nom \*/})).toHaveValue('');
