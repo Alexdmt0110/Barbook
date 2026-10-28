@@ -48,7 +48,7 @@ import { FormDraft } from './form-draft';
         {{
           controlledResolution()
             ? 'Compare explicitement la recette serveur avant de repartir de cette version.'
-            : 'Recharge explicitement le classement pour le remplacer.'
+            : conflictAdvice() || 'Recharge explicitement le classement pour le remplacer.'
         }}
       </p>
     }
@@ -111,6 +111,7 @@ import { FormDraft } from './form-draft';
 })
 export class DraftNotice {
   readonly controlledResolution = input(false);
+  readonly conflictAdvice = input<string | null>(null);
   readonly draft = input.required<FormDraft>();
   readonly restore = output<void>();
   readonly discard = output<void>();

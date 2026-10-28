@@ -448,6 +448,8 @@ export class CocktailCreate {
     }
 
     if (error.status === 409) {
+      if (this.workspace.current()?.kind === 'SHARED')
+        return 'Conflit de création dans ce Bar. Vérifie ses droits et sa bibliothèque avant une nouvelle action. Ta saisie est conservée.';
       return 'Un cocktail portant ce nom existe déjà dans ton Barbook.';
     }
 
