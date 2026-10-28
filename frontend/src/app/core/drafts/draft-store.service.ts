@@ -82,8 +82,19 @@ export class DraftStore {
   hasDrafts(): boolean {
     this.prune();
     // Suspended drafts still require explicit confirmation before a voluntary switch.
+    if (this.entries.length > 0) return true;
     const stored = this.storage.read('session', DRAFT_KEY);
-    return this.entries.length > 0 || !!stored;
+    if (!stored) return false;
+    try {
+      if (stored.length > MAX_BYTES) return true;
+      const envelope: unknown = JSON.parse(stored);
+      // Inspect bounded metadata only. Do not activate/import another workspace's payload.
+      return object(envelope) && Array.isArray(envelope['entries'])
+        ? envelope['entries'].some((entry) => this.isRecord(entry, Date.now()))
+        : true;
+    } catch {
+      return true;
+    }
   }
   hasPendingMutation(): boolean {
     return this.pending.size > 0;

@@ -207,4 +207,13 @@ describe('Confirmed business workspace and existing draft isolation', () => {
     expect(context.current()).toBeNull();
     expect(drafts.lease()).toBeNull();
   });
+  it('does not claim that a successfully saved empty envelope still contains a draft', async () => {
+    const lease = drafts.lease();
+    drafts.save(lease, 'edit', 1, { notes: 'saved' });
+    drafts.remove(lease, 'edit');
+    expect(sessionStorage.getItem(DRAFT_KEY)).not.toBeNull();
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    await enterBar();
+    expect(confirm).not.toHaveBeenCalled();
+  });
 });
