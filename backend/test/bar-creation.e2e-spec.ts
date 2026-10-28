@@ -206,7 +206,11 @@ describe('Explicit Bar creation and private creation receipts over PostgreSQL/HT
   );
   it('requires a cookie session and CSRF, even for an otherwise valid intention', async () => {
     const body = payload();
-    await api().post('/api/workspaces').send(body).expect(401);
+    // Origin/custom-header middleware rejects an entirely untrusted write before authentication.
+    await api().post('/api/workspaces').send(body).expect(403);
+    const { Cookie: _cookie, ...withoutCookie } = browserHeaders(owner);
+    void _cookie;
+    await api().post('/api/workspaces').set(withoutCookie).send(body).expect(401);
     await api()
       .post('/api/workspaces')
       .set({ ...browserHeaders(owner), 'X-Barbook-CSRF': 'invalid' })
