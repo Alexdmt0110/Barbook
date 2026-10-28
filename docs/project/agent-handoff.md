@@ -1,3 +1,15 @@
+# Reprise — BB1b fusionné/qualifié, BB1d minimal démarré — 28 octobre2026
+
+PR40 mergedAt2026-10-28T11:44:32Z, merge38149070950a2a4f10a14325b8be5bbe9932f828. Parents76d96822ce97ce3720b4214c678138f18037677f puisc7c5c2c8dd97e4eeb0866013922b77ffaa58f156 ; arbree18f1e19f2e6692502bae077aab68a7590e02de6 identique au HEAD qualifié. Les71blobs/19commits, diff, discussions/revues/commentaires vides et Gate effectif ont été vérifiés. Artefact final12804527813/run40662262069 SHA256e75e2a92f1ecf1c52b3ec5e4375f49a6bfcae336334d57e1736fa5d076f0c8e2 intact, captures profils/OWNER clair/sombre/mobile et brouillon bloqué réellement vues. Après reprise environnement, code local réconcilié sans perte ; archive locale des8fichiers avant réconciliation, différences seulement journal et blancs de tests.
+
+Main GitHub et fetch local38149070 qualifiés : six contrôles post-merge et six journaux lus,273backend/263frontend/250PG-HTTP/24Chromium, audits0. Branche historique feature/bar-recipe-workspace conservée auc7c5c2c8. BB1b livré côté développement : sélection profil, recettes partagées read/create/edit, OWNER membres, garanties sessions/drafts ; pas de disponibilité réelle ni création Bar autonome encore livrée.
+
+Nouvelle branche feature/bar-self-service créée depuis ce main exactement. Design préventive docs/project/bb1d-design.md à publier avant modèle/code : création nom/couleur/OWNER atomique et idempotente, reçu explicite, ouverture distincte, palette confirmée limitée aux accents, migration additive test seulement. Réglages ultérieurs différés. Prochaine étape : implémentation additive après publication de la revue, tests PG/HTTP/browser et Gate D8 ; aucune validation de routine à redemander. Aucun arbitrage métier ouvert identifié.
+
+Git : commits/push atomiques, branches conservées. VM : aucun déploiement. SQL : aucune base propriétaire ; futur delta uniquement test jetable gardé. Infra : aucun changement. OPS reste documentaire, D7 et cible/sauvegarde restaurée/rollback non qualifiés. Inventaire manuel/suggestions puis batchs autonomes suivent ; pas de consommation automatique ni copie implicite. Mise en service complète et sûre au30octobre non considérée réaliste à ce stade.
+
+---
+
 # Reprise sécurisée après perte de l’environnement — 28 octobre 2026
 
 Environnement d’exécution devenu indisponible pendant le checkpoint, avant toute publication du dernier correctif. GitHub directement revérifié : main76d96822, PR40 toujours draft au b2b4ce5b, aucune fusion. Les huit fichiers du correctif ont été reconstruits depuis les blobs GitHub de ce HEAD avec contextes de remplacement strictement contrôlés ; ils doivent être relus et requalifiés par la CI native avant Gate. Aucune qualification de working tree local n’est présumée après la coupure.
