@@ -1,3 +1,4 @@
+import { InventoryModule } from './inventory/inventory.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
@@ -24,6 +25,7 @@ import { IngredientsModule } from './ingredients/ingredients.module';
     AuthModule,
     CocktailsModule,
     IngredientsModule,
+    InventoryModule,
     WorkspacesModule,
   ],
 
