@@ -1,3 +1,15 @@
+# Priorité courante — préparer la mise à disposition réelle, BB2b en pause avant code
+
+29octobre2026, consigne explicite d'Alex après validation de BB2a : présenter l'état OPS avant nouveau développement important. Main revérifié18c1ee09 qualifié287/287/303/44. Aucun code BB2b commencé ; conception b4a88c69 conservée sur feature/batch-production-reports, copiePersonnel→Bar non abandonnée mais phasage à arbitrer. Branche actuelle documentaire seulement, aucun nouveau merge ni PR documentaire inutile.
+
+Dossier beta-bar-ops-authorization.md réécrit sur les faits actuels : Compose=PGlocal seulement, absence de packaging/supervision de release qualifiés, /api=HelloWorld et non preuveDB, listen sans hôte explicite/trustproxy1 nécessite isolation réseau réelle, allowlist seulement nouvelles inscriptions. Douze migrations testées en CI ; schéma/données/cible propriétaire inconnus. Proposition d'ouverture périmètre intégré puisBB2b/copie à soumettre à Alex, pas un report décidé unilatéralement.
+
+D7 et informations requises : cible/domaine/accès sécurisé, données/comptes/services à préserver, RPO/RTO, destination/protection/rétention sauvegardes et logs, fenêtre/recette/contact, emails des deux titulaires. Première autorisation future = inventaire ciblé lecture seule ; staging/backup/restore/migrations/comptes/déploiement nécessitent accords distincts et plans concrets. Aucun VPS/base réelle/compte/domaine/DNS/TLS/coût ou autre opération sensible exécuté. Aucun test de déploiement, backup ou restauration propriétaire revendiqué. Vérification de cette mise à jour documentaire : git diff --check ; aucune réexécution des tests applicatifs inchangés nécessaire.
+
+Suite : recevoir arbitrage de phasage et informationsD7 ; préparer l'inventaire RO précisément borné, l'exécuter seulement si autorisé, puis qualifier release/transition/restauration/rollback en environnement isolé autorisé. Aucun retour implicite au codeBB2b avant réponse au point OPS présenté. Les checkpoints suivants sont historiques.
+
+---
+
 # Checkpoint courant — BB2a fusionné et main qualifié ; BB2b conçu avant code — 29 octobre2026
 
 Main réel18c1ee09f4a8264ff8ce665374f3dce8345a39a3. PR48 mergedAt2026-10-29T14:31:19Z, parents66d4bb3f9e2be8883cb570a4e9d58c53ff2291e5 puisbd1f036a6da0eeeb22aa66e59fa8b039e991cc38, arbreee572b6d3cf24f059942a6613fb6872f1cf98d6e identique au HEAD qualifié. Source feature/autonomous-batch-plans conservée. Un appel post-merge interrompu a été repris en lecture seule ; aucune seconde fusion ni perte de code.

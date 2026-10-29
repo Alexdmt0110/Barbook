@@ -1,5 +1,9 @@
 # Roadmap autorisée
 
+## Priorité du29octobre — première mise en service privée
+Avant nouveau développement important : état OPS concret et arbitragesD7/hébergement/phasage. BB2b et copiePersonnel→Bar restent prévus, pas abandonnés ; ouverture du périmètre intégré proposée à Alex avant leur livraison. Aucune opération réelle autorisée. Voir beta-bar-ops-authorization.md et journal courant ; main18c1ee09 qualifié.
+
+
 ## BB2a intégré et qualifié — BB2b conçu avant code
 29octobre : PR48 fusionnée en18c1ee09, parents/arbre/mergedAt/source conservée vérifiés, sixCIpostmerge et journaux287backend/287frontend/303PostgreSQL-HTTP/44Chromium, audits production0. Plans de batch livrés côté développement, aucun effet sur l'inventaire. [BB2b réalisé](bb2-production-design.md) conçu sur feature/batch-production-reports depuis ce main, pas encore implémenté. Disponibilité réelle non prouvée ; D7 et autorisations OPS distincts.
 
