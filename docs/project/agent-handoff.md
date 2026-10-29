@@ -1,3 +1,21 @@
+# Checkpoint courant — BB2a fusionné et main qualifié ; BB2b conçu avant code — 29 octobre2026
+
+Main réel18c1ee09f4a8264ff8ce665374f3dce8345a39a3. PR48 mergedAt2026-10-29T14:31:19Z, parents66d4bb3f9e2be8883cb570a4e9d58c53ff2291e5 puisbd1f036a6da0eeeb22aa66e59fa8b039e991cc38, arbreee572b6d3cf24f059942a6613fb6872f1cf98d6e identique au HEAD qualifié. Source feature/autonomous-batch-plans conservée. Un appel post-merge interrompu a été repris en lecture seule ; aucune seconde fusion ni perte de code.
+
+Gate complet source :29blobs exacts/7commits relus contre main66d4bb3, diff/historique/consommateurs/versions/transactions/compatibilité vérifiés, commentaires/revues/threads vides, sixCI287backend/287frontend/303PG-HTTP/44Chromium, audits de production0 ; artefact12904593603/run40890703518,57687979octets et SHA25654c88ad18666800ba3941cc2919a86cc8f0525c843fe3f0496f3e97a38f3c360 recalculés après téléchargement, six captures finales desktop/mobile/aperçu/conflit/sombre/fiche claire réellement inspectées. Aucun BLOCKER/P1 identifié. Risques résiduels :8vulnérabilités faibles de chaîne tests backend, warning CSS historique cocktails+36octets ; aucun seuil abaissé.
+
+Qualification post-merge réelle : six contrôles et sixjournaux lus. Backend123512087230287/27suites ; frontend123512086548287/42 ; PostgreSQL123512087197303/24 et dérive nulle ; Browser12351208671144passés à14:37:13Z ; audits123512086207/123512085749production0. Artefact postmerge12906335805/run40892308950, uploadSHA60c31ec1622a1e504d9582d681a11b4237e688866bd791047efc03ffb44eee1b. Main/source revérifiés après succès. PR48 contient aussi la clôture effective.
+
+BB2a livré en développement : plans partagés, snapshot recette serveur/version, aperçu exact rationnel base/service/arrondis/reste, création reçue idempotente, révision préconditionnée/conflit et navigation protégée. Aucune déclaration de fabrication, consommation automatique ou modification de stock. Migration12 seulement CI jetable ; aucun PostgreSQL local/propriétaire utilisé. Sessions/brouillons recettes/carnet personnel et Bar/inventaire/suggestions restent qualifiés. CI jetable n'est pas une instance permanente ni une disponibilité pour Alex/Maël.
+
+Prochaine tranche autorisée BB2b : branche feature/batch-production-reports publiée immédiatement depuis ce main qualifié, worktree séparé barbook-production. Design Review docs/project/bb2-production-design.md publiée avant code : déclaration explicite du réalisé, mesures inconnues distinctes de0, auteur/date serveur, snapshot/version du plan, correction traçable/versionnée, reçu, aucun stock. Aucun modèle/route/UI/migration de production encore développé à ce checkpoint. Aucun arbitrage métier supplémentaire identifié dans ce minimum ; ne pas activer plus que ce contrat.
+
+Environnement opérationnel revenu. Worktree barbook-batch propre au bd1f036a, ancien clone barbook-l5 laissé avec ses7fichiers locaux, sans reset/stash/force/suppression. Reprendre la branche production existante et vérifier son dernierHEAD réel avant écriture ; premier micro-bloc = modèle additif13/contrats/services et tests PG-HTTP, puis UI dédiée et Chromium. SixCI/GateD8/merge commit/postmain obligatoires. Aucune autre session d'écriture déclarée.
+
+OPS reste documentaire : D7/cible/HTTPS/sauvegarde restaurée/rollback/comptes réels non qualifiés. CopiePersonnel→Bar et BB2b non livrés. Mise en service complète sûre au30octobre non garantie. Aucun déploiement, VPS, migration propriétaire, compte réel, coût, purge, CONTRACT ou changement d'infrastructure. Les entrées suivantes sont des photographies historiques, pas l'état courant.
+
+---
+
 # Checkpoint courant — environnement revenu, BB2a implémenté / PR48 en qualification — 29 octobre2026
 
 WORK reprend dans cette conversation. Exec opérationnel, ancien clone barbook-l5 sale conservé sans modification ; nouveau worktree barbook-batch depuis la branche distante1e7f3e0, main réellement inchangé66d4bb3 qualifié273/282/292/38 après47. Aucun doublon de branche ni réécriture historique.

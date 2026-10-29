@@ -1,5 +1,9 @@
 # Roadmap autorisée
 
+## BB2a intégré et qualifié — BB2b conçu avant code
+29octobre : PR48 fusionnée en18c1ee09, parents/arbre/mergedAt/source conservée vérifiés, sixCIpostmerge et journaux287backend/287frontend/303PostgreSQL-HTTP/44Chromium, audits production0. Plans de batch livrés côté développement, aucun effet sur l'inventaire. [BB2b réalisé](bb2-production-design.md) conçu sur feature/batch-production-reports depuis ce main, pas encore implémenté. Disponibilité réelle non prouvée ; D7 et autorisations OPS distincts.
+
+
 ## BB2a — PR48 en qualification, 29octobre
 Plans partagés implémentés depuis main66d4bb3 qualifié : moteur exact/snapshot/version/révision/aperçu/interface. Vérifications locales287backend/287frontend passées ; cinqCI dontPG réussies au c147bde3, Chromium/captures/Gate à terminer. Environnement revenu et ancien clone sale préservé. BB2b réalisé reste distinct/non livré ; aucun débit stock. État de développement seulement, OPS/D7 séparés.
 
