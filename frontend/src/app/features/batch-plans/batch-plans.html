@@ -1,0 +1,237 @@
+<section class="batch-page" aria-labelledby="batch-heading">
+  <h1 id="batch-heading">Plans de batch</h1>
+  @if (workspace.current()?.kind !== 'SHARED') {
+    <p>Choisis un Bar confirmé depuis ton profil pour consulter ses plans.</p>
+  } @else {
+    <p>
+      Prépare une base à partir d’une version de recette. Un plan ne déclare aucune fabrication et
+      ne modifie jamais l’inventaire manuel.
+    </p>
+    <p>
+      La saisie non enregistrée reste seulement en mémoire : elle peut être perdue après
+      actualisation ou expiration de session. Aucune durée de conservation sanitaire n’est calculée.
+    </p>
+    @if (error()) {
+      <p role="alert">{{ error() }}</p>
+    }
+    @if (message()) {
+      <p role="status">{{ message() }}</p>
+    }
+    @if (busy()) {
+      <p role="status">Vérification en cours…</p>
+    }
+    @if (!editing() && !active()) {
+      <div class="actions">
+        <button class="bb-button" type="button" [disabled]="busy()" (click)="begin()">
+          Nouveau plan</button
+        ><button class="bb-button" type="button" [disabled]="busy()" (click)="load()">
+          Actualiser les plans
+        </button>
+      </div>
+      <h2>Plans du Bar</h2>
+      @if (!busy() && !error() && total() === 0) {
+        <p>Aucun plan enregistré dans ce Bar.</p>
+      }
+      <ul class="cards">
+        @for (plan of plans(); track plan.id) {
+          <li class="card">
+            <h3>{{ plan.name }}</h3>
+            <p>
+              Version du plan {{ plan.version }} · version source {{ plan.sourceContentVersion }}.
+            </p>
+            <button class="bb-button" type="button" [disabled]="busy()" (click)="open(plan.id)">
+              Ouvrir {{ plan.name }}
+            </button>
+          </li>
+        }
+      </ul>
+      @if (plans().length < total()) {
+        <button class="bb-button" type="button" [disabled]="busy()" (click)="load(true)">
+          Voir les autres plans
+        </button>
+      }
+    }
+    @if (editing()) {
+      <section class="card" aria-label="Saisie du plan">
+        <h2>{{ active() ? 'Réviser le plan' : 'Créer un plan' }}</h2>
+        @if (!active()) {
+          <h3>Recette source du Bar</h3>
+          <ul class="recipe-choices">
+            @for (recipe of recipeOptions(); track recipe.id) {
+              <li>
+                <button
+                  class="bb-button"
+                  type="button"
+                  [disabled]="busy() || blocked()"
+                  (click)="choose(recipe.id)"
+                >
+                  Choisir {{ recipe.name }}
+                </button>
+              </li>
+            }
+          </ul>
+          @if (recipeOptions().length < recipeTotal()) {
+            <button
+              class="bb-button"
+              type="button"
+              [disabled]="busy() || blocked()"
+              (click)="loadRecipes(true)"
+            >
+              Voir les autres recettes
+            </button>
+          }
+          @if (!busy() && recipeTotal() === 0 && !error()) {
+            <p>Aucune recette disponible. Crée d’abord une recette dans le carnet Bar.</p>
+          }
+        }
+        @if (source(); as recipe) {
+          <p>
+            Source chargée : {{ recipe.content.name }}, version {{ recipe.contentVersion }}.
+            L’enregistrement conserve ce snapshot ; les modifications ultérieures de recette ne
+            mettent pas le plan à jour automatiquement.
+          </p>
+          <form (ngSubmit)="calculate()">
+            <fieldset [disabled]="busy() || blocked()">
+              <label
+                >Nom du plan<input
+                  name="name"
+                  maxlength="120"
+                  required
+                  [(ngModel)]="name"
+                  (ngModelChange)="changed()"
+              /></label>
+              <label
+                >Cible<select name="mode" [(ngModel)]="mode" (ngModelChange)="changed()">
+                  <option value="VOLUME_ML">Volume de base en mL</option>
+                  <option value="PORTIONS">Nombre de portions</option>
+                </select></label
+              >
+              <label
+                >{{ mode === 'VOLUME_ML' ? 'Volume cible de base (mL)' : 'Nombre de portions'
+                }}<input
+                  name="target"
+                  type="number"
+                  min="0.001"
+                  [max]="mode === 'VOLUME_ML' ? 1000000 : 10000"
+                  step="0.001"
+                  required
+                  [(ngModel)]="target"
+                  (ngModelChange)="changed()"
+              /></label>
+              <h3>Inclusion dans la base</h3>
+              <p>
+                Coche explicitement les ingrédients de la base. Les autres restent au service.
+                Compléter (TOP_UP) reste toujours au service. En cible volume, chaque ligne incluse
+                doit être une quantité connue en mL.
+              </p>
+              @for (line of recipe.content.ingredients; track $index; let i = $index) {
+                <label class="check"
+                  ><input
+                    type="checkbox"
+                    [name]="'include-' + i"
+                    [disabled]="line.unit === 'TOP_UP'"
+                    [(ngModel)]="included[i]"
+                    (ngModelChange)="changed()"
+                  />{{ line.ingredientName }} ·
+                  {{ line.amount === null ? 'quantité inconnue' : line.amount }} {{ line.unit }} ·
+                  {{ included[i] ? 'Base' : 'Au service' }}</label
+                >
+              }
+              <h3>Arrondis mesurables</h3>
+              <p>
+                Champ vide = sans arrondi. Un pas est propre à chaque unité, sans conversion.
+                Arrondi au plus proche, égalité vers le haut ; l’aperçu affiche les écarts et le
+                volume réellement obtenu.
+              </p>
+              @for (unit of units(); track unit) {
+                <label
+                  >Pas d’arrondi {{ unit
+                  }}<input
+                    [name]="'step-' + unit"
+                    type="number"
+                    min="0.001"
+                    max="100000"
+                    step="0.001"
+                    [(ngModel)]="rounding[unit]"
+                    (ngModelChange)="changed()"
+                /></label>
+              }
+              <button type="submit" class="bb-button" [disabled]="!ready()">
+                Calculer l’aperçu
+              </button>
+            </fieldset>
+          </form>
+          @if (preview(); as result) {
+            <app-batch-result [result]="result" />
+          }
+          <button class="bb-button" type="button" [disabled]="!canSave()" (click)="save()">
+            Enregistrer le plan
+          </button>
+        }
+        @if (blocked()) {
+          <p>
+            La version chargée et l’intention initiale restent conservées. Aucun écrasement ni
+            renvoi automatique.
+          </p>
+          @if (!active()) {
+            <button class="bb-button" type="button" [disabled]="busy()" (click)="receipt()">
+              Vérifier le reçu de création
+            </button>
+            @if (uncertain() && missingReceipt()) {
+              <button class="bb-button" type="button" [disabled]="busy()" (click)="retrySame()">
+                Relancer exactement la même intention
+              </button>
+            }
+          }
+          @if (active()) {
+            <button class="bb-button" type="button" [disabled]="busy()" (click)="inspect()">
+              Vérifier le plan enregistré et les droits
+            </button>
+            @if (inspected(); as current) {
+              <p>
+                Plan actuellement enregistré : {{ current.name }}, version {{ current.version }}. La
+                saisie n’a pas été remplacée.
+              </p>
+              @if (!uncertain()) {
+                <button class="bb-button" type="button" [disabled]="busy()" (click)="resolve()">
+                  Remplacer explicitement la saisie par le plan enregistré
+                </button>
+              } @else {
+                <p>
+                  Cette lecture ne prouve pas qui a enregistré une révision. Ferme la saisie sans la
+                  renvoyer, puis ouvre le plan pour une nouvelle intention.
+                </p>
+              }
+            }
+          }
+        }
+      </section>
+    }
+    @if (active() && !editing()) {
+      <section class="card" aria-label="Plan enregistré">
+        <h2>{{ active()!.name }}</h2>
+        <p>Version du plan {{ active()!.version }}.</p>
+        @if (active()!.sourceChanged) {
+          <p role="status">
+            La recette source a changé. Ce plan conserve son snapshot d’origine. Pour adopter une
+            nouvelle source, crée explicitement un autre plan.
+          </p>
+        }
+        <app-batch-result [result]="active()!" />
+        <button class="bb-button" type="button" [disabled]="busy()" (click)="edit()">
+          Modifier le plan
+        </button>
+      </section>
+    }
+    @if (editing() || active()) {
+      <button
+        class="bb-button bb-button--ghost"
+        type="button"
+        [disabled]="busy()"
+        (click)="close()"
+      >
+        Fermer et revenir aux plans
+      </button>
+    }
+  }
+</section>

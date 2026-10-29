@@ -21,6 +21,12 @@ export const routes: Routes = [
     loadComponent: () => import('./layout/app-shell/app-shell').then((module) => module.AppShell),
     children: [
       {
+        path: 'batch-plans',
+        title: 'Plans de batch · Barbook',
+        canDeactivate: [draftExitGuard],
+        loadComponent: () => import('./features/batch-plans/batch-plans').then((m) => m.BatchPlans),
+      },
+      {
         path: 'inventory',
         title: 'Inventaire manuel · Barbook',
         loadComponent: () => import('./features/inventory/inventory').then((m) => m.Inventory),

@@ -23,6 +23,7 @@
         </a>
         @if (workspace.current()?.kind === 'SHARED') {
           <a routerLink="/inventory" routerLinkActive="active">Inventaire</a>
+          <a routerLink="/batch-plans" routerLinkActive="active">Batchs</a>
         }
         @if (workspace.current()?.kind === 'PERSONAL') {
           <a routerLink="/folders" routerLinkActive="active">Dossiers</a>
