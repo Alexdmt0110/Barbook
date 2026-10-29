@@ -77,4 +77,18 @@ describe('Same-context access verification', () => {
     expect(workspace.current()).toBe(null);
     expect(workspace.error()).toContain('pas revérifiés');
   });
+  it('asks a memory form before a workspace switch and permits switching after unregister', async () => {
+    const current = workspace.current();
+    const guard = vi.fn(() => false),
+      remove = workspace.registerExitGuard(guard);
+    expect(await lastValueFrom(workspace.select('other', async () => true))).toBe(false);
+    expect(workspace.current()).toBe(current);
+    http.expectNone('/api/workspaces/other');
+    expect(guard).toHaveBeenCalledOnce();
+    remove();
+    const changing = lastValueFrom(workspace.select('other', async () => true));
+    http.expectOne('/api/workspaces/other').flush({ ...shared, id: 'other' });
+    expect(await changing).toBe(true);
+    expect(workspace.current()?.id).toBe('other');
+  });
 });

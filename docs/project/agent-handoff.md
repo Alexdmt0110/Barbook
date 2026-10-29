@@ -1,3 +1,37 @@
+# Checkpoint courant — environnement revenu, BB2a implémenté / PR48 en qualification — 29 octobre2026
+
+WORK reprend dans cette conversation. Exec opérationnel, ancien clone barbook-l5 sale conservé sans modification ; nouveau worktree barbook-batch depuis la branche distante1e7f3e0, main réellement inchangé66d4bb3 qualifié273/282/292/38 après47. Aucun doublon de branche ni réécriture historique.
+
+Branche feature/autonomous-batch-plans, PR48 draft : Design1e7f3e0, contrats a932124e avant code, moteur6c40ccb8 (14nouveaux tests), serveur071ee26a, garde mémoire revue ab29db8b avant interfacec147bde3. Publication via API : chaque arbre comparé exactement à git write-tree local, parent/message/arbre distant vérifiés ; push immédiat et fast-forward local sans reset/stash/force.
+
+Local réellement passé : backend verify287tests/27suites, lint/build/Prisma/3compat ; frontend verify287tests/42suites, lint/build/2compat ; typage backend natifs et Chromium, diff-check. PostgreSQL local absent : pas de migration locale. Migration12 additive20261029100000_autonomous_batch_plans seulement sur CI jetable. CI du c147bde3 : cinq contrôles réussis dont PostgreSQL, Chromium encore en cours à ce checkpoint ; nombre natif à lire dans les logs. Commentaires/revues/inline vides, base66d4bb3 et mergeability propre vérifiées. Aucun résultat visuel ou Gate final anticipé.
+
+BB2a implémenté : calcul rationnel exact, base/service, portions/volume, arrondis explicites avec écarts/ratio/reste ; snapshot serveur L5 avec ABV conservé, versions contenu/accès/plan, créations idempotentes/reçu privé, révisions atomiques et snapshot immuable. UI Bar liste/choix recette/aperçu/création, lecture seule/révision, conflit conservé et remplacement confirmé, réponse perdue vérifiée sans replay. Saisie mémoire honnêtement annoncée, garde avant bascule/navigation. Aucun lien ni effet sur stock. Trois Chromium x2 nouveaux,44attendus, pas de timeout/retry/seuil/assertion historique modifié. Un petit correctif local empêche la double confirmation après une bascule déjà acceptée ;287tests frontend repassés. Publier/requalifier le nouveau HEAD avant toute clôture D8.
+
+Suite : sixCI et sixjournaux dernierHEAD, artefact et captures réelles desktop/mobile/deuxmodes ; revue entière diff/historique/transactions/consommateurs/compatibilité/discussions, aucunBLOCKER/P1 ; ready/merge commit seulement si D8 satisfait, puis mergedAt/parents/arbre/main et sixCIpostmerge réels. BB2b déclaration distincte du réalisé encore absente ; aucune fabrication ni consommation automatique livrée. CopiePersonnel→Bar absente. Ne pas annoncer une disponibilité réelle ou un BB2 complet.
+
+OPS reste documentaire : D7/cible/HTTPS/sauvegarde restaurée/rollback/comptes réels non qualifiés. Aucun VPS/déploiement/base propriétaire/provisionnement/coût/purge/CONTRACT/infrastructure. Mise en service complète sûre au30octobre non garantie. Les checkpoints ci-dessous sont historiques.
+
+---
+
+# Checkpoint courant — PR47 intégrée et main qualifié, BB2a en conception — 29 octobre2026
+
+Main66d4bb3f9e2be8883cb570a4e9d58c53ff2291e5. PR47 mergedAt2026-10-29T08:11:34Z ; parents ordonnés f878e1572da18783db63e93826b32c2924d4e5f6 puis0cf73f063d853c51c1da18586f0da52506b21b1f, arbre5e98698c871f4657b199dd065ab94946d073b250 identique au HEAD qualifié. Main réel et branche source conservée recontrôlés. Aucun force/rebase/squash/delete.
+
+Review Gate D8 source consigné durablement dans PR47 :29fichiers/10commits,393→412blobs, aucun fichier/mode supprimé, dix anciennes migrations intactes ; revue complète diff/historique/transactions/consommateurs/compatibilité. Commentaires, revues et threads vides, mergeable propre, sixCI et sixlogs273backend/282frontend/292PostgreSQL-HTTP/38Chromium, audits de production0. Tests réels concurrence, rollback, révocation dans les deux ordres, idempotence, réponse perdue, scopes, migration et cible≥seuil. Aucun seuil/assertion/timeout/retry réduit.
+
+Captures réellement inspectées au HEAD0cf73f0 : six PNG desktop/mobile, clair/sombre, création/comptage/paramètres/inventaire/conflit après relecture. Fragments issus des captures réelles Chromium CI reconstitués ; signature PNG, longueur et SHA256 indépendamment recalculés avant affichage. Artefact12882256129/run40839035763 téléchargé par connecteur, taille55428423 et digest API/upload6d02490fbb1103dbe1674d5b0b7ec36e20d41d261f9d0c2e3c8bca827d2fd379 concordants. Ne pas prétendre à un recalcul local du ZIP : runtime indisponible. Gate sans BLOCKER/P1 identifié ; risque résiduel :8vulnérabilités faibles dans la chaîne de tests backend, audits --omit=dev0.
+
+Qualification post-merge : six contrôles réussis et sixjournaux lus ; backend123335048800273/26, frontend123335048380282/41, PostgreSQL123335048594292/22 et dérive nulle, Chromium12333504832438passés ; audits123335049139/123335048752production0. Main et source de nouveau vérifiés après succès. L'inventaire et les suggestions sont livrés côté développement, pas en exploitation. Formulaires stock en mémoire seulement, noms/conditionnements initiaux immuables, pas de volumes/conversions/prévisions/achats, aucune relation recette/batch. Réglages seuil/cible OWNER ; comptages OWNER/MEMBER.
+
+Prochaine branche prévue feature/autonomous-batch-plans depuis ce main qualifié, avant toute modification applicative : Design Review docs/project/bb2-batch-plan-design.md (F036–F037, snapshot/version, base/service, calcul exact et arrondis explicites). BB2b déclaration volontaire du réalisé distincte et sans stock ensuite. Pas de code batch, modèle batch, migration batch ni parcours batch livrés à ce checkpoint. Pas de PR documentaire supplémentaire nécessaire ; la conception et ce checkpoint restent sur la branche du prochain incrément, à compléter avant PR applicative.
+
+Blocage technique constaté de nouveau le29octobre : exec_command refuse « No usable execution environment is available ». GitHub reste accessible et a permis la qualification effective/merge47, mais le travail local, l'exécution interactive des tests et les fichiers temporaires ne sont pas disponibles. À la reprise : vérifier environnement, lire git status et confronter les fichiers restants à GitHub ; archiver/réconcilier sans reset/stash/force. Ne pas supposer que le clone est sur le nouveau main ou que les fichiers locaux sont propres. Aucun nouveau test local prétendu ; les résultats ci-dessus proviennent des vrais jobs CI.
+
+BB1b/BB1d acquis, copie Personnel→Bar non livrée. Batchs absents ; mise en service complète et sûre au30octobre non garantie. D7/cible/HTTPS/backup restauré/rollback/comptes réels non qualifiés, dossier beta-bar-ops-authorization.md actualisé ; aucune opération VPS, déploiement, migration propriétaire, compte réel, coût, purge, CONTRACT. D8 maintenue sans nouvel accord de routine, aucun développement en arrière-plan présumé. Les entrées ci-dessous sont historiques et ne prévalent pas sur ce checkpoint.
+
+---
+
 # Checkpoint — environnement indisponible, PR47 reste draft — 29 octobre2026
 
 checkpoint_utc: "2026-10-29T07:44:41.853Z"

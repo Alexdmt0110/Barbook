@@ -46,6 +46,14 @@ export class WorkspaceContext {
   private lastContext: BusinessWorkspace | null = null;
   private candidate: { userId: string; id: string } | null = null;
   private readonly commands = new Set<symbol>();
+  private readonly exitGuards = new Set<() => boolean>();
+
+  registerExitGuard(guard: () => boolean): () => void {
+    this.exitGuards.add(guard);
+    return () => {
+      this.exitGuards.delete(guard);
+    };
+  }
   readonly current = signal<BusinessWorkspace | null>(null);
   readonly transitioning = signal(false);
   readonly pendingCommands = signal(0);
@@ -150,6 +158,7 @@ export class WorkspaceContext {
       if (this.pendingCommands() || this.drafts.hasPendingMutation())
         throw new Error('Attends la fin de l’enregistrement avant de changer d’espace.');
       if (this.current()?.id === id) return of(false);
+      if ([...this.exitGuards].some((guard) => !guard())) return of(false);
       this.transitioning.set(true);
       const epoch = this.generation;
       const accepted =
