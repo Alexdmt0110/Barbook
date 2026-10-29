@@ -1,7 +1,7 @@
 import { expect, Page, test } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { join } from 'node:path';
-import { randomUUID } from 'node:crypto';
+import { basename, join } from 'node:path';
+import { createHash, randomUUID } from 'node:crypto';
 interface Actor {user:{id:string;email:string};workspaceId:string;credential:string;csrfToken:string}
 interface Fixture {owner:Actor;member:Actor;bar:{id:string;name:string}}
 function fixture():Fixture{return JSON.parse(execFileSync(process.execPath,['--import','tsx','test/create-browser-bar-fixture.ts'],{cwd:join(__dirname,'../../backend'),encoding:'utf8',stdio:['ignore','pipe','pipe']})) as Fixture;}
@@ -16,7 +16,20 @@ async function closed(page:Page){await expect(page.getByRole('button',{name:'Com
 const card=(page:Page,name:string)=>page.getByRole('listitem',{name:`Produit ${name}`,exact:true});
 async function captureView(page:Page,path:string){
   await page.evaluate(()=>window.scrollTo({top:0,left:0,behavior:'instant'}));
-  await page.screenshot({path,fullPage:true});
+  const png = await page.screenshot({path,fullPage:true});
+  // CI fixtures are synthetic and test-database guarded. Expose only selected PNGs, never HTTP credentials.
+  // Chunked evidence lets review tools verify/render the actual capture without an available local runtime.
+  const project = test.info().project.name;
+  const name = basename(path);
+  const selected = (project === 'mobile' && ['inventory-light.png', 'inventory-create-dark.png', 'inventory-count-dark.png', 'inventory-conflict-reviewed.png'].includes(name))
+    || (project === 'desktop' && ['inventory-dark.png', 'inventory-settings-light.png'].includes(name));
+  if (process.env.CI && selected) {
+    const key = `${project}/${name}`;
+    const encoded = png.toString('base64');
+    console.log('BARBOOK_VISUAL_META ' + JSON.stringify({key, bytes:png.length, sha256:createHash('sha256').update(png).digest('hex'), chunks:Math.ceil(encoded.length/8192)}));
+    for (let offset=0; offset<encoded.length; offset+=8192)
+      console.log('BARBOOK_VISUAL_CHUNK ' + JSON.stringify({key, index:offset/8192, data:encoded.slice(offset,offset+8192)}));
+  }
 }
 async function create(page:Page,name:string,target=8,capture?:string){
   await page.getByRole('button',{name:'Nouveau produit',exact:true}).click();

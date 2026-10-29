@@ -16,6 +16,8 @@ Inventaire et suggestions développés sur branche, non intégrés ni disponible
 
 CI47b682e0 : audits0 ; backend/PG arrêtés au formatage du validateur (aucun résultat292 présumé) ; nouveau test frontend invalide avant stabilisation ngModel (NG0100). Correctif : déclaration intermédiaire du validateur pour respecter Prettier ; test asynchrone via événements input réels après whenStable, mêmes assertions de bouton désactivé et absence de PUT, aucun timeout/retry modifié. Environnement toujours indisponible pour CLI/inspection ; requalifier ce nouveau HEAD via CI puis captures réelles après restauration. Main inchangé, PR47 draft.
 
+Voie de qualification visuelle sans CLI local (2026-10-29T07:59:12.847Z) :5f5407ef a sixCI réussis,282frontend/292PG-HTTP ; pas de merge automatique sans voir les captures. Le helper de capture Chromium peut émettre seulement six PNG synthétiques déjà sauvegardés dans l’artefact, sous CI, par segments JSON8192 avec taille/SHA256 et clé projet/fichier. Aucune donnée HTTP/cookie/CSRF ni compte réel, aucun workflow/permission/dépendance/infrastructure changé. Le relecteur doit reconstituer les segments complets, recalculer SHA256 indépendamment et afficher les PNG réels via l’outil d’image ; vérifier aussi le lien HEAD/run/artefact et la concordance empreinte d’upload/métadonnées. Ne pas affirmer avoir recomputé le ZIP localement tant que l’environnement manque. Cette voie ne dispense ni des sixCI du dernierHEAD ni du Gate ni de la qualification post-merge. À la reprise, réconcilier le working tree local conservé sans reset/stash/force.
+
 ---
 
 # État actif — BB1b/BB1d intégrés et qualifiés, inventaire manuel en qualification — 29 octobre2026
