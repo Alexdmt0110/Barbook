@@ -127,4 +127,37 @@ describe('Inventory account/workspace isolation', () => {
     expect(c.history()?.items.map((x) => x.id)).toEqual(['old']);
     expect(c.historyError()).toContain('changé pendant la lecture');
   });
+  it('serializes repeated rights checks and disables new stock actions until the check ends', () => {
+    const auth = signal(session),
+      context = signal(initial),
+      check = new Subject<void>();
+    const verify = vi.fn(() => check);
+    TestBed.configureTestingModule({
+      imports: [Inventory],
+      providers: [
+        { provide: AuthService, useValue: { snapshot: auth } },
+        {
+          provide: WorkspaceContext,
+          useValue: { current: context, error: signal(null), verifyCurrentAccess: verify },
+        },
+        {
+          provide: InventoryApi,
+          useValue: {
+            list: () => of({ items: [], total: 0, page: 1, pageSize: 25, accessVersion: 7 }),
+          },
+        },
+      ],
+    });
+    const f = TestBed.createComponent(Inventory);
+    f.detectChanges();
+    const c = f.componentInstance;
+    expect(c.canAct()).toBe(true);
+    c.verifyRights();
+    c.verifyRights();
+    expect(verify).toHaveBeenCalledOnce();
+    expect(c.canAct()).toBe(false);
+    check.next();
+    check.complete();
+    expect(c.canAct()).toBe(true);
+  });
 });

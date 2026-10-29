@@ -17,7 +17,7 @@
       <button
         type="button"
         class="bb-button"
-        [disabled]="loading() || reorderLoading() || !!form()"
+        [disabled]="loading() || reorderLoading() || verifying() || !!form()"
         (click)="refresh()"
       >
         Actualiser l’inventaire
@@ -25,7 +25,7 @@
       <button
         type="button"
         class="bb-button"
-        [disabled]="loading() || !!form()"
+        [disabled]="loading() || verifying() || !!form()"
         (click)="verifyRights()"
       >
         Vérifier les droits du Bar
@@ -36,6 +36,9 @@
         </button>
       }
     </div>
+    @if (verifying()) {
+      <p role="status">Vérification des droits du Bar…</p>
+    }
     @if (notice()) {
       <p role="status">{{ notice() }}</p>
     }

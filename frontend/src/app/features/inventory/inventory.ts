@@ -22,6 +22,7 @@ export class Inventory {
   readonly total = signal(0);
   readonly reorderTotal = signal(0);
   readonly loading = signal(false);
+  readonly verifying = signal(false);
   readonly reorderLoading = signal(false);
   readonly error = signal<string | null>(null);
   readonly reorderError = signal<string | null>(null);
@@ -73,6 +74,7 @@ export class Inventory {
     this.notice.set(null);
     this.access.set(null);
     this.loading.set(false);
+    this.verifying.set(false);
     this.reorderLoading.set(false);
     this.historyLoading.set(false);
     this.historyError.set(null);
@@ -150,6 +152,7 @@ export class Inventory {
       !this.workspace.error() &&
       !this.form() &&
       !this.loading() &&
+      !this.verifying() &&
       !this.error() &&
       this.access() !== null &&
       this.access() === this.workspace.current()?.accessVersion &&
@@ -175,16 +178,24 @@ export class Inventory {
     this.refresh();
   }
   verifyRights(): void {
-    if (this.form() || this.loading()) return;
+    if (this.form() || this.loading() || this.verifying()) return;
     const key = this.scope;
+    this.verifying.set(true);
     this.workspace
       .verifyCurrentAccess()
-      .pipe(takeUntilDestroyed(this.destroy))
+      .pipe(
+        takeUntilDestroyed(this.destroy),
+        finalize(() => {
+          if (key === this.scope) this.verifying.set(false);
+        }),
+      )
       .subscribe({
         next: () => {
           if (key === this.scope) this.refresh();
         },
-        error: () => this.error.set('Les droits ne sont pas confirmés.'),
+        error: () => {
+          if (key === this.scope) this.error.set('Les droits ne sont pas confirmés.');
+        },
       });
   }
   showHistory(product: StockProduct, more = false): void {

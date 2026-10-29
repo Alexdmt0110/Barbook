@@ -74,7 +74,22 @@ export class InventoryCommand implements OnInit, AfterViewInit {
     }
   }
   ngAfterViewInit(): void {
-    this.host.nativeElement.querySelector<HTMLElement>('input, select, textarea')?.focus();
+    const control = this.host.nativeElement.querySelector<HTMLElement>('input, select, textarea');
+    control?.focus({ preventScroll: true });
+    if (control && typeof control.scrollIntoView === 'function') {
+      control.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
+      const header = this.host.nativeElement.ownerDocument.querySelector('.app-header');
+      if (header) {
+        const overlap =
+          control.getBoundingClientRect().top - header.getBoundingClientRect().bottom - 16;
+        if (overlap < 0)
+          this.host.nativeElement.ownerDocument.defaultView?.scrollBy({
+            top: overlap,
+            left: 0,
+            behavior: 'instant',
+          });
+      }
+    }
   }
   valid(value: number | null): value is number {
     return value !== null && Number.isInteger(value) && value >= 0 && value <= 2147483647;
