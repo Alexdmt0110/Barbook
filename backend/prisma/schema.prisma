@@ -25,6 +25,13 @@ enum BarAccent {
   BLUE
 }
 
+enum StockMovementKind {
+  INITIAL
+  ADD
+  REMOVE
+  SET
+}
+
 enum CocktailType {
   CLASSIC
   PERSONAL_CREATION
@@ -64,6 +71,7 @@ model User {
   memberships       WorkspaceMember[]
   sessions          Session[]
   createdBars       Workspace[] @relation("WorkspaceCreator")
+  stockMovements    StockMovement[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -110,6 +118,8 @@ model Workspace {
   ingredients Ingredient[]
   tags        Tag[]
   folders     Folder[]
+  stockProducts StockProduct[]
+  stockMovements StockMovement[]
 
   @@unique([creationActorId, creationRequestId])
 
@@ -319,4 +329,44 @@ model CocktailTag {
 
   @@id([cocktailId, tagId])
   @@index([tagId])
+}
+
+// Physical units only. No relationship to recipe ingredients or batch calculations.
+model StockProduct {
+  id String @id @default(uuid())
+  workspaceId String
+  name String @db.VarChar(80)
+  packaging String @db.VarChar(120)
+  quantity Int
+  threshold Int
+  target Int
+  version Int @default(0)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  movements StockMovement[]
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  @@unique([workspaceId, id])
+  @@index([workspaceId, name, id])
+}
+
+model StockMovement {
+  id String @id @default(uuid())
+  workspaceId String
+  productId String
+  actorId String
+  requestId String @db.Uuid
+  fingerprint String @db.Char(64)
+  kind StockMovementKind
+  beforeQuantity Int
+  afterQuantity Int
+  delta Int
+  reason String @db.VarChar(240)
+  productVersion Int
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+  product StockProduct @relation(fields: [workspaceId, productId], references: [workspaceId, id], onDelete: Restrict)
+  actor User @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  @@unique([actorId, requestId])
+  @@unique([productId, productVersion])
+  @@index([workspaceId, productId, productVersion])
 }

@@ -6,23 +6,11 @@ export interface ExpectedRecipeVersion {
   expectedVersion?: number | null;
 }
 
-export function requireVersion(actual: number, expected?: number | null): void {
-  if (expected == null)
-    throw new ConflictException('A version precondition is required.');
-  if (!Number.isSafeInteger(expected) || expected < 0 || expected > 2147483647)
-    throw new BadRequestException('Invalid version precondition.');
-  if (actual !== expected)
-    throw new ConflictException(
-      'The resource has changed. Reload before continuing.',
-    );
-}
-
-export function requireVersionCapacity(version: number): void {
-  if (version >= 2147483647)
-    throw new ConflictException(
-      'Version capacity reached. No change was saved.',
-    );
-}
+// Keep the historical recipe import path compatible. The validation is domain independent.
+export {
+  requireVersion,
+  requireVersionCapacity,
+} from '../../common/version-preconditions';
 
 /** Exact coverage: never replace a missing client version with a fresh server value. */
 export function recipePreconditions(

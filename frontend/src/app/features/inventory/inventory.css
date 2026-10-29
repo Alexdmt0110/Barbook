@@ -1,0 +1,97 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.inventory-page {
+  max-width: 1600px;
+  margin-inline: auto;
+  padding: var(--page-gutter);
+}
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin-block: var(--space-6);
+}
+h2 {
+  margin-top: var(--space-8);
+}
+h3 {
+  margin-top: 0;
+}
+p {
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.inventory-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block: var(--space-3);
+}
+.inventory-grid {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-4);
+}
+.inventory-card,
+.inventory-form {
+  min-width: 0;
+  padding: var(--space-6);
+  background: var(--color-surface-solid);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+.inventory-form {
+  margin-block: var(--space-6);
+  max-width: 48rem;
+}
+.inventory-form h2 {
+  margin-top: 0;
+}
+fieldset {
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+label {
+  display: grid;
+  gap: var(--space-2);
+}
+input,
+select,
+textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-solid);
+  color: var(--color-text);
+  font: inherit;
+}
+button {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.inventory-history {
+  padding-left: var(--space-6);
+}
+.inventory-history li {
+  padding-block: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+[hidden] {
+  display: none !important;
+}
+
+h1,
+h2,
+h3 {
+  overflow-wrap: anywhere;
+}

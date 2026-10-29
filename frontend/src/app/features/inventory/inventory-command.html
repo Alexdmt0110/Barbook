@@ -1,0 +1,170 @@
+<section class="inventory-form" aria-label="Action d’inventaire">
+  <h2>
+    {{
+      form().mode === 'create'
+        ? 'Nouveau produit physique'
+        : form().mode === 'settings'
+          ? 'Régler le seuil et la cible'
+          : 'Mouvement manuel'
+    }}
+  </h2>
+  @if (currentSource(); as product) {
+    <p>
+      <strong>{{ product.name }}</strong> · {{ product.packaging }}<br />État chargé :
+      {{ product.quantity }} unité(s), version {{ product.version }}.
+    </p>
+  }
+  <p>
+    Cette saisie reste en mémoire. Après une interruption ou un rechargement, vérifie le stock et
+    l’historique avant toute nouvelle action.
+  </p>
+  <p>
+    Utilise des unités entières. Ajouter et retirer demandent un nombre positif ; corriger définit
+    le nouveau total compté, zéro compris.
+  </p>
+  @if (form().mode !== 'move') {
+    <p>La cible doit être au moins égale au seuil d’alerte.</p>
+  }
+  <form (ngSubmit)="submit()">
+    <fieldset [disabled]="busy() || blocked()">
+      @if (form().mode === 'create') {
+        <label
+          >Nom du produit<input name="productName" required maxlength="80" [(ngModel)]="name"
+        /></label>
+        <label
+          >Conditionnement descriptif<input
+            name="packaging"
+            required
+            maxlength="120"
+            placeholder="Ex. bouteille 700 mL"
+            [(ngModel)]="packaging"
+        /></label>
+        <label
+          >Comptage initial (unités physiques)<input
+            name="initialQuantity"
+            type="number"
+            min="0"
+            max="2147483647"
+            step="1"
+            required
+            [(ngModel)]="initialQuantity"
+        /></label>
+      }
+      @if (form().mode === 'move') {
+        <label
+          >Opération<select name="operation" [(ngModel)]="operation">
+            <option value="ADD">Ajouter des unités</option>
+            <option value="REMOVE">Retirer des unités</option>
+            <option value="SET">Corriger le comptage total</option>
+          </select></label
+        >
+        <label
+          >{{ operation === 'SET' ? 'Nouveau comptage total' : 'Nombre d’unités'
+          }}<input
+            name="amount"
+            type="number"
+            min="0"
+            max="2147483647"
+            step="1"
+            required
+            [(ngModel)]="amount"
+        /></label>
+        <label
+          >Motif du mouvement<textarea
+            name="reason"
+            required
+            maxlength="240"
+            rows="2"
+            [(ngModel)]="reason"
+          ></textarea>
+        </label>
+      } @else {
+        <label
+          >Seuil d’alerte (unités)<input
+            name="threshold"
+            type="number"
+            min="0"
+            max="2147483647"
+            step="1"
+            required
+            [(ngModel)]="threshold"
+        /></label>
+        <label
+          >Stock cible (unités)<input
+            name="target"
+            type="number"
+            [min]="threshold ?? 0"
+            max="2147483647"
+            step="1"
+            required
+            [(ngModel)]="target"
+        /></label>
+      }
+      <button type="submit" class="bb-button" [disabled]="!ready()">
+        {{
+          form().mode === 'create'
+            ? 'Créer le produit et son comptage'
+            : form().mode === 'settings'
+              ? 'Enregistrer les paramètres'
+              : 'Confirmer le mouvement'
+        }}
+      </button>
+    </fieldset>
+  </form>
+  @if (busy()) {
+    <p role="status">Vérification en cours…</p>
+  }
+  @if (message()) {
+    <p role="alert">{{ message() }}</p>
+  }
+  @if (blocked() && !isSettings()) {
+    <button class="bb-button" type="button" [disabled]="busy()" (click)="inspectReceipt()">
+      Vérifier le reçu de cette intention
+    </button>
+  }
+  @if (uncertain() && missing()) {
+    <p>
+      Tu peux relancer explicitement la même intention et sa même clé. Aucune donnée ni version ne
+      sera remplacée pour contourner un conflit.
+    </p>
+    <button class="bb-button" type="button" [disabled]="busy()" (click)="retrySame()">
+      Relancer exactement la même intention
+    </button>
+  }
+  @if (blocked() && (!uncertain() || isSettings())) {
+    <button class="bb-button" type="button" [disabled]="busy()" (click)="inspectState()">
+      Vérifier l’état actuel et les droits
+    </button>
+  }
+  @if (inspected()) {
+    @if (reviewed(); as product) {
+      <p>
+        État vérifié : {{ product.quantity }} unité(s), version {{ product.version }} ; seuil
+        {{ product.threshold }}, cible {{ product.target }}.
+      </p>
+    } @else {
+      <p>
+        Droits revérifiés. Vérifie aussi la liste des produits avant de confirmer une nouvelle
+        création.
+      </p>
+    }
+    @if (!uncertain()) {
+      <button class="bb-button" type="button" [disabled]="busy()" (click)="newIntention()">
+        Préparer explicitement une nouvelle intention
+      </button>
+    } @else {
+      <p>
+        Ces valeurs décrivent l’état actuel ; elles ne prouvent pas l’auteur d’un réglage. Tu peux
+        fermer cette action sans la renvoyer.
+      </p>
+    }
+  }
+  <button
+    type="button"
+    class="bb-button bb-button--ghost"
+    [disabled]="busy() || (uncertain() && !(isSettings() && inspected()))"
+    (click)="close()"
+  >
+    Fermer cette saisie
+  </button>
+</section>
