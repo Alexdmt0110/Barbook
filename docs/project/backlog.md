@@ -1,5 +1,18 @@
 # Backlog d'exécution
 
+## État courant — 29 octobre2026
+
+BB3/BB4 intégrés par [PR47](https://github.com/Alexdmt0110/Barbook/pull/47), merge66d4bb3f9e2be8883cb570a4e9d58c53ff2291e5, mergedAt2026-10-29T08:11:34Z. Deux parents f878e157 puis0cf73f0 et arbre5e98698c871f4657b199dd065ab94946d073b250 vérifiés ; branche historique conservée. Six contrôles post-merge et six journaux relus :273backend/282frontend/292PostgreSQL-HTTP/38Chromium, audits de production0. Huit vulnérabilités faibles de dépendances de tests backend restent signalées par npm ci, aucune nouvelle dépendance ajoutée.
+
+Livré et qualifié en développement : carnet Personnel/Bar, création utilisateur d'un Bar nom/palette/OWNER, recettes partagées, membres/révocation, inventaire de produits physiques entièrement manuel et suggestions expliquées. Aucun débit recette/batch. Tests à comptes synthétiques sur CI jetable ; aucune instance permanente ni disponibilité réelle pour Alex/Maël prouvée.
+
+Priorité suivante : [BB2a — plans de batch autonomes](bb2-batch-plan-design.md), F036–F037 ; BB2b déclaration distincte du réalisé ensuite, sans consommation de stock. Design publiée avant code. Aucun batch encore implémenté, aucune copie Personnel→Bar livrée, BB1c complet non revendiqué. L'environnement local d'exécution est indisponible ; le développement exige sa remise à disposition, sans contournement des tests ni modification OPS. Le prochain responsable doit réconcilier les fichiers locaux conservés avec GitHub sans reset/stash/force.
+
+La mise en service complète et sûre au30octobre reste non garantie. Plus petit périmètre proposé : carnet partagé privé déjà qualifié, puis inventaire manuel/suggestions désormais intégrés ; batchs explicitement absents tant que leur PR n'est pas qualifiée. D7, cible/HTTPS, sauvegarde restaurée et rollback réels restent à valider par une autorisation OPS distincte. Aucun VPS/déploiement/base propriétaire/compte réel/coût/CONTRACT/purge. UX-E, carrousel et fonctions secondaires restent exclus. Les sections datées suivantes sont historiques.
+
+---
+
+
 ## État courant — 28 octobre 2026
 
 L5/BB0 est clos techniquement sur main depuis PR38 ; les dix critères personnels ont été qualifiés. BB1a serveur (membres/révocation) est intégré depuis PR39. La passe UX prioritaire A/B/C/D est intégrée par PR41–44 ; main38149070950a2a4f10a14325b8be5bbe9932f828 inclut ensuite BB1b et a ses six contrôles post-merge et journaux vérifiés :273backend/263frontend/250PostgreSQL-HTTP/24Chromium, audits0. UX-E et carrousel restent exclus.
