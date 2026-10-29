@@ -166,21 +166,23 @@ describe('Inventory intention and explicit recovery', () => {
     expect(workspace.pendingCommands()).toBe(0);
     http.expectNone(`${base}/products/${product.id}/movements`);
   });
-  it('does not dispatch settings with a target below the alert threshold', () => {
+  it('does not dispatch settings with a target below the alert threshold', async () => {
     const f = TestBed.createComponent(InventoryCommand);
     f.componentRef.setInput('form', { mode: 'settings', product, accessVersion: 7 });
     f.detectChanges();
-    const c = f.componentInstance;
-    c.threshold = 4;
-    c.target = 3;
-    f.detectChanges();
-    c.submit();
+    await f.whenStable();
+    const host = f.nativeElement as HTMLElement;
+    const threshold = host.querySelector<HTMLInputElement>('input[name=threshold]')!;
+    const target = host.querySelector<HTMLInputElement>('input[name=target]')!;
+    threshold.value = '4';
+    threshold.dispatchEvent(new Event('input'));
+    await f.whenStable();
+    target.value = '3';
+    target.dispatchEvent(new Event('input'));
+    await f.whenStable();
+    f.componentInstance.submit();
     http.expectNone(`${base}/products/${product.id}`);
-    expect(
-      (f.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
-        'button[type=submit]',
-      )?.disabled,
-    ).toBe(true);
+    expect(host.querySelector<HTMLButtonElement>('button[type=submit]')?.disabled).toBe(true);
   });
 
 });

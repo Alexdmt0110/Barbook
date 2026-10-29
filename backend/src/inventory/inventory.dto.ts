@@ -25,9 +25,8 @@ export class StockSettingsDto extends WorkspaceVersionDto {
     name: 'stockTargetAtLeastThreshold',
     validator: {
       validate: (value: unknown, args?: ValidationArguments) => {
-        const threshold = (
-          args?.object as { threshold?: unknown } | undefined
-        )?.threshold;
+        const object = args?.object as { threshold?: unknown } | undefined;
+        const threshold = object?.threshold;
         return (
           typeof value === 'number' &&
           typeof threshold === 'number' &&

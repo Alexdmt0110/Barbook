@@ -14,6 +14,8 @@ Prochaine étape : lire les sixCI/journaux de ce nouveau HEAD, corriger toute er
 
 Inventaire et suggestions développés sur branche, non intégrés ni disponibles réellement. Batchs autonomes et copie Personnel→Bar toujours absents ; aucun code batch/branche batch commencé. OPS demeure documentaire : D7/cible/backup restauré/rollback/provisionnement réels non qualifiés. Aucun VPS, déploiement, migration propriétaire, compte réel, coût, purge ou CONTRACT. Migrations seulement CI jetables gardées. Mise en service complète et sûre au30octobre non garantie.
 
+CI47b682e0 : audits0 ; backend/PG arrêtés au formatage du validateur (aucun résultat292 présumé) ; nouveau test frontend invalide avant stabilisation ngModel (NG0100). Correctif : déclaration intermédiaire du validateur pour respecter Prettier ; test asynchrone via événements input réels après whenStable, mêmes assertions de bouton désactivé et absence de PUT, aucun timeout/retry modifié. Environnement toujours indisponible pour CLI/inspection ; requalifier ce nouveau HEAD via CI puis captures réelles après restauration. Main inchangé, PR47 draft.
+
 ---
 
 # État actif — BB1b/BB1d intégrés et qualifiés, inventaire manuel en qualification — 29 octobre2026
