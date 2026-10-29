@@ -107,6 +107,7 @@ export class InventoryCommand implements OnInit, AfterViewInit {
         (this.operation !== 'ADD' || this.amount + (this.source?.quantity ?? 0) <= 2147483647)
       );
     if (!this.valid(this.threshold) || !this.valid(this.target)) return false;
+    if (this.target < this.threshold) return false;
     return (
       this.form().mode === 'settings' ||
       (!!this.name.trim() &&

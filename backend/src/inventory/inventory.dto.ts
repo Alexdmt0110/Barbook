@@ -8,6 +8,8 @@ import {
   Max,
   Min,
   ValidateIf,
+  ValidateBy,
+  ValidationArguments,
 } from 'class-validator';
 import { WorkspaceVersionDto } from '../workspaces/workspace.dto';
 export { BrowseWorkspacesDto as BrowseInventoryDto } from '../workspaces/workspace.dto';
@@ -16,7 +18,27 @@ const trim = ({ value }: { value: unknown }) =>
 
 export class StockSettingsDto extends WorkspaceVersionDto {
   @IsInt() @Min(0) @Max(2147483647) threshold!: number;
-  @IsInt() @Min(0) @Max(2147483647) target!: number;
+  @IsInt()
+  @Min(0)
+  @Max(2147483647)
+  @ValidateBy({
+    name: 'stockTargetAtLeastThreshold',
+    validator: {
+      validate: (value: unknown, args?: ValidationArguments) => {
+        const threshold = (
+          args?.object as { threshold?: unknown } | undefined
+        )?.threshold;
+        return (
+          typeof value === 'number' &&
+          typeof threshold === 'number' &&
+          value >= threshold
+        );
+      },
+      defaultMessage: () =>
+        'Stock target must be at least its alert threshold.',
+    },
+  })
+  target!: number;
 }
 export class CreateStockProductDto extends StockSettingsDto {
   @Transform(trim) @IsString() @Length(1, 80) name!: string;

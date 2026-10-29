@@ -1,3 +1,21 @@
+# Checkpoint — environnement indisponible, PR47 reste draft — 29 octobre2026
+
+checkpoint_utc: "2026-10-29T07:44:41.853Z"
+
+Main GitHub revérifié f878e1572da18783db63e93826b32c2924d4e5f6, qualifié273backend/269frontend/267PG-HTTP/30Chromium et audits0 après #46. Aucun merge47 effectué. Branche feature/manual-bar-inventory, parent distant cf0b9987877243329b59a262fe386ca7c6cbd63a, arbre de base b648400a50e1b864a39bfb703814d4f717c8bc68. Branches historiques conservées.
+
+Environnement d’exécution devenu indisponible pendant la vérification locale du dernier correctif ; appel explicite refusé « No usable execution environment is available ». Les logs temporaires et l’état exact des fichiers locaux restants ne sont plus lisibles. Ne pas prétendre que la vérification locale du correctif cible/seuil est terminée. Les neuf fichiers de cette publication sont reconstruits depuis les contenus GitHub de cf0b9987 avec remplacements stricts et revue des données ; contrôler l’intégralité de l’arbre distant avant mise à jour. À la reprise, lire git status et archiver/réconcilier les fichiers locaux avec GitHub sans reset, stash, force ou suppression.
+
+État avant ce correctif : fb925840 avait sixCI273/280/291/38 et artefact12879571336 intègre, SHA256ef34f18e40a3e2f40f02869a8afc1302516c89b2a502c55d390a0ef20d776bc8 ; captures création desktop sombre/inventaire mobile clair/conflit mobile réellement vues. cf0b9987 a aussi six contrôles réussis (UI de3c6a9946 avec garde de vérification/focus/captures, puis amendement documentaire). Les captures de ce HEAD et du nouveau correctif ne sont pas encore inspectées : l’environnement manquant empêche extraction/inspection de l’artefact récent. Une CI verte seule ne ferme pas le Gate.
+
+La revue de conformité a identifié la cohérence cible≥seuil prévue dans beta-bar-plan.md. Amendement préventif cf0b9987 publié avant correction. Nouveau correctif : validation croisée DTO, CHECK PostgreSQL, garde formulaire/minimum du champ et texte explicite, tests de refus sans effet. Le cas zéro suggestion reste stock=seuil=cible2 ; le refus d’une cible inférieure est ajouté, aucune preuve de sécurité ou assertion historique n’est supprimée pour rendre la CI verte. Attendus nouveaux :273backend/282frontend/292PG-HTTP/38Chromium, à constater réellement en CI et non à présumer.
+
+Prochaine étape : lire les sixCI/journaux de ce nouveau HEAD, corriger toute erreur de compilation/lint dans le périmètre autorisé, puis restaurer un environnement utilisable pour extraire l’artefact, contrôler son SHA256 et inspecter réellement les captures. Revue complète du diff/historique/discussions/compatibilité/GateD8, ready/merge commit seulement si toutes les conditions sont satisfaites, puis mergedAt/deux parents/arbre/main et six contrôles post-merge. PR47 reste impérativement draft tant que la validation visuelle manque. Aucun nouvel accord de routine nécessaire.
+
+Inventaire et suggestions développés sur branche, non intégrés ni disponibles réellement. Batchs autonomes et copie Personnel→Bar toujours absents ; aucun code batch/branche batch commencé. OPS demeure documentaire : D7/cible/backup restauré/rollback/provisionnement réels non qualifiés. Aucun VPS, déploiement, migration propriétaire, compte réel, coût, purge ou CONTRACT. Migrations seulement CI jetables gardées. Mise en service complète et sûre au30octobre non garantie.
+
+---
+
 # État actif — BB1b/BB1d intégrés et qualifiés, inventaire manuel en qualification — 29 octobre2026
 
 Main réellement qualifié f878e1572da18783db63e93826b32c2924d4e5f6, merge PR46 mergedAt2026-10-28T13:40:59Z. Parents8a221ca4ab9722414877fe32ffa3c1fff4e1f810 puis7e4a61b2b589430405948e4f42da2179051b3fbe, arbre0d72f61669c9a06eb5c145d6f3c76640d45e95e1 identique au HEAD qualifié. Six contrôles post-merge/six journaux effectivement lus :273backend/26suites,269frontend/38suites,267PostgreSQL-HTTP/20suites,30Chromium desktop/mobile, audits0. Jobs122852258590/122852257825/122852253802/122852253581/122852253291/122852253019 ; Chromium30passés13:45:52Z. Main GitHub vérifié inchangé. Branches historiques conservées.

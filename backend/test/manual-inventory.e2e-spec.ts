@@ -344,6 +344,17 @@ describe('Manual inventory — real PostgreSQL/HTTP, independent physical units'
       .send(settings)
       .expect(200);
     expect((changed.body as Product).version).toBe(1);
+    await api()
+      .put(`${root()}/products/${p.id}`)
+      .set(browserHeaders(owner))
+      .send({
+        threshold: 4,
+        target: 3,
+        expectedProductVersion: 1,
+        expectedAccessVersion: 0,
+      })
+      .expect(400);
+    expect(await get(p)).toMatchObject({ threshold: 3, target: 9, version: 1 });
     await move(p).expect(409);
     await api()
       .put(`${root()}/products/${p.id}`)
@@ -401,7 +412,7 @@ describe('Manual inventory — real PostgreSQL/HTTP, independent physical units'
       .set(browserHeaders(owner))
       .send({
         threshold: 2,
-        target: 1,
+        target: 2,
         expectedProductVersion: 0,
         expectedAccessVersion: 0,
       })
@@ -443,6 +454,7 @@ describe('Manual inventory — real PostgreSQL/HTTP, independent physical units'
     { initialQuantity: 1.5 },
     { initialQuantity: '2' },
     { threshold: -1 },
+    { target: 1 },
     { target: 2147483648 },
     { name: ' ' },
     { packaging: '' },

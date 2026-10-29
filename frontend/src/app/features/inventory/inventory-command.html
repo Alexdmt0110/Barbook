@@ -22,6 +22,9 @@
     Utilise des unités entières. Ajouter et retirer demandent un nombre positif ; corriger définit
     le nouveau total compté, zéro compris.
   </p>
+  @if (form().mode !== 'move') {
+    <p>La cible doit être au moins égale au seuil d’alerte.</p>
+  }
   <form (ngSubmit)="submit()">
     <fieldset [disabled]="busy() || blocked()">
       @if (form().mode === 'create') {
@@ -90,7 +93,7 @@
           >Stock cible (unités)<input
             name="target"
             type="number"
-            min="0"
+            [min]="threshold ?? 0"
             max="2147483647"
             step="1"
             required

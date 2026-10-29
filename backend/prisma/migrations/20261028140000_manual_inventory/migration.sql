@@ -6,7 +6,7 @@ CREATE TABLE "StockProduct" (
   "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMPTZ(3) NOT NULL,
   CONSTRAINT "StockProduct_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "StockProduct_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "Workspace"("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT "StockProduct_values_check" CHECK ("quantity">=0 AND "threshold">=0 AND "target">=0 AND "version">=0),
+  CONSTRAINT "StockProduct_values_check" CHECK ("quantity">=0 AND "threshold">=0 AND "target">=0 AND "version">=0 AND "target">="threshold"),
   CONSTRAINT "StockProduct_labels_check" CHECK (length(trim("name"))>0 AND length(trim("packaging"))>0)
 );
 CREATE UNIQUE INDEX "StockProduct_workspaceId_id_key" ON "StockProduct"("workspaceId","id");

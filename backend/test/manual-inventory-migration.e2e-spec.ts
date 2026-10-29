@@ -81,6 +81,11 @@ describe('Additive manual inventory migration', () => {
         code: '23503',
       });
       await product('p', 'bar', 2);
+      await expect(
+        client.query(
+          `UPDATE "StockProduct" SET target=1,threshold=2 WHERE id='p'`,
+        ),
+      ).rejects.toMatchObject({ code: '23514' });
       const key = randomUUID();
       await client.query(
         `INSERT INTO "StockMovement" (id,"workspaceId","productId","actorId","requestId",fingerprint,kind,"beforeQuantity","afterQuantity",delta,reason,"productVersion") VALUES ('initial','bar','p','owner',$1,$2,'INITIAL',0,2,2,'Comptage initial',0)`,
