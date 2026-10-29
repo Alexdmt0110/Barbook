@@ -1,0 +1,203 @@
+<section class="inventory-page" aria-labelledby="inventory-heading">
+  <h1 id="inventory-heading">Inventaire manuel</h1>
+  @if (workspace.current()?.kind !== 'SHARED') {
+    <p>Choisis un Bar confirmé depuis ton profil pour accéder à son inventaire partagé.</p>
+  }
+  <section [hidden]="workspace.current()?.kind !== 'SHARED'">
+    <p>
+      Compte des unités physiques : une bouteille entamée reste une unité jusqu’à son retrait
+      manuel. Le conditionnement est descriptif. Les recettes et les batchs ne modifient jamais ce
+      compteur.
+    </p>
+    <p>
+      Après une interruption, vérifie le stock et l’historique avant de saisir une nouvelle action.
+      Aucune commande fournisseur n’est envoyée.
+    </p>
+    <div class="inventory-actions">
+      <button
+        type="button"
+        class="bb-button"
+        [disabled]="loading() || reorderLoading() || !!form()"
+        (click)="refresh()"
+      >
+        Actualiser l’inventaire
+      </button>
+      <button
+        type="button"
+        class="bb-button"
+        [disabled]="loading() || !!form()"
+        (click)="verifyRights()"
+      >
+        Vérifier les droits du Bar
+      </button>
+      @if (workspace.current()?.role === 'OWNER') {
+        <button type="button" class="bb-button" [disabled]="!canAct()" (click)="begin('create')">
+          Nouveau produit
+        </button>
+      }
+    </div>
+    @if (notice()) {
+      <p role="status">{{ notice() }}</p>
+    }
+    @if (error()) {
+      <p role="alert">{{ error() }}</p>
+    }
+    @if (access() !== null && access() !== workspace.current()?.accessVersion) {
+      <p role="alert">
+        Les versions d’accès diffèrent. Vérifie les droits avant une nouvelle action.
+      </p>
+    }
+    @if (form(); as active) {
+      <app-inventory-command
+        [form]="active"
+        (saved)="confirmed($event)"
+        (cancelled)="close()"
+        (refreshCatalog)="refresh()"
+      />
+    }
+    <section aria-labelledby="inventory-products-heading">
+      <h2 id="inventory-products-heading">Produits physiques</h2>
+      @if (loading()) {
+        <p role="status">Chargement des produits…</p>
+      }
+      @if (!loading() && !error() && total() === 0) {
+        <p>Aucun produit enregistré dans ce Bar.</p>
+      }
+      <ul class="inventory-grid">
+        @for (product of products(); track product.id) {
+          <li class="inventory-card" [attr.aria-label]="'Produit ' + product.name">
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.packaging }}</p>
+            <p>
+              <strong>Stock : {{ product.quantity }} unité(s)</strong><br />Seuil
+              {{ product.threshold }} · cible {{ product.target }}
+            </p>
+            <div class="inventory-actions">
+              <button
+                class="bb-button"
+                type="button"
+                [disabled]="!canAct()"
+                (click)="begin('move', product)"
+              >
+                Compter {{ product.name }}
+              </button>
+              @if (workspace.current()?.role === 'OWNER') {
+                <button
+                  class="bb-button"
+                  type="button"
+                  [disabled]="!canAct()"
+                  (click)="begin('settings', product)"
+                >
+                  Régler {{ product.name }}
+                </button>
+              }
+              <button
+                class="bb-button bb-button--ghost"
+                type="button"
+                [disabled]="historyLoading()"
+                (click)="showHistory(product)"
+              >
+                Historique {{ product.name }}
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+      @if (products().length < total()) {
+        <button class="bb-button" type="button" [disabled]="loading()" (click)="load(false)">
+          Voir les autres produits
+        </button>
+      }
+    </section>
+    <section aria-labelledby="inventory-reorder-heading">
+      <h2 id="inventory-reorder-heading">À recommander</h2>
+      <p>
+        Si stock ≤ seuil : quantité suggérée = max(0, cible − stock), en unités physiques. Aucune
+        conversion de volume ni consommation prévue.
+      </p>
+      @if (reorderLoading()) {
+        <p role="status">Chargement des suggestions…</p>
+      }
+      @if (reorderError()) {
+        <p role="alert">{{ reorderError() }}</p>
+      }
+      @if (!reorderLoading() && !reorderError() && reorderTotal() === 0) {
+        <p>Aucun produit au seuil d’alerte.</p>
+      }
+      <ul class="inventory-grid">
+        @for (product of recommendations(); track product.id) {
+          <li class="inventory-card" [attr.aria-label]="'Suggestion ' + product.name">
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.packaging }}</p>
+            <p>
+              Stock {{ product.quantity }} ≤ seuil {{ product.threshold }} ; cible
+              {{ product.target }}.
+            </p>
+            <p>
+              <strong>{{ product.suggestedQuantity }} unité(s) suggérée(s)</strong> = max(0,
+              {{ product.target }} − {{ product.quantity }}).
+            </p>
+            @if (product.suggestedQuantity === 0) {
+              <p>Cible déjà atteinte : aucune quantité supplémentaire suggérée.</p>
+            }
+          </li>
+        }
+      </ul>
+      @if (recommendations().length < reorderTotal()) {
+        <button
+          class="bb-button"
+          type="button"
+          [disabled]="reorderLoading()"
+          (click)="load(false, true)"
+        >
+          Voir les autres suggestions
+        </button>
+      }
+    </section>
+    @if (historyProduct(); as product) {
+      <section aria-label="Historique des mouvements">
+        <h2>Historique · {{ product.name }}</h2>
+        @if (historyLoading()) {
+          <p role="status">Chargement de l’historique…</p>
+        }
+        @if (historyError()) {
+          <p role="alert">{{ historyError() }}</p>
+        }
+        <ol class="inventory-history">
+          @for (entry of history()?.items; track entry.id) {
+            <li>
+              <p>
+                <strong>{{ entry.beforeQuantity }} → {{ entry.afterQuantity }} unité(s)</strong> ·
+                {{ entry.actor.displayName }}
+              </p>
+              <p>
+                {{ entry.reason }} · {{ entry.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }} · version
+                {{ entry.productVersion }}
+              </p>
+            </li>
+          }
+        </ol>
+        <button
+          class="bb-button"
+          type="button"
+          [disabled]="historyLoading()"
+          (click)="showHistory(product)"
+        >
+          Actualiser cet historique
+        </button>
+        @if (history(); as page) {
+          @if (page.items.length < page.total) {
+            <button
+              class="bb-button"
+              type="button"
+              [disabled]="historyLoading()"
+              (click)="showHistory(product, true)"
+            >
+              Voir les mouvements précédents
+            </button>
+          }
+        }
+      </section>
+    }
+  </section>
+</section>

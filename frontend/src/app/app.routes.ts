@@ -21,6 +21,11 @@ export const routes: Routes = [
     loadComponent: () => import('./layout/app-shell/app-shell').then((module) => module.AppShell),
     children: [
       {
+        path: 'inventory',
+        title: 'Inventaire manuel · Barbook',
+        loadComponent: () => import('./features/inventory/inventory').then((m) => m.Inventory),
+      },
+      {
         path: 'trash',
         canActivate: [personalSpaceGuard],
         title: 'Corbeille · Barbook',

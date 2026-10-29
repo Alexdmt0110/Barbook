@@ -82,6 +82,42 @@ export class WorkspaceContext {
       : throwError(() => new Error('Confirme d’abord ta session.'));
   }
 
+  /** Verify the SAME confirmed Bar without unmounting its active form before the response. */
+  verifyCurrentAccess(): Observable<void> {
+    return defer(() => {
+      const auth = this.auth;
+      const current = this.current();
+      if (!auth || current?.kind !== 'SHARED' || this.transitioning())
+        throw new Error('Choisis d’abord un Bar confirmé.');
+      if (this.pendingCommands() || this.drafts.hasPendingMutation())
+        throw new Error('Attends la fin de l’enregistrement avant de vérifier les droits.');
+      const epoch = this.generation;
+      return this.resolve(auth, current.id).pipe(
+        map((confirmed) => {
+          if (epoch !== this.generation || auth !== this.auth || current !== this.current())
+            throw new Error('Le contexte a changé pendant la vérification.');
+          if (this.pendingCommands() || this.drafts.hasPendingMutation())
+            throw new Error('Un enregistrement a commencé. Les droits ne sont pas réadoptés.');
+          this.generation++;
+          this.install(confirmed);
+        }),
+        catchError((error: unknown) => {
+          if (epoch === this.generation && auth === this.auth && current === this.current()) {
+            if (error instanceof HttpErrorResponse && [403, 404].includes(error.status)) {
+              this.generation++;
+              this.current.set(null);
+              this.drafts.suspend();
+            }
+            this.error.set(
+              'Les droits du Bar ne sont pas revérifiés. Aucune nouvelle action d’inventaire avant confirmation.',
+            );
+          }
+          return throwError(() => error);
+        }),
+      );
+    });
+  }
+
   confirmSession(auth: AuthResponse): Observable<void> {
     return defer(() => {
       const epoch = ++this.generation;

@@ -21,6 +21,9 @@
         <a routerLink="/cocktails" routerLinkActive="active">
           {{ workspace.current()?.kind === 'SHARED' ? 'Carnet Bar' : 'Mes cocktails' }}
         </a>
+        @if (workspace.current()?.kind === 'SHARED') {
+          <a routerLink="/inventory" routerLinkActive="active">Inventaire</a>
+        }
         @if (workspace.current()?.kind === 'PERSONAL') {
           <a routerLink="/folders" routerLinkActive="active">Dossiers</a>
           <a routerLink="/trash" routerLinkActive="active">Corbeille</a>
