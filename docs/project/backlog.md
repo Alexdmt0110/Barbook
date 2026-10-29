@@ -1,5 +1,9 @@
 # Backlog d'exécution
 
+## BB2a — PR48 en qualification, 29octobre
+Plans partagés implémentés depuis main66d4bb3 qualifié : moteur exact/snapshot/version/révision/aperçu/interface. Vérifications locales287backend/287frontend passées ; cinqCI dontPG réussies au c147bde3, Chromium/captures/Gate à terminer. Environnement revenu et ancien clone sale préservé. BB2b réalisé reste distinct/non livré ; aucun débit stock. État de développement seulement, OPS/D7 séparés.
+
+
 ## État courant — 29 octobre2026
 
 BB3/BB4 intégrés par [PR47](https://github.com/Alexdmt0110/Barbook/pull/47), merge66d4bb3f9e2be8883cb570a4e9d58c53ff2291e5, mergedAt2026-10-29T08:11:34Z. Deux parents f878e157 puis0cf73f0 et arbre5e98698c871f4657b199dd065ab94946d073b250 vérifiés ; branche historique conservée. Six contrôles post-merge et six journaux relus :273backend/282frontend/292PostgreSQL-HTTP/38Chromium, audits de production0. Huit vulnérabilités faibles de dépendances de tests backend restent signalées par npm ci, aucune nouvelle dépendance ajoutée.

@@ -395,6 +395,9 @@ export class BatchPlans {
     this.load();
   }
   canLeave() {
+    const current = this.workspace.current();
+    // Selection already asked before installing a different context.
+    if (!current || this.scope !== `${current.userId}:${current.id}`) return true;
     return (
       !this.busy() &&
       (!this.dirty ||
