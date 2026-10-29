@@ -25,6 +25,7 @@ import { CocktailOrganizationService } from './organization/cocktail-organizatio
     CocktailOrganizationController,
     FoldersController,
   ],
+  exports: [CocktailContentService],
   providers: [
     CocktailLifecycleService,
     FoldersService,

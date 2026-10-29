@@ -1,3 +1,4 @@
+import { BatchPlansModule } from './batch-plans/batch-plans.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -26,6 +27,7 @@ import { IngredientsModule } from './ingredients/ingredients.module';
     CocktailsModule,
     IngredientsModule,
     InventoryModule,
+    BatchPlansModule,
     WorkspacesModule,
   ],
 
