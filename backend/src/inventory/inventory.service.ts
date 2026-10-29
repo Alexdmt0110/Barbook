@@ -12,7 +12,7 @@ import { WorkspaceAccessService } from '../workspaces/workspace-access.service';
 import {
   requireVersion,
   requireVersionCapacity,
-} from '../cocktails/organization/organization-preconditions';
+} from '../common/version-preconditions';
 import {
   BrowseInventoryDto,
   CreateStockMovementDto,
@@ -78,9 +78,10 @@ export class InventoryService {
     query: BrowseInventoryDto,
   ) {
     return this.access.shared(userId, workspaceId, async (tx) => {
-      await this.product(tx, workspaceId, productId);
+      const product = await this.product(tx, workspaceId, productId);
       const where = { workspaceId, productId };
       return {
+        snapshotVersion: product.version,
         items: await tx.stockMovement.findMany({
           where,
           select: {

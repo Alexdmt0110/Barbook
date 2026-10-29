@@ -3,7 +3,7 @@ CREATE TYPE "StockMovementKind" AS ENUM ('INITIAL','ADD','REMOVE','SET');
 CREATE TABLE "StockProduct" (
   "id" TEXT NOT NULL, "workspaceId" TEXT NOT NULL, "name" VARCHAR(80) NOT NULL, "packaging" VARCHAR(120) NOT NULL,
   "quantity" INTEGER NOT NULL, "threshold" INTEGER NOT NULL, "target" INTEGER NOT NULL, "version" INTEGER NOT NULL DEFAULT 0,
-  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL,
+  "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMPTZ(3) NOT NULL,
   CONSTRAINT "StockProduct_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "StockProduct_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "Workspace"("id") ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT "StockProduct_values_check" CHECK ("quantity">=0 AND "threshold">=0 AND "target">=0 AND "version">=0),
@@ -16,7 +16,7 @@ CREATE TABLE "StockMovement" (
   "requestId" UUID NOT NULL, "fingerprint" CHAR(64) NOT NULL, "kind" "StockMovementKind" NOT NULL,
   "beforeQuantity" INTEGER NOT NULL, "afterQuantity" INTEGER NOT NULL, "delta" INTEGER NOT NULL,
   "reason" VARCHAR(240) NOT NULL, "productVersion" INTEGER NOT NULL,
-  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT "StockMovement_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "StockMovement_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "Workspace"("id") ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT "StockMovement_workspaceId_productId_fkey" FOREIGN KEY ("workspaceId","productId") REFERENCES "StockProduct"("workspaceId","id") ON DELETE RESTRICT ON UPDATE CASCADE,

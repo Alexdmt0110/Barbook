@@ -176,6 +176,9 @@ describe('Manual inventory — real PostgreSQL/HTTP, independent physical units'
       .get(`${root()}/products/${p.id}/movements`)
       .set(browserHeaders(member))
       .expect(200);
+    expect((history.body as { snapshotVersion: number }).snapshotVersion).toBe(
+      3,
+    );
     expect((history.body as { items: unknown[] }).items).toMatchObject([
       {
         kind: 'SET',

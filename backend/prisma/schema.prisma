@@ -343,8 +343,8 @@ model StockProduct {
   version Int @default(0)
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
   movements StockMovement[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
   @@unique([workspaceId, id])
   @@index([workspaceId, name, id])
 }
@@ -362,7 +362,7 @@ model StockMovement {
   delta Int
   reason String @db.VarChar(240)
   productVersion Int
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
   product StockProduct @relation(fields: [workspaceId, productId], references: [workspaceId, id], onDelete: Restrict)
   actor User @relation(fields: [actorId], references: [id], onDelete: Restrict)

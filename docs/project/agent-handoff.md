@@ -8,6 +8,10 @@ Branche feature/manual-bar-inventory créée depuis ce main exact après qualifi
 
 OPS reste documentaire : D7/RPO/RTO/cible HTTPS/backup/restauration/rollback réels ouverts, dossier distinct actualisé. Dix migrations intégrées dont20261028115000_bar_self_service, exécutées seulement en CI jetable. Aucune migration propriétaire, VPS, déploiement, compte réel, coût, purge ou CONTRACT. Mise en service complète et sûre au30octobre non considérée réaliste ; inventaire/suggestions et batchs encore absents. États antérieurs ci-dessous historiques.
 
+Checkpoint29octobre : PR47 draft au dcc906c3 (socle serveur) ; première exécution PostgreSQL réelle291tests/22suites réussie, migrations fresh/replay/status/drift sans écart. Interface encore locale/non publiée à cet instant, verify frontend280tests/41suites/lint/build/compat2 et typesChromium réussis. Amendement préventif647987c9 publié avant verifyCurrentAccess : garder le contexte confirmé pendant la relecture, invalider réponses tardives/mutations en cours, suspendre si403/404, aucune adoption de versions de commande avant action explicite. Les tests core et formulaire couvrent ce comportement ; le parcours historique refreshAccess reste intact. Nouveaux Chromium deux comptes/conflit/reçu perdu+stockage refusé/révocation écrits et typés, à exécuter réellement après publication UI.
+
+Delta backend suivant : historique renvoie snapshotVersion pour refuser le mélange de pages concurrentes ; dates stock en timestamptz(3) ; validateurs de version purs déplacés vers common avec réexport historique identique (aucun lien métier stock→recettes). Tests migration/instantané renforcés. Verify backend273/26, lint/build/Prisma/compat3/types réussis. Ce delta doit repasser PostgreSQL/HTTP en CI ; ne pas transformer le291du socle précédent en qualification du nouveau HEAD. Mainf878e157 toujours qualifié et inchangé, aucun merge47 admissible avant UI/Chromium/captures/Gate. OPS reste documentaire.
+
 ---
 
 # État actif — correction de qualification post-merge BB1d — 28 octobre2026

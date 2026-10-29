@@ -55,6 +55,14 @@ describe('Additive manual inventory migration', () => {
       ).toBe(0);
       await client.query(sql);
       expect(
+        (
+          await client.query(
+            "SELECT data_type FROM information_schema.columns WHERE table_schema=$1 AND table_name='StockMovement' AND column_name='createdAt'",
+            [schema],
+          )
+        ).rows,
+      ).toEqual([{ data_type: 'timestamp with time zone' }]);
+      expect(
         (await client.query('SELECT * FROM "Workspace" ORDER BY id')).rows,
       ).toEqual(before);
       expect(
