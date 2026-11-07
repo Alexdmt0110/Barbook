@@ -18,3 +18,5 @@ Unités : host/port, config statique invalide. HTTP réel : fichiers, routes pro
 ## Risques et alternatives
 
 Servir depuis Nest évite un deuxième proxy et ses ambiguïtés CSRF. Middleware dédié cohésif, aucune dépendance ajoutée. Build statique de confiance uniquement, aucun upload dans ce dossier. Loopback ne protège pas d'un processus malveillant sur le PC. PC endormi/arrêté indisponible. Sauvegarde même disque ne couvre pas perte/vol/compromission ; RPO4h/RTO24h non garantis dans ces scénarios. Migration OVH par dump complet, identités conservées, sessions invalidées et reconnexion, brouillons navigateur non transférés.
+
+Qualification supplémentaire : job Windows Delivery (septième contrôle, six historiques conservés), backend verify/Angular build Windows, analyse PowerShell5.1/diagnostic et refus avant toute opération sans configuration ou destination sûre. Smoke release Linux avec vrai build Angular et PostgreSQL jetable. Les tests de jonctions utilisent une jonction Windows sans privilèges de création de symlink fichier.
