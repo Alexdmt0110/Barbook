@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - main
+      - feature/recipe-canonical-name-uniqueness
       - feature/cocktail-folder-management
       - feature/secure-web-sessions
       - feature/web-session-cutover
