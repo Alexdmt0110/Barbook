@@ -48,3 +48,10 @@ Codes additifs de409 uniquement après lookup autorisé du slug : COCKTAIL_NAME_
 Compléments de tests : deux membres/deux noms/un catalogue neuf commun, variantes casse/accents/ponctuation/espaces, mêmes noms dans deuxBars, refus étranger, réservation de l’URL après renommage. Les scénarios existants de doublon201/409, corbeille, révocation et rollback sont conservés. Nouveau parcours Chromium deux acteurs : création concurrente après saisie,409code précis, alerte accessible, champs conservés, un seulPOST, restauration explicite du brouillon après refresh ; captures clair/sombre desktop/mobile.
 
 Aucun endpoint de disponibilité, schéma, migration, contrat de renommage ou règle nouvelle d’unicité n’est activé. Cette PR ne prétend donc pas empêcher les doublons de noms affichés par renommage. L’arbitrage A/B/C reste nécessaire avant ce chantier et son préflight complet.
+
+
+## Preuves de qualification de l’état applicatif
+
+Le HEAD applicatif df600b8c a passé les sept contrôles :296backend,290frontend,307PG/HTTP,46Chromium, Windows Delivery et audits complets/runtime0. Les nouveaux scénarios deux acteurs réels desktop/mobile confirment409NAME_TAKEN après création concurrente, conservation des champs, un seulPOST et restauration explicite du brouillon. Les tests historiques de révocation, réponse HTTP perdue et rollback sont conservés. La fixtureAPI initiale utilisait CL (unité d’affichage), refusé400 par le contrat ; trace vérifiée, fixture corrigée en50ML sans toucher au produit ni aux contrôles.
+
+Artefact13578382716/run42382931559 : ZIP téléchargé et testé, SHA25682173c1c81c0f4b951e0fccc091ce0562cac89813cb3b4d2bd56cac77aa1c022 recalculé conforme au digestGitHub. Quatre captures réelles name-conflict clair/sombre, desktop1365/mobile390 inspectées (nom conservé et zone erreur/actions) : lisibilité et retours à la ligne corrects, pas de débordement horizontal. Aucun style ni disposition modifié. État documentaire final à requalifier au dernier HEAD avant Gate et mergeD8 ; clôture effective et post-main dans PR50. Aucun changement structurel implémenté avant arbitrage.
