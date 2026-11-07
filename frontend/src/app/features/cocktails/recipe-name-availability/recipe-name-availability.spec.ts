@@ -106,6 +106,16 @@ describe('Advisory recipe-name check with identity/context and cancellation guar
     expect(fixture.componentInstance.message()).toContain('Tu peux tenter');
     expect(control.valid).toBe(true);
   });
+  it('bounds an unresponsive advisory read and leaves an explicit save possible', () => {
+    name('Mojito');
+    wait();
+    const pending = http.expectOne((r) => r.url === path);
+    vi.advanceTimersByTime(5000);
+    expect(pending.cancelled).toBe(true);
+    expect(fixture.componentInstance.state()).toBe('UNKNOWN');
+    expect(fixture.componentInstance.message()).toContain('Tu peux tenter');
+    expect(control.valid).toBe(true);
+  });
   it('includes the current recipe in edit checks and sees a silent server/draft reset', () => {
     fixture.componentRef.setInput('cocktailId', 'current-recipe');
     name('Mojito');

@@ -1,3 +1,4 @@
+import { timeout } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { WorkspaceContext } from '../../../core/workspaces/workspace-context';
@@ -15,8 +16,10 @@ export class RecipeNameAvailabilityService {
   check(name: string, cocktailId?: string) {
     let params = new HttpParams().set('name', name);
     if (cocktailId) params = params.set('cocktailId', cocktailId);
-    return this.workspace.request('cocktail-name-availability', false, (url) =>
-      this.http.get<RecipeNameAvailabilityResult>(url, { params }),
-    );
+    return this.workspace
+      .request('cocktail-name-availability', false, (url) =>
+        this.http.get<RecipeNameAvailabilityResult>(url, { params }),
+      )
+      .pipe(timeout(5000));
   }
 }
