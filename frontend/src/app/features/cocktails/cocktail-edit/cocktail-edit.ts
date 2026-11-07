@@ -1,3 +1,4 @@
+import { RecipeNameAvailability } from '../recipe-name-availability/recipe-name-availability';
 import { WorkspaceContext } from '../../../core/workspaces/workspace-context';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
@@ -51,11 +52,13 @@ import { CocktailOrganizationEditor } from '../cocktail-detail/cocktail-organiza
     DraftNotice,
     CocktailContentPreview,
     CocktailOrganizationEditor,
+    RecipeNameAvailability,
   ],
   templateUrl: './cocktail-edit.html',
   styleUrls: ['../cocktail-create/cocktail-create.css', './cocktail-edit.css'],
 })
 export class CocktailEdit implements OnInit {
+  private readonly nameAvailability = viewChild(RecipeNameAvailability);
   readonly workspace = inject(WorkspaceContext);
   private accessVersion: number | undefined;
   private readonly organizationEditor = viewChild(CocktailOrganizationEditor);
@@ -298,7 +301,13 @@ export class CocktailEdit implements OnInit {
         error: (error) => {
           if (!this.current()) return;
           draft.rejected(error);
-          if (error instanceof HttpErrorResponse && error.status === 409) draft.conflict.set(true);
+          this.nameAvailability()?.identifiedConflict(error);
+          if (
+            error instanceof HttpErrorResponse &&
+            error.status === 409 &&
+            error.error?.code !== 'COCKTAIL_NAME_TAKEN'
+          )
+            draft.conflict.set(true);
           this.error.set(this.message(error));
         },
       });
@@ -403,6 +412,8 @@ export class CocktailEdit implements OnInit {
   private message(error: unknown): string {
     if (!(error instanceof HttpErrorResponse))
       return 'Réponse abandonnée ou indisponible. Vérifie ta session avant de poursuivre.';
+    if (error.status === 409 && error.error?.code === 'COCKTAIL_NAME_TAKEN')
+      return 'Ce nom est déjà utilisé dans cet espace, éventuellement par une recette en corbeille même après 30 jours. Ta saisie est conservée ; choisis explicitement un autre nom.';
     if (error.status === 409)
       return 'La recette ou le catalogue a changé. Ta saisie est conservée ; compare la version serveur avant toute nouvelle intention.';
     if (error.status === 404)
