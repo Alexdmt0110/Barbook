@@ -1,3 +1,9 @@
+# Reprise courante — unicité des noms option A autorisée
+
+7 novembre 2026. Main réellement vérifié `8bfaef93645d13214ba4f9324900835d9d5864c0`, sept contrôles réussis, aucune PR ouverte avant nouvelle tranche. Branche `feature/recipe-canonical-name-uniqueness` publiée immédiatement depuis ce main, WORK responsable dans cette conversation. Option A et réservation des noms/slugs tant que lignes conservées validées explicitement ; préflight création/édition inclus. Design préventif dans `recipe-name-integrity-design.md`, décision RECIPE-NAME-01 inscrite avant code. Prochaine étape : migration additive protégée, parité de normalisation et tests de rollback/ancienne version ; puis API/formulaires et qualification complète D8. Ne pas recommencer PR49/50, ni BB2b/copie. Aucun PC, Tailscale, VPS, base réelle, déploiement ou coût autorisé. Les états ci-dessous sont historiques ; la prochaine PR de cette tranche et son Gate font foi pour sa clôture effective.
+
+---
+
 # Reprise courante — PR49 clôturée ; PR50, conflits de création et arbitrage des noms
 
 7 novembre 2026. PR49 fusionnée le 7 novembre à 14:21:15 UTC, main `56826381401f9da97efd9a698bd9a63d8fe6795a`. Parents `18c1ee09` puis `dad04230`, arbre `f3d2f3b5` identique à la source. Les sept contrôles et leurs journaux post-merge sont réussis : 293 backend, 287 frontend, 304 PostgreSQL/HTTP, 44 Chromium ; Windows, compatibilité15/7 et audits complets/runtime à zéro. Artefact navigateur13577803242 téléchargé, SHA256 `6dd6f02d1dd3df24b70d7307bf6284b464417b639bfaa0ab06aa03bfa364fd5a` recalculé conforme, ZIP intact. Branches historiques, livraison et BB2b conservées.
