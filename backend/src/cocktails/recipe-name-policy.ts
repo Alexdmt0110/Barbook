@@ -68,7 +68,18 @@ export function recipeNameDatabaseConflict(
 ): ConflictException | null {
   if (!isPrismaKnownRequestError(error, 'P2002')) return null;
   if (error.meta?.modelName && error.meta.modelName !== 'Cocktail') return null;
-  const target: unknown = error.meta?.target;
+  // Prisma's PostgreSQL JS adapter reports the actual constraint under its cause.
+  const object = (value: unknown): Record<string, unknown> | null =>
+    value !== null && typeof value === 'object'
+      ? (value as Record<string, unknown>)
+      : null;
+  const adapter = object(error.meta?.driverAdapterError);
+  const cause = object(adapter?.cause);
+  const constraint =
+    cause?.kind === 'UniqueConstraintViolation'
+      ? object(cause.constraint)
+      : null;
+  const target: unknown = error.meta?.target ?? constraint?.index;
   if (
     (error.meta?.modelName === 'Cocktail' &&
       Array.isArray(target) &&

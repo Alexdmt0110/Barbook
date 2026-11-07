@@ -17,6 +17,29 @@ function unique(meta: Record<string, unknown>) {
 describe('Recipe name conflict identification', () => {
   it.each([
     [
+      {
+        modelName: 'Cocktail',
+        driverAdapterError: {
+          cause: {
+            kind: 'UniqueConstraintViolation',
+            constraint: { index: 'Cocktail_workspaceId_nameKey_key' },
+          },
+        },
+      },
+      'COCKTAIL_NAME_TAKEN',
+    ],
+    [
+      {
+        driverAdapterError: {
+          cause: {
+            kind: 'UniqueConstraintViolation',
+            constraint: { index: 'Cocktail_workspaceId_slug_key' },
+          },
+        },
+      },
+      'COCKTAIL_SLUG_RESERVED',
+    ],
+    [
       { modelName: 'Cocktail', target: ['workspaceId', 'nameKey'] },
       'COCKTAIL_NAME_TAKEN',
     ],
@@ -35,6 +58,22 @@ describe('Recipe name conflict identification', () => {
     { modelName: 'Cocktail', target: ['id'] },
     { target: ['workspaceId', 'slug'] },
     { target: ['workspaceId', 'nameKey'] },
+    {
+      driverAdapterError: {
+        cause: {
+          kind: 'UniqueConstraintViolation',
+          constraint: { index: 'Ingredient_workspaceId_slug_key' },
+        },
+      },
+    },
+    {
+      driverAdapterError: {
+        cause: {
+          kind: 'ForeignKeyConstraintViolation',
+          constraint: { index: 'Cocktail_workspaceId_nameKey_key' },
+        },
+      },
+    },
     { modelName: 'Cocktail' },
     {},
   ])('does not mislabel %j', (meta) => {
