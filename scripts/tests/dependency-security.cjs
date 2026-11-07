@@ -29,9 +29,11 @@ for (const consumer of globConsumers) {
       writeFileSync(join(cwd, 'src/a.spec.ts'), '');
       writeFileSync(join(cwd, 'src/readme.md'), '');
       const options = { cwd, ignore: ['**/*.spec.ts'] };
-      assert.deepEqual(glob.globSync('src/**/*.ts', options), ['src/a.ts']);
-      assert.deepEqual(await glob.glob('src/**/*.ts', options), ['src/a.ts']);
-      assert.deepEqual(glob.globSync('src\\*.ts', {...options, windowsPathsNoEscape: true}), ['src/a.ts']);
+      assert.deepEqual(glob.globSync('src/**/*.ts', options), [join('src','a.ts')]);
+      assert.deepEqual(await glob.glob('src/**/*.ts', options), [join('src','a.ts')]);
+      assert.deepEqual(glob.globSync('src\\*.ts', {...options, windowsPathsNoEscape: true}), [join('src','a.ts')]);
+      assert.deepEqual(glob.globSync('src/**/*.ts', {...options,posix:true}), ['src/a.ts']);
+      assert.deepEqual(await glob.glob('src/**/*.ts', {...options,posix:true}), ['src/a.ts']);
       const controller = new AbortController();
       controller.abort(new Error('fixture cancellation'));
       await assert.rejects(glob.glob('**/*', {cwd, signal:controller.signal}), /fixture cancellation/);
