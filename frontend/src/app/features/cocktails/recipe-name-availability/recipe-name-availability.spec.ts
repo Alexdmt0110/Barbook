@@ -166,6 +166,7 @@ describe('Advisory recipe-name check with identity/context and cancellation guar
     const pending = http.expectOne((r) => r.url === path);
     fixture.componentInstance.identifiedConflict(
       new HttpErrorResponse({ status: 409, error: { code: 'COCKTAIL_NAME_TAKEN' } }),
+      control.value,
     );
     pending.flush({ canonicalName: 'mojito', status: 'AVAILABLE' });
     expect(fixture.componentInstance.state()).toBe('NAME_TAKEN');
@@ -174,6 +175,19 @@ describe('Advisory recipe-name check with identity/context and cancellation guar
     http
       .expectOne((r) => r.url === path)
       .flush({ canonicalName: 'mojito-maison', status: 'AVAILABLE' });
+    expect(fixture.componentInstance.state()).toBe('AVAILABLE');
+  });
+  it('does not attach a late submission conflict to a different current name', () => {
+    name('Mojito');
+    const submitted = control.value;
+    name('Menthe');
+    fixture.componentInstance.identifiedConflict(
+      new HttpErrorResponse({ status: 409, error: { code: 'COCKTAIL_NAME_TAKEN' } }),
+      submitted,
+    );
+    expect(fixture.componentInstance.hasConflict()).toBe(false);
+    wait();
+    http.expectOne((r) => r.url === path).flush({ canonicalName: 'menthe', status: 'AVAILABLE' });
     expect(fixture.componentInstance.state()).toBe('AVAILABLE');
   });
   it('does not send checks for empty, invalid or noncanonical names and cancels on destruction', () => {

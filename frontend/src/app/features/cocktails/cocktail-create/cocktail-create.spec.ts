@@ -460,6 +460,31 @@ describe('CocktailCreate', () => {
     expect(navigateSpy).not.toHaveBeenCalled();
   });
 
+  it.each(['success', 'conflict'])(
+    'ignores a late creation %s after identity replacement',
+    (outcome) => {
+      const response = new Subject<{ id: string; slug: string }>();
+      cocktailsService.response = response;
+      const component = createComponent();
+      fillRequiredFields(component);
+      const ingredient = component.ingredients.at(0);
+      ingredient.controls.ingredientName.setValue('Gin');
+      ingredient.controls.ingredientDefaultAbv.setValue(40);
+      ingredient.controls.amount.setValue(5);
+      component.submit();
+      const store = TestBed.inject(DraftStore);
+      store.confirmIdentity({ userId: 'other', workspaceId: 'other-space' });
+      store.save(store.lease(), 'create:new', 1, { keep: 'other identity' });
+      if (outcome === 'success') response.next({ id: 'old-id', slug: 'old-url' });
+      else
+        response.error(
+          new HttpErrorResponse({ status: 409, error: { code: 'COCKTAIL_NAME_TAKEN' } }),
+        );
+      expect(navigateSpy).not.toHaveBeenCalled();
+      expect(component.errorMessage()).toBeNull();
+      expect(store.find(store.lease(), 'create:new')?.value).toEqual({ keep: 'other identity' });
+    },
+  );
   it('does not submit an invalid form', () => {
     const component = createComponent();
 

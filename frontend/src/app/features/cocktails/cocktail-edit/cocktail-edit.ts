@@ -269,6 +269,7 @@ export class CocktailEdit implements OnInit {
       return;
     }
     if (!draft.begin(this.draftValue())) return;
+    const submittedName = this.form.controls.name.value;
     this.submitting.set(true);
     this.error.set(null);
     this.success.set(null);
@@ -301,7 +302,7 @@ export class CocktailEdit implements OnInit {
         error: (error) => {
           if (!this.current()) return;
           draft.rejected(error);
-          this.nameAvailability()?.identifiedConflict(error);
+          this.nameAvailability()?.identifiedConflict(error, submittedName);
           if (
             error instanceof HttpErrorResponse &&
             error.status === 409 &&

@@ -61,8 +61,9 @@ export class CocktailCreate {
     this.workspace.current()?.kind === 'SHARED'
       ? this.workspace.current()?.accessVersion
       : undefined;
+  private readonly draftStore = inject(DraftStore);
   readonly draft = new FormDraft(
-    inject(DraftStore),
+    this.draftStore,
     'create:new',
     1,
     (value, version) => version === 1 && isCreationDraft(value),
@@ -339,6 +340,8 @@ export class CocktailCreate {
     }
 
     if (!this.draft.begin(this.draftValue())) return;
+    const submissionLease = this.draftStore.lease();
+    const submittedName = this.form.controls.name.value;
     this.isSubmitting.set(true);
 
     this.errorMessage.set(null);
@@ -363,13 +366,15 @@ export class CocktailCreate {
       )
       .subscribe({
         next: (createdCocktail) => {
+          if (!this.draftStore.valid(submissionLease)) return;
           this.draft.succeeded();
           void this.router.navigate(['/cocktails', createdCocktail.slug]);
         },
 
         error: (error: unknown) => {
           this.draft.rejected(error);
-          this.nameAvailability()?.identifiedConflict(error);
+          if (!this.draftStore.valid(submissionLease)) return;
+          this.nameAvailability()?.identifiedConflict(error, submittedName);
           this.errorMessage.set(this.resolveErrorMessage(error));
         },
       });

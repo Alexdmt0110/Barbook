@@ -48,6 +48,7 @@ export class RecipeNameAvailability {
   // Signal bridge also sees explicit restores/server resets made with emitEvent:false.
   readonly value = input.required<string>();
   private generation = 0;
+  private renderedControl: FormControl<string> | null = null;
   readonly cocktailId = input<string | undefined>();
   readonly messageId = input.required<string>();
   private readonly api = inject(RecipeNameAvailabilityService);
@@ -74,6 +75,7 @@ export class RecipeNameAvailability {
   constructor() {
     effect((onCleanup) => {
       const control = this.nameControl();
+      this.renderedControl = control;
       const context = this.workspace.current();
       const cocktailId = this.cocktailId();
       const lease = this.drafts.lease();
@@ -108,7 +110,14 @@ export class RecipeNameAvailability {
       onCleanup(() => sub.unsubscribe());
     });
   }
-  identifiedConflict(error: unknown): void {
+  identifiedConflict(error: unknown, submittedName: string): void {
+    if (
+      !this.renderedControl ||
+      submittedName !== this.renderedControl.value ||
+      !this.drafts.lease() ||
+      !this.workspace.current()
+    )
+      return;
     if (!(error instanceof HttpErrorResponse) || error.status !== 409) return;
     if (error.error?.code === 'COCKTAIL_NAME_TAKEN') {
       this.generation++;
