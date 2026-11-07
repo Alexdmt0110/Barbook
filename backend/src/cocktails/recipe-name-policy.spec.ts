@@ -33,6 +33,8 @@ describe('Recipe name conflict identification', () => {
   it.each([
     { modelName: 'Ingredient', target: ['workspaceId', 'slug'] },
     { modelName: 'Cocktail', target: ['id'] },
+    { target: ['workspaceId', 'slug'] },
+    { target: ['workspaceId', 'nameKey'] },
     { modelName: 'Cocktail' },
     {},
   ])('does not mislabel %j', (meta) => {

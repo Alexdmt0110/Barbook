@@ -70,12 +70,16 @@ export function recipeNameDatabaseConflict(
   if (error.meta?.modelName && error.meta.modelName !== 'Cocktail') return null;
   const target: unknown = error.meta?.target;
   if (
-    (Array.isArray(target) && target.includes('nameKey')) ||
+    (error.meta?.modelName === 'Cocktail' &&
+      Array.isArray(target) &&
+      target.includes('nameKey')) ||
     target === 'Cocktail_workspaceId_nameKey_key'
   )
     return recipeNameConflict('NAME_TAKEN');
   if (
-    (Array.isArray(target) && target.includes('slug')) ||
+    (error.meta?.modelName === 'Cocktail' &&
+      Array.isArray(target) &&
+      target.includes('slug')) ||
     target === 'Cocktail_workspaceId_slug_key'
   )
     return recipeNameConflict('SLUG_RESERVED');
