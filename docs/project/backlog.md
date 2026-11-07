@@ -1,3 +1,15 @@
+# Priorité courante — unicité des noms puis première installation Windows
+
+7 novembre 2026. Main de départ réellement qualifié `8bfaef93`, PR49/50 fusionnées. Carnets Personnel/Bar, création du Bar/palette/membres, inventaire manuel, suggestions et plans de batch sont intégrés et qualifiés en développement. BB2b et copie Personnel→Bar restent reportés après première ouverture. Aucune disponibilité réelle sur le PC d'Alex n'est encore démontrée.
+
+RECIPE-NAME-01 option A et réservation après expiration validées. Branche `feature/recipe-canonical-name-uniqueness` : migration additive, autorité PostgreSQL, ancien client compatible, préflight création/édition et protections de saisie implémentés ; qualification globale en cours. Dernières preuves partielles :305unités backend,322PG/HTTP réels avec migrations/collisions/ancien client/parité Unicode ;302frontend localement. Chromium, visuel et Gate final à conclure sur le dernierHEAD, puis D8 et sept contrôles post-main. Voir [Design Review](recipe-name-integrity-design.md) et journal de reprise ; ne pas considérer ce paragraphe comme une preuve de merge.
+
+Prochaine action après qualification : reprendre le diagnostic Windows lecture seule (`scripts/windows/Diagnose-Barbook.ps1`), déterminer les logiciels réellement manquants, puis faire valider les opérations d'installation/base/Serve et la recette à deux comptes. Pas de nouveau chantier métier. Cible temporaire PC Windows + PostgreSQL local + Nest/Angular loopback + Tailscale Serve HTTPS privé, puis OVH séparément. Aucun PC/Tailscale/réseau/base réelle/VPS/déploiement/coût autorisé à ce stade. RPO4h/RTO24h restent des objectifs à démontrer ; sauvegardes locales et risque de perte du PC à accepter avant ouverture.
+
+Les sections datées ci-dessous sont historiques lorsqu'elles contredisent ce checkpoint.
+
+---
+
 # Backlog d'exécution
 
 ## BB2a — PR48 en qualification, 29octobre

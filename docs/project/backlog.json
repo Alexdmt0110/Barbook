@@ -1973,23 +1973,31 @@
       "autorisation": "PROPOSITION_NON_APPROUVEE"
     }
   ],
-  "date_suivi_execution": "2026-10-26",
+  "date_suivi_execution": "2026-11-07",
   "checkpoint_execution": {
-    "date": "2026-10-27",
-    "main_qualifie": "76d96822ce97ce3720b4214c678138f18037677f",
+    "date": "2026-11-07",
+    "main_qualifie": "8bfaef93645d13214ba4f9324900835d9d5864c0",
     "L5_BB0": "CLOTURE_TECHNIQUEMENT",
-    "BB1a": "SERVEUR_INTEGRE_QUALIFIE",
-    "BB1b": "PR40_DRAFT_IMPLEMENTATION_ET_QUALIFICATION_A_TERMINER",
-    "UX": "A_B_C_D_PRIORITAIRE_INTEGRES_QUALIFIES_PAS_AUDIT_EXHAUSTIF",
-    "ci_main": {
-      "backend": 273,
-      "frontend": 234,
-      "postgresql_http": 240,
-      "chromium": 16,
-      "audits_vulnerabilites": 0
+    "BB1a": "INTEGRE_QUALIFIE",
+    "BB1b_BB1d": "CARNET_PARTAGE_CREATION_BAR_PALETTE_MEMBRES_INTEGRES_QUALIFIES",
+    "BB2a": "PLANS_AUTONOMES_INTEGRES_QUALIFIES",
+    "BB3_BB4": "INVENTAIRE_MANUEL_SUGGESTIONS_INTEGRES_QUALIFIES",
+    "BB2b_copie": "REPORTES_APRES_PREMIERE_OUVERTURE",
+    "livraison_Windows": "PR49_INTEGREE_QUALIFIEE_PAS_INSTALLATION_REELLE",
+    "RECIPE_NAME_01": {
+      "decision": "OPTION_A_RESERVATION_TANT_QUE_LIGNE_EXISTE_VALIDEE",
+      "branche": "feature/recipe-canonical-name-uniqueness",
+      "etat": "IMPLEMENTE_QUALIFICATION_FINALE_EN_COURS",
+      "preuves_partielles": {
+        "backend": 305,
+        "frontend_local": 302,
+        "postgresql_http": 322
+      },
+      "suite": "CHROMIUM_VISUEL_GATE_D8_SEPT_CHECKS_ET_POST_MAIN"
     },
+    "prochaine_action": "DIAGNOSTIC_WINDOWS_PUIS_ACCORD_DISTINCT_INSTALLATION_BASE_SERVE",
     "disponibilite_reelle": false,
     "OPS_reels_autorises": false,
-    "D7": "NON_VALIDE"
+    "D7": "CIBLES_WINDOWS_TEMPORAIRE_OVH_ULTERIEUR_ET_RPO4H_RTO24H_DECIDEES_FAISABILITE_A_QUALIFIER"
   }
 }

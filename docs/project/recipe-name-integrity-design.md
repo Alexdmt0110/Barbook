@@ -49,3 +49,12 @@ En cas de409 identifié au nom, conserver saisie/brouillon et montrer le message
 - Sept contrôles obligatoires au dernierHEAD : backend/frontend, PostgreSQL/HTTP, Chromium, Windows Delivery et audits backend/frontend. Review Gate complet puis mergecommit D8 et sept post-main ; branches conservées.
 
 Git : commits atomiques et push immédiat. VM : aucun déploiement. SQL : migration développée et testée uniquement en environnements jetables. Infra : aucun changement. Retour ensuite au diagnostic Windows et aux étapes d'installation existantes ; aucune autre feature métier.
+
+
+## Checkpoint d'implémentation avant qualification finale
+
+Backend publié8caac079 :305unités passent,322PostgreSQL/HTTP passent (27suites), migrate deploy répété/status et migrate diff sans différence. Migration pleine, collisions actives/corbeille expirée, rollback DDL tardif, parité de tous scalaires UTF8 et contextes combinés, courses HTTP et ancien client Prisma généré depuis le schéma exact8bfaef93 vérifiés sur CI jetable. Ancien schéma reconstruit avec SHA256545a7abd53644ead24a6f0a6993aeb32f216ad1a66fb47892b47b861cc02bea0 avant génération. Fixture enrichie ensuite avec dossiers, tags, lignes, garnitures, étapes et image pour comparaison de toutes les colonnes historiques ; PostgreSQL02a46493 réussi également.
+
+Composant commun creation/edit publié7caef633, parcours Chromium renforcés02a46493, lecture informative bornée5secondes c877762c :302frontend locaux réussis. Aucune modification d'un timeout/retry/seuil existant. Vérification à400ms annulable, réponse de contrôle plus ancienne ignorée après un409 définitif, resets silencieux du formulaire pris en compte. La vérification ne change jamais la validité Angular ni ne soumet une commande. Le nom du champ et sa description sont associés séparément pour ne pas confondre le libellé accessible et le message.
+
+Qualification du dernierHEAD, captures réelles, revue de branche/PR et post-main encore à terminer ; ne pas anticiper la livraison de cette tranche. Le journal et le corps de la PR suivante consigneront les résultats effectifs. Branche ajoutée aux seuls déclenchements push existants des trois workflows pour exercer les sept contrôles avant PR ; aucun job, assertion ou audit affaibli. Retour à Windows ensuite, pas de BB2b/copie.
