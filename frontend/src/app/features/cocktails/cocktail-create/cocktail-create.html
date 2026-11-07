@@ -1,30 +1,27 @@
 <section class="create-page">
-  <a class="back-link" routerLink="/cocktails"> ← Mes cocktails </a>
+  <a
+    class="back-link"
+    routerLink="/cocktails"
+  >
+    ← Mes cocktails
+  </a>
 
   <header class="page-header">
-    <p class="eyebrow">Nouvelle recette</p>
+    <p class="eyebrow">
+      Nouvelle recette
+    </p>
 
     <h1>Créer un cocktail</h1>
 
     <p>
-      Construis ta recette étape par étape. Les volumes saisis en cL seront automatiquement
-      enregistrés en mL.
+      Construis ta recette étape par étape.
+      Les volumes saisis en cL seront
+      automatiquement enregistrés en mL.
     </p>
   </header>
 
-  <app-draft-notice
-    [libraryInSameTab]="workspace.current()?.kind === 'SHARED'"
-    [conflictAdvice]="
-      workspace.current()?.kind === 'SHARED'
-        ? 'Les droits du Bar ont changé. Conserve ta saisie pour la recopier, ou abandonne explicitement ce brouillon avant de repartir d’un formulaire autorisé.'
-        : null
-    "
-    [draft]="draft"
-    (restore)="restoreDraft()"
-    (discard)="discardDraft()"
-  />
-  <form
-    [attr.inert]="draft.candidate() || isSubmitting() ? '' : null"
+  <app-draft-notice [libraryInSameTab]="workspace.current()?.kind === 'SHARED'" [conflictAdvice]="workspace.current()?.kind === 'SHARED' ? 'Les droits du Bar ont changé. Conserve ta saisie pour la recopier, ou abandonne explicitement ce brouillon avant de repartir d’un formulaire autorisé.' : null" [draft]="draft" (restore)="restoreDraft()" (discard)="discardDraft()" />
+  <form [attr.inert]="draft.candidate() || isSubmitting() ? '' : null"
     class="cocktail-form"
     [formGroup]="form"
     (ngSubmit)="submit()"
@@ -33,12 +30,19 @@
     <section class="form-card">
       <div class="section-heading">
         <div>
-          <p class="section-index">01</p>
+          <p class="section-index">
+            01
+          </p>
 
-          <h2>Identité & service</h2>
+          <h2>
+            Identité & service
+          </h2>
         </div>
 
-        <p>Les informations principales de la recette.</p>
+        <p>
+          Les informations principales
+          de la recette.
+        </p>
       </div>
 
       <div class="field-grid">
@@ -50,25 +54,23 @@
             formControlName="name"
             aria-labelledby="create-name-label"
             aria-describedby="create-name-availability"
-            [attr.aria-invalid]="
-              nameCheck.hasConflict() || (form.controls.name.touched && form.controls.name.invalid)
-                ? true
-                : null
-            "
+            [attr.aria-invalid]="nameCheck.hasConflict() || (form.controls.name.touched && form.controls.name.invalid) ? true : null"
             maxlength="120"
             autocomplete="off"
             placeholder="Whiskey Sour"
           />
-          <app-recipe-name-availability
-            #nameCheck
-            [nameControl]="form.controls.name"
-            [value]="form.controls.name.value"
-            messageId="create-name-availability"
-          />
+          <app-recipe-name-availability #nameCheck
+            [nameControl]="form.controls.name" [value]="form.controls.name.value"
+            messageId="create-name-availability" />
 
-          @if (form.controls.name.touched && form.controls.name.invalid) {
+          @if (
+            form.controls.name.touched &&
+            form.controls.name.invalid
+            ) {
             <small class="field-error">
-              Le nom doit contenir entre 2 et 120 caractères utiles.
+              Le nom doit contenir
+              entre 2 et 120 caractères
+              utiles.
             </small>
           }
         </label>
@@ -77,8 +79,13 @@
           <span>Type *</span>
 
           <select formControlName="type">
-            @for (option of cocktailTypes; track option.value) {
-              <option [value]="option.value">
+            @for (
+              option of cocktailTypes;
+              track option.value
+              ) {
+              <option
+                [value]="option.value"
+              >
                 {{ option.label }}
               </option>
             }
@@ -88,15 +95,27 @@
         <label class="field">
           <span>Famille</span>
 
-          <input type="text" formControlName="family" maxlength="80" placeholder="Sour" />
+          <input
+            type="text"
+            formControlName="family"
+            maxlength="80"
+            placeholder="Sour"
+          />
         </label>
 
         <label class="field">
           <span>Méthode *</span>
 
-          <select formControlName="method">
-            @for (option of recipeMethods; track option.value) {
-              <option [value]="option.value">
+          <select
+            formControlName="method"
+          >
+            @for (
+              option of recipeMethods;
+              track option.value
+              ) {
+              <option
+                [value]="option.value"
+              >
                 {{ option.label }}
               </option>
             }
@@ -106,17 +125,32 @@
         <label class="field">
           <span>Verre *</span>
 
-          <input type="text" formControlName="glass" maxlength="80" placeholder="Old fashioned" />
+          <input
+            type="text"
+            formControlName="glass"
+            maxlength="80"
+            placeholder="Old fashioned"
+          />
 
-          @if (form.controls.glass.touched && form.controls.glass.invalid) {
-            <small class="field-error"> Le verre est obligatoire. </small>
+          @if (
+            form.controls.glass.touched &&
+            form.controls.glass.invalid
+            ) {
+            <small class="field-error">
+              Le verre est obligatoire.
+            </small>
           }
         </label>
 
         <label class="field">
           <span>Glace</span>
 
-          <input type="text" formControlName="ice" maxlength="80" placeholder="Gros glaçon" />
+          <input
+            type="text"
+            formControlName="ice"
+            maxlength="80"
+            placeholder="Gros glaçon"
+          />
         </label>
       </div>
     </section>
@@ -124,65 +158,137 @@
     <section class="form-card">
       <div class="section-heading">
         <div>
-          <p class="section-index">02</p>
+          <p class="section-index">
+            02
+          </p>
 
           <h2>Ingrédients</h2>
         </div>
 
-        <p>Saisis les ingrédients dans leur ordre de lecture.</p>
+        <p>
+          Saisis les ingrédients dans
+          leur ordre de lecture.
+        </p>
       </div>
 
-      <div class="dynamic-list" formArrayName="ingredients">
-        @for (ingredient of ingredients.controls; track ingredient; let index = $index) {
-          <article class="dynamic-card" [formGroupName]="index">
-            <header class="dynamic-card-header">
+      <div
+        class="dynamic-list"
+        formArrayName="ingredients"
+      >
+        @for (
+          ingredient
+            of ingredients.controls;
+          track ingredient;
+          let index = $index
+          ) {
+          <article
+            class="dynamic-card"
+            [formGroupName]="index"
+          >
+            <header
+              class="dynamic-card-header"
+            >
               <strong>
                 Ingrédient
                 {{ rowNumber(index) }}
               </strong>
 
-              @if (ingredients.length > 1) {
-                <button class="remove-action" type="button" (click)="removeIngredient(index)">
+              @if (
+                ingredients.length > 1
+                ) {
+                <button
+                  class="remove-action"
+                  type="button"
+                  (click)="
+                    removeIngredient(
+                      index
+                    )
+                  "
+                >
                   Supprimer
                 </button>
               }
             </header>
 
             <div class="field-grid">
-              <div class="field field-wide">
+              <div
+                class="field field-wide"
+              >
                 <label
                   class="field-label"
-                  [id]="'recipe-ingredient-label-' + index"
-                  [for]="'recipe-ingredient-input-' + index"
+                  [id]="
+                    'recipe-ingredient-label-' +
+                    index
+                  "
+                  [for]="
+                    'recipe-ingredient-input-' +
+                    index
+                  "
                 >
                   Ingrédient *
                 </label>
 
                 <app-ingredient-autocomplete
                   formControlName="ingredientName"
-                  [inputId]="'recipe-ingredient-input-' + index"
-                  [ariaLabelledBy]="'recipe-ingredient-label-' + index"
+                  [inputId]="
+                    'recipe-ingredient-input-' +
+                    index
+                  "
+                  [ariaLabelledBy]="
+                    'recipe-ingredient-label-' +
+                    index
+                  "
                   placeholder="Gin, jus de citron jaune…"
-                  (ingredientNameChanged)="onIngredientNameChanged(index, $event)"
-                  (ingredientSelected)="onIngredientSelected(index, $event)"
+                  (ingredientNameChanged)="
+                    onIngredientNameChanged(
+                      index,
+                      $event
+                    )
+                  "
+                  (ingredientSelected)="
+                    onIngredientSelected(
+                      index,
+                      $event
+                    )
+                  "
                 />
               </div>
 
               <label class="field">
                 <span>Unité *</span>
 
-                <select formControlName="unit" (change)="onIngredientUnitChange(index)">
-                  @for (option of ingredientUnits; track option.value) {
-                    <option [value]="option.value">
+                <select
+                  formControlName="unit"
+                  (change)="
+                    onIngredientUnitChange(
+                      index
+                    )
+                  "
+                >
+                  @for (
+                    option
+                      of ingredientUnits;
+                    track option.value
+                    ) {
+                    <option
+                      [value]="
+                        option.value
+                      "
+                    >
                       {{ option.label }}
                     </option>
                   }
                 </select>
               </label>
 
-              @if (ingredient.controls.unit.value !== 'TOP_UP') {
+              @if (
+                ingredient.controls.unit
+                  .value !== 'TOP_UP'
+                ) {
                 <label class="field">
-                  <span> Quantité * </span>
+                  <span>
+                    Quantité *
+                  </span>
 
                   <input
                     type="number"
@@ -195,17 +301,28 @@
                   />
                 </label>
               } @else {
-                <div class="field top-up-info">
-                  <span> Quantité </span>
+                <div
+                  class="field top-up-info"
+                >
+                  <span>
+                    Quantité
+                  </span>
 
-                  <p>Compléter selon le volume final souhaité.</p>
+                  <p>
+                    Compléter selon le
+                    volume final souhaité.
+                  </p>
                 </div>
               }
 
               <label class="field">
-                <span> Degré alcoolique </span>
+                <span>
+                  Degré alcoolique
+                </span>
 
-                <div class="number-suffix">
+                <div
+                  class="number-suffix"
+                >
                   <input
                     type="number"
                     formControlName="ingredientDefaultAbv"
@@ -214,17 +331,25 @@
                     step="0.01"
                     inputmode="decimal"
                     placeholder="40"
-                    (input)="syncMainAlcoholSelection()"
+                    (input)="
+                      syncMainAlcoholSelection()
+                    "
                   />
 
                   <span>%</span>
                 </div>
 
-                <small> 0 = sans alcool. Laisse vide si le degré est inconnu. </small>
+                <small>
+                  0 = sans alcool.
+                  Laisse vide si le degré
+                  est inconnu.
+                </small>
               </label>
 
               <label class="field">
-                <span> Spécification </span>
+                <span>
+                  Spécification
+                </span>
 
                 <input
                   type="text"
@@ -234,8 +359,12 @@
                 />
               </label>
 
-              <label class="field field-wide">
-                <span> Note ingrédient </span>
+              <label
+                class="field field-wide"
+              >
+                <span>
+                  Note ingrédient
+                </span>
 
                 <input
                   type="text"
@@ -246,36 +375,66 @@
               </label>
             </div>
 
-            @if (ingredient.touched && ingredient.hasError('amountRequired')) {
-              <p class="row-error">Une quantité est obligatoire sauf pour « compléter ».</p>
+            @if (
+              ingredient.touched &&
+              ingredient.hasError(
+                'amountRequired'
+              )
+              ) {
+              <p class="row-error">
+                Une quantité est
+                obligatoire sauf pour
+                « compléter ».
+              </p>
             }
 
-            @if (ingredient.touched && ingredient.hasError('amountMax')) {
-              <p class="row-error">La quantité saisie dépasse la valeur maximale autorisée.</p>
+            @if (
+              ingredient.touched &&
+              ingredient.hasError(
+                'amountMax'
+              )
+              ) {
+              <p class="row-error">
+                La quantité saisie dépasse
+                la valeur maximale autorisée.
+              </p>
             }
           </article>
         }
       </div>
 
       @if (
-        (ingredients.dirty || ingredients.touched) &&
-        ingredients.hasError('duplicateCanonicalIngredient')
-      ) {
+        (
+          ingredients.dirty ||
+          ingredients.touched
+        ) &&
+        ingredients.hasError(
+          'duplicateCanonicalIngredient'
+        )
+        ) {
         <p class="row-error">
-          Un même ingrédient ne peut apparaître qu’une seule fois dans la recette.
+          Un même ingrédient ne peut
+          apparaître qu’une seule fois
+          dans la recette.
         </p>
       }
 
       <button
         class="add-row-action"
         type="button"
-        [disabled]="ingredients.length >= maxRecipeIngredients"
+        [disabled]="
+          ingredients.length >=
+          maxRecipeIngredients
+        "
         (click)="addIngredient()"
       >
         + Ajouter un ingrédient
       </button>
 
-      @if (ingredients.length >= maxRecipeIngredients) {
+      @if (
+        ingredients.length >=
+        maxRecipeIngredients
+        ) {
         <p class="section-empty">
           Limite de
           {{ maxRecipeIngredients }}
@@ -285,13 +444,27 @@
 
       <div class="main-alcohol-block">
         <label class="field">
-          <span> Alcool principal </span>
+          <span>
+            Alcool principal
+          </span>
 
-          <select formControlName="mainAlcoholName">
-            <option value="">Aucun</option>
+          <select
+            formControlName="mainAlcoholName"
+          >
+            <option value="">
+              Aucun
+            </option>
 
-            @for (ingredientName of alcoholicIngredientOptions(); track ingredientName) {
-              <option [value]="ingredientName">
+            @for (
+              ingredientName
+                of alcoholicIngredientOptions();
+              track ingredientName
+              ) {
+              <option
+                [value]="
+                  ingredientName
+                "
+              >
                 {{ ingredientName }}
               </option>
             }
@@ -303,16 +476,27 @@
     <section class="form-card">
       <div class="section-heading">
         <div>
-          <p class="section-index">03</p>
+          <p class="section-index">
+            03
+          </p>
 
           <h2>Préparation</h2>
         </div>
 
-        <p>Une action claire par étape.</p>
+        <p>
+          Une action claire par étape.
+        </p>
       </div>
 
-      <div class="dynamic-list compact-list" formArrayName="steps">
-        @for (step of steps.controls; track step; let index = $index) {
+      <div
+        class="dynamic-list compact-list"
+        formArrayName="steps"
+      >
+        @for (
+          step of steps.controls;
+          track step;
+          let index = $index
+          ) {
           <article class="step-row">
             <div class="step-number">
               {{ index + 1 }}
@@ -332,8 +516,16 @@
               ></textarea>
             </label>
 
-            @if (steps.length > 1) {
-              <button class="remove-action step-remove" type="button" (click)="removeStep(index)">
+            @if (
+              steps.length > 1
+              ) {
+              <button
+                class="remove-action step-remove"
+                type="button"
+                (click)="
+                  removeStep(index)
+                "
+              >
                 Supprimer
               </button>
             }
@@ -344,13 +536,19 @@
       <button
         class="add-row-action"
         type="button"
-        [disabled]="steps.length >= maxPreparationSteps"
+        [disabled]="
+          steps.length >=
+          maxPreparationSteps
+        "
         (click)="addStep()"
       >
         + Ajouter une étape
       </button>
 
-      @if (steps.length >= maxPreparationSteps) {
+      @if (
+        steps.length >=
+        maxPreparationSteps
+        ) {
         <p class="section-empty">
           Limite de
           {{ maxPreparationSteps }}
@@ -362,45 +560,89 @@
     <section class="form-card">
       <div class="section-heading">
         <div>
-          <p class="section-index">04</p>
+          <p class="section-index">
+            04
+          </p>
 
           <h2>Garnitures</h2>
         </div>
 
-        <p>Facultatif.</p>
+        <p>
+          Facultatif.
+        </p>
       </div>
 
-      @if (garnishes.length === 0) {
-        <p class="section-empty">Aucune garniture pour le moment.</p>
+      @if (
+        garnishes.length === 0
+        ) {
+        <p class="section-empty">
+          Aucune garniture
+          pour le moment.
+        </p>
       } @else {
-        <div class="dynamic-list" formArrayName="garnishes">
-          @for (garnish of garnishes.controls; track garnish; let index = $index) {
-            <article class="dynamic-card" [formGroupName]="index">
-              <header class="dynamic-card-header">
+        <div
+          class="dynamic-list"
+          formArrayName="garnishes"
+        >
+          @for (
+            garnish
+              of garnishes.controls;
+            track garnish;
+            let index = $index
+            ) {
+            <article
+              class="dynamic-card"
+              [formGroupName]="index"
+            >
+              <header
+                class="dynamic-card-header"
+              >
                 <strong>
                   Garniture
                   {{ rowNumber(index) }}
                 </strong>
 
-                <button class="remove-action" type="button" (click)="removeGarnish(index)">
+                <button
+                  class="remove-action"
+                  type="button"
+                  (click)="
+                    removeGarnish(
+                      index
+                    )
+                  "
+                >
                   Supprimer
                 </button>
               </header>
 
               <div class="field-grid">
-                <div class="field field-wide">
+                <div
+                  class="field field-wide"
+                >
                   <label
                     class="field-label"
-                    [id]="'garnish-ingredient-label-' + index"
-                    [for]="'garnish-ingredient-input-' + index"
+                    [id]="
+                      'garnish-ingredient-label-' +
+                      index
+                    "
+                    [for]="
+                      'garnish-ingredient-input-' +
+                      index
+                    "
                   >
                     Ingrédient *
                   </label>
 
                   <app-ingredient-autocomplete
                     formControlName="ingredientName"
-                    [inputId]="'garnish-ingredient-input-' + index"
-                    [ariaLabelledBy]="'garnish-ingredient-label-' + index"
+                    [inputId]="
+                      'garnish-ingredient-input-' +
+                      index
+                    "
+                    [ariaLabelledBy]="
+                      'garnish-ingredient-label-' +
+                      index
+                    "
                     placeholder="Citron jaune…"
                   />
                 </div>
@@ -408,18 +650,38 @@
                 <label class="field">
                   <span>Unité</span>
 
-                  <select formControlName="unit" (change)="onGarnishUnitChange(index)">
-                    @for (option of garnishUnits; track option.value) {
-                      <option [value]="option.value">
+                  <select
+                    formControlName="unit"
+                    (change)="
+                      onGarnishUnitChange(
+                        index
+                      )
+                    "
+                  >
+                    @for (
+                      option
+                        of garnishUnits;
+                      track option.value
+                      ) {
+                      <option
+                        [value]="
+                          option.value
+                        "
+                      >
                         {{ option.label }}
                       </option>
                     }
                   </select>
                 </label>
 
-                @if (garnish.controls.unit.value !== '') {
+                @if (
+                  garnish.controls.unit
+                    .value !== ''
+                  ) {
                   <label class="field">
-                    <span> Quantité </span>
+                    <span>
+                      Quantité
+                    </span>
 
                     <input
                       type="number"
@@ -433,13 +695,23 @@
                 }
 
                 <label class="field">
-                  <span> Spécification </span>
+                  <span>
+                    Spécification
+                  </span>
 
-                  <input type="text" formControlName="specification" maxlength="160" />
+                  <input
+                    type="text"
+                    formControlName="specification"
+                    maxlength="160"
+                  />
                 </label>
 
-                <label class="field field-wide">
-                  <span> Utilisation * </span>
+                <label
+                  class="field field-wide"
+                >
+                  <span>
+                    Utilisation *
+                  </span>
 
                   <textarea
                     formControlName="usage"
@@ -450,12 +722,29 @@
                 </label>
               </div>
 
-              @if (garnish.touched && garnish.hasError('amountUnitPair')) {
-                <p class="row-error">Quantité et unité doivent être renseignées ensemble.</p>
+              @if (
+                garnish.touched &&
+                garnish.hasError(
+                  'amountUnitPair'
+                )
+                ) {
+                <p class="row-error">
+                  Quantité et unité
+                  doivent être renseignées
+                  ensemble.
+                </p>
               }
 
-              @if (garnish.touched && garnish.hasError('amountMax')) {
-                <p class="row-error">La quantité saisie dépasse la valeur maximale autorisée.</p>
+              @if (
+                garnish.touched &&
+                garnish.hasError(
+                  'amountMax'
+                )
+                ) {
+                <p class="row-error">
+                  La quantité saisie dépasse
+                  la valeur maximale autorisée.
+                </p>
               }
             </article>
           }
@@ -465,13 +754,19 @@
       <button
         class="add-row-action"
         type="button"
-        [disabled]="garnishes.length >= maxGarnishes"
+        [disabled]="
+          garnishes.length >=
+          maxGarnishes
+        "
         (click)="addGarnish()"
       >
         + Ajouter une garniture
       </button>
 
-      @if (garnishes.length >= maxGarnishes) {
+      @if (
+        garnishes.length >=
+        maxGarnishes
+        ) {
         <p class="section-empty">
           Limite de
           {{ maxGarnishes }}
@@ -483,16 +778,22 @@
     <section class="form-card">
       <div class="section-heading">
         <div>
-          <p class="section-index">05</p>
+          <p class="section-index">
+            05
+          </p>
 
           <h2>Notes</h2>
         </div>
 
-        <p>Facultatif.</p>
+        <p>
+          Facultatif.
+        </p>
       </div>
 
       <label class="field">
-        <span> Notes générales </span>
+        <span>
+          Notes générales
+        </span>
 
         <textarea
           formControlName="notes"
@@ -504,13 +805,21 @@
     </section>
 
     @if (errorMessage()) {
-      <div class="submit-error" role="alert">
+      <div
+        class="submit-error"
+        role="alert"
+      >
         {{ errorMessage() }}
       </div>
     }
 
     <footer class="form-actions">
-      <a class="cancel-action" routerLink="/cocktails"> Annuler </a>
+      <a
+        class="cancel-action"
+        routerLink="/cocktails"
+      >
+        Annuler
+      </a>
 
       <button
         class="submit-action"

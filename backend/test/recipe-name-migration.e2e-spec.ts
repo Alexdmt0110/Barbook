@@ -30,6 +30,15 @@ async function previousSchema(
       INSERT INTO "Cocktail"(id,slug,name,type,method,glass,"workspaceId","updatedAt","contentVersion","organizationVersion") VALUES
         ('original','stable-original-url','Mójito','CLASSIC','BUILD','Glass','a',now(),4,7),
         ('other-space','other-url','mojito','CLASSIC','BUILD','Glass','b',now(),0,0);
+      INSERT INTO "Folder"(id,name,"workspaceId","updatedAt") VALUES('folder','Folder','a',now());
+      INSERT INTO "Ingredient"(id,name,slug,"defaultAbv","workspaceId","updatedAt") VALUES('ingredient','Gin','gin',40,'a',now());
+      UPDATE "Cocktail" SET "folderId"='folder',"mainAlcoholId"='ingredient',"imageUrl"='/synthetic/preserved.png' WHERE id='original';
+      INSERT INTO "CocktailFolder"("workspaceId","cocktailId","folderId") VALUES('a','original','folder');
+      INSERT INTO "CocktailIngredient"(id,"workspaceId","cocktailId","ingredientId",amount,unit,"abvOverride","sortOrder") VALUES('line','a','original','ingredient',50,'ML',37,1);
+      INSERT INTO "GarnishIngredient"(id,"workspaceId","cocktailId","ingredientId",usage,"sortOrder") VALUES('garnish','a','original','ingredient','Synthetic garnish',1);
+      INSERT INTO "PreparationStep"(id,"cocktailId",content,"sortOrder") VALUES('step','original','Stir',1);
+      INSERT INTO "Tag"(id,name,slug,"workspaceId","updatedAt") VALUES('tag','Tag','tag','a',now());
+      INSERT INTO "CocktailTag"("workspaceId","cocktailId","tagId") VALUES('a','original','tag');
     `);
     await run(client, schema);
   } finally {
