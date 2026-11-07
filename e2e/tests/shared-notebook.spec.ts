@@ -188,7 +188,8 @@ test('a late competing Bar creation gives a precise conflict and preserves form 
   await page.goto('/cocktails/new');
   const name = `Concurrent ${randomUUID().slice(0, 8)}`;
   await fill(page, name);
-  // A real second account commits after the member has already filled the form.
+  await expect(page.locator('#create-name-availability')).toContainText('disponible pour le moment');
+  // A real second account commits after a successful advisory check and completed form.
   const winner = await page.request.post(`http://127.0.0.1:3000/api/workspaces/${f.bar.id}/cocktails`, {
     headers: { ...headers(f.owner), Cookie: `barbook-session-dev=${f.owner.credential}` },
     data: { name, type: 'PERSONAL_CREATION', method: 'SHAKER', glass: 'Coupe',
@@ -222,4 +223,68 @@ test('a late competing Bar creation gives a precise conflict and preserves form 
   await expect(page.getByRole('textbox', { name: /^Nom \*/ })).toHaveValue(name);
   await expect(page.getByRole('combobox', { name: /^Ingrédient/ })).toHaveValue('Gin partagé');
   expect(submissions).toBe(1);
+});
+
+
+test('name preflight handles self, rename conflicts, reserved URLs and an unavailable advisory service', async ({ page }, info) => {
+  const f = fixture();
+  await use(page, f.member, info.project.name === 'mobile' ? 233 : 232);
+  acceptDraftNavigation(page);
+  const initial = `Initial ${randomUUID().slice(0,8)}`;
+  const taken = `Taken ${randomUUID().slice(0,8)}`;
+  const make = async (name: string) => {
+    const response = await page.request.post(`http://127.0.0.1:3000/api/workspaces/${f.bar.id}/cocktails`, {
+      headers: {...headers(f.owner),Cookie:`barbook-session-dev=${f.owner.credential}`},
+      data:{name,type:'PERSONAL_CREATION',method:'SHAKER',glass:'Coupe',ingredients:[{ingredientName:'Gin partagé',ingredientDefaultAbv:40,amount:50,unit:'ML'}],steps:['Shaker puis filtrer.'],expectedAccessVersion:0},
+    });
+    expect(response.status(),await response.text()).toBe(201);
+    return await response.json() as {id:string;slug:string};
+  };
+  const original = await make(initial); await make(taken);
+  await openBar(page,f.bar);
+  await page.goto(`/cocktails/id/${original.id}/edit`);
+  await expect(page.locator('#edit-name-availability')).toContainText('disponible pour le moment');
+  const name = page.getByRole('textbox',{name:/^Nom \*/});
+  await name.fill(taken);
+  await expect(page.locator('#edit-name-availability')).toContainText('déjà utilisé');
+  await expect(name).toHaveAttribute('aria-invalid','true');
+  await expect(name).toHaveAttribute('aria-describedby','edit-name-availability');
+  const failed = page.waitForResponse(r=>r.request().method()==='PUT'&&r.url().endsWith(`/cocktails/id/${original.id}/content`));
+  await page.getByRole('button',{name:'Enregistrer la recette',exact:true}).focus(); await page.keyboard.press('Enter');
+  expect((await failed).status()).toBe(409);
+  await expect(name).toHaveValue(taken);
+  for(const theme of ['light','dark']) {
+    await page.getByRole('button',{name:/^Thème d’affichage :/}).click();
+    await page.getByRole('button',{name:theme==='light'?/^Clair/:/^Sombre/}).click();
+    await name.locator('..').screenshot({path:info.outputPath(`edit-name-preflight-${theme}.png`)});
+  }
+  await name.fill(`Changed ${randomUUID().slice(0,8)}`);
+  await expect(page.locator('#edit-name-availability')).toContainText('disponible pour le moment');
+  const saved = page.waitForResponse(r=>r.request().method()==='PUT'&&r.url().endsWith(`/cocktails/id/${original.id}/content`));
+  await page.getByRole('button',{name:'Enregistrer la recette',exact:true}).click();
+  const savedResponse=await saved;
+  expect(savedResponse.status()).toBe(200);
+  expect(savedResponse.request().postDataJSON().expectedContentVersion).toBe(0);
+  expect(await savedResponse.json()).toMatchObject({slug:original.slug,contentVersion:1});
+  await expect(page.getByText('Recette enregistrée.',{exact:true})).toBeVisible();
+  await page.goto('/cocktails/new');
+  await page.getByRole('textbox',{name:/^Nom \*/}).fill(initial);
+  await expect(page.locator('#create-name-availability')).toContainText('adresse associée à ce nom est réservée');
+  await page.getByRole('textbox',{name:/^Nom \*/}).fill(taken);
+  await expect(page.locator('#create-name-availability')).toContainText('30 jours');
+  for(const theme of ['light','dark']) {
+    await page.getByRole('button',{name:/^Thème d’affichage :/}).click();
+    await page.getByRole('button',{name:theme==='light'?/^Clair/:/^Sombre/}).click();
+    await page.getByRole('textbox',{name:/^Nom \*/}).locator('..').screenshot({path:info.outputPath(`create-name-preflight-${theme}.png`)});
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  }
+  await page.route(url=>url.pathname.endsWith('/cocktail-name-availability'),route=>route.abort('failed'));
+  const explicit = `Unknown ${randomUUID().slice(0,8)}`;
+  await fill(page,explicit);
+  await expect(page.locator('#create-name-availability')).toContainText('impossible à vérifier');
+  await expect(page.getByRole('button',{name:'Créer le cocktail',exact:true})).toBeEnabled();
+  const created=page.waitForResponse(r=>r.request().method()==='POST'&&r.url().endsWith(`/workspaces/${f.bar.id}/cocktails`));
+  await page.getByRole('button',{name:'Créer le cocktail',exact:true}).focus(); await page.keyboard.press('Enter');
+  expect((await created).status()).toBe(201);
+  await expect(page.getByRole('heading',{name:explicit,exact:true})).toBeVisible();
 });

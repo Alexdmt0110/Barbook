@@ -5,7 +5,11 @@ import {
   InternalServerErrorException,
   ServiceUnavailableException,
 } from '@nestjs/common';
-import { toSlug } from '../common/slug';
+import { lockOrganizationWorkspace } from '../database/lock-organization-workspace';
+import {
+  recipeNameDatabaseConflict,
+  requireRecipeNameAvailable,
+} from './recipe-name-policy';
 import { isPrismaKnownRequestError } from '../common/prisma-errors';
 import { PrismaService } from '../database/prisma.service';
 import { Prisma } from '../generated/prisma/client';
@@ -61,33 +65,22 @@ export class CocktailCreationService {
 
     const { slug, mainAlcoholSlug } = this.prepareCreation(dto);
 
-    const existingCocktail = await this.prisma.cocktail.findUnique({
-      where: {
-        workspaceId_slug: {
-          workspaceId,
-          slug,
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-      },
+    await requireRecipeNameAvailable(this.prisma, workspaceId, dto.name, {
+      creation: true,
     });
 
-    if (existingCocktail) {
-      throw this.creationConflict(existingCocktail.name, dto.name);
-    }
-
     const persistRecipe = () =>
-      this.prisma.$transaction((transaction) =>
-        this.persistInWorkspace(
+      this.prisma.$transaction(async (transaction) => {
+        // Same order as personal editing: workspace, then catalogue, then recipe.
+        await lockOrganizationWorkspace(transaction, workspaceId);
+        return this.persistInWorkspace(
           transaction,
           workspaceId,
           dto,
           slug,
           mainAlcoholSlug,
-        ),
-      );
+        );
+      });
     let catalogRetries = 0;
     for (;;) {
       try {
@@ -108,14 +101,16 @@ export class CocktailCreationService {
           }
 
           if (error.meta?.modelName === 'Cocktail') {
-            // The failed transaction has rolled back. A scoped read can now
-            // identify the winner without replaying any write.
-            const winner = await this.prisma.cocktail.findUnique({
-              where: { workspaceId_slug: { workspaceId, slug } },
-              select: { id: true, name: true },
-            });
-            if (winner) throw this.creationConflict(winner.name, dto.name);
+            // Read only after rollback; never replay a potentially committed HTTP command.
+            await requireRecipeNameAvailable(
+              this.prisma,
+              workspaceId,
+              dto.name,
+              { creation: true },
+            );
           }
+          const identified = recipeNameDatabaseConflict(error);
+          if (identified) throw identified;
           throw new ConflictException(
             'Recipe changed concurrently. Reload before retrying.',
           );
@@ -133,11 +128,9 @@ export class CocktailCreationService {
     dto: CreateCocktailDto,
   ): Promise<CreateCocktailResult> {
     const { slug, mainAlcoholSlug } = this.prepareCreation(dto);
-    const existing = await transaction.cocktail.findUnique({
-      where: { workspaceId_slug: { workspaceId, slug } },
-      select: { id: true, name: true },
+    await requireRecipeNameAvailable(transaction, workspaceId, dto.name, {
+      creation: true,
     });
-    if (existing) throw this.creationConflict(existing.name, dto.name);
     try {
       return await this.persistInWorkspace(
         transaction,
@@ -148,29 +141,14 @@ export class CocktailCreationService {
       );
     } catch (error: unknown) {
       // Do not retry an aborted transaction or replay a potentially committed HTTP command.
+      const identified = recipeNameDatabaseConflict(error);
+      if (identified) throw identified;
       if (isPrismaKnownRequestError(error, 'P2002'))
         throw new ConflictException(
           'Recipe or ingredient changed concurrently. Reload before retrying.',
         );
       throw error;
     }
-  }
-
-  private creationConflict(
-    existingName: string,
-    requestedName: string,
-  ): ConflictException {
-    // A stable URL can remain reserved after a rename. Do not report an
-    // unrelated version/access/catalogue conflict as a duplicate display name.
-    const sameName = toSlug(existingName) === toSlug(requestedName);
-    return new ConflictException({
-      statusCode: 409,
-      error: 'Conflict',
-      code: sameName ? 'COCKTAIL_NAME_TAKEN' : 'COCKTAIL_SLUG_RESERVED',
-      message: sameName
-        ? 'A cocktail with this name already exists.'
-        : 'The URL for this name is reserved by an existing recipe.',
-    });
   }
 
   private prepareCreation(dto: CreateCocktailDto): {

@@ -63,6 +63,15 @@ describe('Personal recipe editing UI and L4 drafts', () => {
     fixture.detectChanges();
     return fixture;
   }
+  it('associates the name input with an existing label and a separate availability description', () => {
+    const f = setup();
+    const root = f.nativeElement as HTMLElement;
+    const input = root.querySelector('input[formControlName="name"]');
+    expect(input?.getAttribute('aria-labelledby')).toBe('edit-name-label');
+    expect(root.querySelector('#edit-name-label')?.textContent).toBe('Nom *');
+    expect(input?.getAttribute('aria-describedby')).toBe('edit-name-availability');
+    expect(root.querySelector('#edit-name-availability')?.getAttribute('aria-live')).toBe('polite');
+  });
   it('loads organization only on explicit request, preserves its draft on content save and guards both forms', () => {
     const f = setup();
     const c = f.componentInstance;
@@ -155,6 +164,30 @@ describe('Personal recipe editing UI and L4 drafts', () => {
     expect(c.draft()?.dirty()).toBe(false);
     expect(c.success()).toContain('inchangée');
     expect(store.find(store.lease(), 'organization:recipe-a')).not.toBeNull();
+  });
+  it('keeps a known name conflict editable without adopting or bypassing the loaded content version', () => {
+    const c = setup().componentInstance;
+    c.form.controls.name.setValue('Nom occupé');
+    c.submit();
+    http
+      .expectOne(path)
+      .flush({ code: 'COCKTAIL_NAME_TAKEN' }, { status: 409, statusText: 'Conflict' });
+    expect(c.form.controls.name.value).toBe('Nom occupé');
+    expect(c.error()).toContain('nom est déjà utilisé');
+    expect(c.draft()?.conflict()).toBe(false);
+    expect(store.find(store.lease(), 'edit:recipe-a')).not.toBeNull();
+    http.expectNone(path);
+    c.form.controls.name.setValue('Nom corrigé explicitement');
+    c.submit();
+    const retry = http.expectOne(path);
+    expect(retry.request.method).toBe('PUT');
+    expect(retry.request.body.expectedContentVersion).toBe(7);
+    expect(retry.request.body.name).toBe('Nom corrigé explicitement');
+    retry.flush({
+      ...snapshot(8),
+      content: { ...completeContent(), name: 'Nom corrigé explicitement' },
+    });
+    expect(c.success()).toBe('Recette enregistrée.');
   });
   it('preserves a conflict, only reads on comparison and requires explicit abandonment before adopting a new version', () => {
     const c = setup().componentInstance;
@@ -375,5 +408,4 @@ describe('Personal recipe editing UI and L4 drafts', () => {
       uncertain: true,
     });
   });
-
 });

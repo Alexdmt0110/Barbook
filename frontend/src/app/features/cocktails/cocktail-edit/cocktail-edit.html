@@ -79,8 +79,25 @@
             </div>
             <div class="field-grid">
               <label class="field"
-                ><span>Nom *</span
-                ><input formControlName="name" maxlength="120" required autocomplete="off"
+                ><span id="edit-name-label">Nom *</span
+                ><input
+                  formControlName="name"
+                  aria-labelledby="edit-name-label"
+                  maxlength="120"
+                  required
+                  autocomplete="off"
+                  aria-describedby="edit-name-availability"
+                  [attr.aria-invalid]="
+                    nameCheck.hasConflict() ||
+                    (form.controls.name.touched && form.controls.name.invalid)
+                      ? true
+                      : null
+                  " /><app-recipe-name-availability
+                  #nameCheck
+                  [nameControl]="form.controls.name"
+                  [value]="form.controls.name.value"
+                  [cocktailId]="loaded()?.id"
+                  messageId="edit-name-availability"
               /></label>
               <label class="field"
                 ><span>Type *</span

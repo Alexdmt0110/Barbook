@@ -47,15 +47,21 @@
 
       <div class="field-grid">
         <label class="field field-wide">
-          <span>Nom *</span>
+          <span id="create-name-label">Nom *</span>
 
           <input
             type="text"
             formControlName="name"
+            aria-labelledby="create-name-label"
+            aria-describedby="create-name-availability"
+            [attr.aria-invalid]="nameCheck.hasConflict() || (form.controls.name.touched && form.controls.name.invalid) ? true : null"
             maxlength="120"
             autocomplete="off"
             placeholder="Whiskey Sour"
           />
+          <app-recipe-name-availability #nameCheck
+            [nameControl]="form.controls.name" [value]="form.controls.name.value"
+            messageId="create-name-availability" />
 
           @if (
             form.controls.name.touched &&

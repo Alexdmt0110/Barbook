@@ -5,6 +5,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import {
+  recipeNameDatabaseConflict,
+  requireRecipeNameAvailable,
+} from './recipe-name-policy';
 import { isPrismaKnownRequestError } from '../common/prisma-errors';
 import { lockOrganizationWorkspace } from '../database/lock-organization-workspace';
 import { PrismaService } from '../database/prisma.service';
@@ -95,6 +99,10 @@ export class CocktailContentService {
 
       const current = await this.requireRecipe(tx, workspaceId, cocktailId);
       requireVersion(current.contentVersion, dto.expectedContentVersion);
+      await requireRecipeNameAvailable(tx, workspaceId, dto.name, {
+        cocktailId,
+        creation: false,
+      });
 
       const catalog = new Map<
         string,
@@ -224,6 +232,8 @@ export class CocktailContentService {
     } catch (error: unknown) {
       if (error instanceof CocktailCreationValidationError)
         throw new BadRequestException(error.message);
+      const identified = recipeNameDatabaseConflict(error);
+      if (identified) throw identified;
       if (isPrismaKnownRequestError(error, 'P2002'))
         throw new ConflictException(
           'The ingredient catalogue changed. Reload before continuing.',

@@ -30,3 +30,11 @@ for (const args of [
     );
   }
 }
+
+const legacy = spawnSync(
+  process.execPath,
+  ['--import', 'tsx', 'test/prepare-legacy-name-client.ts'],
+  { stdio: 'inherit' },
+);
+if (legacy.error || legacy.status !== 0)
+  throw new Error('Legacy name compatibility fixture preparation failed.');

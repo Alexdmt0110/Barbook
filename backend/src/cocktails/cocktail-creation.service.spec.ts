@@ -44,6 +44,7 @@ type CreateManyMock = jest.Mock<
 >;
 
 interface TransactionMock {
+  $queryRaw: jest.Mock;
   ingredient: {
     upsert: IngredientUpsertMock;
   };
@@ -202,6 +203,7 @@ describe('CocktailCreationService', () => {
     >();
 
     transaction = {
+      $queryRaw: jest.fn().mockResolvedValue([{ id: 'workspace-123' }]),
       ingredient: {
         upsert: ingredientUpsert,
       },
@@ -593,7 +595,13 @@ describe('CocktailCreationService', () => {
   ])(
     'identifies only the known conflict for existing name %s',
     async (name, code) => {
-      cocktailFindUnique.mockResolvedValue({ id: 'existing-cocktail', name });
+      cocktailFindUnique
+        .mockResolvedValueOnce(
+          code === 'COCKTAIL_NAME_TAKEN'
+            ? { id: 'existing-cocktail', name }
+            : null,
+        )
+        .mockResolvedValueOnce({ id: 'existing-cocktail', name });
       await expect(
         service.createPersonalCocktail('user-123', buildCreateDto()),
       ).rejects.toMatchObject({ response: { statusCode: 409, code } });
@@ -644,6 +652,7 @@ describe('CocktailCreationService', () => {
   it('identifies a committed personal slug winner after rollback without replaying the write', async () => {
     cocktailFindUnique
       .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
       .mockResolvedValueOnce({ id: 'winner', name: 'Whiskey Sour' });
     cocktailCreate.mockRejectedValue(
       createKnownRequestError('P2002', { modelName: 'Cocktail' }),
@@ -652,7 +661,7 @@ describe('CocktailCreationService', () => {
       service.createPersonalCocktail('user-123', buildCreateDto()),
     ).rejects.toMatchObject({ response: { code: 'COCKTAIL_NAME_TAKEN' } });
     expect(prismaTransaction).toHaveBeenCalledTimes(1);
-    expect(cocktailFindUnique).toHaveBeenCalledTimes(2);
+    expect(cocktailFindUnique).toHaveBeenCalledTimes(3);
   });
 
   it('fails when the authenticated user has no personal workspace', async () => {

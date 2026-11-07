@@ -1,3 +1,8 @@
+import { RecipeNameAvailabilityService } from './recipe-name-availability.service';
+import {
+  PersonalRecipeNameAvailabilityController,
+  SharedRecipeNameAvailabilityController,
+} from './recipe-name-availability.controller';
 import { SharedCocktailsController } from './shared-cocktails.controller';
 import { Module } from '@nestjs/common';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
@@ -18,6 +23,8 @@ import { CocktailOrganizationService } from './organization/cocktail-organizatio
 @Module({
   imports: [AuthModule, PrismaModule, WorkspacesModule],
   controllers: [
+    PersonalRecipeNameAvailabilityController,
+    SharedRecipeNameAvailabilityController,
     SharedCocktailsController,
     SharedCocktailContentController,
     CocktailLifecycleController,
@@ -27,6 +34,7 @@ import { CocktailOrganizationService } from './organization/cocktail-organizatio
   ],
   exports: [CocktailContentService],
   providers: [
+    RecipeNameAvailabilityService,
     CocktailLifecycleService,
     FoldersService,
     CocktailsService,

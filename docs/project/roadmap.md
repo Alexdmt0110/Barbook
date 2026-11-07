@@ -1,3 +1,15 @@
+# Priorité courante — unicité des noms puis première installation Windows
+
+7 novembre 2026. Main de départ réellement qualifié `8bfaef93`, PR49/50 fusionnées. Carnets Personnel/Bar, création du Bar/palette/membres, inventaire manuel, suggestions et plans de batch sont intégrés et qualifiés en développement. BB2b et copie Personnel→Bar restent reportés après première ouverture. Aucune disponibilité réelle sur le PC d'Alex n'est encore démontrée.
+
+RECIPE-NAME-01 option A et réservation après expiration validées. Branche `feature/recipe-canonical-name-uniqueness` : migration additive, autorité PostgreSQL, ancien client compatible, préflight création/édition et protections de saisie implémentés ; qualification globale en cours. Dernières preuves partielles :311unités backend et306frontend locaux ;322PG/HTTP de la tranche avant la précision finale du mapping Prisma. Dernier mapping réel et callbacks tardifs à requalifier au dernierHEAD. Chromium, visuel et Gate final à conclure sur le dernierHEAD, puis D8 et sept contrôles post-main. Voir [Design Review](recipe-name-integrity-design.md) et journal de reprise ; ne pas considérer ce paragraphe comme une preuve de merge.
+
+Prochaine action après qualification : reprendre le diagnostic Windows lecture seule (`scripts/windows/Diagnose-Barbook.ps1`), déterminer les logiciels réellement manquants, puis faire valider les opérations d'installation/base/Serve et la recette à deux comptes. Pas de nouveau chantier métier. Cible temporaire PC Windows + PostgreSQL local + Nest/Angular loopback + Tailscale Serve HTTPS privé, puis OVH séparément. Aucun PC/Tailscale/réseau/base réelle/VPS/déploiement/coût autorisé à ce stade. RPO4h/RTO24h restent des objectifs à démontrer ; sauvegardes locales et risque de perte du PC à accepter avant ouverture.
+
+Les sections datées ci-dessous sont historiques lorsqu'elles contredisent ce checkpoint.
+
+---
+
 # Priorité validée — bêta privée temporaire Windows/Tailscale
 
 7 novembre2026 : périmètre intégré main18c1ee09/#48 qualifié. BB2b et copiePersonnel→Bar reportés après première ouverture, sans abandon. Cible temporaire approuvée : PC Windows, PostgreSQL local, Nest+Angular loopback, ServeHTTPS privé ; pas Docker/WSL/portpublic. Deux adaptations de livraison et scripts autorisés, PR49 en qualification, aucun déploiement ni installation autorisé. OVH/domaine barbook.melioria.fr ensuite, migration des données complète sans recréer comptes/recettes. D7RPO4h/RTO24h objectifs ; sauvegardes locales seulement, risque pertePC à accepter avant ouverture. Voir docs/ops/windows-beta.md. Les anciens ordres de lots/contraintes de stockage externe ci-dessous sont historiques.

@@ -1,5 +1,9 @@
 # Décisions Barbook
 
+## RECIPE-NAME-01 — option A validée le 7 novembre 2026
+
+Nom canonique unique par workspace en création et renommage, distinct du slug ; noms identiques autorisés entre espaces. Identifiants/URLs/références stables, PostgreSQL autorité finale. Noms et slugs réservés tant que la ligne existe, même après expiration des30jours ; aucune libération, purge ou correction de données automatique. Migration additive autorisée dans le dépôt et sur bases jetables uniquement, contrôle bloquant des collisions existantes et rollback applicatif compatible. Vérification préalable serveur en création/édition, informative et accessible, sans contournement des droits/versions ni perte de saisie/draft. [Design Review](recipe-name-integrity-design.md). D8 et sept contrôles maintenus ; PC/Tailscale/OPS réels toujours non autorisés. BB2b/copie reportés ; retour à la première installation Windows après cette tranche.
+
 ## BB-ESPACES-UX-01 — validée le 27 octobre 2026
 Le mandat utilisateur place Personnel/Bar dans le panneau ouvert par nom/initiales. Personnel reste privé ; catalogue des seuls Bars membres, action « Créer un bar » ou « Créer mon premier bar » après état vide confirmé ; Compte et sécurité reste accessible. Bascule explicite, contexte serveur, isolation/sessions/garanties D2 conservés.
 Tout utilisateur authentifié/admis peut créer explicitement un Bar nommé et choisir sa couleur dans une palette. Transaction serveur : nouveau SHARED et créateur OWNER local uniquement. Ajout ultérieur de membres déjà inscrits ; aucune inscription publique, attribution OWNER d’un Bar existant ou création automatique. Cette décision remplace l’obligation antérieure de provisionnement OPS pour créer le Bar, pas les restrictions sur les opérations réelles.

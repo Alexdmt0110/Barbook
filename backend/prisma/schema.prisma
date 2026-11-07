@@ -172,6 +172,7 @@ model Cocktail {
   id   String @id @default(uuid())
   slug String
   name String
+  nameKey String @default("")
 
   type   CocktailType
   family String?
@@ -214,6 +215,7 @@ model Cocktail {
 
   @@unique([workspaceId, id])
   @@unique([workspaceId, slug])
+  @@unique([workspaceId, nameKey])
   @@index([folderId])
   @@index([mainAlcoholId])
   @@index([workspaceId, name])

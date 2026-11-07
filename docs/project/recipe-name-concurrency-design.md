@@ -1,5 +1,7 @@
 # Noms de recettes — Design Review ciblée, avant évolution structurelle
 
+**Statut courant, 7 novembre 2026 : option A et réservation des noms/slugs tant que les lignes existent validées explicitement.** Voir [la conception d’implémentation](recipe-name-integrity-design.md) et RECIPE-NAME-01. Les mentions d’arbitrage en attente ci-dessous retracent la qualification de PR50 avant cette validation.
+
 7 novembre2026. Revue depuis code recette intégré à main18c1ee09, inchangé par livraisonPR49. Aucun schéma/contrat de renommage modifié ici. Données réelles jamais consultées.
 
 ## Constats prouvés par lecture et tests existants

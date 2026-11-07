@@ -1,6 +1,7 @@
+import { RecipeNameAvailability } from '../recipe-name-availability/recipe-name-availability';
 import { WorkspaceContext } from '../../../core/workspaces/workspace-context';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, HostListener, inject, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, signal, viewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -43,18 +44,26 @@ import {
 
 @Component({
   selector: 'app-cocktail-create',
-  imports: [ReactiveFormsModule, RouterLink, IngredientAutocomplete, DraftNotice],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    IngredientAutocomplete,
+    DraftNotice,
+    RecipeNameAvailability,
+  ],
   templateUrl: './cocktail-create.html',
   styleUrl: './cocktail-create.css',
 })
 export class CocktailCreate {
+  private readonly nameAvailability = viewChild(RecipeNameAvailability);
   readonly workspace = inject(WorkspaceContext);
   private accessVersion =
     this.workspace.current()?.kind === 'SHARED'
       ? this.workspace.current()?.accessVersion
       : undefined;
+  private readonly draftStore = inject(DraftStore);
   readonly draft = new FormDraft(
-    inject(DraftStore),
+    this.draftStore,
     'create:new',
     1,
     (value, version) => version === 1 && isCreationDraft(value),
@@ -331,6 +340,8 @@ export class CocktailCreate {
     }
 
     if (!this.draft.begin(this.draftValue())) return;
+    const submissionLease = this.draftStore.lease();
+    const submittedName = this.form.controls.name.value;
     this.isSubmitting.set(true);
 
     this.errorMessage.set(null);
@@ -355,12 +366,15 @@ export class CocktailCreate {
       )
       .subscribe({
         next: (createdCocktail) => {
+          if (!this.draftStore.valid(submissionLease)) return;
           this.draft.succeeded();
           void this.router.navigate(['/cocktails', createdCocktail.slug]);
         },
 
         error: (error: unknown) => {
           this.draft.rejected(error);
+          if (!this.draftStore.valid(submissionLease)) return;
+          this.nameAvailability()?.identifiedConflict(error, submittedName);
           this.errorMessage.set(this.resolveErrorMessage(error));
         },
       });
