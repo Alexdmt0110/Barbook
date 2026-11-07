@@ -1,0 +1,11 @@
+# PR49 — correction ciblée des dépendances, revue préventive
+
+7 novembre2026. Autorisation explicite reçue : glob/minimatch/deepmerge et dépendances nécessaires, sans framework majeur ni auditfixforce/seuil assoupli. Base main18c1ee09 ; branche existante chore/windows-private-beta-release HEAD5a668be6 propre.
+
+Chaînes observées : NestCLI11→glob13 et fork-ts-checker9→deepmerge4 ; Jest30→glob13/deepmerge4, ts-jest→transform→Istanbul→test-exclude7→glob10/minimatch10 ; typescript-eslint→minimatch10 ; AngularCLI21→pacote/cacache→glob et ESLint10→minimatch10. Versions corrigées publiées glob14.0.2 et minimatch11.0.1, pas de deepmerge upstream corrigé (4.3.1 dernier). Ne pas rétrograder deepmerge pour sortir artificiellement de la plage d'alerte.
+
+Stratégie : versions exactes d'overrides limitées aux plages vulnérables glob>=9<14.0.2 et minimatch>=7<11.0.1, garder anciennes générations non affectées. Avant de remplacer deepmerge : examiner un fork API4 compatible, source/licence/scripts/provenance et code du correctif ; vérifier concrètement absence de prototype poisoning. Éviter un adaptateur réécrit ou une montée de framework. @stackline/deepmerge est un candidat annoncé compatible, pas encore qualifié. Aucune absence d'alerte par simple alias ne constitue une preuve de correction.
+
+Qualification : fixture sécurité reproduisant la vulnérabilité de l'ancien deepmerge et refus par le remplacement, contrats arrays/customMerge/symboles/fonctions et absence mutation ; vraie fusion config Jest globals/projets et options fork-ts-checker ; vrais consommateurs glob/minimatch résolus depuis chaque package, chemins Windows/POSIX, exclusions, sync/async et abort ; builds/CLI/test runner/coverage. Lockfiles régénérés avec npm, npmci propre et audits complets/runtime. Tous checks backend/frontend/PGHTTP/Chromium/Windows/audits et Gate entier contre main ; aucune fusion tant que dernierHEAD non qualifié. En cas d'incompatibilité non résoluble sans framework majeur, arrêt ciblé et alternatives.
+
+Concurrence et unicité des recettes : autre tranche après qualification main ; aucun code fonctionnel ajouté à PR49. Design Review et arbitrage obligatoires avant changement structurel nom/slug/contrainte/migration.
