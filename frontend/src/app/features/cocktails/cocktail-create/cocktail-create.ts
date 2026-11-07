@@ -449,9 +449,14 @@ export class CocktailCreate {
     }
 
     if (error.status === 409) {
+      const code: unknown = error.error?.code;
+      if (code === 'COCKTAIL_NAME_TAKEN')
+        return 'Un cocktail portant ce nom existe déjà dans cet espace, éventuellement dans la corbeille. Ta saisie est conservée.';
+      if (code === 'COCKTAIL_SLUG_RESERVED')
+        return 'L’URL associée à ce nom est réservée par une recette existante, éventuellement renommée ou dans la corbeille. Choisis explicitement un autre nom. Ta saisie est conservée.';
       if (this.workspace.current()?.kind === 'SHARED')
         return 'Conflit de création dans ce Bar. Vérifie ses droits et sa bibliothèque avant une nouvelle action. Ta saisie est conservée.';
-      return 'Un cocktail portant ce nom existe déjà dans ton Barbook.';
+      return 'Conflit de création. Vérifie la bibliothèque avant une nouvelle action. Ta saisie est conservée.';
     }
 
     return 'La création du cocktail a échoué. Réessaie dans quelques instants.';

@@ -577,6 +577,7 @@ describe('CocktailCreationService', () => {
   it('returns conflict when the cocktail slug already exists', async () => {
     cocktailFindUnique.mockResolvedValue({
       id: 'existing-cocktail',
+      name: 'Whiskey Sour',
     });
 
     await expect(
@@ -585,6 +586,20 @@ describe('CocktailCreationService', () => {
 
     expect(prismaTransaction).not.toHaveBeenCalled();
   });
+
+  it.each([
+    [' WHÍSKEY --- Sour ', 'COCKTAIL_NAME_TAKEN'],
+    ['Renamed recipe', 'COCKTAIL_SLUG_RESERVED'],
+  ])(
+    'identifies only the known conflict for existing name %s',
+    async (name, code) => {
+      cocktailFindUnique.mockResolvedValue({ id: 'existing-cocktail', name });
+      await expect(
+        service.createPersonalCocktail('user-123', buildCreateDto()),
+      ).rejects.toMatchObject({ response: { statusCode: 409, code } });
+      expect(prismaTransaction).not.toHaveBeenCalled();
+    },
+  );
 
   it('retries a rolled-back ingredient collision using a fresh transaction', async () => {
     prismaTransaction.mockRejectedValueOnce(
@@ -624,6 +639,20 @@ describe('CocktailCreationService', () => {
     expect(cocktailIngredientCreateMany).not.toHaveBeenCalled();
     expect(garnishIngredientCreateMany).not.toHaveBeenCalled();
     expect(preparationStepCreateMany).not.toHaveBeenCalled();
+  });
+
+  it('identifies a committed personal slug winner after rollback without replaying the write', async () => {
+    cocktailFindUnique
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: 'winner', name: 'Whiskey Sour' });
+    cocktailCreate.mockRejectedValue(
+      createKnownRequestError('P2002', { modelName: 'Cocktail' }),
+    );
+    await expect(
+      service.createPersonalCocktail('user-123', buildCreateDto()),
+    ).rejects.toMatchObject({ response: { code: 'COCKTAIL_NAME_TAKEN' } });
+    expect(prismaTransaction).toHaveBeenCalledTimes(1);
+    expect(cocktailFindUnique).toHaveBeenCalledTimes(2);
   });
 
   it('fails when the authenticated user has no personal workspace', async () => {

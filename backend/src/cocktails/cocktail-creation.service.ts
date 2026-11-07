@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import { toSlug } from '../common/slug';
 import { isPrismaKnownRequestError } from '../common/prisma-errors';
 import { PrismaService } from '../database/prisma.service';
 import { Prisma } from '../generated/prisma/client';
@@ -69,11 +70,12 @@ export class CocktailCreationService {
       },
       select: {
         id: true,
+        name: true,
       },
     });
 
     if (existingCocktail) {
-      throw new ConflictException('A cocktail with this name already exists.');
+      throw this.creationConflict(existingCocktail.name, dto.name);
     }
 
     const persistRecipe = () =>
@@ -105,8 +107,17 @@ export class CocktailCreationService {
             );
           }
 
+          if (error.meta?.modelName === 'Cocktail') {
+            // The failed transaction has rolled back. A scoped read can now
+            // identify the winner without replaying any write.
+            const winner = await this.prisma.cocktail.findUnique({
+              where: { workspaceId_slug: { workspaceId, slug } },
+              select: { id: true, name: true },
+            });
+            if (winner) throw this.creationConflict(winner.name, dto.name);
+          }
           throw new ConflictException(
-            'A cocktail with this name already exists.',
+            'Recipe changed concurrently. Reload before retrying.',
           );
         }
 
@@ -124,10 +135,9 @@ export class CocktailCreationService {
     const { slug, mainAlcoholSlug } = this.prepareCreation(dto);
     const existing = await transaction.cocktail.findUnique({
       where: { workspaceId_slug: { workspaceId, slug } },
-      select: { id: true },
+      select: { id: true, name: true },
     });
-    if (existing)
-      throw new ConflictException('A cocktail with this name already exists.');
+    if (existing) throw this.creationConflict(existing.name, dto.name);
     try {
       return await this.persistInWorkspace(
         transaction,
@@ -144,6 +154,23 @@ export class CocktailCreationService {
         );
       throw error;
     }
+  }
+
+  private creationConflict(
+    existingName: string,
+    requestedName: string,
+  ): ConflictException {
+    // A stable URL can remain reserved after a rename. Do not report an
+    // unrelated version/access/catalogue conflict as a duplicate display name.
+    const sameName = toSlug(existingName) === toSlug(requestedName);
+    return new ConflictException({
+      statusCode: 409,
+      error: 'Conflict',
+      code: sameName ? 'COCKTAIL_NAME_TAKEN' : 'COCKTAIL_SLUG_RESERVED',
+      message: sameName
+        ? 'A cocktail with this name already exists.'
+        : 'The URL for this name is reserved by an existing recipe.',
+    });
   }
 
   private prepareCreation(dto: CreateCocktailDto): {
