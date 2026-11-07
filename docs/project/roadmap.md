@@ -1,3 +1,7 @@
+# Priorité validée — bêta privée temporaire Windows/Tailscale
+
+7 novembre2026 : périmètre intégré main18c1ee09/#48 qualifié. BB2b et copiePersonnel→Bar reportés après première ouverture, sans abandon. Cible temporaire approuvée : PC Windows, PostgreSQL local, Nest+Angular loopback, ServeHTTPS privé ; pas Docker/WSL/portpublic. Deux adaptations de livraison et scripts autorisés, PR49 en qualification, aucun déploiement ni installation autorisé. OVH/domaine barbook.melioria.fr ensuite, migration des données complète sans recréer comptes/recettes. D7RPO4h/RTO24h objectifs ; sauvegardes locales seulement, risque pertePC à accepter avant ouverture. Voir docs/ops/windows-beta.md. Les anciens ordres de lots/contraintes de stockage externe ci-dessous sont historiques.
+
 # Roadmap autorisée
 
 ## BB2a — PR48 en qualification, 29octobre

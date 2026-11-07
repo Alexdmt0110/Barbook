@@ -1,3 +1,17 @@
+# Reprise courante — livraison bêta Windows, 7 novembre 2026
+
+WORK propriétaire actif de chore/windows-private-beta-release ; PR49 draft, base main18c1ee09, code135c5884. Main contient bien PR48 fusionnée et qualifiée (ancien titre ci-dessous obsolète). Design5dbc0f21 puis67eced01 avant code. Aucun code BB2b ; feature/batch-production-reports et sa conception conservées.
+
+Autorisation récente : deux adaptations minimales (IP écoute explicite, distribution Angular avec exclusion API) et scripts opérateur. D8 préautorise mergecommit seulement après Gate complet, six contrôles historiques et Windows Delivery supplémentaires réussis, diff/discussions/historique vérifiés puis qualification postmain. Code135c5884 :293backend/287frontend localverify passés, typage natif/lint et tree1c51bf0 exact local/distant. Au code135c5884 : CI293backend/287frontend/304PG-HTTP/44Chromium réussis, WindowsDelivery réussi (builds et PowerShell5.1). Six contrôles historiques4verts/2auditsrouges, septième Windowsvert. Aucun merge/main nouveau qualifié. Deux audits échouent sur vulnérabilités build/test préexistantes glob/minimatch ; runtime audits locaux séparés0. Merge suspendu D8 ; aucun auditfixforce/upgrade majeur ni seuil assoupli. Détails docs/ops/windows-beta-review.md. Tranche corrective de compatibilité/sécurité à arbitrer hors des deux adaptations strictes. Aucun BLOCKER/P1 déclaré résolu par simple CI.
+
+Cible temporaire validée PC Windows personnel → Tailscale Serve HTTPS → Nest+Angular loopback → PGlocal ; OVH/barbook.melioria.fr reste ultérieur. D7objectifsRPO4h/RTO24h ; sauvegardes locales seulement sans nouveau service payant, risque perte totale à accepter avant ouverture, pas de garantie pendant arrêt/pertePC. BB2b et copiePersonnel→Bar explicitement reportés après ouverture.
+
+Scripts et procédure docs/ops/windows-beta.md préparés seulement : diagnosticRO, Startforeground/Ctrl+C, StopServe443 explicite dédié, Backupdumpcustom sans purge/restauration automatique. Aucun PC/VPS/réseau/Tailscale/base réelle/compte/déploiement/coût autorisé ou réalisé. PersonalTailscale noncommercial : activation réelle au bar nécessite éligibilité clarifiée, jamais présumée parce que privé. Politiques additivement permissives à auditer avant autoriser443seul pour Maël.
+
+Environnement Work récupéré par clone neuf barbook-release après maintenance ; anciens worktrees locaux ne sont plus présents, ne pas annoncer leurs7modifications historiques récupérées. Les branches/commits distants restent préservés. Prochainmicrobloc : lire les7contrôles/logs PR49, corriger si besoin sans baisser garanties, Gate entier, mergeD8 admissible/postmain. Ensuite diagnosticWindows fourni au propriétaire, aucune installation sans accord séparé. Les checkpoints suivants sont historiques.
+
+---
+
 # Checkpoint courant — environnement revenu, BB2a implémenté / PR48 en qualification — 29 octobre2026
 
 WORK reprend dans cette conversation. Exec opérationnel, ancien clone barbook-l5 sale conservé sans modification ; nouveau worktree barbook-batch depuis la branche distante1e7f3e0, main réellement inchangé66d4bb3 qualifié273/282/292/38 après47. Aucun doublon de branche ni réécriture historique.
