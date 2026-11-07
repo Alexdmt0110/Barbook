@@ -404,6 +404,7 @@ describe('CocktailCreate', () => {
         new HttpErrorResponse({
           status: 409,
           statusText: 'Conflict',
+          error: { code: 'COCKTAIL_NAME_TAKEN' },
         }),
     );
 
@@ -422,9 +423,40 @@ describe('CocktailCreate', () => {
     component.submit();
 
     expect(component.errorMessage()).toBe(
-      'Un cocktail portant ce nom existe déjà dans ton Barbook.',
+      'Un cocktail portant ce nom existe déjà dans cet espace, éventuellement dans la corbeille. Ta saisie est conservée.',
     );
 
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [
+      undefined,
+      'Conflit de création. Vérifie la bibliothèque avant une nouvelle action. Ta saisie est conservée.',
+    ],
+    [
+      'ACCESS_CONFLICT',
+      'Conflit de création. Vérifie la bibliothèque avant une nouvelle action. Ta saisie est conservée.',
+    ],
+    [
+      'COCKTAIL_SLUG_RESERVED',
+      'L’URL associée à ce nom est réservée par une recette existante, éventuellement renommée ou dans la corbeille. Choisis explicitement un autre nom. Ta saisie est conservée.',
+    ],
+  ])('preserves the form and does not mislabel conflict %s', (code, message) => {
+    cocktailsService.response = throwError(
+      () => new HttpErrorResponse({ status: 409, error: { code } }),
+    );
+    const component = createComponent();
+    fillRequiredFields(component);
+    const ingredient = component.ingredients.at(0);
+    ingredient.controls.ingredientName.setValue('Gin');
+    ingredient.controls.ingredientDefaultAbv.setValue(40);
+    ingredient.controls.amount.setValue(5);
+    component.submit();
+    expect(component.errorMessage()).toBe(message);
+    expect(component.form.controls.name.value).toBe('Tom Collins');
+    expect(ingredient.controls.ingredientName.value).toBe('Gin');
+    expect(cocktailsService.requests).toHaveLength(1);
     expect(navigateSpy).not.toHaveBeenCalled();
   });
 
@@ -559,5 +591,4 @@ describe('CocktailCreate', () => {
     c.submit();
     expect(cocktailsService.requests).toHaveLength(1);
   });
-
 });

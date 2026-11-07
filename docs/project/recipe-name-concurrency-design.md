@@ -39,3 +39,12 @@ Le rollback applicatif doit continuer à remplir/faire calculer la clé ; une re
 Endpoint lecture seule, SessionGuard, contexte/workspace autorisé et versiond'accès, validation serveur longueur/clé ; pas de lookup global ni fuite workspaceétranger. Réponse disponible/nompris/adresseréservée, inclut assez de contexte pour rejet des réponses obsolètes sans exposer les recettes privées. CôtéAngular : debounce~400ms oublur, distinctUntilChanged/switchMap, annulation lors de destruction/contexte/identité ; epoch et nom de requête vérifiés avant application. Message souschamp aria-describedby/aria-live, aria-invalid pour collision connue, texte/icône en plus couleur. Réseauindisponible = état inconnu informatif nonbloquant ; autoritéfinale API+PG, pas de récupération de version pour forcer ni resoumission automatique.
 
 Tests requis : fenêtre préflight→créationparautreacteur→409précis, changementdecompte/espace et réponses tardives, storage/refus/expiration/brouillon conservé, disponibilitéinconnue permet soumission explicite, normalisation et nomrenommé/corbeille/anciennesURL, concurrence new/edit/restore, rollback vraiPG et compteétranger. Chromiumdeuxcomptes/mobile/clavier/messageaccessible, captures réelles si UI modifiée. Gate complet et sept contrôles actuels avant tout mergeD8.
+
+
+## Réalisation compatible — qualification en cours
+
+Codes additifs de409 uniquement après lookup autorisé du slug : COCKTAIL_NAME_TAKEN si le nom courant est canonique identique, sinon COCKTAIL_SLUG_RESERVED. Une collision personnelle P2002 explicitement Cocktail permet une lecture du gagnant après rollback, jamais un replay d’écriture ; sans gagnant identifié, réponse générique. Les conflits d’accès/version restent distincts et ne reçoivent aucun code de nom.
+
+Compléments de tests : deux membres/deux noms/un catalogue neuf commun, variantes casse/accents/ponctuation/espaces, mêmes noms dans deuxBars, refus étranger, réservation de l’URL après renommage. Les scénarios existants de doublon201/409, corbeille, révocation et rollback sont conservés. Nouveau parcours Chromium deux acteurs : création concurrente après saisie,409code précis, alerte accessible, champs conservés, un seulPOST, restauration explicite du brouillon après refresh ; captures clair/sombre desktop/mobile.
+
+Aucun endpoint de disponibilité, schéma, migration, contrat de renommage ou règle nouvelle d’unicité n’est activé. Cette PR ne prétend donc pas empêcher les doublons de noms affichés par renommage. L’arbitrage A/B/C reste nécessaire avant ce chantier et son préflight complet.

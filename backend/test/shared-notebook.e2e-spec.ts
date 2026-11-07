@@ -2,6 +2,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
 import * as request from 'supertest';
+import { MeasurementUnit } from '../src/generated/prisma/client';
 import { PrismaService } from '../src/database/prisma.service';
 import {
   Actor,
@@ -210,12 +211,115 @@ describe('Shared notebook reads, catalogue and atomic creation over HTTP/Postgre
         organizationVersion: 1,
       },
     });
-    await create(w.id, member, body).expect(409);
+    await create(w.id, member, body)
+      .expect(409)
+      .expect((r) =>
+        expect(r.body).toMatchObject({ code: 'COCKTAIL_NAME_TAKEN' }),
+      );
     await api()
       .get(list(w.id))
       .set(browserHeaders(owner))
       .expect(200)
       .expect((r) => expect(r.body).toMatchObject({ total: 0, items: [] }));
+    expect(await prisma.cocktail.count({ where: { workspaceId: w.id } })).toBe(
+      1,
+    );
+  });
+
+  it('commits two different recipes concurrently with one new shared catalogue ingredient', async () => {
+    const w = await space();
+    const ingredientName = `Catalogue ${randomUUID()}`;
+    const payload = recipePayload({
+      mainAlcoholName: ingredientName,
+      ingredients: [
+        { ingredientName, ingredientDefaultAbv: 40, amount: 50, unit: 'ML' },
+      ],
+    });
+    const results = await Promise.all([
+      create(w.id, owner, {
+        ...payload,
+        name: `First ${randomUUID()}`,
+        expectedAccessVersion: 0,
+      }),
+      create(w.id, member, {
+        ...payload,
+        name: `Second ${randomUUID()}`,
+        expectedAccessVersion: 0,
+      }),
+    ]);
+    expect(results.map((r) => r.status)).toEqual([201, 201]);
+    expect(await prisma.cocktail.count({ where: { workspaceId: w.id } })).toBe(
+      2,
+    );
+    const ingredients = await prisma.ingredient.findMany({
+      where: { workspaceId: w.id, name: ingredientName },
+    });
+    expect(ingredients).toHaveLength(1);
+    expect(
+      await prisma.cocktailIngredient.count({
+        where: { workspaceId: w.id, ingredientId: ingredients[0].id },
+      }),
+    ).toBe(2);
+    expect(
+      await prisma.preparationStep.count({
+        where: { cocktail: { workspaceId: w.id } },
+      }),
+    ).toBe(2);
+  });
+
+  it('normalizes case, accents, punctuation and whitespace without crossing workspaces', async () => {
+    const a = await space();
+    const b = await space();
+    const suffix = randomUUID();
+    const body = {
+      ...recipePayload(),
+      name: `  MÓJITO --- FRAIS ${suffix}  `,
+      expectedAccessVersion: 0,
+    };
+    const normalized = { ...body, name: `mojito frais ${suffix}` };
+    const results = await Promise.all([
+      create(a.id, owner, body),
+      create(a.id, member, normalized),
+    ]);
+    expect(results.map((r) => r.status).sort()).toEqual([201, 409]);
+    expect(results.find((r) => r.status === 409)!.body).toMatchObject({
+      code: 'COCKTAIL_NAME_TAKEN',
+    });
+    await create(b.id, member, normalized).expect(201);
+    expect(await prisma.cocktail.count({ where: { workspaceId: a.id } })).toBe(
+      1,
+    );
+    expect(await prisma.cocktail.count({ where: { workspaceId: b.id } })).toBe(
+      1,
+    );
+    expect(
+      await prisma.cocktailIngredient.count({ where: { workspaceId: a.id } }),
+    ).toBe(1);
+    expect(
+      await prisma.preparationStep.count({
+        where: { cocktail: { workspaceId: a.id } },
+      }),
+    ).toBe(1);
+    await create(a.id, stranger, body).expect(404);
+  });
+
+  it('distinguishes an immutable URL reservation from a canonical name collision', async () => {
+    const w = await space();
+    const body = { ...recipePayload(), expectedAccessVersion: 0 };
+    const created = await create(w.id, owner, body).expect(201);
+    // Fixture represents a rename: URLs are immutable; no new uniqueness rule is introduced.
+    await prisma.cocktail.update({
+      where: { id: created.body.id as string },
+      data: {
+        name: `Renamed ${randomUUID()}`,
+        contentVersion: { increment: 1 },
+      },
+    });
+    await create(w.id, member, body)
+      .expect(409)
+      .expect((r) =>
+        expect(r.body).toMatchObject({ code: 'COCKTAIL_SLUG_RESERVED' }),
+      );
     expect(await prisma.cocktail.count({ where: { workspaceId: w.id } })).toBe(
       1,
     );

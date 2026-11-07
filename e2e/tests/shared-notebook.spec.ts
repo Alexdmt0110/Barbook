@@ -179,3 +179,47 @@ test('shared creation committed before a lost HTTP response is never blindly rep
   await loseCreationResponse(page, `Réponse Bar perdue ${randomUUID().slice(0, 8)}`, fill, headers(f.member), `/api/workspaces/${f.bar.id}/cocktails`);
   await exerciseDraftQuota(page, 'Carnet Bar');
 });
+
+
+test('a late competing Bar creation gives a precise conflict and preserves form and draft', async ({ page }, info) => {
+  const f = fixture();
+  await use(page, f.member, info.project.name === 'mobile' ? 229 : 228);
+  await openBar(page, f.bar);
+  await page.goto('/cocktails/new');
+  const name = `Concurrent ${randomUUID().slice(0, 8)}`;
+  await fill(page, name);
+  // A real second account commits after the member has already filled the form.
+  const winner = await page.request.post(`http://127.0.0.1:3000/api/workspaces/${f.bar.id}/cocktails`, {
+    headers: { ...headers(f.owner), Cookie: `barbook-session-dev=${f.owner.credential}` },
+    data: { name, type: 'PERSONAL_CREATION', method: 'SHAKER', glass: 'Coupe',
+      ingredients: [{ ingredientName: 'Gin partagé', ingredientDefaultAbv: 40, amount: 5, unit: 'CL' }],
+      steps: ['Shaker puis filtrer.'], expectedAccessVersion: 0 },
+  });
+  expect(winner.status()).toBe(201);
+  let submissions = 0;
+  page.on('request', request => {
+    if (request.method() === 'POST' && request.url().endsWith(`/workspaces/${f.bar.id}/cocktails`)) submissions++;
+  });
+  const conflict = page.waitForResponse(r => r.request().method() === 'POST' && r.url().endsWith(`/workspaces/${f.bar.id}/cocktails`));
+  await page.getByRole('button', { name: 'Créer le cocktail', exact: true }).click();
+  const response = await conflict;
+  expect(response.status()).toBe(409);
+  expect(await response.json()).toMatchObject({ code: 'COCKTAIL_NAME_TAKEN' });
+  const message = 'Un cocktail portant ce nom existe déjà dans cet espace, éventuellement dans la corbeille. Ta saisie est conservée.';
+  await expect(page.getByRole('alert').filter({ hasText: message })).toBeVisible();
+  await expect(page.getByRole('textbox', { name: /^Nom \*/ })).toHaveValue(name);
+  await expect(page.getByRole('combobox', { name: /^Ingrédient/ })).toHaveValue('Gin partagé');
+  for (const theme of ['light', 'dark']) {
+    await page.getByRole('button', { name: /^Thème d’affichage :/ }).click();
+    await page.getByRole('button', { name: theme === 'light' ? /^Clair/ : /^Sombre/ }).click();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({ path: info.outputPath(`name-conflict-${theme}.png`), fullPage: true });
+  }
+  expect(submissions).toBe(1);
+  page.on('dialog', dialog => void dialog.accept());
+  await page.reload();
+  await page.getByRole('button', { name: 'Restaurer le brouillon', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: /^Nom \*/ })).toHaveValue(name);
+  await expect(page.getByRole('combobox', { name: /^Ingrédient/ })).toHaveValue('Gin partagé');
+  expect(submissions).toBe(1);
+});
