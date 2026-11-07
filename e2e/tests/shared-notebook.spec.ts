@@ -192,10 +192,10 @@ test('a late competing Bar creation gives a precise conflict and preserves form 
   const winner = await page.request.post(`http://127.0.0.1:3000/api/workspaces/${f.bar.id}/cocktails`, {
     headers: { ...headers(f.owner), Cookie: `barbook-session-dev=${f.owner.credential}` },
     data: { name, type: 'PERSONAL_CREATION', method: 'SHAKER', glass: 'Coupe',
-      ingredients: [{ ingredientName: 'Gin partagé', ingredientDefaultAbv: 40, amount: 5, unit: 'CL' }],
+      ingredients: [{ ingredientName: 'Gin partagé', ingredientDefaultAbv: 40, amount: 50, unit: 'ML' }],
       steps: ['Shaker puis filtrer.'], expectedAccessVersion: 0 },
   });
-  expect(winner.status()).toBe(201);
+  expect(winner.status(), await winner.text()).toBe(201);
   let submissions = 0;
   page.on('request', request => {
     if (request.method() === 'POST' && request.url().endsWith(`/workspaces/${f.bar.id}/cocktails`)) submissions++;
