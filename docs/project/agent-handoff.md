@@ -1,3 +1,11 @@
+# Reprise courante — PR49 fusionnée/main qualifié, revue noms séparée
+
+7novembre2026. PR49 mergedAt14:21:15UTC, merge56826381401f9da97efd9a698bd9a63d8fe6795a ; parents18c1ee09 puisdad04230, arbref3d2f3b5 identique au source vérifiés. Les7contrôles et7journaux postmain réussis293backend/287frontend/304PG-HTTP/44Chromium, Windows builds/293+15compat/PowerShell5.1 et auditscomplets/runtime0. Main recontrôlé après succès. Branches livraison/BB2b/historiques conservées. Aucun PC/Tailscale/VPS/SQLréel/coût.
+
+WORK démarre feature/recipe-name-availability depuis ce main qualifié, branche publiée immédiatement. Revue docs/project/recipe-name-concurrency-design.md avant code : contraintes slug/concurrence/verrous/rollback existants corrects ; renommage ne garantit pas unicité du nomaffiché. Incrément compatible = testsPG/HTTP complémentaires + erreurs de création identifiées + UI qui garde saisie/draft. Préflightcomplet et clécanonique/schema/contratrenommage attendent arbitrage explicite sur Design Review ; aucune migration/renommage/réécritureURL. Ne pas relancer BB2b/copie. Suite : implémenter uniquement incrément compatible, testsunitaires/PG/Chromium/visuel pour messages,7CI/GateD8/postmain, puis attente arbitrageA/B/C. Le diagnosticWindows reste à fournir par propriétaire, installation distincte non autorisée.
+
+---
+
 # Reprise courante — correction sécurité PR49 autorisée et en qualification
 
 7novembre2026, WORK sur chore/windows-private-beta-release, base main18c1ee09 ; PR49 toujours draft. Design ciblée075a162d publiée avant modifications. Autorisation explicite du propriétaire glob/minimatch/deepmerge et auxiliaires, sans framework majeur/auditfixforce/seuil assoupli. Overrides exacts glob14.0.3/minimatch11.0.4 et alias backend @stackline/deepmerge1.1.2 pour Jest/fork-ts-checker. Implémentation indépendante inspectée MIT/sans runtime deps/hooks, SRI vérifié,820signatures/142attestations npm vérifiées. Ancien exploit reproduit avec tarballupstream et bloqué par remplacement réel. Lockfiles npmci reproductibles, versions frameworks inchangées ; audits locaux complets/runtime0/0deuxcôtés ; compat15backend/7frontend. Tests fullverify/7CI à conclure sur dernierHEAD ; aucun nouveau main/merge anticipé.
