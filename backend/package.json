@@ -27,7 +27,7 @@
     "verify:db": "npm run verify && prisma migrate status",
     "db:seed": "prisma db seed --",
     "audit:security": "npm audit --package-lock-only --audit-level=moderate && npm audit --package-lock-only --omit=dev --audit-level=moderate",
-    "test:dependency-compatibility": "node --test test/dependency-compatibility.cjs test/http-parser-compatibility.cjs"
+    "test:dependency-compatibility": "node --test test/dependency-compatibility.cjs test/http-parser-compatibility.cjs ../scripts/tests/dependency-security.cjs"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -85,7 +85,10 @@
     },
     "@istanbuljs/load-nyc-config": {
       "js-yaml": "4.3.2"
-    }
+    },
+    "glob@>=9 <14.0.3": "14.0.3",
+    "minimatch@>=7 <11.0.4": "11.0.4",
+    "deepmerge@>=4.2.0 <=4.3.1": "npm:@stackline/deepmerge@1.1.2"
   },
   "jest": {
     "moduleFileExtensions": [
