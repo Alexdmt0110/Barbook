@@ -437,20 +437,44 @@ describe('Recipe name authority and advisory HTTP checks, two real accounts', ()
         nameKey: 'renamed-old-client',
         contentVersion: 1,
       });
-      const collision = legacy.cocktail.create({
-        data: {
-          workspaceId: ws,
-          name: 'RENAMED OLD CLIENT',
-          slug: 'distinct-url',
-          type: 'CLASSIC',
-          method: 'BUILD',
-          glass: 'Glass',
-        },
-      });
-      await expect(collision).rejects.toMatchObject({ code: 'P2002' });
+      await expect(
+        legacy.cocktail.create({
+          data: {
+            workspaceId: ws,
+            name: 'RENAMED OLD CLIENT',
+            slug: 'distinct-url',
+            type: 'CLASSIC',
+            method: 'BUILD',
+            glass: 'Glass',
+          },
+        }),
+      ).rejects.toMatchObject({ code: 'P2002' });
+      // Current API mapping uses the current model; legacy clients do not know nameKey.
+      const collision = Promise.resolve(
+        prisma.cocktail.create({
+          data: {
+            workspaceId: ws,
+            name: 'RENAMED OLD CLIENT',
+            slug: 'current-distinct-url',
+            type: 'CLASSIC',
+            method: 'BUILD',
+            glass: 'Glass',
+          },
+        }),
+      );
       const failure: unknown = await collision.catch((error: unknown) => error);
-      expect(recipeNameDatabaseConflict(failure)?.getResponse()).toMatchObject({
-        code: 'COCKTAIL_NAME_TAKEN',
+      const metadata = failure as {
+        code?: unknown;
+        meta?: { modelName?: unknown; target?: unknown };
+      };
+      expect({
+        code: metadata.code,
+        modelName: metadata.meta?.modelName,
+        target: metadata.meta?.target,
+        response: recipeNameDatabaseConflict(failure)?.getResponse(),
+      }).toMatchObject({
+        code: 'P2002',
+        response: { code: 'COCKTAIL_NAME_TAKEN' },
       });
       const second = await legacy.cocktail.create({
         data: {
