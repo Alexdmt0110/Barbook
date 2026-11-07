@@ -1,18 +1,10 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { resolveListener } from './delivery/listener-config';
+import { frontendDelivery } from './delivery/frontend-delivery';
 import { AppModule } from './app.module';
 import { configureApplication } from './configure-application';
-
-function resolvePort(value: string | undefined): number {
-  const port = Number(value ?? '3000');
-
-  if (!Number.isInteger(port) || port < 1 || port > 65535) {
-    throw new Error('PORT must be a valid TCP port.');
-  }
-
-  return port;
-}
 
 /**
  * Démarre l'API Barbook.
@@ -22,11 +14,17 @@ async function bootstrap(): Promise<void> {
 
   const configService = app.get(ConfigService);
 
-  const port = resolvePort(configService.get<string>('PORT'));
+  const listener = resolveListener(
+    configService.get<string>('LISTEN_HOST'),
+    configService.get<string>('PORT'),
+  );
 
   configureApplication(app);
 
-  await app.listen(port);
+  const frontend = configService.get<string>('FRONTEND_DIST_DIR');
+  if (frontend !== undefined) app.use(frontendDelivery(frontend));
+
+  await app.listen(listener.port, listener.host);
 }
 
 bootstrap().catch((error: unknown) => {

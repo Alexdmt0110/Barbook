@@ -43,3 +43,8 @@ postgres-data/
 # Browser test output
 e2e/test-results/
 e2e/playwright-report/
+
+# Local beta backup archives and Windows state
+*.dump
+*.partial
+*.dump.sha256

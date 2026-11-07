@@ -83,3 +83,47 @@ jobs:
 
       - name: Verify frontend
         run: npm run verify
+
+  windows-delivery:
+    name: Windows Delivery
+    runs-on: windows-latest
+    env:
+      CI: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '24'
+      - name: Build and test backend on Windows
+        working-directory: backend
+        run: |
+          npm ci
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run verify
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build Angular on Windows
+        working-directory: frontend
+        run: |
+          npm ci
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Validate operator scripts without exposing a service
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Get-ChildItem scripts/windows/*.ps1 | ForEach-Object {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count -ne 0) { throw "Invalid PowerShell syntax in $($_.Name)" }
+          }
+          & ./scripts/windows/Diagnose-Barbook.ps1
+          $rejected = $false
+          try { & ./scripts/windows/Start-Barbook.ps1 } catch { $rejected = $_.Exception.Message -eq 'Private root .env missing.' }
+          if (!$rejected) { throw 'Launcher must fail closed without private configuration.' }
+          $rejected = $false
+          try { & ./scripts/windows/Backup-Barbook.ps1 -OutputDirectory ./backend -UserName barbook } catch { $rejected = $_.Exception.Message -eq 'Backup destination must be outside the repository.' }
+          if (!$rejected) { throw 'Backup must reject repository destination before using PostgreSQL.' }

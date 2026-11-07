@@ -66,9 +66,14 @@ jobs:
         run: npm run test:integration:prepare
       - name: Run real PostgreSQL and HTTP integration tests
         run: npm run test:e2e
+      - name: Build frontend for single-origin release smoke
+        working-directory: frontend
+        run: npm ci && npm run build
       - name: Smoke test compiled production entry point
         shell: bash
         run: |
+          export FRONTEND_DIST_DIR="$GITHUB_WORKSPACE/frontend/dist/frontend/browser"
+          export LISTEN_HOST=127.0.0.1
           setsid npm run start:prod > "$RUNNER_TEMP/barbook-api-smoke.log" 2>&1 &
           barbook_api_pid=$!
           trap 'kill -- "-$barbook_api_pid" 2>/dev/null || true' EXIT
@@ -77,7 +82,15 @@ jobs:
           while (Date.now() < deadline) {
             try {
               const result = await fetch('http://127.0.0.1:3000/api', { signal: AbortSignal.timeout(1000) });
-              if (result.ok && await result.text() === 'Hello World!') process.exit(0);
+              if (result.ok && await result.text() === 'Hello World!') {
+                const deep = await fetch('http://127.0.0.1:3000/cocktails/example/edit', { headers: { Accept: 'text/html' } });
+                if (!deep.ok || !(await deep.text()).includes('<app-root>')) throw new Error('Angular deep route failed');
+                const missing = await fetch('http://127.0.0.1:3000/api/not-a-route', { headers: { Accept: 'text/html' } });
+                if (missing.status !== 404 || !(missing.headers.get('content-type') || '').includes('json')) throw new Error('API error masked');
+                const asset = await fetch('http://127.0.0.1:3000/missing.js');
+                if (asset.status !== 404) throw new Error('Missing asset masked');
+                process.exit(0);
+              }
             } catch {}
             await new Promise(resolve => setTimeout(resolve, 250));
           }
