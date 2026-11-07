@@ -1,3 +1,9 @@
+# Actualisation — correction sécurité autorisée, 7 novembre2026
+
+Le propriétaire autorise explicitement glob/minimatch/deepmerge et dépendances nécessaires. Plan/provenance/tests : dependency-security-review.md. Les premiers audits locaux après overrides ciblés sont0complet/runtime, compatibilité15backend/7frontend passée, fullverify en qualification. Les anciens constats NON_ADMISSIBLE ci-dessous restent historiques ; seul le dernierHEAD et ses7contrôles/Gate pourront autoriser le merge. Aucun framework principal majeur, auditfixforce, seuil ou assertion affaibli.
+
+---
+
 # Review Gate livraison Windows — PR49, en qualification
 
 7novembre2026. Base18c1ee09, code135c5884, arbre1c51bf0ae9a10c2cc5b7f5cee2bea97305623680. Seize fichiers GitHub relus, chaque blob comparé exactement au clone, aucun fichier supprimé, trois commits avec Design Review préventive. Commentaires/revues/inline vides au contrôle initial. Aucune nouvelle dépendance, aucun lockfile modifié, aucune migration, aucun retrait d'API/CONTRACT.

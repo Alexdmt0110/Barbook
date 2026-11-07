@@ -1,3 +1,13 @@
+# Reprise courante — correction sécurité PR49 autorisée et en qualification
+
+7novembre2026, WORK sur chore/windows-private-beta-release, base main18c1ee09 ; PR49 toujours draft. Design ciblée075a162d publiée avant modifications. Autorisation explicite du propriétaire glob/minimatch/deepmerge et auxiliaires, sans framework majeur/auditfixforce/seuil assoupli. Overrides exacts glob14.0.3/minimatch11.0.4 et alias backend @stackline/deepmerge1.1.2 pour Jest/fork-ts-checker. Implémentation indépendante inspectée MIT/sans runtime deps/hooks, SRI vérifié,820signatures/142attestations npm vérifiées. Ancien exploit reproduit avec tarballupstream et bloqué par remplacement réel. Lockfiles npmci reproductibles, versions frameworks inchangées ; audits locaux complets/runtime0/0deuxcôtés ; compat15backend/7frontend. Tests fullverify/7CI à conclure sur dernierHEAD ; aucun nouveau main/merge anticipé.
+
+Suite obligatoire : tests backend/frontend, PGHTTP/Chromium/Windows/audits dernierHEAD puis Gate entier/diff/discussions/compatibilité, mergecommit D8 si admissible et postmain réel. Ensuite revue ciblée concurrence/noms dans tranche séparée : conserver protections existantes ; avant toute modification de règle/contrainte/schema/contrat du renommage, Design Review alternatives et arbitrage propriétaire. Préflight/UI compatibles éventuellement PR distincte, jamais dériverPR49. Aucun développement BB2b/copie ; branche historique conservée.
+
+Aucune opération PC/Tailscale/VPS/base réelle/coût autorisée ni exécutée. Diagnostic Windows attendu du propriétaire. Les entrées suivantes sont des photographies historiques et ne réservent plus le correctif de dépendances désormais autorisé.
+
+---
+
 # Reprise courante — livraison bêta Windows, 7 novembre 2026
 
 WORK propriétaire actif de chore/windows-private-beta-release ; PR49 draft, base main18c1ee09, code135c5884. Main contient bien PR48 fusionnée et qualifiée (ancien titre ci-dessous obsolète). Design5dbc0f21 puis67eced01 avant code. Aucun code BB2b ; feature/batch-production-reports et sa conception conservées.
