@@ -232,7 +232,12 @@ describe('Shared notebook reads, catalogue and atomic creation over HTTP/Postgre
     const payload = recipePayload({
       mainAlcoholName: ingredientName,
       ingredients: [
-        { ingredientName, ingredientDefaultAbv: 40, amount: 50, unit: 'ML' },
+        {
+          ingredientName,
+          ingredientDefaultAbv: 40,
+          amount: 50,
+          unit: MeasurementUnit.ML,
+        },
       ],
     });
     const results = await Promise.all([
@@ -309,7 +314,7 @@ describe('Shared notebook reads, catalogue and atomic creation over HTTP/Postgre
     const created = await create(w.id, owner, body).expect(201);
     // Fixture represents a rename: URLs are immutable; no new uniqueness rule is introduced.
     await prisma.cocktail.update({
-      where: { id: created.body.id as string },
+      where: { id: (created.body as { id: string }).id },
       data: {
         name: `Renamed ${randomUUID()}`,
         contentVersion: { increment: 1 },
