@@ -281,7 +281,8 @@ test('editing round trip, competing editor, explicit recovery and genuinely lost
   });
 });
 
-test('editing draft survives expiration, keeps explicit restore, handles refused storage and purges changed identity', async ({
+for (const expirationTrigger of ['save', 'name-check'] as const) {
+test(`editing draft survives expiration via ${expirationTrigger}, keeps explicit restore, handles refused storage and purges changed identity`, async ({
   page,
   browser,
 }, info) => {
@@ -313,11 +314,22 @@ test('editing draft survives expiration, keeps explicit restore, handles refused
   await page
     .getByRole('textbox', { name: 'Notes', exact: true })
     .fill('Brouillon privé après expiration');
+  // Settle the new advisory read before deliberately expiring the session.
+  // Otherwise its legitimate 401 can remove the form before the save click.
+  await expect(page.locator('#edit-name-availability')).toContainText('disponible pour le moment');
   execFileSync(process.execPath, ['--import', 'tsx', 'test/expire-browser-session.ts', a.user.id], {
     cwd: backend,
     stdio: 'pipe',
   });
-  await save(page).click();
+  const expired = page.waitForResponse((r) =>
+    expirationTrigger === 'save'
+      ? r.request().method() === 'PUT' && r.url().endsWith(`/cocktails/id/${recipe.id}/content`)
+      : r.request().method() === 'GET' && r.url().includes('/api/cocktail-name-availability?'),
+  );
+  const expiredName = `Expired draft ${randomUUID().slice(0, 8)}`;
+  if (expirationTrigger === 'save') await save(page).click();
+  else await page.getByRole('textbox', { name: /^Nom \*/ }).fill(expiredName);
+  expect((await expired).status()).toBe(401);
   await expect(page).toHaveURL(/\/login\?returnUrl=/);
   await page.getByLabel('Adresse email', { exact: true }).fill(a.user.email);
   await page.getByLabel('Mot de passe', { exact: true }).fill(password);
@@ -332,6 +344,8 @@ test('editing draft survives expiration, keeps explicit restore, handles refused
   await expect(page.getByRole('textbox', { name: 'Notes', exact: true })).toHaveValue(
     'Brouillon privé après expiration',
   );
+  if (expirationTrigger === 'name-check')
+    await expect(page.getByRole('textbox', { name: /^Nom \*/ })).toHaveValue(expiredName);
   // The same qualified memory fallback handles denied getters on a separate document.
   const context = await browser.newContext({
     baseURL: 'http://127.0.0.1:4200',
@@ -379,3 +393,4 @@ test('editing draft survives expiration, keeps explicit restore, handles refused
     page.getByRole('button', { name: 'Restaurer le brouillon', exact: true }),
   ).toHaveCount(0);
 });
+}
