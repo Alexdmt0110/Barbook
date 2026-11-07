@@ -63,6 +63,15 @@ describe('Personal recipe editing UI and L4 drafts', () => {
     fixture.detectChanges();
     return fixture;
   }
+  it('associates the name input with an existing label and a separate availability description', () => {
+    const f = setup();
+    const root = f.nativeElement as HTMLElement;
+    const input = root.querySelector('input[formControlName="name"]');
+    expect(input?.getAttribute('aria-labelledby')).toBe('edit-name-label');
+    expect(root.querySelector('#edit-name-label')?.textContent).toBe('Nom *');
+    expect(input?.getAttribute('aria-describedby')).toBe('edit-name-availability');
+    expect(root.querySelector('#edit-name-availability')?.getAttribute('aria-live')).toBe('polite');
+  });
   it('loads organization only on explicit request, preserves its draft on content save and guards both forms', () => {
     const f = setup();
     const c = f.componentInstance;
