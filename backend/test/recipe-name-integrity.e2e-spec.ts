@@ -1,3 +1,4 @@
+import { recipeNameDatabaseConflict } from '../src/cocktails/recipe-name-policy';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
@@ -113,9 +114,15 @@ describe('Recipe name authority and advisory HTTP checks, two real accounts', ()
     await check(ws, owner, name.toUpperCase())
       .expect(200)
       .expect((r) => expect(r.body).toMatchObject({ status: 'NAME_TAKEN' }));
+    const beforeCheck = await prisma.cocktail.findUniqueOrThrow({
+      where: { id: made.id },
+    });
     await check(ws, owner, name, made.id)
       .expect(200)
       .expect((r) => expect(r.body).toMatchObject({ status: 'AVAILABLE' }));
+    expect(
+      await prisma.cocktail.findUniqueOrThrow({ where: { id: made.id } }),
+    ).toEqual(beforeCheck);
     await check(ws, stranger, name).expect(404);
     await check(ws, owner, name, randomUUID()).expect(404);
     await check(ws, owner, '!').expect(400);
@@ -430,18 +437,21 @@ describe('Recipe name authority and advisory HTTP checks, two real accounts', ()
         nameKey: 'renamed-old-client',
         contentVersion: 1,
       });
-      await expect(
-        legacy.cocktail.create({
-          data: {
-            workspaceId: ws,
-            name: 'RENAMED OLD CLIENT',
-            slug: 'distinct-url',
-            type: 'CLASSIC',
-            method: 'BUILD',
-            glass: 'Glass',
-          },
-        }),
-      ).rejects.toMatchObject({ code: 'P2002' });
+      const collision = legacy.cocktail.create({
+        data: {
+          workspaceId: ws,
+          name: 'RENAMED OLD CLIENT',
+          slug: 'distinct-url',
+          type: 'CLASSIC',
+          method: 'BUILD',
+          glass: 'Glass',
+        },
+      });
+      await expect(collision).rejects.toMatchObject({ code: 'P2002' });
+      const failure: unknown = await collision.catch((error: unknown) => error);
+      expect(recipeNameDatabaseConflict(failure)?.getResponse()).toMatchObject({
+        code: 'COCKTAIL_NAME_TAKEN',
+      });
       const second = await legacy.cocktail.create({
         data: {
           workspaceId: ws,
