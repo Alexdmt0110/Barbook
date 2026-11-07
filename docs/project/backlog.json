@@ -1989,11 +1989,13 @@
       "branche": "feature/recipe-canonical-name-uniqueness",
       "etat": "IMPLEMENTE_QUALIFICATION_FINALE_EN_COURS",
       "preuves_partielles": {
-        "backend": 305,
-        "frontend_local": 302,
-        "postgresql_http": 322
+        "backend_local": 311,
+        "frontend_local": 306,
+        "postgresql_http_avant_mapping_final": 322,
+        "dernier_HEAD": "A_REQUALIFIER"
       },
-      "suite": "CHROMIUM_VISUEL_GATE_D8_SEPT_CHECKS_ET_POST_MAIN"
+      "suite": "CHROMIUM_VISUEL_GATE_D8_SEPT_CHECKS_ET_POST_MAIN",
+      "reference_cloture": "Corps de la PR de feature/recipe-canonical-name-uniqueness après vérification réelle du merge et de main"
     },
     "prochaine_action": "DIAGNOSTIC_WINDOWS_PUIS_ACCORD_DISTINCT_INSTALLATION_BASE_SERVE",
     "disponibilite_reelle": false,
